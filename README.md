@@ -13,6 +13,9 @@ The repository **Dropthought** contains the interfaces and functions for using D
 The repository **react-native-modules** contains the related react-native modules for Dropthought.
 
 * [Requirement](#Requirement)
+* [Installation](#Installation)
+* [Usage for Objective-C](#Usage_for_Objective-C)
+* [Usage for Swift](#Usage_for_Swift)
 
 ## Requirement
 
