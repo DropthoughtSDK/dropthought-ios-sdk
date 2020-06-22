@@ -6,9 +6,9 @@ s.name = "Dropthought"
 s.summary = "Dropthought iOS SDK."
 s.requires_arc = true
 s.static_framework = true
-s.version = "0.1.0"
+s.version = "1.0.0"
 s.author = { "BCT-Barney" => "barney.chen@bahwancybertek.com" }
-s.homepage = "https://github.com/BCT-Barney"
+s.homepage = "https://github.com/DropthoughtSDK/dropthought-ios-sdk"
 s.source = { :git => "../Dropthought/" }
 
 s.source_files = ['src/*.{m,h}']
