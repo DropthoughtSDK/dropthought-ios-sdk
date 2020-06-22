@@ -133,7 +133,8 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 ### Open a survey from a view controller
 
 ```swift
-Survey.sharedInstance()?.present(self, surveyId: "23856ed5-5805-4146-b67e-5ff9aace0362")
+// self represent a UIViewController where you what to present a survey
+Survey.sharedInstance()?.present(self, surveyId: "SURVEY_ID")
 ```
 
 ### Upload offline feedbacks
