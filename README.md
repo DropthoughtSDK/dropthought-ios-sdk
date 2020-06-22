@@ -23,3 +23,45 @@ Move/Copy these two repositories **Dropthought** and **react-native-modules** in
 Note: Same path/level as the **Podfile**
 
 <img src="https://github.com/DropthoughtSDK/dropthought-ios-sdk/blob/master/imgs/repository.png" width="30%" height="30%">
+
+### Step 3. Modify your Podfile
+
+Open your Podfile and paste following scripts into your project target.
+
+```python
+  pod 'Dropthought', :path => './Dropthought'
+  
+  react_native_modules_path = './react-native-modules/'
+  pod 'FBLazyVector', :path => react_native_modules_path + 'react-native/Libraries/FBLazyVector'
+  pod 'FBReactNativeSpec', :path => react_native_modules_path + 'react-native/Libraries/FBReactNativeSpec'
+  pod 'RCTRequired', :path => react_native_modules_path + 'react-native/Libraries/RCTRequired'
+  pod 'RCTTypeSafety', :path => react_native_modules_path + 'react-native/Libraries/TypeSafety'
+  pod 'React', :path => react_native_modules_path + 'react-native/'
+  pod 'React-Core', :path => react_native_modules_path + 'react-native/'
+  pod 'React-CoreModules', :path => react_native_modules_path + 'react-native/React/CoreModules'
+  pod 'React-Core/DevSupport', :path => react_native_modules_path + 'react-native/'
+  pod 'React-RCTActionSheet', :path => react_native_modules_path + 'react-native/Libraries/ActionSheetIOS'
+  pod 'React-RCTAnimation', :path => react_native_modules_path + 'react-native/Libraries/NativeAnimation'
+  pod 'React-RCTBlob', :path => react_native_modules_path + 'react-native/Libraries/Blob'
+  pod 'React-RCTImage', :path => react_native_modules_path + 'react-native/Libraries/Image'
+  pod 'React-RCTLinking', :path => react_native_modules_path + 'react-native/Libraries/LinkingIOS'
+  pod 'React-RCTNetwork', :path => react_native_modules_path + 'react-native/Libraries/Network'
+  pod 'React-RCTSettings', :path => react_native_modules_path + 'react-native/Libraries/Settings'
+  pod 'React-RCTText', :path => react_native_modules_path + 'react-native/Libraries/Text'
+  pod 'React-RCTVibration', :path => react_native_modules_path + 'react-native/Libraries/Vibration'
+  pod 'React-Core/RCTWebSocket', :path => react_native_modules_path + 'react-native/'
+  pod 'React-cxxreact', :path => react_native_modules_path + 'react-native/ReactCommon/cxxreact'
+  pod 'React-jsi', :path => react_native_modules_path + 'react-native/ReactCommon/jsi'
+  pod 'React-jsiexecutor', :path => react_native_modules_path + 'react-native/ReactCommon/jsiexecutor'
+  pod 'React-jsinspector', :path => react_native_modules_path + 'react-native/ReactCommon/jsinspector'
+  pod 'ReactCommon/callinvoker', :path => react_native_modules_path + 'react-native/ReactCommon'
+  pod 'ReactCommon/turbomodule/core', :path => react_native_modules_path + 'react-native/ReactCommon'
+  pod 'Yoga', :path => react_native_modules_path + 'react-native/ReactCommon/yoga', :modular_headers => true
+  pod 'DoubleConversion', :podspec => react_native_modules_path + 'react-native/third-party-podspecs/DoubleConversion.podspec'
+  pod 'glog', :podspec => react_native_modules_path + 'react-native/third-party-podspecs/glog.podspec'
+  pod 'Folly', :podspec => react_native_modules_path + 'react-native/third-party-podspecs/Folly.podspec'
+  pod 'RNGestureHandler', :path => react_native_modules_path + 'react-native-gesture-handler'
+  pod 'react-native-safe-area-context', :path => react_native_modules_path + 'react-native-safe-area-context'
+  pod 'RNCAsyncStorage', :path => react_native_modules_path + '@react-native-community/async-storage'
+  pod 'RNLocalize', :path => react_native_modules_path + 'react-native-localize'
+```
