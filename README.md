@@ -110,6 +110,10 @@ And execute **pod install**
 
 ### Upload offline feedbacks
 
+Dropthought SDK will cache user's feedbacks if there has no network connection.
+
+You can call this function and we will check and submit again.
+
 ```objc
 [[Survey sharedInstance] sendUploadOfflineFeedbacksEvent];
 ```
@@ -142,6 +146,10 @@ Survey.sharedInstance().present(self, surveyId: "SURVEY_ID")
 ```
 
 ### Upload offline feedbacks
+
+Dropthought SDK will cache user's feedbacks if there has no network connection.
+
+You can call this function and we will check and submit again.
 
 ```swift
 Survey.sharedInstance().sendUploadOfflineFeedbacksEvent()
