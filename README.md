@@ -9,6 +9,10 @@ The repository **Dropthought** contains the interfaces and functions for using D
 The repository **react-native-modules** contains the related react-native modules for Dropthought.
 
 
+## Requirement
+
+- iOS 12.0+
+
 ## Installation
 
 ### Step 1. Download Source Files
@@ -26,9 +30,10 @@ Note: Same path/level as the **Podfile**
 
 ### Step 3. Modify your Podfile
 
-Open your Podfile and paste following scripts into your project target.
+Open your Podfile and paste following scripts into your project target.  
+And execute **pod install**
 
-```python
+```ruby
   pod 'Dropthought', :path => './Dropthought'
   
   react_native_modules_path = './react-native-modules/'
@@ -64,4 +69,29 @@ Open your Podfile and paste following scripts into your project target.
   pod 'react-native-safe-area-context', :path => react_native_modules_path + 'react-native-safe-area-context'
   pod 'RNCAsyncStorage', :path => react_native_modules_path + '@react-native-community/async-storage'
   pod 'RNLocalize', :path => react_native_modules_path + 'react-native-localize'
+```
+
+## Usage
+
+### AppDelegate.m
+
+```objc
+#import "Survey.h"
+```
+
+```objc
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    // Override point for customization after application launch.
+
+    [[Survey sharedInstance] initSurvey:launchOptions apiKey:@"{YOUR_API_KEY}"];
+
+    return YES;
+}
+````
+
+### Open a survey from a view controller
+
+```objc
+// self represent a UIViewController where you what to present a survey
+[[Survey sharedInstance] present:self surveyId:{SURVEY_ID}];
 ```
