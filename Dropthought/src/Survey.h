@@ -10,14 +10,14 @@
 #import <React/RCTBridgeModule.h>
 
 @interface Survey : NSObject <RCTBridgeModule>
-+ (instancetype) sharedInstance;
++ (_Nonnull instancetype) sharedInstance;
 
-- (void)initSurvey:(NSDictionary *)launchOptions apiKey:(NSString *)apiKey;
+- (void)initSurvey:(NSDictionary * _Nullable)launchOptions apiKey:(NSString * _Nonnull)apiKey;
 
 // NOTE: For Demo App scenario. Remove before release
-- (void)setupAPIKey:(NSString *)apiKey;
+- (void)setupAPIKey:(NSString * _Nonnull)apiKey;
 
 
-- (void)present:(UIViewController *)from surveyId:(NSString *)surveyId;
+- (void)present:(UIViewController * _Nonnull)from surveyId:(NSString * _Nonnull)surveyId;
 - (void)sendUploadOfflineFeedbacksEvent;
 @end

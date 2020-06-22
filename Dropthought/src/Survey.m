@@ -27,7 +27,7 @@
 
 RCT_EXPORT_MODULE();
 
-+ (instancetype)sharedInstance {
++ (_Nonnull instancetype)sharedInstance {
     static Survey *instance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -36,7 +36,7 @@ RCT_EXPORT_MODULE();
     return instance;
 }
 
-- (void)initSurvey:(NSDictionary *)launchOptions apiKey:(NSString *)apiKey {
+- (void)initSurvey:(NSDictionary * _Nullable)launchOptions apiKey:(NSString * _Nonnull)apiKey {
     self.app = [[SurveyApplication alloc] init];
     [self.app setupBridge:launchOptions];
     self.apiKey = apiKey;
@@ -46,7 +46,7 @@ RCT_EXPORT_MODULE();
     self.apiKey = apiKey;
 }
 
-- (void)present:(UIViewController *)from surveyId:(NSString *)surveyId {
+- (void)present:(UIViewController * _Nonnull)from surveyId:(NSString * _Nonnull)surveyId {
     self.from = from;
 
     NSDictionary *initialProperties = @{ @"apiKey" : self.apiKey, @"surveyId": surveyId };
