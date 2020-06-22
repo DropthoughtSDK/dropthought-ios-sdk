@@ -34,6 +34,8 @@ Open your Podfile and paste following scripts into your project target.
 And execute **pod install**
 
 ```ruby
+  use_frameworks!
+  
   pod 'Dropthought', :path => './Dropthought'
   
   react_native_modules_path = './react-native-modules/'
