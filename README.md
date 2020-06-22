@@ -73,7 +73,7 @@ And execute **pod install**
   pod 'RNLocalize', :path => react_native_modules_path + 'react-native-localize'
 ```
 
-## Usage
+## Usage Objective-C
 
 ### AppDelegate.m
 
@@ -102,4 +102,22 @@ And execute **pod install**
 
 ```objc
 [[Survey sharedInstance] sendUploadOfflineFeedbacksEvent];
+```
+
+## Usage Swift
+
+### AppDelegate.swift
+
+```swift
+import Dropthought
+```
+
+```swift
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    // Override point for customization after application launch.
+
+    Survey.sharedInstance()?.initSurvey(launchOptions, apiKey: "YOUR_API_KEY")
+
+    return true
+}
 ```
