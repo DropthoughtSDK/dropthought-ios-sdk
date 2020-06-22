@@ -77,7 +77,7 @@ And execute **pod install**
   pod 'RNLocalize', :path => react_native_modules_path + 'react-native-localize'
 ```
 
-## Usage Objective-C
+## Usage for Objective-C
 
 ### import Dropthought SDK
 
@@ -110,7 +110,7 @@ And execute **pod install**
 [[Survey sharedInstance] sendUploadOfflineFeedbacksEvent];
 ```
 
-## Usage Swift
+## Usage for Swift
 
 ### import Dropthought SDK
 
