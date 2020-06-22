@@ -14,8 +14,8 @@ The repository **react-native-modules** contains the related react-native module
 
 * [Requirement](#Requirement)
 * [Installation](#Installation)
-* [Usage for Objective-C](#Usage_for_Objective-C)
-* [Usage for Swift](#Usage_for_Swift)
+* [Usage for Objective-C](#Usage-for-Objective-C)
+* [Usage for Swift](#Usage-for-Swift)
 
 ## Requirement
 
