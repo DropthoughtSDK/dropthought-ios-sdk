@@ -128,7 +128,7 @@ import Dropthought
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     // Override point for customization after application launch.
 
-    Survey.sharedInstance()?.initSurvey(launchOptions, apiKey: "YOUR_API_KEY")
+    Survey.sharedInstance().initSurvey(launchOptions, apiKey: "YOUR_API_KEY")
 
     return true
 }
@@ -138,11 +138,11 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 
 ```swift
 // self represent a UIViewController where you what to present a survey
-Survey.sharedInstance()?.present(self, surveyId: "SURVEY_ID")
+Survey.sharedInstance().present(self, surveyId: "SURVEY_ID")
 ```
 
 ### Upload offline feedbacks
 
 ```swift
-Survey.sharedInstance()?.sendUploadOfflineFeedbacksEvent()
+Survey.sharedInstance().sendUploadOfflineFeedbacksEvent()
 ```
