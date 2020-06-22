@@ -95,3 +95,9 @@ And execute **pod install**
 // self represent a UIViewController where you what to present a survey
 [[Survey sharedInstance] present:self surveyId:{SURVEY_ID}];
 ```
+
+### Upload offline feedbacks
+
+```objc
+[[Survey sharedInstance] sendUploadOfflineFeedbacksEvent];
+```
