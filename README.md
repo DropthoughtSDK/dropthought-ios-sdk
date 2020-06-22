@@ -2,7 +2,11 @@
 
 This repository contains all Dropthought iOS SDK sources.
 
-There are two main repositories **Dropthought** and **react-native-modules**.
+There are two main repositories:
+
+- **Dropthought**
+
+- **react-native-modules**
 
 The repository **Dropthought** contains the interfaces and functions for using Dropthought iOS SDK.
 
@@ -28,7 +32,7 @@ Note: Same path/level as the **Podfile**
 
 <img src="https://github.com/DropthoughtSDK/dropthought-ios-sdk/blob/master/imgs/repository.png" width="30%" height="30%">
 
-### Step 3. Modify your Podfile
+### Step 3. Modify Your Podfile
 
 Open your Podfile and paste following scripts into your project target.  
 And execute **pod install**
@@ -75,11 +79,13 @@ And execute **pod install**
 
 ## Usage Objective-C
 
-### AppDelegate.m
+### import Dropthought SDK
 
 ```objc
 #import "Survey.h"
 ```
+
+### AppDelegate.m
 
 ```objc
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -106,11 +112,13 @@ And execute **pod install**
 
 ## Usage Swift
 
-### AppDelegate.swift
+### import Dropthought SDK
 
 ```swift
 import Dropthought
 ```
+
+### AppDelegate.swift
 
 ```swift
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -120,4 +128,16 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 
     return true
 }
+```
+
+### Open a survey from a view controller
+
+```swift
+Survey.sharedInstance()?.present(self, surveyId: "23856ed5-5805-4146-b67e-5ff9aace0362")
+```
+
+### Upload offline feedbacks
+
+```swift
+Survey.sharedInstance()?.sendUploadOfflineFeedbacksEvent()
 ```
