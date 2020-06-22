@@ -16,6 +16,7 @@ s.resource_bundles = {
     'main' => ['assets/*']
 }
 
+s.ios.framework  = 'UIKit'
 s.dependency "React"
 
 end
