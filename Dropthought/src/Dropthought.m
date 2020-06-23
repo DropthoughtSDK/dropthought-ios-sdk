@@ -1,9 +1,6 @@
 //
-//  Survey.m
-//  DropthoughtSDK-Objc
-//
-//  Created by BCT-Barney on 2020/6/4.
-//  Copyright © 2020 bct.tpe. All rights reserved.
+//  Dropthought.m
+//  Dropthought
 //
 
 #import <UIKit/UIKit.h>
@@ -11,39 +8,37 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 
-#import "Survey.h"
+#import "Dropthought.h"
 #import "SurveyApplication.h"
 #import "SurveyEmitter.h"
 #import "SurveyViewController.h"
 
 
-@interface Survey()
+@interface Dropthought()
 @property (nonatomic, strong) UIViewController *from;
 @property (nonatomic, strong) SurveyApplication *app;
 @property (nonatomic, strong) NSString *apiKey;
 @end
 
-@implementation Survey
+@implementation Dropthought
 
 RCT_EXPORT_MODULE();
 
-+ (_Nonnull instancetype)sharedInstance {
-    static Survey *instance = nil;
++ (_Nonnull instancetype)instance {
+    static Dropthought *instance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        instance = [[Survey alloc] init];
+        instance = [[Dropthought alloc] init];
     });
     return instance;
 }
 
-- (void)initSurvey:(NSDictionary * _Nullable)launchOptions apiKey:(NSString * _Nonnull)apiKey {
+- (void)init:(NSDictionary * _Nullable)launchOptions apiKey:(NSString * _Nonnull)apiKey {
     self.app = [[SurveyApplication alloc] init];
     [self.app setupBridge:launchOptions];
     self.apiKey = apiKey;
-}
 
-- (void)setupAPIKey:(NSString *)apiKey {
-    self.apiKey = apiKey;
+    [self uploadOfflineFeedbacks];
 }
 
 - (void)present:(UIViewController * _Nonnull)from surveyId:(NSString * _Nonnull)surveyId {
@@ -60,7 +55,7 @@ RCT_EXPORT_MODULE();
     [self.from presentViewController:vc animated:YES completion:NULL];
 }
 
-- (void)sendUploadOfflineFeedbacksEvent {
+- (void)uploadOfflineFeedbacks {
     [self.app.bridge enqueueJSCall:@"RCTDeviceEventEmitter" method:@"emit" args:@[@"UploadQueuedFeedback", @{@"apiKey": self.apiKey}] completion:NULL];
 }
 
@@ -68,7 +63,7 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(dismiss)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[[Survey sharedInstance] from] dismissViewControllerAnimated:YES completion:nil];
+        [[Dropthought instance].from dismissViewControllerAnimated:YES completion:nil];
     });
 }
 @end

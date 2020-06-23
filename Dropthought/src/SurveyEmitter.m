@@ -1,9 +1,6 @@
 //
 //  SurveyEmitter.m
-//  DropthoughtSDK-Objc
-//
-//  Created by BCT-Barney on 2020/6/10.
-//  Copyright © 2020 bct.tpe. All rights reserved.
+//  Dropthought
 //
 
 #import "SurveyEmitter.h"

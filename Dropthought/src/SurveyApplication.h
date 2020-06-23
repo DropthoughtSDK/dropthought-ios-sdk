@@ -1,9 +1,6 @@
 //
 //  SurveyApplication.h
-//  DropthoughtSDK-Objc
-//
-//  Created by BCT-Barney on 2020/6/5.
-//  Copyright © 2020 bct.tpe. All rights reserved.
+//  Dropthought
 //
 
 #import <UIKit/UIKit.h>
@@ -12,6 +9,5 @@
 
 @interface SurveyApplication : UIResponder <RCTBridgeDelegate>
 @property (nonatomic) RCTBridge *bridge;
-
 - (void)setupBridge:(NSDictionary *)launchOptions;
 @end
