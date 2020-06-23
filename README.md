@@ -21,6 +21,10 @@ The repository **react-native-modules** contains the related react-native module
 
 - iOS 12.0+
 
+## Precondition
+
+Contact Customer Support at cs@dropthought.com to get help on how to publish your program through SDK.
+
 ## Installation
 
 ### Step 1. Download Source Files
@@ -86,7 +90,7 @@ And execute **pod install**
 ### import Dropthought SDK
 
 ```objc
-#import "Survey.h"
+#import "Dropthought.h"
 ```
 
 ### AppDelegate.m
@@ -95,7 +99,7 @@ And execute **pod install**
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
 
-    [[Survey sharedInstance] initSurvey:launchOptions apiKey:@"{YOUR_API_KEY}"];
+    [[Dropthought instance] init:launchOptions apiKey:@"{YOUR_API_KEY}"];
 
     return YES;
 }
@@ -105,7 +109,7 @@ And execute **pod install**
 
 ```objc
 // self represent a UIViewController where you what to present a survey
-[[Survey sharedInstance] present:self surveyId:{SURVEY_ID}];
+[[Dropthought instance] present:self surveyId:{SURVEY_ID}];
 ```
 
 ### Upload offline feedbacks
@@ -115,7 +119,7 @@ Dropthought SDK will cache user's feedbacks if there has no network connection.
 You can call this function and we will check and submit again.
 
 ```objc
-[[Survey sharedInstance] sendUploadOfflineFeedbacksEvent];
+[[Dropthought instance] uploadOfflineFeedbacks];
 ```
 
 ## Usage for Swift
@@ -132,7 +136,7 @@ import Dropthought
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     // Override point for customization after application launch.
 
-    Survey.sharedInstance().initSurvey(launchOptions, apiKey: "YOUR_API_KEY")
+    Dropthought.instance().init(launchOptions, apiKey: "YOUR_API_KEY")
 
     return true
 }
@@ -142,7 +146,7 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 
 ```swift
 // self represent a UIViewController where you what to present a survey
-Survey.sharedInstance().present(self, surveyId: "SURVEY_ID")
+Dropthought.instance().present(self, surveyId: "SURVEY_ID")
 ```
 
 ### Upload offline feedbacks
@@ -152,5 +156,5 @@ Dropthought SDK will cache user's feedbacks if there has no network connection.
 You can call this function and we will check and submit again.
 
 ```swift
-Survey.sharedInstance().sendUploadOfflineFeedbacksEvent()
+Dropthought.instance().uploadOfflineFeedbacks()
 ```
