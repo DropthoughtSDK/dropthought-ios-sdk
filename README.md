@@ -42,6 +42,7 @@ Note: Same path/level as the **Podfile**
 
 ### Step 3. Modify Your Podfile
 
+We use CocoaPods to manage the SDK. You can find more detail about CocoaPods [here](https://cocoapods.org)  
 Open your Podfile and paste following scripts into your project target.  
 And execute **pod install**
 
