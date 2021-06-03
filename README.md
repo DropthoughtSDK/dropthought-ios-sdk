@@ -1,4 +1,4 @@
-# Dropthought iOS Sdk
+# Dropthought iOS SDK
 
 This repository contains all Dropthought iOS SDK sources.
 
