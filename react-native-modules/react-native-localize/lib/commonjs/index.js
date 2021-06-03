@@ -8,67 +8,67 @@ exports.removeEventListener = removeEventListener;
 exports.findBestAvailableLanguage = findBestAvailableLanguage;
 Object.defineProperty(exports, "getCalendar", {
   enumerable: true,
-  get: function get() {
+  get: function () {
     return _module.getCalendar;
   }
 });
 Object.defineProperty(exports, "getCountry", {
   enumerable: true,
-  get: function get() {
+  get: function () {
     return _module.getCountry;
   }
 });
 Object.defineProperty(exports, "getCurrencies", {
   enumerable: true,
-  get: function get() {
+  get: function () {
     return _module.getCurrencies;
   }
 });
 Object.defineProperty(exports, "getLocales", {
   enumerable: true,
-  get: function get() {
+  get: function () {
     return _module.getLocales;
   }
 });
 Object.defineProperty(exports, "getNumberFormatSettings", {
   enumerable: true,
-  get: function get() {
+  get: function () {
     return _module.getNumberFormatSettings;
   }
 });
 Object.defineProperty(exports, "getTemperatureUnit", {
   enumerable: true,
-  get: function get() {
+  get: function () {
     return _module.getTemperatureUnit;
   }
 });
 Object.defineProperty(exports, "getTimeZone", {
   enumerable: true,
-  get: function get() {
+  get: function () {
     return _module.getTimeZone;
   }
 });
 Object.defineProperty(exports, "uses24HourClock", {
   enumerable: true,
-  get: function get() {
+  get: function () {
     return _module.uses24HourClock;
   }
 });
 Object.defineProperty(exports, "usesMetricSystem", {
   enumerable: true,
-  get: function get() {
+  get: function () {
     return _module.usesMetricSystem;
   }
 });
 Object.defineProperty(exports, "usesAutoDateAndTime", {
   enumerable: true,
-  get: function get() {
+  get: function () {
     return _module.usesAutoDateAndTime;
   }
 });
 Object.defineProperty(exports, "usesAutoTimeZone", {
   enumerable: true,
-  get: function get() {
+  get: function () {
     return _module.usesAutoTimeZone;
   }
 });
