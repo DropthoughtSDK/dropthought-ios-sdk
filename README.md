@@ -4,7 +4,7 @@ This repository contains all Dropthought iOS SDK sources.
 
 ## Latest Version
 
-- 1.1.8
+- 2.0.0
 
 There are two main repositories:
 
