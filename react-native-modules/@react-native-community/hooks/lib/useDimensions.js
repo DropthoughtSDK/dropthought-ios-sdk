@@ -13,8 +13,18 @@ function useDimensions() {
         setDimensions({ window: window, screen: screen });
     };
     react_1.useEffect(function () {
-        react_native_1.Dimensions.addEventListener('change', onChange);
-        return function () { return react_native_1.Dimensions.removeEventListener('change', onChange); };
+        var subscription = react_native_1.Dimensions.addEventListener('change', onChange);
+        return function () {
+            // @ts-expect-error - React Native >= 0.65
+            if (typeof (subscription === null || subscription === void 0 ? void 0 : subscription.remove) === 'function') {
+                // @ts-expect-error - need update @types/react-native@0.65.x
+                subscription.remove();
+            }
+            else {
+                // React Native < 0.65
+                react_native_1.Dimensions.removeEventListener('change', onChange);
+            }
+        };
     }, []);
     return dimensions;
 }

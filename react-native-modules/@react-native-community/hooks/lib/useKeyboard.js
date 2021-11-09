@@ -39,15 +39,27 @@ function useKeyboard() {
         }
     };
     react_1.useEffect(function () {
-        react_native_1.Keyboard.addListener('keyboardWillShow', handleKeyboardWillShow);
-        react_native_1.Keyboard.addListener('keyboardDidShow', handleKeyboardDidShow);
-        react_native_1.Keyboard.addListener('keyboardWillHide', handleKeyboardWillHide);
-        react_native_1.Keyboard.addListener('keyboardDidHide', handleKeyboardDidHide);
+        var subscriptions = [
+            react_native_1.Keyboard.addListener('keyboardWillShow', handleKeyboardWillShow),
+            react_native_1.Keyboard.addListener('keyboardDidShow', handleKeyboardDidShow),
+            react_native_1.Keyboard.addListener('keyboardWillHide', handleKeyboardWillHide),
+            react_native_1.Keyboard.addListener('keyboardDidHide', handleKeyboardDidHide),
+        ];
         return function () {
-            react_native_1.Keyboard.removeListener('keyboardWillShow', handleKeyboardWillShow);
-            react_native_1.Keyboard.removeListener('keyboardDidShow', handleKeyboardDidShow);
-            react_native_1.Keyboard.removeListener('keyboardWillHide', handleKeyboardWillHide);
-            react_native_1.Keyboard.removeListener('keyboardDidHide', handleKeyboardDidHide);
+            if (react_native_1.Keyboard.removeListener) {
+                // React Native < 0.65
+                react_native_1.Keyboard.removeListener('keyboardWillShow', handleKeyboardWillShow);
+                react_native_1.Keyboard.removeListener('keyboardDidShow', handleKeyboardDidShow);
+                react_native_1.Keyboard.removeListener('keyboardWillHide', handleKeyboardWillHide);
+                react_native_1.Keyboard.removeListener('keyboardDidHide', handleKeyboardDidHide);
+            }
+            else {
+                // React Native >= 0.65
+                for (var _i = 0, subscriptions_1 = subscriptions; _i < subscriptions_1.length; _i++) {
+                    var subscription = subscriptions_1[_i];
+                    subscription.remove();
+                }
+            }
         };
     }, []);
     return {

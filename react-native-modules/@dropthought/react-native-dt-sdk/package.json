@@ -1,0 +1,159 @@
+{
+  "name": "@dropthought/react-native-dt-sdk",
+  "version": "3.0.0-rc.1",
+  "description": "dropthought sdk for react-native app",
+  "main": "lib/commonjs/index",
+  "module": "lib/module/index",
+  "types": "lib/typescript/index.d.ts",
+  "react-native": "src/index",
+  "source": "src/index",
+  "files": [
+    "src",
+    "lib",
+    "android",
+    "ios",
+    "cpp",
+    "react-native-dt-sdk.podspec",
+    "!lib/typescript/example",
+    "!android/build",
+    "!ios/build",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__"
+  ],
+  "scripts": {
+    "test": "jest",
+    "typescript": "tsc --noEmit",
+    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "prepare": "bob build",
+    "release": "release-it",
+    "example": "yarn --cwd example",
+    "pods": "cd example && pod-install --quiet",
+    "bootstrap": "yarn example && yarn && yarn pods"
+  },
+  "keywords": [
+    "react-native",
+    "ios",
+    "android"
+  ],
+  "repository": "https://gitlab.com/bct-taipei/react-native-dt-sdk",
+  "author": "Taipei BCT <taipei-bct@bahwancybertek.com> (https://gitlab.com/taipei-bct)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://gitlab.com/bct-taipei/react-native-dt-sdk/issues"
+  },
+  "homepage": "https://gitlab.com/bct-taipei/react-native-dt-sdk#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@commitlint/config-conventional": "^11.0.0",
+    "@react-native-community/eslint-config": "^2.0.0",
+    "@release-it/conventional-changelog": "^2.0.0",
+    "@types/jest": "^26.0.0",
+    "@types/ramda": "^0.27.45",
+    "@types/react": "^16.9.19",
+    "axios": "^0.19.2",
+    "commitlint": "^11.0.0",
+    "eslint": "^7.2.0",
+    "eslint-config-prettier": "^7.0.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "husky": "^6.0.0",
+    "jest": "^26.0.1",
+    "pod-install": "^0.1.0",
+    "prettier": "^2.0.5",
+    "react": "16.13.1",
+    "react-native": "0.63.4",
+    "react-native-builder-bob": "^0.18.0",
+    "release-it": "^14.2.2",
+    "typescript": "^4.1.3"
+  },
+  "peerDependencies": {
+    "react": ">16.8.3",
+    "react-native": ">0.59.3",
+    "react-native-aes-crypto": "^1.3.0",
+    "react-native-safe-area-context": ">=3.0.0",
+    "react-native-secure-key-store": "^2.0.0"
+  },
+  "jest": {
+    "preset": "react-native",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/example/node_modules",
+      "<rootDir>/lib/"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "release-it": {
+    "git": {
+      "commitMessage": "chore: release ${version}",
+      "tagName": "v${version}"
+    },
+    "npm": {
+      "publish": true
+    },
+    "github": {
+      "release": true
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": "angular"
+      }
+    }
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@react-native-community",
+      "prettier"
+    ],
+    "rules": {
+      "prettier/prettier": [
+        "error",
+        {
+          "quoteProps": "consistent",
+          "singleQuote": true,
+          "tabWidth": 2,
+          "trailingComma": "es5",
+          "useTabs": false
+        }
+      ]
+    }
+  },
+  "eslintIgnore": [
+    "node_modules/",
+    "lib/"
+  ],
+  "prettier": {
+    "quoteProps": "consistent",
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "useTabs": false
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      "commonjs",
+      "module",
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  },
+  "dependencies": {
+    "@bct-taipei/dt-rn-encrypted-storage": "git+https://github.com/DropthoughtSDK/dropthought-rn-sdk.git#bct-taipei-dt-rn-encrypted-storage-v1.0.3-gitpkg",
+    "@dropthought/react-native-ui": "^1.0.1",
+    "jwt-decode": "^3.1.2",
+    "ramda": "^0.27.1",
+    "react-async": "^10.0.1",
+    "uuid": "^3.3.2"
+  }
+}

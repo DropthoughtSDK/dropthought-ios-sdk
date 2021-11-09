@@ -1,3 +1,73 @@
+# v2.8.0 (Tue Oct 19 2021)
+
+:tada: This release contains work from a new contributor! :tada:
+
+Thank you, WhiteSource Renovate ([@renovate-bot](https://github.com/renovate-bot)), for all your work!
+
+#### 🚀 Enhancement
+
+- [RN 0.65.x] Adapt unsubscription for new EventEmitter API [#268](https://github.com/react-native-community/hooks/pull/268) ([@retyui](https://github.com/retyui))
+
+#### 🐛 Bug Fix
+
+- Update dependency all-contributors-cli to v6.20.0 [#182](https://github.com/react-native-community/hooks/pull/182) ([@renovate-bot](https://github.com/renovate-bot) [@renovate[bot]](https://github.com/renovate[bot]))
+- Prevent "maximum update depth exceeded" error when pass image as a new object on each render [#269](https://github.com/react-native-community/hooks/pull/269) ([@retyui](https://github.com/retyui))
+- Update dependency eslint-plugin-prettier to v3.4.1 [#219](https://github.com/react-native-community/hooks/pull/219) ([@renovate-bot](https://github.com/renovate-bot) [@renovate[bot]](https://github.com/renovate[bot]))
+- Update dependency @testing-library/react-native to v8 [#255](https://github.com/react-native-community/hooks/pull/255) ([@renovate-bot](https://github.com/renovate-bot) [@renovate[bot]](https://github.com/renovate[bot]))
+- Update dependency jest to v27.3.1 [#270](https://github.com/react-native-community/hooks/pull/270) ([@renovate-bot](https://github.com/renovate-bot))
+- Update dependency @types/react-native to v0.64.16 [#265](https://github.com/react-native-community/hooks/pull/265) ([@renovate-bot](https://github.com/renovate-bot))
+- Update dependency jest to v27.3.0 [#186](https://github.com/react-native-community/hooks/pull/186) ([@renovate-bot](https://github.com/renovate-bot) [@renovate[bot]](https://github.com/renovate[bot]))
+
+#### Authors: 3
+
+- [@renovate[bot]](https://github.com/renovate[bot])
+- David NRB ([@retyui](https://github.com/retyui))
+- WhiteSource Renovate ([@renovate-bot](https://github.com/renovate-bot))
+
+---
+
+# v2.7.0 (Mon Oct 18 2021)
+
+:tada: This release contains work from new contributors! :tada:
+
+Thanks for all your work!
+
+:heart: Thibault Maekelbergh ([@thibmaek](https://github.com/thibmaek))
+
+:heart: Gertjan Reynaert ([@GertjanReynaert](https://github.com/GertjanReynaert))
+
+:heart: WhiteSource Renovate ([@renovate-bot](https://github.com/renovate-bot))
+
+#### 🚀 Enhancement
+
+- Add the option to pass headers to useImageDimensions [#225](https://github.com/react-native-community/hooks/pull/225) ([@thibmaek](https://github.com/thibmaek) [@GertjanReynaert](https://github.com/GertjanReynaert))
+
+#### 🐛 Bug Fix
+
+- Add useImageDimensions tests [#259](https://github.com/react-native-community/hooks/pull/259) ([@retyui](https://github.com/retyui))
+- Add useDimensions tests [#260](https://github.com/react-native-community/hooks/pull/260) ([@retyui](https://github.com/retyui))
+- Add useAppState tests [#263](https://github.com/react-native-community/hooks/pull/263) ([@retyui](https://github.com/retyui))
+- Add useAccessibilityInfo tests [#264](https://github.com/react-native-community/hooks/pull/264) ([@retyui](https://github.com/retyui))
+- Add useDeviceOrientation tests [#262](https://github.com/react-native-community/hooks/pull/262) ([@retyui](https://github.com/retyui) [@LinusU](https://github.com/LinusU))
+- Add useKeyboard() hook tests [#258](https://github.com/react-native-community/hooks/pull/258) ([@retyui](https://github.com/retyui))
+- Update dependency ts-jest to v27.0.7 [#256](https://github.com/react-native-community/hooks/pull/256) ([@renovate-bot](https://github.com/renovate-bot) [@renovate[bot]](https://github.com/renovate[bot]))
+- Add simple tests & update dev dependencies [#252](https://github.com/react-native-community/hooks/pull/252) ([@retyui](https://github.com/retyui))
+- Update dependency prettier to v2.4.1 [#254](https://github.com/react-native-community/hooks/pull/254) ([@renovate-bot](https://github.com/renovate-bot))
+- Update dependency @types/react to v16.14.17 [#253](https://github.com/react-native-community/hooks/pull/253) ([@renovate-bot](https://github.com/renovate-bot))
+- Bump glob-parent from 5.1.0 to 5.1.2 [#234](https://github.com/react-native-community/hooks/pull/234) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### Authors: 7
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- [@renovate[bot]](https://github.com/renovate[bot])
+- David NRB ([@retyui](https://github.com/retyui))
+- Gertjan Reynaert ([@GertjanReynaert](https://github.com/GertjanReynaert))
+- Linus Unnebäck ([@LinusU](https://github.com/LinusU))
+- Thibault Maekelbergh ([@thibmaek](https://github.com/thibmaek))
+- WhiteSource Renovate ([@renovate-bot](https://github.com/renovate-bot))
+
+---
+
 # v2.6.0 (Fri Jun 05 2020)
 
 :tada: This release contains work from new contributors! :tada:

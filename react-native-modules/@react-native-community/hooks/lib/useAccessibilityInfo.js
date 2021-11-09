@@ -10,8 +10,18 @@ function useAccessibilityStateListener(eventName, initializerName) {
             return;
         }
         react_native_1.AccessibilityInfo[initializerName]().then(setIsEnabled);
-        react_native_1.AccessibilityInfo.addEventListener(eventName, setIsEnabled);
-        return function () { return react_native_1.AccessibilityInfo.removeEventListener(eventName, setIsEnabled); };
+        var subscription = react_native_1.AccessibilityInfo.addEventListener(eventName, setIsEnabled);
+        return function () {
+            // @ts-expect-error - React Native >= 0.65
+            if (typeof (subscription === null || subscription === void 0 ? void 0 : subscription.remove) === 'function') {
+                // @ts-expect-error - need update @types/react-native@0.65.x
+                subscription.remove();
+            }
+            else {
+                // React Native < 0.65
+                react_native_1.AccessibilityInfo.removeEventListener(eventName, setIsEnabled);
+            }
+        };
     }, [eventName, initializerName]);
     return isEnabled;
 }
