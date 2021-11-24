@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.opacity30 = exports.opacity15 = exports.opacity10 = exports.Colors = void 0;
+exports.opacity60 = exports.opacity30 = exports.opacity15 = exports.opacity10 = exports.Colors = void 0;
 const Colors = {
   purple: '#4c3794',
   borderColor: '#c2c2c2',
@@ -11,7 +11,7 @@ const Colors = {
   borderFocusedColor: '#4c3794',
   backgroundGrey: '#f5f6fa',
   backgroundGreyMask: '#f5f6facf',
-  white: '#fff',
+  white: '#ffffff',
   dateGrey: '#8b8b8b',
   buttonGrey: '#dcdcdc',
   black: '#000',
@@ -58,4 +58,8 @@ exports.opacity15 = opacity15;
 const opacity30 = color => `${color}4d`;
 
 exports.opacity30 = opacity30;
+
+const opacity60 = color => `${color}99`;
+
+exports.opacity60 = opacity60;
 //# sourceMappingURL=Colors.js.map

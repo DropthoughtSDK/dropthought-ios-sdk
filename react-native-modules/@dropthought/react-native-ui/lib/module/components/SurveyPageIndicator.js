@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
-import { opacity10, Colors } from '../styles';
+import { opacity10, opacity60, Colors } from '../styles';
+import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 
 const SurveyPageIndicator = props => {
   const {
@@ -9,17 +10,20 @@ const SurveyPageIndicator = props => {
     pageIndex = 0,
     rtl
   } = props;
+  const {
+    colorScheme
+  } = useTheme();
+  const isDarkMode = colorScheme === COLOR_SCHEMES.dark;
   const themeColor = survey.surveyProperty.hexCode;
   const dimensionWidthType = useDimensionWidthType();
   const dimensionStyles = dimensionWidthType === DimensionWidthType.phone ? phoneStyles : tabletStyles;
   const currentPage = survey.pages[pageIndex];
-  const titleStyle = [styles.title, dimensionStyles.title];
   return /*#__PURE__*/React.createElement(View, {
     style: [styles.container, dimensionStyles.container, {
       backgroundColor: opacity10(themeColor)
-    }, rtl ? styles.rtl : {}]
+    }, isDarkMode && styles.darkModeContainer, rtl ? styles.rtl : {}]
   }, /*#__PURE__*/React.createElement(Text, {
-    style: titleStyle
+    style: [styles.title, dimensionStyles.title, isDarkMode && styles.darkModeTitle]
   }, currentPage.pageTitle));
 };
 
@@ -29,8 +33,14 @@ const styles = StyleSheet.create({
     height: 40,
     width: '100%'
   },
+  darkModeContainer: {
+    backgroundColor: '#39393a'
+  },
   title: {
     fontWeight: '600'
+  },
+  darkModeTitle: {
+    color: opacity60(Colors.white)
   },
   rtl: {
     alignItems: 'flex-end'

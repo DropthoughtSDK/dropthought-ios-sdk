@@ -1,6 +1,6 @@
 {
   "name": "@dropthought/react-native-dt-sdk",
-  "version": "3.0.0-rc.1",
+  "version": "3.0.0-rc.2",
   "description": "dropthought sdk for react-native app",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -150,7 +150,7 @@
   },
   "dependencies": {
     "@bct-taipei/dt-rn-encrypted-storage": "git+https://github.com/DropthoughtSDK/dropthought-rn-sdk.git#bct-taipei-dt-rn-encrypted-storage-v1.0.3-gitpkg",
-    "@dropthought/react-native-ui": "^1.0.1",
+    "@dropthought/react-native-ui": "1.0.2",
     "jwt-decode": "^3.1.2",
     "ramda": "^0.27.1",
     "react-async": "^10.0.1",

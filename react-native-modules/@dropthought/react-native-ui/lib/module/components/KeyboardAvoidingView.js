@@ -1,82 +1,27 @@
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 import React from 'react';
-import { View, TextInput, StyleSheet, Platform, Keyboard, UIManager, LayoutAnimation, findNodeHandle, ScrollView } from 'react-native';
+import { View, TextInput, StyleSheet, Platform, Keyboard, UIManager, findNodeHandle, ScrollView } from 'react-native';
+import debounce from 'lodash/debounce';
 
 if (Platform.OS === 'android') {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
   }
-} // compute the offsets from keyboard End coordinate to frame's bottom
+}
 
+const callAll = (...fns) => (...args) => fns.forEach(fn => typeof fn === 'function' && fn(...args));
 
-const computeOffset = (keyboardEvent, frameBottomY, show) => {
-  let offset = 0;
-
-  if (keyboardEvent && show && frameBottomY) {
-    // the offset from keyboard coordinate to view's bottom Y coordinate
-    const keyboardEndY = keyboardEvent.endCoordinates.screenY - Platform.select({
-      // it looks that in android, it didn't consider the the suggestion box of the keyboard
-      android: 40,
-      default: 0
-    }); // only consider the negative
-
-    offset = Math.min(keyboardEndY - frameBottomY, 0);
-  }
-
-  return offset;
+const getKeyboardExtraHeight = () => {
+  return Platform.select({
+    // it looks that in android, it didn't consider the suggestion box of the keyboard
+    android: 40,
+    default: 0
+  });
 };
 
-const configureLayoutAnimation = keyboardEvent => {
-  const {
-    duration = 0,
-    easing
-  } = keyboardEvent;
-
-  if (easing) {
-    LayoutAnimation.configureNext({
-      // We have to pass the duration equal to minimal accepted duration defined here: RCTLayoutAnimation.m
-      duration: Math.max(duration, 10),
-      update: {
-        duration: Math.max(duration, 10),
-        type: Platform.OS === 'android' ? LayoutAnimation.Types.easeIn : LayoutAnimation.Types[easing]
-      }
-    });
-  }
-};
-
-export const useKeyboardAvoidingFocusedInputView = (parentViewRef, extraAvoidingSpace = 0) => {
-  const [bottomHeight, setBottomHeight] = React.useState(0);
-  const keyboardChangeHandler = React.useCallback((event, show) => {
-    // @ts-ignore
-    const currentlyFocusedField = TextInput.State.currentlyFocusedInput ? // @ts-ignore
-    findNodeHandle(TextInput.State.currentlyFocusedInput()) : TextInput.State.currentlyFocusedField(); // if there's no focused input or keyboard is not show or view is not existed
-
-    if (!currentlyFocusedField || !show || !parentViewRef.current) {
-      configureLayoutAnimation(event);
-      setBottomHeight(0);
-      return;
-    } // here we want to check if the focused input is "within" this view
-    // if it is not this view, do nothing (it could be a un-focused screen)
-    // @ts-ignore
-
-
-    UIManager.viewIsDescendantOf(currentlyFocusedField, findNodeHandle(parentViewRef.current), isDescendant => {
-      if (isDescendant) {
-        // measure the input's layout, compute the offset to the keyboard
-        UIManager.measureInWindow(currentlyFocusedField, (_x, y, _width, height) => {
-          const currentlyFocusedFieldBottomY = y + height + extraAvoidingSpace;
-          const offset = computeOffset(event, currentlyFocusedFieldBottomY, show); // if the offset is smaller than 0, it means it is below the keyboard
-
-          if (offset < 0) {
-            configureLayoutAnimation(event);
-            setBottomHeight(0 - offset);
-          }
-        });
-      }
-    });
-  }, [parentViewRef, extraAvoidingSpace]); // keyboard change effect
-
+export const useKeyboardListener = (keyboardChangeHandler = () => {}) => {
+  // keyboard change effect
   React.useEffect(() => {
     // subscribe to these keyboard events
     let keyboardEvents = Platform.select({
@@ -104,36 +49,118 @@ export const useKeyboardAvoidingFocusedInputView = (parentViewRef, extraAvoiding
       });
     };
   }, [keyboardChangeHandler]);
+};
+
+const getCurrentlyFocusedField = () => {
+  return TextInput.State.currentlyFocusedInput ? findNodeHandle(TextInput.State.currentlyFocusedInput()) : TextInput.State.currentlyFocusedField();
+};
+
+export const useKeyboardAvoidingFocusedInputView = (parentViewRef, extraAvoidingSpace = 0, insetBottom = 0) => {
+  const parentViewLayoutRef = React.useRef();
+  const contentOffsetYRef = React.useRef(0);
+  const keyboardEndCoordinatesRef = React.useRef();
+  const isKeyboardShowingRef = React.useRef(false);
+  const [keyboardHeight, setKeyboardHeight] = React.useState(0);
+  const keyboardHeightHandler = React.useCallback((event, show) => {
+    keyboardEndCoordinatesRef.current = event.endCoordinates;
+    isKeyboardShowingRef.current = show;
+    setKeyboardHeight(show ? event.endCoordinates.height - (Platform.OS === 'android' ? 0 : insetBottom) + getKeyboardExtraHeight() : 0);
+  }, [insetBottom]);
+  useKeyboardListener(keyboardHeightHandler); // eslint-disable-next-line react-hooks/exhaustive-deps
+
+  const updateOffset = React.useCallback(debounce(() => {
+    if (!parentViewRef.current) {
+      return;
+    }
+
+    const currentlyFocusedField = getCurrentlyFocusedField();
+
+    if (currentlyFocusedField) {
+      // here we want to check if the focused input is "within" this view
+      // if it is not this view, do nothing (it could be a un-focused screen)
+      UIManager.viewIsDescendantOf(currentlyFocusedField, findNodeHandle(parentViewRef.current), isDescendant => {
+        if (isDescendant) {
+          // measure the input's layout, compute the offset to the keyboard
+          UIManager.measureInWindow(currentlyFocusedField, (x, y, width, height) => {
+            if (!parentViewLayoutRef.current || !keyboardEndCoordinatesRef.current) {
+              return;
+            }
+
+            const screenHeight = keyboardEndCoordinatesRef.current.screenY + keyboardEndCoordinatesRef.current.height;
+            const keyboardScreenY = keyboardEndCoordinatesRef.current.screenY - getKeyboardExtraHeight();
+            const parentViewTopDistance = screenHeight - insetBottom - parentViewLayoutRef.current.height;
+            const currentlyFocusedFieldBottomY = y + height + extraAvoidingSpace;
+            const topIsCoverd = parentViewTopDistance > y;
+            const bottomIsCoverd = currentlyFocusedFieldBottomY > keyboardScreenY; // can see the field completely
+
+            if (!topIsCoverd && !bottomIsCoverd) {
+              return;
+            }
+
+            const offset = currentlyFocusedFieldBottomY + contentOffsetYRef.current - keyboardScreenY;
+
+            if (offset >= 0) {
+              parentViewRef.current.scrollTo({
+                x: 0,
+                y: offset,
+                animated: true
+              });
+            }
+          });
+        }
+      });
+    }
+  }, 100), [extraAvoidingSpace, insetBottom, parentViewRef]);
+  const handleKeyboardChange = React.useCallback((event, show) => {
+    if (isKeyboardShowingRef.current) {
+      updateOffset(event);
+    }
+  }, [updateOffset]);
+  useKeyboardListener(handleKeyboardChange);
+
+  const handleScrollViewContentSizeChange = (contentWidth, contentHeight) => {
+    if (isKeyboardShowingRef.current) {
+      updateOffset();
+    }
+  };
+
+  const handleScrollViewScroll = event => {
+    contentOffsetYRef.current = Math.max(event.nativeEvent.contentOffset.y, 0);
+  };
+
+  const handleScrollViewLayout = event => {
+    parentViewLayoutRef.current = event.nativeEvent.layout;
+  };
+
   return {
-    bottomHeight
+    keyboardHeight,
+    handleScrollViewLayout,
+    handleScrollViewContentSizeChange,
+    handleScrollViewScroll
   };
 };
+/**
+ * @type {React.FunctionComponent<KeyboardAvoidingProps & ViewProps>}
+ * @param {KeyboardAvoidingProps & ViewProps} param0
+ */
 
 const KeyboardAvoidingView = ({
   children,
   style,
+  contentContainerStyle,
   extraAvoidingSpace = 0,
   ...props
 }) => {
-  const viewRef = React.useRef(null);
+  const viewRef = React.useRef();
   const {
-    bottomHeight
-  } = useKeyboardAvoidingFocusedInputView( // @ts-ignore
-  viewRef, extraAvoidingSpace);
-
-  if (Platform.OS === 'android') {
-    return /*#__PURE__*/React.createElement(View, _extends({
-      style: style
-    }, props), children);
-  }
-
+    keyboardHeight
+  } = useKeyboardAvoidingFocusedInputView(viewRef, extraAvoidingSpace);
   return /*#__PURE__*/React.createElement(View, _extends({
     ref: viewRef,
     style: style
   }, props), /*#__PURE__*/React.createElement(View, {
     style: StyleSheet.compose(styles.contentContainerStyle, {
-      // @ts-ignore
-      bottom: bottomHeight
+      bottom: keyboardHeight
     })
   }, children));
 };
@@ -148,34 +175,48 @@ const KeyboardAvoidingScrollViewForwardRef = ({
   style,
   contentContainerStyle,
   extraAvoidingSpace = 0,
+  onLayout,
+  onContentSizeChange,
+  onScroll,
+  insetBottom,
   ...props
 }, ref) => {
+  var _contentContainerStyl;
+
+  const scrollRef = React.useRef(null);
   const {
-    bottomHeight
-  } = useKeyboardAvoidingFocusedInputView(ref, extraAvoidingSpace);
-
-  if (Platform.OS === 'android') {
-    return /*#__PURE__*/React.createElement(ScrollView, _extends({
-      style: style,
-      contentContainerStyle: contentContainerStyle
-    }, props, {
-      ref: ref
-    }), children);
-  }
-
+    keyboardHeight,
+    handleScrollViewLayout,
+    handleScrollViewContentSizeChange,
+    handleScrollViewScroll
+  } = useKeyboardAvoidingFocusedInputView(scrollRef, extraAvoidingSpace, insetBottom);
   return /*#__PURE__*/React.createElement(ScrollView, _extends({
-    ref: ref,
-    style: style,
+    ref: node => {
+      scrollRef.current = node;
+
+      if (ref && ref.hasOwnProperty('current')) {
+        ref.current = node;
+      } else if (typeof ref === 'function') {
+        ref(node);
+      }
+    },
+    style: StyleSheet.compose(style, {
+      flex: 1
+    }),
     contentContainerStyle: StyleSheet.compose(contentContainerStyle, {
-      bottom: bottomHeight
-    })
-  }, props), children);
+      paddingBottom: ((_contentContainerStyl = contentContainerStyle === null || contentContainerStyle === void 0 ? void 0 : contentContainerStyle.paddingBottom) !== null && _contentContainerStyl !== void 0 ? _contentContainerStyl : 0) + keyboardHeight
+    }),
+    onLayout: callAll(onLayout, handleScrollViewLayout),
+    onContentSizeChange: callAll(onContentSizeChange, handleScrollViewContentSizeChange),
+    onScroll: callAll(onScroll, handleScrollViewScroll)
+  }, props, {
+    scrollEventThrottle: 16
+  }), children);
 };
 /** @type {React.FunctionComponent<KeyboardAvoidingProps & ScrollViewProps>} */
 
 
-export const KeyboardAvoidingScrollView = /*#__PURE__*/React.forwardRef( // @ts-ignore
-KeyboardAvoidingScrollViewForwardRef);
+export const KeyboardAvoidingScrollView = /*#__PURE__*/React.forwardRef(KeyboardAvoidingScrollViewForwardRef);
 const styles = StyleSheet.create({
   contentContainerStyle: {
     height: '100%'
@@ -187,5 +228,11 @@ export default KeyboardAvoidingView;
  * @property {ViewStyle} contentContainerStyle
  * @property {ViewStyle} style
  * @property {number=} extraAvoidingSpace - optional, the default behavior of this keyboard avoiding is to avoid the whole input box, but if you wish to have extra space to avoid
+ */
+
+/**
+ * @typedef {import('react-native').StyleProp<import('react-native').ViewStyle>} ViewStyle
+ * @typedef {import('react-native').ViewProps} ViewProps
+ * @typedef {import('react-native').ScrollViewProps} ScrollViewProps
  */
 //# sourceMappingURL=KeyboardAvoidingView.js.map

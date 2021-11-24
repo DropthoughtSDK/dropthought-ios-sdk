@@ -104,6 +104,7 @@ const SurveyScreenLayout = (props: Props) => {
       />
       {/* @ts-ignore */}
       <ScrollView
+        // @ts-ignore
         ref={scrollViewRef}
         style={[styles.scrollView, { backgroundColor }]}
         extraAvoidingSpace={30}

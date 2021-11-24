@@ -203,7 +203,8 @@ const styles = _reactNative.StyleSheet.create({
     width: 45
   },
   backgroundDark: {
-    backgroundColor: _styles.Colors.sliderBackgroundDark
+    backgroundColor: _styles.Colors.sliderBackgroundDark,
+    elevation: 0
   },
   horizontal: {
     flex: 1,
@@ -243,7 +244,6 @@ const styles = _reactNative.StyleSheet.create({
     fontSize: 12
   },
   selectedLabel: {
-    color: _styles.Colors.white,
     textAlign: 'center'
   }
 });

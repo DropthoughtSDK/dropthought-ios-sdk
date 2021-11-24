@@ -13,6 +13,8 @@ var _styles = _interopRequireWildcard(require("../styles"));
 
 var _translation = _interopRequireDefault(require("../translation"));
 
+var _theme = require("../contexts/theme");
+
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -22,16 +24,20 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const QuestionWarningMessage = ({
   message
 }) => {
-  if (!message) return null;
+  const {
+    colorScheme
+  } = (0, _theme.useTheme)();
+  const isDarkMode = colorScheme === _theme.COLOR_SCHEMES.dark;
   const rtl = _translation.default.dir() === 'rtl';
+  if (!message) return null;
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: [styles.container, rtl && _styles.default.horizontalFlip]
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
-    style: styles.tip
+    style: [styles.tip, isDarkMode && styles.darkModeTip]
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
-    style: styles.bubble
+    style: [styles.bubble, isDarkMode && styles.darkModeBubble]
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-    style: [styles.hint, rtl && _styles.default.horizontalFlip]
+    style: [styles.hint, isDarkMode && styles.darkModeHint, rtl && _styles.default.horizontalFlip]
   }, message)));
 };
 
@@ -56,6 +62,9 @@ const styles = _reactNative.StyleSheet.create({
     borderBottomColor: 'transparent',
     borderRightColor: '#FFDEE4'
   },
+  darkModeTip: {
+    borderRightColor: '#39393a'
+  },
   bubble: {
     backgroundColor: '#FFDEE4',
     minWidth: 280,
@@ -63,9 +72,15 @@ const styles = _reactNative.StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 9
   },
+  darkModeBubble: {
+    backgroundColor: '#39393a'
+  },
   hint: {
     color: _styles.Colors.black,
     fontSize: 13
+  },
+  darkModeHint: {
+    color: '#FFE0E5'
   }
 });
 //# sourceMappingURL=QuestionWarningMessage.js.map

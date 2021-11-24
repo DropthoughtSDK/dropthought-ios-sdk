@@ -95,7 +95,8 @@ const SurveyScreenLayout = props => {
     pageIndex: pageIndex,
     survey: survey,
     rtl: _translation.default.dir() === 'rtl'
-  }), /*#__PURE__*/React.createElement(ScrollView, {
+  }), /*#__PURE__*/React.createElement(ScrollView // @ts-ignore
+  , {
     ref: scrollViewRef,
     style: [styles.scrollView, {
       backgroundColor

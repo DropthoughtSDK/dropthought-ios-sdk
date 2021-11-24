@@ -250,6 +250,7 @@ const styles = StyleSheet.create({
   },
   backgroundDark: {
     backgroundColor: Colors.sliderBackgroundDark,
+    elevation: 0,
   },
   horizontal: {
     flex: 1,
@@ -289,7 +290,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   selectedLabel: {
-    color: Colors.white,
     textAlign: 'center',
   },
 });

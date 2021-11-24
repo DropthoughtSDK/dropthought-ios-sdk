@@ -28,7 +28,7 @@
         "survey-back": "Back",
         "survey-next": "Next",
         "survey-submit": "Submit",
-        "mandatory": "You forgot to answer this question.",
+        "mandatory": "Oops! You Forgot To Answer This Question",
         "progress-bar": "{{percentage}}% Completed",
         "char-left": "Characters left: {{left}}",
         "idle-warning": "Do you want to continue the survey?",

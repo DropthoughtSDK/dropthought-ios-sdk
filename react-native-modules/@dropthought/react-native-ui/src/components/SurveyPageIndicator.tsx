@@ -5,8 +5,9 @@ import {
   DimensionWidthType,
   useDimensionWidthType,
 } from '../hooks/useWindowDimensions';
-import { opacity10, Colors } from '../styles';
+import { opacity10, opacity60, Colors } from '../styles';
 import type { Survey } from '../data';
+import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 
 type Props = {
   pageIndex: number;
@@ -16,7 +17,8 @@ type Props = {
 
 const SurveyPageIndicator = (props: Props) => {
   const { survey, pageIndex = 0, rtl } = props;
-
+  const { colorScheme } = useTheme();
+  const isDarkMode = colorScheme === COLOR_SCHEMES.dark;
   const themeColor = survey.surveyProperty.hexCode;
 
   const dimensionWidthType = useDimensionWidthType();
@@ -27,8 +29,6 @@ const SurveyPageIndicator = (props: Props) => {
 
   const currentPage = survey.pages[pageIndex];
 
-  const titleStyle = [styles.title, dimensionStyles.title];
-
   return (
     <View
       style={[
@@ -37,10 +37,19 @@ const SurveyPageIndicator = (props: Props) => {
         {
           backgroundColor: opacity10(themeColor),
         },
+        isDarkMode && styles.darkModeContainer,
         rtl ? styles.rtl : {},
       ]}
     >
-      <Text style={titleStyle}>{currentPage.pageTitle}</Text>
+      <Text
+        style={[
+          styles.title,
+          dimensionStyles.title,
+          isDarkMode && styles.darkModeTitle,
+        ]}
+      >
+        {currentPage.pageTitle}
+      </Text>
     </View>
   );
 };
@@ -51,8 +60,14 @@ const styles = StyleSheet.create({
     height: 40,
     width: '100%',
   },
+  darkModeContainer: {
+    backgroundColor: '#39393a',
+  },
   title: {
     fontWeight: '600',
+  },
+  darkModeTitle: {
+    color: opacity60(Colors.white),
   },
   rtl: {
     alignItems: 'flex-end',

@@ -5,7 +5,7 @@ export const Colors = {
   borderFocusedColor: '#4c3794',
   backgroundGrey: '#f5f6fa',
   backgroundGreyMask: '#f5f6facf',
-  white: '#fff',
+  white: '#ffffff',
   dateGrey: '#8b8b8b',
   buttonGrey: '#dcdcdc',
   black: '#000',
@@ -42,4 +42,5 @@ export const Colors = {
 export const opacity10 = color => `${color}1a`;
 export const opacity15 = color => `${color}26`;
 export const opacity30 = color => `${color}4d`;
+export const opacity60 = color => `${color}99`;
 //# sourceMappingURL=Colors.js.map
