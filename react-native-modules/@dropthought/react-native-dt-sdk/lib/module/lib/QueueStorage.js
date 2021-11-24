@@ -67,7 +67,11 @@ export class QueueStorage {
       await waitUntil(() => this.initialized === true);
     }
 
-    return encryptedStorage.setItemT(this.storageKey, this.queue);
+    try {
+      await encryptedStorage.setItemT(this.storageKey, this.queue);
+    } catch (err) {
+      console.log('##### syncToStorage error, err', err);
+    }
   }
   /**
    * @private

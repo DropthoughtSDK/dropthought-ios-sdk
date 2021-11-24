@@ -1,6 +1,6 @@
 {
   "name": "@dropthought/react-native-dt-sdk",
-  "version": "3.0.0-rc.2",
+  "version": "3.0.0-rc.3",
   "description": "dropthought sdk for react-native app",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
