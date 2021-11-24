@@ -1,6 +1,6 @@
 {
   "name": "@dropthought/react-native-ui",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "UI element for Dropthought React Native SDK",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",

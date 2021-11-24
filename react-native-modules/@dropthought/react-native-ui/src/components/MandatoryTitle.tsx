@@ -33,10 +33,10 @@ const MandatoryTitle = ({
   const addMandatoryRef = useAddMandatoryRef();
 
   React.useEffect(() => {
-    if (ref.current && question.mandatory) {
+    if (ref.current) {
       addMandatoryRef(question.questionId, ref.current);
     }
-  }, [addMandatoryRef, question.mandatory, question.questionId]);
+  }, [addMandatoryRef, question.questionId]);
 
   return (
     <View

@@ -41,10 +41,10 @@ const MandatoryTitle = ({
   const ref = React.useRef(null);
   const addMandatoryRef = (0, _surveyPage.useAddMandatoryRef)();
   React.useEffect(() => {
-    if (ref.current && question.mandatory) {
+    if (ref.current) {
       addMandatoryRef(question.questionId, ref.current);
     }
-  }, [addMandatoryRef, question.mandatory, question.questionId]);
+  }, [addMandatoryRef, question.questionId]);
   return /*#__PURE__*/React.createElement(_reactNative.View, {
     ref: ref,
     style: [styles.horizontal, style, rtl && _styles.default.flexRowReverse]
