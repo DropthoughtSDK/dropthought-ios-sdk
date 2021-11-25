@@ -4,26 +4,26 @@ This repository contains all Dropthought iOS SDK sources.
 
 ## Latest Version
 
-- 2.0.0
+-   3.0.0
 
 There are two main repositories:
 
-- **Dropthought**
+-   **Dropthought**
 
-- **react-native-modules**
+-   **react-native-modules**
 
 The repository **Dropthought** contains the interfaces and functions for using Dropthought iOS SDK.
 
 The repository **react-native-modules** contains the related react-native modules for Dropthought.
 
-* [Requirement](#Requirement)
-* [Installation](#Installation)
-* [Usage for Objective-C](#Usage-for-Objective-C)
-* [Usage for Swift](#Usage-for-Swift)
+-   [Requirement](#Requirement)
+-   [Installation](#Installation)
+-   [Usage for Objective-C](#Usage-for-Objective-C)
+-   [Usage for Swift](#Usage-for-Swift)
 
 ## Requirement
 
-- iOS 12.0+
+-   iOS 12.0+
 
 ## Precondition
 
@@ -39,22 +39,22 @@ Select Download ZIP to download source files to your computer.
 
 ### Step 2. Move/Copy Downloaded Repositories
 
-Move/Copy these two repositories **Dropthought** and **react-native-modules** into your project root.  
+Move/Copy these two repositories **Dropthought** and **react-native-modules** into your project root.
 Note: Same path/level as the **Podfile**
 
 <img src="https://github.com/DropthoughtSDK/dropthought-ios-sdk/blob/master/imgs/repository.png" width="30%" height="30%">
 
 ### Step 3. Modify Your Podfile
 
-We use CocoaPods to manage the SDK. You can find more detail about CocoaPods [here](https://cocoapods.org)  
-Open your Podfile and paste following scripts into your project target.  
+We use CocoaPods to manage the SDK. You can find more detail about CocoaPods [here](https://cocoapods.org)
+Open your Podfile and paste following scripts into your project target.
 And execute **pod install**
 
 ```ruby
   use_frameworks!
-  
+
   pod 'Dropthought', :path => './Dropthought'
-  
+
   react_native_modules_path = './react-native-modules/'
   pod 'FBLazyVector', :path => react_native_modules_path + 'react-native/Libraries/FBLazyVector'
   pod 'FBReactNativeSpec', :path => react_native_modules_path + 'react-native/Libraries/FBReactNativeSpec'
@@ -87,7 +87,6 @@ And execute **pod install**
   pod 'RNGestureHandler', :path => react_native_modules_path + 'react-native-gesture-handler'
   pod 'react-native-safe-area-context', :path => react_native_modules_path + 'react-native-safe-area-context'
   pod 'RNCAsyncStorage', :path => react_native_modules_path + '@react-native-community/async-storage'
-  pod 'RNLocalize', :path => react_native_modules_path + 'react-native-localize'
 ```
 
 ## Usage for Objective-C
@@ -108,7 +107,7 @@ And execute **pod install**
 
     return YES;
 }
-````
+```
 
 ### Open a survey from a view controller
 
@@ -151,7 +150,7 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 
 ```swift
 // self represent a UIViewController where you what to present a survey
-Dropthought.instance().present(self, surveyId: "SURVEY_ID")
+Dropthought.instance().present(self, surveyId: "SURVEY_ID", theme: "default" | "light" | "dark", fontColor: "FONT_COLOR", backgroundColor: "BACKGROUND_COLOR")
 ```
 
 ### Upload offline feedbacks
