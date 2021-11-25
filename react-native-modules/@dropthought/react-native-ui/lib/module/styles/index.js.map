@@ -1,0 +1,1 @@
+{"version":3,"sources":["index.ts"],"names":["GlobalStyle"],"mappings":"AAAA,cAAc,UAAd;AAEA,SAASA,WAAT,QAA4B,eAA5B;AACA,eAAeA,WAAf;AAEA,cAAc,eAAd","sourcesContent":["export * from './Colors';\n\nimport { GlobalStyle } from './GlobalStyle';\nexport default GlobalStyle;\n\nexport * from './GlobalStyle';\n"]}

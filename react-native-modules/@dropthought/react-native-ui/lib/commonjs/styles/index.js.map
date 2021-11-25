@@ -1,0 +1,1 @@
+{"version":3,"sources":["index.ts"],"names":["GlobalStyle"],"mappings":";;;;;;;;AAAA;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AAEA;;AAGA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;eAFeA,wB","sourcesContent":["export * from './Colors';\n\nimport { GlobalStyle } from './GlobalStyle';\nexport default GlobalStyle;\n\nexport * from './GlobalStyle';\n"]}

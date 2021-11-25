@@ -2,7 +2,7 @@ import { ScreenRect } from 'react-native';
 export declare function useKeyboard(): {
     keyboardShown: boolean;
     coordinates: {
-        start: ScreenRect;
+        start: undefined | ScreenRect;
         end: ScreenRect;
     };
     keyboardHeight: number;

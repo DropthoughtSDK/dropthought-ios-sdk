@@ -6,13 +6,21 @@ var react_native_1 = require("react-native");
 function useAppState() {
     var currentState = react_native_1.AppState.currentState;
     var _a = react_1.useState(currentState), appState = _a[0], setAppState = _a[1];
-    function onChange(newState) {
-        setAppState(newState);
-    }
     react_1.useEffect(function () {
-        react_native_1.AppState.addEventListener('change', onChange);
+        function onChange(newState) {
+            setAppState(newState);
+        }
+        var subscription = react_native_1.AppState.addEventListener('change', onChange);
         return function () {
-            react_native_1.AppState.removeEventListener('change', onChange);
+            // @ts-expect-error - React Native >= 0.65
+            if (typeof (subscription === null || subscription === void 0 ? void 0 : subscription.remove) === 'function') {
+                // @ts-expect-error - need update @types/react-native@0.65.x
+                subscription.remove();
+            }
+            else {
+                // React Native < 0.65
+                react_native_1.AppState.removeEventListener('change', onChange);
+            }
         };
     }, []);
     return appState;

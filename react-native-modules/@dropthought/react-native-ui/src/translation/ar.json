@@ -1,0 +1,46 @@
+{
+    "common": {},
+    "placeholder-title": {
+        "NoInternet": "No Internet Connection",
+        "ProgramScheduled": "هذا البرنامج لم يبدأ بعد",
+        "ProgramExpired": "انتهت صلاحية هذا البرنامج",
+        "ProgramDeleted": "تم حذف هذا البرنامج",
+        "ProgramDeactivated": "تم تعطيل هذا البرنامج",
+        "ProgramUnavailable": "هذا البرنامج غير متاح"
+    },
+    "start-survey": {
+        "start-btn": "بدأ الاستبيان",
+        "start-btn-desc": "اضغط على هذا الزر",
+        "qrcode-desc": "مسح QR هذا",
+        "or": "أو",
+        "placeholder-message": "آسف للإزعاج.\nيرجى العودة والتحقق لاحقا."
+    },
+    "survey": {
+        "survey-back": "الرجوع",
+        "survey-next": "التالي",
+        "survey-submit": "إرسال",
+        "mandatory": "نسيت الإجابة على هذا السؤال",
+        "progress-bar": "{{percentage}} ٪ من 100 ٪ اكتملت",
+        "char-left": "عدد الاحرف المتبقي: {{left}}",
+        "other-option": "آخر:",
+        "other-placeholder": "في ماذا تفكر؟",
+        "metadata-anonymous-warning": "لن يتم مشاركة المعلومات الشخصية"
+    },
+    "metadata-question-desc": {
+        "Name": "على سبيل المثال John Doe / يرجى كتابة Name فقط",
+        "Email": "على سبيل المثال test@test.com / يرجى كتابة Email فقط",
+        "Phone": "على سبيل المثال +15555555555 / يرجى كتابة Phone فقط",
+        "Number": "على سبيل المثال 1001 / يرجى كتابة Number فقط",
+        "Date": "على سبيل المثال 2020/03/19 or 2020-03-19 / يرجى كتابة Date فقط",
+        "String": "على سبيل المثال Hello123! / يرجى كتابة Text فقط"
+    },
+    "metadata-invalid-message": {
+        "Email": "يرجى الرد بالبريد الإلكتروني",
+        "Phone": "الرجاء الرد بالهاتف",
+        "Number": "الرجاء الرد بالأرقام",
+        "Date": "الرجاء الرد بالتاريخ"
+    },
+    "end-survey": {
+        "thank": "شكرا للمشاركة"
+    }
+}
