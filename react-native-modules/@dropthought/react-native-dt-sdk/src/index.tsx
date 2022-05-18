@@ -1,7 +1,10 @@
 import { initializeWithAPIKey } from './initialize';
 
 // @ts-ignore
-import { feedbackUploader as jsFeedbackUploader } from './lib/FeedbacksUploader';
+import {
+  feedbackUploader as jsFeedbackUploader,
+  FeedbacksQueue,
+} from './lib/FeedbacksUploader';
 import type { Storage } from './lib/Storage';
 
 const BASE_URL = 'https://api.dropthought.com/dtapp';
@@ -20,6 +23,10 @@ export const feedbackUploader = {
     return jsFeedbackUploader.clear();
   },
 };
+
+export function getAllFeedbacks() {
+  return FeedbacksQueue.getAll();
+}
 
 export { initializeWithAPIKey };
 

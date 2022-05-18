@@ -8,5 +8,6 @@ export declare const feedbackUploader: {
     upload(): Promise<void>;
     clear(): Promise<void>;
 };
+export declare function getAllFeedbacks(): import("./data").SurveyFeedback[];
 export { initializeWithAPIKey };
 export * from './kiosk-rn-sdk';

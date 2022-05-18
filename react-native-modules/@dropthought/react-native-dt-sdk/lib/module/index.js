@@ -1,6 +1,6 @@
 import { initializeWithAPIKey } from './initialize'; // @ts-ignore
 
-import { feedbackUploader as jsFeedbackUploader } from './lib/FeedbacksUploader';
+import { feedbackUploader as jsFeedbackUploader, FeedbacksQueue } from './lib/FeedbacksUploader';
 const BASE_URL = 'https://api.dropthought.com/dtapp';
 export function initialize(params) {
   initializeWithAPIKey({ ...params,
@@ -17,6 +17,9 @@ export const feedbackUploader = {
   }
 
 };
+export function getAllFeedbacks() {
+  return FeedbacksQueue.getAll();
+}
 export { initializeWithAPIKey };
 export * from './kiosk-rn-sdk';
 //# sourceMappingURL=index.js.map
