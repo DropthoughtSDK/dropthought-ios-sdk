@@ -18,5 +18,3 @@ Pod::Spec.new do |s|
   #s.dependency "others"
 
 end
-
-  
