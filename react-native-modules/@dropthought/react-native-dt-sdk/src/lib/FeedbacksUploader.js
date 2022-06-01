@@ -32,9 +32,6 @@ export const FailedReasonsQueue = new QueueStorage({
  * @param {*} cancelSource
  */
 async function sendFeedback(surveyFeedback) {
-  console.log('[RN][sendFeedback] --------------');
-  console.log('[RN][sendFeedback] Send feedback: ', surveyFeedback);
-  console.log('[RN][sendFeedback] --------------');
   return apiPostEvent({
     programId: surveyFeedback.surveyId,
     feedbacks: surveyFeedback.feedbacks,
@@ -141,40 +138,27 @@ function CreateFeedbacksUploader() {
       await sendFeedback(feedback);
       numOfProcessed++;
     } catch (err) {
-      console.log('[RN][uploadSingle][catch] --------------');
-      console.log('[RN][uploadSingle][catch] Feedback: ', feedback);
-      console.log('[RN][uploadSingle][catch] Error: ', err);
+      console.log(
+        'failed when sending feedback',
+        feedback.surveyId,
+        err.message
+      );
       // failed, add to failed queue
       FailedFeedbacksQueue.enqueue(feedback);
       FailedReasonsQueue.enqueue({
         message: err.message,
         status: err.response?.status,
       });
-      console.log(
-        '[RN][uploadStart][catch] FailedFeedbacksQueue: ',
-        FailedFeedbacksQueue.getAll()
-      );
-      console.log('[RN][uploadSingle][catch] --------------');
     } finally {
       FeedbacksQueue.dequeue();
 
       publish();
-      console.log('[RN][uploadSingle][finally] --------------');
-      console.log('[RN][uploadSingle][finally] Upload next');
-      console.log('[RN][uploadSingle][finally] --------------');
       await uploadSingle();
     }
   }
 
   function uploadDone() {
     state = UploaderStates.Idle;
-    console.log('[RN][uploadDone] --------------');
-    console.log('[RN][uploadDone] Done for current upload proccess.');
-    console.log(
-      '[RN][uploadDone] Failed count: ',
-      FailedFeedbacksQueue.getAll()?.length
-    );
-    console.log('[RN][uploadDone] --------------');
     publish();
   }
 
@@ -193,24 +177,7 @@ function CreateFeedbacksUploader() {
     numOfProcessed = 0;
     userCanceled = false;
 
-    console.log('[RN][uploadStart] --------------');
-    console.log('[RN][uploadStart] FeedbacksQueue: ', FeedbacksQueue.getAll());
-    console.log(
-      '[RN][uploadStart] FailedFeedbacksQueue: ',
-      FailedFeedbacksQueue.getAll()
-    );
-    console.log(
-      '[RN][uploadStart] Copy FailedFeedbacksQueue to FeedbacksQueue'
-    );
     retryFailed();
-
-    console.log('[RN][uploadStart] FeedbacksQueue: ', FeedbacksQueue.getAll());
-    console.log(
-      '[RN][uploadStart] FailedFeedbacksQueue: ',
-      FailedFeedbacksQueue.getAll()
-    );
-    console.log('[RN][uploadStart] --------------');
-
     publish();
   }
 

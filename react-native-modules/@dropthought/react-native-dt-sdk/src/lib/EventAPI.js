@@ -3,12 +3,12 @@
  * https://docs.dropthought.com/docs/2_0/api.html#event
  * submit feedback
  */
-import { isNil, isEmpty } from 'ramda';
+import {isNil, isEmpty} from 'ramda'
 
-import { fetcherInstance } from './APIClient';
-import { throwRequestError } from './Fetcher';
+import {fetcherInstance} from './APIClient'
+import {throwRequestError} from './Fetcher'
 
-const EVENT_PATH = '/api/event';
+const EVENT_PATH = '/api/event'
 
 /**
  * post event (feedback)
@@ -25,52 +25,44 @@ const EVENT_PATH = '/api/event';
  * @returns {Promise<Survey>}
  */
 export async function apiPostEvent(
-  {
-    programId,
-    feedbacks = [],
-    source = 'api',
-    metadata = {},
-    createdTime,
-    timeZone,
-  },
-  axiosConfig = {},
-  fetcher = fetcherInstance
+    {programId, feedbacks = [], source = 'api', metadata = {}, createdTime, timeZone},
+    axiosConfig = {},
+    fetcher = fetcherInstance,
 ) {
-  /** @type {AxiosRequestConfig} */
-  const params = {
-    method: 'POST',
-    authRequired: true,
-    data: {
-      refId: programId,
-      data: feedbacks.map((feedback) => ({
-        dataId: feedback.questionId,
-        dataValue:
-          // for not answered question, server doesn't allow empty array for dataValue
-          // it accept [''] for not answered question
-          isNil(feedback.answers) || isEmpty(feedback.answers)
-            ? ['']
-            : feedback.answers,
-        dataType: feedback.type,
-        otherFlag: feedback.otherFlag,
-      })),
-      metaData: {
-        source,
-        ...metadata,
-      },
-      createdTime,
-      timeZone,
-    },
-    ...axiosConfig,
-  };
-
-  return fetcher.request(EVENT_PATH, params).then((response) => {
-    console.log('[RN] Upload feedback response: ', response);
-    if (response.data.success === false) {
-      throwRequestError(response);
-      return;
+    /** @type {AxiosRequestConfig} */
+    const params = {
+        method: 'POST',
+        authRequired: true,
+        data: {
+        refId: programId,
+        data: feedbacks.map((feedback) => ({
+                dataId: feedback.questionId,
+                dataValue:
+                    // for not answered question, server doesn't allow empty array for dataValue
+                    // it accept [''] for not answered question
+                    isNil(feedback.answers) || isEmpty(feedback.answers)
+                        ? ['']
+                        : feedback.answers,
+                dataType: feedback.type,
+                otherFlag: feedback.otherFlag,
+            })),
+            metaData: {
+                source,
+                ...metadata,
+            },
+            createdTime,
+            timeZone,
+        },
+        ...axiosConfig,
     }
-    return response.data;
-  });
+
+    return fetcher.request(EVENT_PATH, params).then((response) => {
+        if (response.data.success === false) {
+            throwRequestError(response)
+            return
+        }
+        return response.data
+    })
 }
 
 /**

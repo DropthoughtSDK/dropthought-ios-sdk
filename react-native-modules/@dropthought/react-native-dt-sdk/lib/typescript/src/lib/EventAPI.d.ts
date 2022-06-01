@@ -12,7 +12,7 @@
  * @param {Fetcher=} fetcher
  * @returns {Promise<Survey>}
  */
-export function apiPostEvent({ programId, feedbacks, source, metadata, createdTime, timeZone, }: {
+export function apiPostEvent({ programId, feedbacks, source, metadata, createdTime, timeZone }: {
     programId: string;
     feedbacks: Feedback[];
     source?: EventAPISourceType;

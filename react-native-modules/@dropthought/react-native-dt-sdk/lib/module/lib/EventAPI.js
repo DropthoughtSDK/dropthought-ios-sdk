@@ -54,8 +54,6 @@ export async function apiPostEvent({
     ...axiosConfig
   };
   return fetcher.request(EVENT_PATH, params).then(response => {
-    console.log('[RN] Upload feedback response: ', response);
-
     if (response.data.success === false) {
       throwRequestError(response);
       return;

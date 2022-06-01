@@ -6,11 +6,9 @@ Object.defineProperty(exports, "__esModule", {
 var _exportNames = {
   initialize: true,
   feedbackUploader: true,
-  getAllFeedbacks: true,
   initializeWithAPIKey: true
 };
 exports.initialize = initialize;
-exports.getAllFeedbacks = getAllFeedbacks;
 Object.defineProperty(exports, "initializeWithAPIKey", {
   enumerable: true,
   get: function () {
@@ -56,8 +54,4 @@ const feedbackUploader = {
 
 };
 exports.feedbackUploader = feedbackUploader;
-
-function getAllFeedbacks() {
-  return _FeedbacksUploader.FeedbacksQueue.getAll();
-}
 //# sourceMappingURL=index.js.map
