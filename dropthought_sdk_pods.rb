@@ -1,7 +1,6 @@
 def use_dropthought_sdk
     
-#    pod 'Dropthought', :path => './Dropthought'
-    pod 'Dropthought', :path => '../iosSDK'
+    pod 'Dropthought', :path => './Dropthought'
   
     prefix = "./react-native-modules"
       
