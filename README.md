@@ -91,7 +91,14 @@ And execute **pod install**
 }
 ```
 
-### Open a survey from a view controller
+### Open a survey from a view controller (SDK Control Center)
+
+```objc
+// self represent a UIViewController where you what to present a survey
+[[Dropthought instance] present:self visibilityId:{VISIBILITY_ID}];
+```
+
+### Open a survey from a view controller (Old Fashioned)
 
 ```objc
 // self represent a UIViewController where you what to present a survey
@@ -134,7 +141,14 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 }
 ```
 
-### Open a survey from a view controller
+### Open a survey from a view controller (SDK Control Center)
+
+```swift
+// self represent a UIViewController where you what to present a survey
+Dropthought.instance().present(self, visibilityId: "VISIBILITY_ID")
+```
+
+### Open a survey from a view controller (Old Fashioned)
 
 ```swift
 // self represent a UIViewController where you what to present a survey
