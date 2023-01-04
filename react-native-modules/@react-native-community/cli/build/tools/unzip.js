@@ -5,6 +5,16 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.unzip = void 0;
 
+function _fsExtra() {
+  const data = require("fs-extra");
+
+  _fsExtra = function () {
+    return data;
+  };
+
+  return data;
+}
+
 const StreamZip = require('node-stream-zip');
 
 const unzip = async (source, destination) => {
@@ -13,6 +23,7 @@ const unzip = async (source, destination) => {
       file: source,
       storeEntries: true
     });
+    (0, _fsExtra().mkdirpSync)(destination);
     zip.on('ready', () => {
       zip.extract(null, destination, err => {
         zip.close();

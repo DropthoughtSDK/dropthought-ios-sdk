@@ -47,7 +47,7 @@ const checkSurveyStatus = (surveyState, surveyStartDate, surveyEndDate) => {
  * @param {ScreenProps} props
  */
 const StartScreen = (props) => {
-  const { onStart } = props;
+  const { onStart, onClose } = props;
   const { survey, changeLanguage } = useSurveyContext();
   const {
     state: surveyState,
@@ -83,6 +83,7 @@ const StartScreen = (props) => {
   return (
     <StartScreenLayout
       survey={survey}
+      onClose={onClose}
       onStart={onStart}
       onLanguageSelect={onLanguageSelectHandler}
     />
@@ -94,4 +95,5 @@ export default StartScreen;
 /**
  * @typedef {Object} ScreenProps
  * @property {() => void} onStart
+ * @property {() => void} onClose
  */

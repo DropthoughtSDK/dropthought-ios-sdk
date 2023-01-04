@@ -4,7 +4,7 @@ import { sum } from 'ramda'; // @ts-ignore
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useKeyboard } from '@react-native-community/hooks';
-import ProgressBar from '../components/ProgressBar';
+import ClassicProgressBar from '../components/ClassicProgressBar';
 import { useFeedbackState } from '../contexts/feedback';
 import { opacity10 } from '../styles';
 
@@ -58,7 +58,7 @@ const SurveyProgressBar = ({
   if (isAndroid && keyboardShown) return null;
   return /*#__PURE__*/React.createElement(View, {
     style: containerStyle
-  }, /*#__PURE__*/React.createElement(ProgressBar, {
+  }, /*#__PURE__*/React.createElement(ClassicProgressBar, {
     value: numValidFeedbacks(feedbackState),
     maxValue: numTotalQuestions(props.survey),
     themeColor: themeColor,

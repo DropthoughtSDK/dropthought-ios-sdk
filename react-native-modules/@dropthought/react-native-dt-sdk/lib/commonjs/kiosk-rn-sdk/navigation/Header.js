@@ -35,12 +35,15 @@ const Header = ({
   themeColor,
   onClose
 }) => {
+  const {
+    themeOption
+  } = (0, _reactNativeUi.useTheme)();
   const insets = (0, _reactNativeSafeAreaContext.useSafeAreaInsets)();
   const isRtl = _reactNativeUi.i18n.dir() === 'rtl';
 
   const isPhone = (0, _reactNativeUi.useDimensionWidthType)() === _reactNativeUi.DimensionWidthType.phone;
 
-  return /*#__PURE__*/React.createElement(_reactNative.View, {
+  const classicHeader = /*#__PURE__*/React.createElement(_reactNative.View, {
     style: [styles.container, {
       backgroundColor: themeColor,
       paddingTop: insets.top
@@ -55,6 +58,7 @@ const Header = ({
   }, /*#__PURE__*/React.createElement(_CloseButton.default, {
     onPress: onClose
   }))));
+  return themeOption === _reactNativeUi.THEME_OPTION.CLASSIC ? classicHeader : null;
 };
 
 var _default = Header;

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Feedback as OriginFeedback, Question as OriginQuestion } from '../data';
+import type { Question as OriginQuestion, Feedback as OriginFeedback } from '../data';
 declare type Feedback = OriginFeedback & {
     answers: string[];
 };

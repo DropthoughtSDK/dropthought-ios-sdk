@@ -21,22 +21,17 @@ import {
   GlobalStyle,
   PlaceholderScreen,
   PlaceholderImageTypes,
+  THEME_OPTION,
 } from '@dropthought/react-native-ui';
+import { ThemeProvider } from '@dropthought/react-native-ui/src/contexts/theme';
 
 import FakeScreen from '../../screens/FakeScreen';
 import { saveCache, loadCache } from '../../../lib/Storage';
-import { apiGetProgramById } from '../../../lib/API';
+import { apiGetProgramById, apiGetVisibilityById } from '../../../lib/API';
 import { isRequestTimeoutError, isNoInternetError } from '../../../lib/Fetcher';
 
 const DT_ERR_MISSING_PARAMS = 'dt-missing-parameters';
-
-/**
- * @typedef {object} SurveyContextValue
- * @property {Survey} survey
- * @property {(language: string) => void} changeLanguage
- * @property {() => void} onClose
- */
-/** @typedef {import('../../../data').Survey} Survey */
+const DT_ERR_NO_BIND_PROGRAM = 'dt-no-bind-program';
 
 /** @type {React.Context<SurveyContextValue>} */
 const SurveyContext = React.createContext({
@@ -51,6 +46,39 @@ export const useSurveyContext = () => {
 export const useSurvey = () => {
   const surveyContextValue = React.useContext(SurveyContext);
   return surveyContextValue.survey;
+};
+
+/**
+ * load the visibility data from cache or api
+ * @param {{visibilityId: string, language: string}} param0
+ */
+const getVisibility = async ({ visibilityId, language }) => {
+  if (!visibilityId) {
+    throw new Error(DT_ERR_MISSING_PARAMS);
+  }
+
+  /** @type {Visibility} */
+  const visibility = await apiGetVisibilityById(visibilityId, {
+    timeout: 10000,
+  });
+
+  if (!visibility.program || !visibility.program.programId) {
+    throw new Error(DT_ERR_NO_BIND_PROGRAM);
+  }
+
+  /** @type {ThemeData} */
+  const theme = {
+    themeOption: visibility.themeOption,
+    appearance: visibility.appearance,
+    fontColor: visibility.fontColor,
+    backgroundColor: visibility.backgroundColor,
+  };
+
+  return getProgram({
+    surveyId: visibility.program.programId,
+    language,
+    theme,
+  });
 };
 
 /**
@@ -100,9 +128,9 @@ const preFetchImage = (survey) =>
 
 /**
  * load the program data from cache or api
- * @param {{surveyId: string, language: string}} param0
+ * @param {{surveyId: string, language: string, theme?: ThemeData }} param0
  */
-const getProgram = async ({ surveyId, language }) => {
+const getProgram = async ({ surveyId, language, theme }) => {
   const programCacheKey = `survey-${surveyId}-${language}`;
   if (!surveyId) {
     throw new Error(DT_ERR_MISSING_PARAMS);
@@ -135,7 +163,32 @@ const getProgram = async ({ surveyId, language }) => {
   // change the i18n language
   i18n.changeLanguage(survey.language);
 
-  return survey;
+  return { survey, theme };
+};
+
+/**
+ * extract questions in page and make them as its' independent page
+ * @param {Survey} survey
+ */
+const singleQuestionPerPageTransformer = (survey) => {
+  /** @type {Survey} */
+  let result = {};
+  if (survey) {
+    const newPageOrder = [];
+    const newPages = [];
+    const { pages } = survey;
+    pages.map((page) => {
+      const { pageId, questions } = page;
+      questions.forEach((question, index) => {
+        const newPageId = `${pageId}_${index}`;
+        newPageOrder.push(newPageId);
+        const newPage = { ...page, pageId: newPageId, questions: [question] };
+        newPages.push(newPage);
+      });
+    });
+    result = { ...survey, pageOrder: newPageOrder, pages: newPages };
+  }
+  return result;
 };
 
 // we want to "remember" the previous selected language
@@ -180,11 +233,22 @@ const defaultOnCloseHandler = () => {
  * @param {Props} param0
  */
 export const SurveyContextProvider = ({
+  visibilityId,
   surveyId,
   children,
   defaultLanguage = 'en',
   onClose = defaultOnCloseHandler,
+  themeOption,
+  appearance,
+  fontColor,
+  backgroundColor,
 }) => {
+  const themeDataFromSDKEntry = {
+    themeOption,
+    appearance,
+    fontColor,
+    backgroundColor,
+  };
   const [
     selectedLanguage,
     prevSelectedLanguage,
@@ -205,27 +269,34 @@ export const SurveyContextProvider = ({
   }, [selectedLanguage, prevSelectedLanguage, setSelectedLanguage]);
 
   const { data, error, isPending } = useAsync({
-    promiseFn: getProgram,
+    promiseFn: visibilityId ? getVisibility : getProgram,
     onReject: onRejectHandler,
 
+    visibilityId,
     surveyId,
     language: selectedLanguage,
 
-    // watch, only re-run the promise, when language is changed or surveyId is changed
+    // watch, only re-run the promise, when language is changed or visibilityId is changed
     watchFn: (props, prevProps) =>
+      props.visibilityId !== prevProps.visibilityId ||
       (props.language !== prevProps.language &&
         props.language !== prevSelectedLanguage) ||
       props.surveyId !== prevProps.surveyId,
   });
 
+  const { survey, theme = themeDataFromSDKEntry } = data ?? {};
+
   /** @type {SurveyContextValue} */
   const contextValue = React.useMemo(
     () => ({
       onClose,
-      survey: data,
+      survey:
+        theme?.themeOption === THEME_OPTION.CLASSIC
+          ? survey
+          : singleQuestionPerPageTransformer(survey),
       changeLanguage: setSelectedLanguageWithBackup,
     }),
-    [data, onClose, setSelectedLanguageWithBackup]
+    [survey, onClose, setSelectedLanguageWithBackup, theme]
   );
 
   // initial loading data view
@@ -252,15 +323,26 @@ export const SurveyContextProvider = ({
     }
     return <FakeScreen onClose={onClose}>{content}</FakeScreen>;
   }
-
   return (
     <SurveyContext.Provider value={contextValue}>
-      <View style={GlobalStyle.flex1}>
-        {children}
-        <ActivityIndicatorMask loading={isPending} />
-      </View>
+      <ThemeProvider {...theme}>
+        <View style={GlobalStyle.flex1}>
+          {children}
+          <ActivityIndicatorMask loading={isPending} />
+        </View>
+      </ThemeProvider>
     </SurveyContext.Provider>
   );
 };
 
 /** @typedef {import('../../SDKEntry').SDKEntryProps} Props */
+
+/**
+ * @typedef {object} SurveyContextValue
+ * @property {Survey} survey
+ * @property {(language: string) => void} changeLanguage
+ * @property {() => void} onClose
+ */
+/** @typedef {import('../../../data').Survey} Survey */
+/** @typedef {import('../../../data').Visibility} Visibility */
+/** @typedef {import('../../../data').ThemeData} ThemeData */

@@ -1,5 +1,6 @@
 import { Fetcher } from './Fetcher';
 import { apiGetProgramById as _apiGetProgramById } from './ProgramAPI';
+import { apiGetVisibilityById as _apiGetVisibilityById } from './VisibilityAPI';
 import { apiPostEvent as _apiPostEvent } from './EventAPI';
 import { BASE_URL } from './APIClient';
 
@@ -13,6 +14,13 @@ export const sdkFetcher = new Fetcher({
  */
 export const apiGetProgramById = (param, requestConfig) =>
   _apiGetProgramById(param, requestConfig, sdkFetcher);
+
+/**
+ * @param {string} visibilityId
+ * @param {RequestConfig=} requestConfig
+ */
+export const apiGetVisibilityById = (visibilityId, requestConfig) =>
+  _apiGetVisibilityById(visibilityId, requestConfig, sdkFetcher);
 
 /**
  *

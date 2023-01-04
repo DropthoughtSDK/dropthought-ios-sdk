@@ -9,13 +9,13 @@ var React = _interopRequireWildcard(require("react"));
 
 var _reactNativeSafeAreaContext = require("react-native-safe-area-context");
 
-var _reactNativeUi = require("@dropthought/react-native-ui");
-
 var _survey = require("./contexts/survey");
 
 var _customProps = require("./contexts/custom-props");
 
 var _SurveyStackContainer = _interopRequireDefault(require("./SurveyStackContainer"));
+
+var _feedback = require("@dropthought/react-native-ui/src/contexts/feedback");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -28,11 +28,13 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 /**
  * @typedef {object} SDKEntryOwnProps
  * @property {string} apiKey
+ * @property {string} visibilityId
  * @property {string} surveyId
  * @property {string=} defaultLanguage if not provided, default is "en"
  * @property {string=} baseURL if not provided, default is ...
  * @property {()=>void=} onClose when the close icon is pressed in the header
- * @property {ThemeType=} theme
+ * @property {THEME_OPTION} themeOption
+ * @property {ThemeType=} appearance
  * @property {string=} fontColor
  * @property {string=} backgroundColor
  */
@@ -44,16 +46,7 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 /**
  * @param {SDKEntryProps} props
  */
-function SDKEntry({
-  theme,
-  fontColor,
-  backgroundColor,
-  ...props
-}) {
-  return /*#__PURE__*/React.createElement(_reactNativeSafeAreaContext.SafeAreaProvider, null, /*#__PURE__*/React.createElement(_reactNativeUi.KioskProvider, {
-    theme: theme,
-    fontColor: fontColor,
-    backgroundColor: backgroundColor
-  }, /*#__PURE__*/React.createElement(_customProps.CustomPropsContextProvider, props, /*#__PURE__*/React.createElement(_survey.SurveyContextProvider, props, /*#__PURE__*/React.createElement(_SurveyStackContainer.default, null)))));
+function SDKEntry(props) {
+  return /*#__PURE__*/React.createElement(_reactNativeSafeAreaContext.SafeAreaProvider, null, /*#__PURE__*/React.createElement(_feedback.FeedbackProvider, null, /*#__PURE__*/React.createElement(_customProps.CustomPropsContextProvider, props, /*#__PURE__*/React.createElement(_survey.SurveyContextProvider, props, /*#__PURE__*/React.createElement(_SurveyStackContainer.default, null)))));
 }
 //# sourceMappingURL=SDKEntry.js.map

@@ -1,4 +1,4 @@
-export type { IColorSchemesType, IThemeOptionsType, FontColor, BackgroundColor, } from './contexts/theme';
+export type { IColorSchemesType, IAppearanceType, FontColor, BackgroundColor, IThemeOptionType, } from './contexts/theme';
 export declare type QuestionType = 'rating' | 'open' | 'multiChoice' | 'singleChoice' | 'nps';
 export declare type QuestionSubType = 'smiley' | 'slider';
 export declare type QuestionBrandType = 'other';
@@ -18,7 +18,7 @@ export interface Question {
     options?: string[];
     type: QuestionType;
     subType?: QuestionSubType;
-    scale?: number;
+    scale?: string;
 }
 export interface Page {
     pageId: string;

@@ -1,6 +1,6 @@
 {
   "name": "@react-native-community/cli-types",
-  "version": "4.8.0",
+  "version": "4.10.1",
   "main": "build",
   "publishConfig": {
     "access": "public"
@@ -10,5 +10,6 @@
     "!*.map"
   ],
   "types": "build/index.d.ts",
-  "license": "MIT"
+  "license": "MIT",
+  "gitHead": "f76add94dcfb647dd55b59a5fad9a4d5363962fa"
 }

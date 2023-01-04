@@ -36,26 +36,41 @@ const MandatoryTitle = ({
   const rtl = _translation.default.dir() === 'rtl';
   const dimensionWidthType = (0, _useWindowDimensions.useDimensionWidthType)();
   const {
-    fontColor
+    fontColor,
+    themeOption,
+    customFontColor
   } = (0, _theme.useTheme)();
+  const {
+    questionId,
+    questionTitle,
+    mandatory,
+    type,
+    subType
+  } = question;
   const ref = React.useRef(null);
   const addMandatoryRef = (0, _surveyPage.useAddMandatoryRef)();
   React.useEffect(() => {
     if (ref.current) {
-      addMandatoryRef(question.questionId, ref.current);
+      addMandatoryRef(questionId, ref.current);
     }
-  }, [addMandatoryRef, question.questionId]);
+  }, [addMandatoryRef, questionId]);
+  let color = fontColor;
+  const isOption6Smiley = themeOption === _theme.THEME_OPTION.OPTION6 && type === 'rating' && subType === 'smiley';
+
+  if ((customFontColor === undefined || customFontColor === '') && isOption6Smiley) {
+    color = _styles.Colors.white;
+  }
+
   return /*#__PURE__*/React.createElement(_reactNative.View, {
     ref: ref,
     style: [styles.horizontal, style, rtl && _styles.default.flexRowReverse]
-  }, question.questionTitle.split(' ').map((text, index) => /*#__PURE__*/React.createElement(_reactNative.Text, {
-    key: index,
+  }, /*#__PURE__*/React.createElement(_reactNative.Text, {
     style: [styles.questionTitle, questionTitleSize[dimensionWidthType], {
-      color: fontColor
+      color
     }]
-  }, text + ' ')), question.mandatory && /*#__PURE__*/React.createElement(_reactNative.Text, {
+  }, questionTitle, mandatory && /*#__PURE__*/React.createElement(_reactNative.Text, {
     style: styles.hint
-  }, "*"), /*#__PURE__*/React.createElement(_QuestionWarningMessage.default // forgot message has higher priority than custom invalid message
+  }, "*")), /*#__PURE__*/React.createElement(_QuestionWarningMessage.default // forgot message has higher priority than custom invalid message
   , {
     message: forgot ? _translation.default.t('survey:mandatory') : invalidMessage
   }));
@@ -66,10 +81,10 @@ exports.default = _default;
 
 const questionTitleSize = _reactNative.StyleSheet.create({
   [_useWindowDimensions.DimensionWidthType.phone]: {
-    fontSize: 16
+    fontSize: 26
   },
   [_useWindowDimensions.DimensionWidthType.tablet]: {
-    fontSize: 18
+    fontSize: 26
   }
 });
 
@@ -80,13 +95,14 @@ const styles = _reactNative.StyleSheet.create({
   },
   horizontal: {
     flexDirection: 'row',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginBottom: 24
   },
   questionTitle: {
-    fontSize: 18,
-    marginBottom: 2,
-    textAlignVertical: 'center',
-    alignSelf: 'center'
+    fontSize: 26,
+    fontWeight: '600',
+    textAlign: 'center'
   }
 });
 //# sourceMappingURL=MandatoryTitle.js.map

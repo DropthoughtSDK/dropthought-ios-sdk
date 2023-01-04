@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.opacity60 = exports.opacity30 = exports.opacity15 = exports.opacity10 = exports.Colors = void 0;
+exports.opacity60 = exports.opacity30 = exports.opacity15 = exports.opacity10 = exports.addOpacityToColor = exports.Option1BackgroundColorDark = exports.Option1BackgroundColor = exports.Colors = void 0;
 const Colors = {
   purple: '#4c3794',
   borderColor: '#c2c2c2',
@@ -14,7 +14,7 @@ const Colors = {
   white: '#ffffff',
   dateGrey: '#8b8b8b',
   buttonGrey: '#dcdcdc',
-  black: '#000',
+  black: '#000000',
   dividerGrey: '#d1d1d1',
   errorHintColor: '#a30000',
   statusBarDivider: '#CCC',
@@ -42,10 +42,26 @@ const Colors = {
   fontColorDark: '#FFFFFFDE',
   backgroundColorLight: '#FFF',
   backgroundColorDark: '#171717',
-  sliderBackgroundDark: '#FFFFFF1A'
+  sliderBackgroundDark: '#FFFFFF1A',
+  unSelectedBackground: '#f1f4f9',
+  smileyRatingScoreGray: '#adadb2',
+  appearanceSubBlack: '#f5f5f7',
+  warningRed: '#cb4647'
+};
+exports.Colors = Colors;
+
+const addOpacityToColor = (hexColor, opacity) => {
+  const o = Math.max(0, Math.min(1, opacity)); // bound opacity from 0 to 1
+
+  const intValue = Math.round(o * 255); // map percent to nearest integer (0 - 255)
+
+  const hexValue = intValue.toString(16); // get hexadecimal representation
+
+  return `${hexColor}${hexValue.padStart(2, '0').toUpperCase()}`; // format with leading 0 and upper case characters
 }; // https://css-tricks.com/8-digit-hex-codes/
 
-exports.Colors = Colors;
+
+exports.addOpacityToColor = addOpacityToColor;
 
 const opacity10 = color => `${color}1a`;
 
@@ -62,4 +78,8 @@ exports.opacity30 = opacity30;
 const opacity60 = color => `${color}99`;
 
 exports.opacity60 = opacity60;
+const Option1BackgroundColor = ['#ff8d8d', '#ffca8d', '#8de0ff', '#dbffb1', '#feed8d'];
+exports.Option1BackgroundColor = Option1BackgroundColor;
+const Option1BackgroundColorDark = ['#b2706d', '#b5976e', '#76a3bb', '#a4b986', '#b8af6e'];
+exports.Option1BackgroundColorDark = Option1BackgroundColorDark;
 //# sourceMappingURL=Colors.js.map

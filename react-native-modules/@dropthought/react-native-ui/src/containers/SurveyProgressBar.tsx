@@ -5,7 +5,7 @@ import { sum } from 'ramda';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useKeyboard } from '@react-native-community/hooks';
 
-import ProgressBar from '../components/ProgressBar';
+import ClassicProgressBar from '../components/ClassicProgressBar';
 import { useFeedbackState } from '../contexts/feedback';
 import { opacity10 } from '../styles';
 import type { Survey, Feedback } from '../data';
@@ -74,7 +74,7 @@ const SurveyProgressBar = ({ rtl, ...props }: Props) => {
 
   return (
     <View style={containerStyle}>
-      <ProgressBar
+      <ClassicProgressBar
         value={numValidFeedbacks(feedbackState)}
         maxValue={numTotalQuestions(props.survey)}
         themeColor={themeColor}

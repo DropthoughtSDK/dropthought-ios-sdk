@@ -44,6 +44,10 @@ class JoiError extends _cliTools().CLIError {
           return error.message;
       }
     }).join());
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, JoiError);
+    }
   }
 
 }

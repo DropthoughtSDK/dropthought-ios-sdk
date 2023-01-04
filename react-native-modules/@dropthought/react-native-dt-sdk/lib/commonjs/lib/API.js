@@ -3,11 +3,13 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.apiPostEvent = exports.apiGetProgramById = exports.sdkFetcher = void 0;
+exports.apiPostEvent = exports.apiGetVisibilityById = exports.apiGetProgramById = exports.sdkFetcher = void 0;
 
 var _Fetcher = require("./Fetcher");
 
 var _ProgramAPI = require("./ProgramAPI");
+
+var _VisibilityAPI = require("./VisibilityAPI");
 
 var _EventAPI = require("./EventAPI");
 
@@ -25,13 +27,22 @@ exports.sdkFetcher = sdkFetcher;
 
 const apiGetProgramById = (param, requestConfig) => (0, _ProgramAPI.apiGetProgramById)(param, requestConfig, sdkFetcher);
 /**
+ * @param {string} visibilityId
+ * @param {RequestConfig=} requestConfig
+ */
+
+
+exports.apiGetProgramById = apiGetProgramById;
+
+const apiGetVisibilityById = (visibilityId, requestConfig) => (0, _VisibilityAPI.apiGetVisibilityById)(visibilityId, requestConfig, sdkFetcher);
+/**
  *
  * @param {APIPostEventParam} param
  * @param {RequestConfig=} requestConfig
  */
 
 
-exports.apiGetProgramById = apiGetProgramById;
+exports.apiGetVisibilityById = apiGetVisibilityById;
 
 const apiPostEvent = (param, requestConfig) => (0, _EventAPI.apiPostEvent)(param, requestConfig, sdkFetcher);
 /**

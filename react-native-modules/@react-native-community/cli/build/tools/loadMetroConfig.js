@@ -26,6 +26,8 @@ function _metroConfig() {
   return data;
 }
 
+var _metroPlatformResolver = require("./metroPlatformResolver");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -38,13 +40,20 @@ const INTERNAL_CALLSITES_REGEX = new RegExp(['/Libraries/Renderer/implementation
  * Default configuration
  */
 const getDefaultConfig = ctx => {
+  const outOfTreePlatforms = Object.keys(ctx.platforms).filter(platform => ctx.platforms[platform].npmPackageName);
   return {
     resolver: {
+      resolveRequest: outOfTreePlatforms.length === 0 ? undefined : (0, _metroPlatformResolver.reactNativePlatformResolver)(outOfTreePlatforms.reduce((result, platform) => {
+        result[platform] = ctx.platforms[platform].npmPackageName;
+        return result;
+      }, {})),
       resolverMainFields: ['react-native', 'browser', 'main'],
       platforms: [...Object.keys(ctx.platforms), 'native']
     },
     serializer: {
-      getModulesRunBeforeMainModule: () => [require.resolve(_path().default.join(ctx.reactNativePath, 'Libraries/Core/InitializeCore'))],
+      // We can include multiple copies of InitializeCore here because metro will
+      // only add ones that are already part of the bundle
+      getModulesRunBeforeMainModule: () => [require.resolve(_path().default.join(ctx.reactNativePath, 'Libraries/Core/InitializeCore')), ...outOfTreePlatforms.map(platform => require.resolve(`${ctx.platforms[platform].npmPackageName}/Libraries/Core/InitializeCore`))],
       getPolyfills: () => require(_path().default.join(ctx.reactNativePath, 'rn-get-polyfills'))()
     },
     server: {
@@ -59,8 +68,9 @@ const getDefaultConfig = ctx => {
       }
     },
     transformer: {
+      allowOptionalDependencies: true,
       babelTransformerPath: require.resolve('metro-react-native-babel-transformer'),
-      assetRegistryPath: _path().default.join(ctx.reactNativePath, 'Libraries/Image/AssetRegistry')
+      assetRegistryPath: 'react-native/Libraries/Image/AssetRegistry'
     },
     watchFolders: []
   };

@@ -15,7 +15,7 @@ var _reactNativeSafeAreaContext = require("react-native-safe-area-context");
 
 var _hooks = require("@react-native-community/hooks");
 
-var _ProgressBar = _interopRequireDefault(require("../components/ProgressBar"));
+var _ClassicProgressBar = _interopRequireDefault(require("../components/ClassicProgressBar"));
 
 var _feedback = require("../contexts/feedback");
 
@@ -78,7 +78,7 @@ const SurveyProgressBar = ({
   if (isAndroid && keyboardShown) return null;
   return /*#__PURE__*/React.createElement(_reactNative.View, {
     style: containerStyle
-  }, /*#__PURE__*/React.createElement(_ProgressBar.default, {
+  }, /*#__PURE__*/React.createElement(_ClassicProgressBar.default, {
     value: numValidFeedbacks(feedbackState),
     maxValue: numTotalQuestions(props.survey),
     themeColor: themeColor,

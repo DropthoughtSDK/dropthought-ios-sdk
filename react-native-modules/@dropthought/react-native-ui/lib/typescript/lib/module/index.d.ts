@@ -1,5 +1,6 @@
 export * from "./components/PlaceholderScreen";
 export * from "./hooks/useWindowDimensions";
+import ClassicQuestionContainer from "./containers/ClassicQuestionContainer";
 import QuestionContainer from "./containers/QuestionContainer";
 import SurveyScreenLayout from "./containers/SurveyScreenLayout";
 import EndScreenLayout from "./containers/EndScreenLayout";
@@ -9,6 +10,6 @@ import { KioskProvider } from "./KioskProvider";
 import ActivityIndicatorMask from "./components/ActivityIndicatorMask";
 import i18n from "./translation";
 import { SurveyProgressBarPosition } from "./containers/SurveyScreenLayout";
-export { QuestionContainer, SurveyScreenLayout, EndScreenLayout, StartScreenLayout, PlaceholderScreen, KioskProvider, ActivityIndicatorMask, i18n, SurveyProgressBarPosition };
+export { ClassicQuestionContainer, QuestionContainer, SurveyScreenLayout, EndScreenLayout, StartScreenLayout, PlaceholderScreen, KioskProvider, KioskProviderProps, ActivityIndicatorMask, i18n, SurveyProgressBarPosition };
 export { Colors, GlobalStyle } from "./styles";
-export { THEME_OPTIONS, COLOR_SCHEMES, useTheme } from "./contexts/theme";
+export { APPEARANCE, COLOR_SCHEMES, THEME_OPTION, useTheme } from "./contexts/theme";

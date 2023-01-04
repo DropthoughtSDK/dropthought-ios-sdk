@@ -1,5 +1,7 @@
 export var __esModule: boolean;
-export var THEME_OPTIONS: {} | undefined;
+export var APPEARANCE: {} | undefined;
 export var COLOR_SCHEMES: {} | undefined;
-export let THEME_OPTIONS: any;
+export var THEME_OPTION: {} | undefined;
+export let APPEARANCE: any;
 export let COLOR_SCHEMES: any;
+export let THEME_OPTION: any;

@@ -1,4 +1,4 @@
-/// <reference types="react" />
+import * as React from 'react';
 import { NativeSyntheticEvent, StyleProp, ViewProps, ViewStyle } from 'react-native';
 export declare type Edge = 'top' | 'right' | 'bottom' | 'left';
 export interface EdgeInsets {

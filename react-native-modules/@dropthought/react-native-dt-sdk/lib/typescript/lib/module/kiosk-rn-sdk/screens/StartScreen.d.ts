@@ -1,6 +1,7 @@
 export default StartScreen;
 export type ScreenProps = {
     onStart: () => void;
+    onClose: () => void;
 };
 /**
  * @type {React.FunctionComponent<ScreenProps>}

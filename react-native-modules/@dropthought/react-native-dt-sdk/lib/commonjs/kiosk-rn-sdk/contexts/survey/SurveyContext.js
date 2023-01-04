@@ -15,6 +15,8 @@ var _reactAsync = require("react-async");
 
 var _reactNativeUi = require("@dropthought/react-native-ui");
 
+var _theme = require("@dropthought/react-native-ui/src/contexts/theme");
+
 var _FakeScreen = _interopRequireDefault(require("../../screens/FakeScreen"));
 
 var _Storage = require("../../../lib/Storage");
@@ -36,15 +38,7 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
  * therefore, the children would always be sure to have "survey" in context
  */
 const DT_ERR_MISSING_PARAMS = 'dt-missing-parameters';
-/**
- * @typedef {object} SurveyContextValue
- * @property {Survey} survey
- * @property {(language: string) => void} changeLanguage
- * @property {() => void} onClose
- */
-
-/** @typedef {import('../../../data').Survey} Survey */
-
+const DT_ERR_NO_BIND_PROGRAM = 'dt-no-bind-program';
 /** @type {React.Context<SurveyContextValue>} */
 
 const SurveyContext = /*#__PURE__*/React.createContext({
@@ -63,13 +57,51 @@ const useSurvey = () => {
   return surveyContextValue.survey;
 };
 /**
+ * load the visibility data from cache or api
+ * @param {{visibilityId: string, language: string}} param0
+ */
+
+
+exports.useSurvey = useSurvey;
+
+const getVisibility = async ({
+  visibilityId,
+  language
+}) => {
+  if (!visibilityId) {
+    throw new Error(DT_ERR_MISSING_PARAMS);
+  }
+  /** @type {Visibility} */
+
+
+  const visibility = await (0, _API.apiGetVisibilityById)(visibilityId, {
+    timeout: 10000
+  });
+
+  if (!visibility.program || !visibility.program.programId) {
+    throw new Error(DT_ERR_NO_BIND_PROGRAM);
+  }
+  /** @type {ThemeData} */
+
+
+  const theme = {
+    themeOption: visibility.themeOption,
+    appearance: visibility.appearance,
+    fontColor: visibility.fontColor,
+    backgroundColor: visibility.backgroundColor
+  };
+  return getProgram({
+    surveyId: visibility.program.programId,
+    language,
+    theme
+  });
+};
+/**
  * pre-fetch survey's image, get the width and height of the survey image
  * @param {Survey} survey
  * @return {Promise<Survey>}
  */
 
-
-exports.useSurvey = useSurvey;
 
 const preFetchImage = survey => new Promise(resolve => {
   const {
@@ -111,13 +143,14 @@ const preFetchImage = survey => new Promise(resolve => {
 });
 /**
  * load the program data from cache or api
- * @param {{surveyId: string, language: string}} param0
+ * @param {{surveyId: string, language: string, theme?: ThemeData }} param0
  */
 
 
 const getProgram = async ({
   surveyId,
-  language
+  language,
+  theme
 }) => {
   const programCacheKey = `survey-${surveyId}-${language}`;
 
@@ -153,7 +186,49 @@ const getProgram = async ({
 
   _reactNativeUi.i18n.changeLanguage(survey.language);
 
-  return survey;
+  return {
+    survey,
+    theme
+  };
+};
+/**
+ * extract questions in page and make them as its' independent page
+ * @param {Survey} survey
+ */
+
+
+const singleQuestionPerPageTransformer = survey => {
+  /** @type {Survey} */
+  let result = {};
+
+  if (survey) {
+    const newPageOrder = [];
+    const newPages = [];
+    const {
+      pages
+    } = survey;
+    pages.map(page => {
+      const {
+        pageId,
+        questions
+      } = page;
+      questions.forEach((question, index) => {
+        const newPageId = `${pageId}_${index}`;
+        newPageOrder.push(newPageId);
+        const newPage = { ...page,
+          pageId: newPageId,
+          questions: [question]
+        };
+        newPages.push(newPage);
+      });
+    });
+    result = { ...survey,
+      pageOrder: newPageOrder,
+      pages: newPages
+    };
+  }
+
+  return result;
 }; // we want to "remember" the previous selected language
 // so that, later when there's error, we could fallback to the previous selected language
 
@@ -187,11 +262,22 @@ const defaultOnCloseHandler = () => {
 
 
 const SurveyContextProvider = ({
+  visibilityId,
   surveyId,
   children,
   defaultLanguage = 'en',
-  onClose = defaultOnCloseHandler
+  onClose = defaultOnCloseHandler,
+  themeOption,
+  appearance,
+  fontColor,
+  backgroundColor
 }) => {
+  const themeDataFromSDKEntry = {
+    themeOption,
+    appearance,
+    fontColor,
+    backgroundColor
+  };
   const [selectedLanguage, prevSelectedLanguage, setSelectedLanguageWithBackup, setSelectedLanguage] = useSelectedLanguageState(defaultLanguage); // handler the rejection when switching language
 
   const onRejectHandler = React.useCallback(() => {
@@ -206,20 +292,25 @@ const SurveyContextProvider = ({
     error,
     isPending
   } = (0, _reactAsync.useAsync)({
-    promiseFn: getProgram,
+    promiseFn: visibilityId ? getVisibility : getProgram,
     onReject: onRejectHandler,
+    visibilityId,
     surveyId,
     language: selectedLanguage,
-    // watch, only re-run the promise, when language is changed or surveyId is changed
-    watchFn: (props, prevProps) => props.language !== prevProps.language && props.language !== prevSelectedLanguage || props.surveyId !== prevProps.surveyId
+    // watch, only re-run the promise, when language is changed or visibilityId is changed
+    watchFn: (props, prevProps) => props.visibilityId !== prevProps.visibilityId || props.language !== prevProps.language && props.language !== prevSelectedLanguage || props.surveyId !== prevProps.surveyId
   });
+  const {
+    survey,
+    theme = themeDataFromSDKEntry
+  } = data !== null && data !== void 0 ? data : {};
   /** @type {SurveyContextValue} */
 
   const contextValue = React.useMemo(() => ({
     onClose,
-    survey: data,
+    survey: (theme === null || theme === void 0 ? void 0 : theme.themeOption) === _reactNativeUi.THEME_OPTION.CLASSIC ? survey : singleQuestionPerPageTransformer(survey),
     changeLanguage: setSelectedLanguageWithBackup
-  }), [data, onClose, setSelectedLanguageWithBackup]); // initial loading data view
+  }), [survey, onClose, setSelectedLanguageWithBackup, theme]); // initial loading data view
 
   if (!data) {
     // loading
@@ -252,13 +343,26 @@ const SurveyContextProvider = ({
 
   return /*#__PURE__*/React.createElement(SurveyContext.Provider, {
     value: contextValue
-  }, /*#__PURE__*/React.createElement(_reactNative.View, {
+  }, /*#__PURE__*/React.createElement(_theme.ThemeProvider, theme, /*#__PURE__*/React.createElement(_reactNative.View, {
     style: _reactNativeUi.GlobalStyle.flex1
   }, children, /*#__PURE__*/React.createElement(_reactNativeUi.ActivityIndicatorMask, {
     loading: isPending
-  })));
+  }))));
 };
 /** @typedef {import('../../SDKEntry').SDKEntryProps} Props */
+
+/**
+ * @typedef {object} SurveyContextValue
+ * @property {Survey} survey
+ * @property {(language: string) => void} changeLanguage
+ * @property {() => void} onClose
+ */
+
+/** @typedef {import('../../../data').Survey} Survey */
+
+/** @typedef {import('../../../data').Visibility} Visibility */
+
+/** @typedef {import('../../../data').ThemeData} ThemeData */
 
 
 exports.SurveyContextProvider = SurveyContextProvider;

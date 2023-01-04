@@ -13,22 +13,18 @@ const QuestionWarningMessage = ({ message }: Props) => {
   const { colorScheme } = useTheme();
   const isDarkMode = colorScheme === COLOR_SCHEMES.dark;
   const rtl = i18n.dir() === 'rtl';
-
+  const hintStyle = [
+    styles.hint,
+    { color: Colors.warningRed },
+    rtl && GlobalStyle.horizontalFlip,
+  ];
   if (!message) return null;
 
   return (
     <View style={[styles.container, rtl && GlobalStyle.horizontalFlip]}>
       <View style={[styles.tip, isDarkMode && styles.darkModeTip]} />
       <View style={[styles.bubble, isDarkMode && styles.darkModeBubble]}>
-        <Text
-          style={[
-            styles.hint,
-            isDarkMode && styles.darkModeHint,
-            rtl && GlobalStyle.horizontalFlip,
-          ]}
-        >
-          {message}
-        </Text>
+        <Text style={hintStyle}>{message}</Text>
       </View>
     </View>
   );
@@ -38,27 +34,27 @@ export default QuestionWarningMessage;
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: 'column',
+    alignItems: 'center',
     marginTop: 12,
   },
   tip: {
-    top: 13,
     width: 0,
     height: 0,
     backgroundColor: 'transparent',
     borderStyle: 'solid',
-    borderTopWidth: 7,
-    borderBottomWidth: 7,
-    borderRightWidth: 12,
-    borderTopColor: 'transparent',
-    borderBottomColor: 'transparent',
-    borderRightColor: '#FFDEE4',
+    borderLeftWidth: 7,
+    borderRightWidth: 7,
+    borderBottomWidth: 12,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#f9ebeb',
   },
   darkModeTip: {
-    borderRightColor: '#39393a',
+    borderBottomColor: '#39393a',
   },
   bubble: {
-    backgroundColor: '#FFDEE4',
+    backgroundColor: '#f9ebeb',
     minWidth: 280,
     paddingHorizontal: 18,
     paddingVertical: 10,
@@ -68,10 +64,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#39393a',
   },
   hint: {
-    color: Colors.black,
     fontSize: 13,
-  },
-  darkModeHint: {
-    color: '#FFE0E5',
+    fontWeight: '600',
   },
 });

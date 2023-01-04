@@ -1,6 +1,10 @@
-export default EndScreen;
-declare function EndScreen({ survey }: {
+export default function EndScreenLayout({ survey, onClose }: {
     survey: any;
-}): React.CElement<import("react-native").ViewProps, View>;
-import { View } from "react-native";
+    onClose: any;
+}): React.FunctionComponentElement<{
+    survey: any;
+}> | React.FunctionComponentElement<{
+    survey: any;
+    onClose: any;
+}>;
 import React from "react";

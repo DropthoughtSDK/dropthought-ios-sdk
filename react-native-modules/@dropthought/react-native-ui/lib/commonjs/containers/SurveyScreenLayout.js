@@ -11,9 +11,13 @@ var _reactNative = require("react-native");
 
 var _surveyPage = require("../contexts/survey-page");
 
+var _ClassicQuestionContainer = _interopRequireDefault(require("./ClassicQuestionContainer"));
+
 var _QuestionContainer = _interopRequireDefault(require("./QuestionContainer"));
 
 var _SurveyProgressBar = _interopRequireDefault(require("./SurveyProgressBar"));
+
+var _ClassicSurveyFooter = _interopRequireDefault(require("./ClassicSurveyFooter"));
 
 var _SurveyFooter = _interopRequireDefault(require("./SurveyFooter"));
 
@@ -27,13 +31,17 @@ var _translation = _interopRequireDefault(require("../translation"));
 
 var _theme = require("../contexts/theme");
 
+var _data = require("../utils/data");
+
+var _feedback = require("../contexts/feedback");
+
+var _SurveyHeader = _interopRequireDefault(require("./SurveyHeader"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 const SurveyProgressBarPosition = {
   FixedBottom: 0,
@@ -42,18 +50,65 @@ const SurveyProgressBarPosition = {
 exports.SurveyProgressBarPosition = SurveyProgressBarPosition;
 const ScrollView = _reactNative.Platform.OS === 'ios' ? _KeyboardAvoidingView.KeyboardAvoidingScrollView : _reactNative.ScrollView;
 
+/**
+ * check if the feedbacks of questions of the page is valid
+ * returns the 1st invalid question id or undefined (means all valid)
+ */
+const firstInvalidQuestionId = (page, feedbackState) => {
+  let invalidQuestionId;
+
+  for (const question of page.questions) {
+    const feedback = feedbackState.feedbacksMap[question.questionId];
+
+    if (!(0, _data.questionFeedbackValidator)(question, feedback)) {
+      invalidQuestionId = question.questionId;
+      break;
+    }
+  }
+
+  return invalidQuestionId;
+};
+/**
+ * get feedbacks array from feedback state
+ */
+
+
+const getFeedbacks = feedbackState => {
+  return feedbackState.answeredQuestionIds.map(qid => feedbackState.feedbacksMap[qid]);
+};
+
 const SurveyScreenLayout = props => {
   const {
+    themeOption,
     backgroundColor
   } = (0, _theme.useTheme)();
   const {
     pageIndex = 0,
     survey,
+    onClose,
+    onPrevPage,
+    onNextPage,
+    onSubmit,
     SurveyPageIndicator = _SurveyPageIndicator.default,
     SurveyProgressBar = _SurveyProgressBar.default,
     surveyProgressBarPosition = SurveyProgressBarPosition.FixedBottom
   } = props;
-  const scrollViewRef = React.useRef(null); // when validation start, set the state
+  const scrollViewRef = React.useRef(null);
+  const questions = survey.pages[pageIndex].questions.map(question => {
+    return /*#__PURE__*/React.createElement(_ClassicQuestionContainer.default, {
+      key: question.questionId,
+      anonymous: survey.anonymous,
+      question: question,
+      validationStarted: validationStarted,
+      themeColor: survey.surveyProperty.hexCode
+    });
+  });
+  const surveyProgressBar = /*#__PURE__*/React.createElement(SurveyProgressBar, {
+    survey: survey,
+    pageIndex: pageIndex,
+    rtl: _translation.default.dir() === 'rtl'
+  });
+  const singleQuestion = survey.pages[pageIndex].questions[0]; // when validation start, set the state
 
   const [validationStarted, setValidationStarted] = React.useState(false);
   const onValidationStartHandler = React.useCallback(() => {
@@ -73,25 +128,42 @@ const SurveyScreenLayout = props => {
       });
     }
   }, []);
-  const questions = survey.pages[pageIndex].questions.map(question => {
-    return /*#__PURE__*/React.createElement(_QuestionContainer.default, {
-      key: question.questionId,
-      anonymous: survey.anonymous,
-      question: question,
-      validationStarted: validationStarted,
-      themeColor: survey.surveyProperty.hexCode
-    });
-  });
-  const surveyProgressBar = /*#__PURE__*/React.createElement(SurveyProgressBar, {
-    survey: survey,
-    pageIndex: pageIndex,
-    rtl: _translation.default.dir() === 'rtl'
-  });
-  return /*#__PURE__*/React.createElement(_reactNative.View, {
-    style: [_styles.default.flex1, {
-      backgroundColor
-    }]
-  }, /*#__PURE__*/React.createElement(SurveyPageIndicator, {
+
+  const onPrevPageHandler = () => {
+    onPrevPage && onPrevPage();
+  };
+
+  const feedbackState = (0, _feedback.useFeedbackState)();
+  const {
+    mandatoryQuestionTitleRefs
+  } = (0, _surveyPage.useSurveyPageContext)();
+  const currentPage = survey.pages[pageIndex];
+  const surveyId = survey.surveyId; // check if feedbacks are valid
+
+  const validatePageFeedbacks = React.useCallback(() => {
+    onValidationStartHandler();
+    const invalidQuestionId = firstInvalidQuestionId(currentPage, feedbackState); // if there's an invalid question, call onValidationFailed
+
+    if (invalidQuestionId) onValidationFailedHandler(invalidQuestionId, mandatoryQuestionTitleRefs[invalidQuestionId]);
+    return !invalidQuestionId;
+  }, [onValidationStartHandler, currentPage, feedbackState, onValidationFailedHandler, mandatoryQuestionTitleRefs]);
+  const onNextPageHandler = React.useCallback(() => {
+    const isValid = validatePageFeedbacks();
+
+    if (isValid) {
+      const nextPageIndex = (0, _data.nextPage)(pageIndex, currentPage.pageId, feedbackState.feedbacksMap, survey);
+
+      if (nextPageIndex === -1) {
+        onSubmit({
+          surveyId,
+          feedbacks: getFeedbacks(feedbackState)
+        });
+      } else {
+        onNextPage(nextPageIndex);
+      }
+    }
+  }, [validatePageFeedbacks, pageIndex, currentPage.pageId, feedbackState, survey, onSubmit, onNextPage, surveyId]);
+  const classicLayout = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SurveyPageIndicator, {
     pageIndex: pageIndex,
     survey: survey,
     rtl: _translation.default.dir() === 'rtl'
@@ -105,11 +177,47 @@ const SurveyScreenLayout = props => {
     contentContainerStyle: styles.scrollViewContentContainer
   }, /*#__PURE__*/React.createElement(_reactNative.View, {
     style: styles.bodyContent
-  }, questions, /*#__PURE__*/React.createElement(_SurveyFooter.default, _extends({}, props, {
+  }, questions, /*#__PURE__*/React.createElement(_ClassicSurveyFooter.default, {
     survey: survey,
-    onValidationFailed: onValidationFailedHandler,
-    onValidationStart: onValidationStartHandler
-  })), surveyProgressBarPosition === SurveyProgressBarPosition.BelowBody && surveyProgressBar)), surveyProgressBarPosition === SurveyProgressBarPosition.FixedBottom && surveyProgressBar);
+    pageIndex: pageIndex,
+    onPrevPage: onPrevPageHandler,
+    onNextPage: onNextPageHandler
+  }), surveyProgressBarPosition === SurveyProgressBarPosition.BelowBody && surveyProgressBar)), surveyProgressBarPosition === SurveyProgressBarPosition.FixedBottom && surveyProgressBar);
+
+  const onCloseHandler = () => {
+    onClose && onClose();
+  }; // Can rename this if have better name
+
+
+  const newLayout = /*#__PURE__*/React.createElement(React.Fragment, null, singleQuestion.type === 'rating' && singleQuestion.subType === 'smiley' ? null : /*#__PURE__*/React.createElement(_SurveyHeader.default, {
+    survey: survey,
+    pageIndex: pageIndex,
+    backgroundColor: backgroundColor,
+    onClose: onCloseHandler
+  }), /*#__PURE__*/React.createElement(_QuestionContainer.default, {
+    key: singleQuestion.questionId,
+    anonymous: survey.anonymous,
+    question: singleQuestion,
+    validationStarted: validationStarted,
+    themeColor: survey.surveyProperty.hexCode,
+    onClose: onCloseHandler,
+    onPrevPage: onPrevPageHandler,
+    onNextPage: onNextPageHandler,
+    survey: survey,
+    pageIndex: pageIndex
+  }), singleQuestion.type === 'rating' && singleQuestion.subType === 'smiley' ? null : /*#__PURE__*/React.createElement(_SurveyFooter.default, {
+    surveyColor: survey.surveyProperty.hexCode,
+    isFirstPage: pageIndex === 0,
+    isLastPage: pageIndex === survey.pageOrder.length - 1,
+    onPrevPage: onPrevPageHandler,
+    onNextPage: onNextPageHandler,
+    backgroundColor: backgroundColor
+  }));
+  return /*#__PURE__*/React.createElement(_reactNative.View, {
+    style: [_styles.default.flex1, {
+      backgroundColor
+    }]
+  }, themeOption === _theme.THEME_OPTION.CLASSIC ? classicLayout : newLayout);
 };
 
 const SurveyScreenLayoutWrapper = props => {

@@ -35,7 +35,7 @@ Object.keys(_kioskRnSdk).forEach(function (key) {
   });
 });
 // @ts-ignore
-const BASE_URL = 'https://api.dropthought.com/dtapp';
+const BASE_URL = 'https://stage-api.dropthought.com/dtapp';
 
 function initialize(params) {
   (0, _initialize.initializeWithAPIKey)({ ...params,

@@ -5,7 +5,7 @@ import GlobalStyle, { Colors } from '../styles';
 import QuestionWarningMessage from './QuestionWarningMessage';
 import i18n from '../translation';
 import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
-import { useTheme } from '../contexts/theme';
+import { useTheme, THEME_OPTION } from '../contexts/theme';
 
 const MandatoryTitle = ({
   forgot,
@@ -16,26 +16,41 @@ const MandatoryTitle = ({
   const rtl = i18n.dir() === 'rtl';
   const dimensionWidthType = useDimensionWidthType();
   const {
-    fontColor
+    fontColor,
+    themeOption,
+    customFontColor
   } = useTheme();
+  const {
+    questionId,
+    questionTitle,
+    mandatory,
+    type,
+    subType
+  } = question;
   const ref = React.useRef(null);
   const addMandatoryRef = useAddMandatoryRef();
   React.useEffect(() => {
     if (ref.current) {
-      addMandatoryRef(question.questionId, ref.current);
+      addMandatoryRef(questionId, ref.current);
     }
-  }, [addMandatoryRef, question.questionId]);
+  }, [addMandatoryRef, questionId]);
+  let color = fontColor;
+  const isOption6Smiley = themeOption === THEME_OPTION.OPTION6 && type === 'rating' && subType === 'smiley';
+
+  if ((customFontColor === undefined || customFontColor === '') && isOption6Smiley) {
+    color = Colors.white;
+  }
+
   return /*#__PURE__*/React.createElement(View, {
     ref: ref,
     style: [styles.horizontal, style, rtl && GlobalStyle.flexRowReverse]
-  }, question.questionTitle.split(' ').map((text, index) => /*#__PURE__*/React.createElement(Text, {
-    key: index,
+  }, /*#__PURE__*/React.createElement(Text, {
     style: [styles.questionTitle, questionTitleSize[dimensionWidthType], {
-      color: fontColor
+      color
     }]
-  }, text + ' ')), question.mandatory && /*#__PURE__*/React.createElement(Text, {
+  }, questionTitle, mandatory && /*#__PURE__*/React.createElement(Text, {
     style: styles.hint
-  }, "*"), /*#__PURE__*/React.createElement(QuestionWarningMessage // forgot message has higher priority than custom invalid message
+  }, "*")), /*#__PURE__*/React.createElement(QuestionWarningMessage // forgot message has higher priority than custom invalid message
   , {
     message: forgot ? i18n.t('survey:mandatory') : invalidMessage
   }));
@@ -44,10 +59,10 @@ const MandatoryTitle = ({
 export default MandatoryTitle;
 const questionTitleSize = StyleSheet.create({
   [DimensionWidthType.phone]: {
-    fontSize: 16
+    fontSize: 26
   },
   [DimensionWidthType.tablet]: {
-    fontSize: 18
+    fontSize: 26
   }
 });
 const styles = StyleSheet.create({
@@ -57,13 +72,14 @@ const styles = StyleSheet.create({
   },
   horizontal: {
     flexDirection: 'row',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginBottom: 24
   },
   questionTitle: {
-    fontSize: 18,
-    marginBottom: 2,
-    textAlignVertical: 'center',
-    alignSelf: 'center'
+    fontSize: 26,
+    fontWeight: '600',
+    textAlign: 'center'
   }
 });
 //# sourceMappingURL=MandatoryTitle.js.map

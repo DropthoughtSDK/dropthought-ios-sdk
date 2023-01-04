@@ -73,6 +73,7 @@ const dependencyConfig = t().object({
     })).default([])
   }).default(),
   platforms: map(t().string(), t().object({
+    npmPackageName: t().string().optional(),
     dependencyConfig: t().func(),
     projectConfig: t().func(),
     linkConfig: t().func()
@@ -137,6 +138,7 @@ const projectConfig = t().object({
   assets: t().array().items(t().string()).default([]),
   commands: t().array().items(command).default([]),
   platforms: map(t().string(), t().object({
+    npmPackageName: t().string().optional(),
     dependencyConfig: t().func(),
     projectConfig: t().func(),
     linkConfig: t().func()

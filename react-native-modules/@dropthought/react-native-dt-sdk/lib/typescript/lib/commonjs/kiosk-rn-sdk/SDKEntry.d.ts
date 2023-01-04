@@ -3,6 +3,7 @@ export default SDKEntry;
 export type ThemeType = "system" | "light" | "dark";
 export type SDKEntryOwnProps = {
     apiKey: string;
+    visibilityId: string;
     surveyId: string;
     /**
      * if not provided, default is "en"
@@ -16,7 +17,8 @@ export type SDKEntryOwnProps = {
      * when the close icon is pressed in the header
      */
     onClose?: (() => void) | undefined;
-    theme?: ThemeType | undefined;
+    themeOption: any;
+    appearance?: ThemeType | undefined;
     fontColor?: string | undefined;
     backgroundColor?: string | undefined;
 };
@@ -25,11 +27,13 @@ export type SDKEntryProps = import('./contexts/custom-props').CustomProps & SDKE
 /**
  * @typedef {object} SDKEntryOwnProps
  * @property {string} apiKey
+ * @property {string} visibilityId
  * @property {string} surveyId
  * @property {string=} defaultLanguage if not provided, default is "en"
  * @property {string=} baseURL if not provided, default is ...
  * @property {()=>void=} onClose when the close icon is pressed in the header
- * @property {ThemeType=} theme
+ * @property {THEME_OPTION} themeOption
+ * @property {ThemeType=} appearance
  * @property {string=} fontColor
  * @property {string=} backgroundColor
  */
@@ -39,4 +43,4 @@ export type SDKEntryProps = import('./contexts/custom-props').CustomProps & SDKE
 /**
  * @param {SDKEntryProps} props
  */
-declare function SDKEntry({ theme, fontColor, backgroundColor, ...props }: SDKEntryProps): any;
+declare function SDKEntry(props: SDKEntryProps): any;

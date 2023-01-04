@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.detachedCommands = exports.projectCommands = void 0;
 
-var _server = _interopRequireDefault(require("./server/server"));
+var _start = _interopRequireDefault(require("./start/start"));
 
 var _bundle = _interopRequireDefault(require("./bundle/bundle"));
 
@@ -29,13 +29,21 @@ var _init = _interopRequireDefault(require("./init"));
 
 var _doctor = _interopRequireDefault(require("./doctor"));
 
+function _cliHermes() {
+  const data = _interopRequireDefault(require("@react-native-community/cli-hermes"));
+
+  _cliHermes = function () {
+    return data;
+  };
+
+  return data;
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// @ts-ignore - JS file
-// @ts-ignore - JS file
-const projectCommands = [_server.default, _bundle.default, _ramBundle.default, _link.default, _unlink.default, _install.default, _uninstall.default, _upgrade.default, _info.default, _config.default, _doctor.default];
+const projectCommands = [_start.default, _bundle.default, _ramBundle.default, _link.default, _unlink.default, _install.default, _uninstall.default, _upgrade.default, _info.default, _config.default, _doctor.default, _cliHermes().default];
 exports.projectCommands = projectCommands;
-const detachedCommands = [_init.default];
+const detachedCommands = [_init.default, _doctor.default];
 exports.detachedCommands = detachedCommands;
 
 //# sourceMappingURL=index.js.map

@@ -19,17 +19,17 @@ function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "functio
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-function getColorScheme(theme, systemColorScheme) {
+function getColorScheme(appearance, systemColorScheme) {
   var _colorScheme;
 
   let colorScheme;
 
-  if (theme === _theme.THEME_OPTIONS.SYSTEM) {
+  if (appearance === _theme.APPEARANCE.SYSTEM) {
     if (systemColorScheme) {
       colorScheme = _theme.COLOR_SCHEMES[systemColorScheme];
     }
-  } else if ([_theme.THEME_OPTIONS.LIGHT, _theme.THEME_OPTIONS.DARK].includes(theme)) {
-    colorScheme = _theme.COLOR_SCHEMES[theme];
+  } else if ([_theme.APPEARANCE.LIGHT, _theme.APPEARANCE.DARK].includes(appearance)) {
+    colorScheme = _theme.COLOR_SCHEMES[appearance];
   }
 
   return (_colorScheme = colorScheme) !== null && _colorScheme !== void 0 ? _colorScheme : _theme.COLOR_SCHEMES.light;
@@ -60,31 +60,37 @@ function getBackgroundColor(customBackgroundColor, colorScheme) {
 }
 
 function useTheme({
-  theme,
+  themeOption,
+  appearance,
   fontColor: customFontColor,
   backgroundColor: customBackgroundColor
 }) {
   const systemColorScheme = (0, _reactNative.useColorScheme)();
-  const colorScheme = getColorScheme(theme, systemColorScheme);
+  const colorScheme = getColorScheme(appearance, systemColorScheme);
   const fontColor = getFontColor(customFontColor, colorScheme);
   const backgroundColor = getBackgroundColor(customBackgroundColor, colorScheme);
   return React.useMemo(() => {
     return {
+      themeOption,
       colorScheme,
       fontColor,
-      backgroundColor
+      backgroundColor,
+      customFontColor,
+      customBackgroundColor
     };
-  }, [colorScheme, fontColor, backgroundColor]);
+  }, [themeOption, colorScheme, fontColor, backgroundColor, customFontColor, customBackgroundColor]);
 }
 
 function ThemeProvider({
   children,
-  theme,
+  themeOption,
+  appearance,
   fontColor,
   backgroundColor
 }) {
   const themeValue = useTheme({
-    theme,
+    themeOption,
+    appearance,
     fontColor,
     backgroundColor
   });

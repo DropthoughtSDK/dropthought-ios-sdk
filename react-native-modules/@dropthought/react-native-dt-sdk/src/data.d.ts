@@ -108,3 +108,38 @@ export interface SurveyFeedback {
   createdTime: string;
   timeZone: string;
 }
+
+export interface Visibility {
+  visibilityId: string;
+  pageName: string;
+  elementName: string;
+  appearance: 'system' | 'light' | 'dark';
+  themeOption:
+    | 'classic'
+    | 'option1'
+    | 'option2'
+    | 'option3'
+    | 'option4'
+    | 'option6';
+  fontColor: string;
+  backgroundColor: string;
+  backgroundImage: string;
+  program: VisibilityProgram;
+}
+
+export interface VisibilityProgram {
+  programId: string;
+}
+
+export interface ThemeData {
+  themeOption:
+    | 'classic'
+    | 'option1'
+    | 'option2'
+    | 'option3'
+    | 'option4'
+    | 'option6';
+  appearance: 'system' | 'light' | 'dark';
+  fontColor: string;
+  backgroundColor: string;
+}

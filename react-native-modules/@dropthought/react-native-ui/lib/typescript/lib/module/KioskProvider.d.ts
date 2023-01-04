@@ -1,6 +1,7 @@
-export function KioskProvider({ children, theme, fontColor, backgroundColor }: {
+export function KioskProvider({ children, themeOption, appearance, fontColor, backgroundColor }: {
     children: any;
-    theme: any;
+    themeOption: any;
+    appearance: any;
     fontColor: any;
     backgroundColor: any;
 }): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;

@@ -96,7 +96,7 @@ const Stack: React.FunctionComponent<StackProps> = ({ survey }) => {
           visible
           isOnTop={!endScreenvisible && visiblePageIds.length === 0}
         >
-          <StartScreen onStart={handleStart} />
+          <StartScreen onStart={handleStart} onClose={onClose} />
         </ScreenWrapper>
         {survey.pageOrder.map((pageId: string, pageIndex: number) => {
           return (
@@ -108,6 +108,7 @@ const Stack: React.FunctionComponent<StackProps> = ({ survey }) => {
               <SurveyScreenLayout
                 survey={survey}
                 pageIndex={pageIndex}
+                onClose={onClose}
                 onNextPage={handleNextPage}
                 onPrevPage={handlePrevPage}
                 onSubmit={handleSubmit}

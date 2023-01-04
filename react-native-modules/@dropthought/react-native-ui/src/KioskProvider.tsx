@@ -3,27 +3,31 @@ import * as React from 'react';
 import { FeedbackProvider } from './contexts/feedback';
 import {
   ThemeProvider,
-  IThemeOptionsType,
+  IThemeOptionType,
+  IAppearanceType,
   FontColor,
   BackgroundColor,
 } from './contexts/theme';
 
-type Props = {
+export type KioskProviderProps = {
   children: React.ReactNode;
-  theme: IThemeOptionsType;
+  themeOption: IThemeOptionType;
+  appearance: IAppearanceType;
   fontColor: FontColor;
   backgroundColor: BackgroundColor;
 };
 
 export const KioskProvider = ({
   children,
-  theme,
+  themeOption,
+  appearance,
   fontColor,
   backgroundColor,
-}: Props) => {
+}: KioskProviderProps) => {
   return (
     <ThemeProvider
-      theme={theme}
+      themeOption={themeOption}
+      appearance={appearance}
       fontColor={fontColor}
       backgroundColor={backgroundColor}
     >

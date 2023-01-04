@@ -37,8 +37,15 @@ export declare const Colors: {
     backgroundColorLight: string;
     backgroundColorDark: string;
     sliderBackgroundDark: string;
+    unSelectedBackground: string;
+    smileyRatingScoreGray: string;
+    appearanceSubBlack: string;
+    warningRed: string;
 };
+export declare const addOpacityToColor: (hexColor: string, opacity: number) => string;
 export declare const opacity10: (color: string) => string;
 export declare const opacity15: (color: string) => string;
 export declare const opacity30: (color: string) => string;
 export declare const opacity60: (color: string) => string;
+export declare const Option1BackgroundColor: string[];
+export declare const Option1BackgroundColorDark: string[];

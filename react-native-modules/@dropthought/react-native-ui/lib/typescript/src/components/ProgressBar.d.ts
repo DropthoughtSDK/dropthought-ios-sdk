@@ -7,7 +7,8 @@ declare type Props = {
     value: number;
     maxValue: number;
     themeColor: string;
+    color: string;
     rtl: boolean;
 };
-declare const _default: React.MemoExoticComponent<({ value, maxValue, themeColor, rtl }: Props) => JSX.Element>;
+declare const _default: React.MemoExoticComponent<({ value, maxValue, themeColor, color, rtl }: Props) => JSX.Element>;
 export default _default;

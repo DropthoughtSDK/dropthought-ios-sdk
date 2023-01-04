@@ -1,4 +1,4 @@
-import { IOSProjectConfig, IOSProjectParams, IOSDependencyConfig, IOSDependencyParams } from './ios';
+import { IOSProjectConfig, IOSProjectParams, IOSDependencyConfig, IOSDependencyParams, IOSNativeModulesConfig } from './ios';
 import { AndroidProjectConfig, AndroidProjectParams, AndroidDependencyConfig, AndroidDependencyParams } from './android';
 export declare type InquirerPrompt = any;
 export declare type CommandFunction<Args = Object> = (argv: Array<string>, ctx: Config, args: Args) => Promise<void> | void;
@@ -27,6 +27,7 @@ export declare type Command<IsDetached extends boolean = false> = {
 };
 export declare type DetachedCommand = Command<true>;
 interface PlatformConfig<ProjectConfig, ProjectParams, DependencyConfig, DependencyParams> {
+    npmPackageName?: string;
     projectConfig: (projectRoot: string, projectParams: ProjectParams | void) => ProjectConfig | void;
     dependencyConfig: (dependency: string, params: DependencyParams) => DependencyConfig | void;
     linkConfig: () => {
@@ -68,7 +69,7 @@ export declare type ProjectConfig = {
  * @property platforms - Map of available platforms (build-ins and dynamically loaded)
  * @property commands - An array of commands that are present in 3rd party packages
  */
-export declare type Config = {
+export interface Config extends IOSNativeModulesConfig {
     root: string;
     reactNativePath: string;
     project: ProjectConfig;
@@ -82,7 +83,7 @@ export declare type Config = {
         [name: string]: PlatformConfig<any, any, any, any>;
     };
     commands: Command[];
-};
+}
 /**
  * Shares some structure with Config, except that root is calculated and can't
  * be defined
@@ -100,6 +101,6 @@ export declare type UserDependencyConfig = {
     commands: Command[];
     platforms: Config['platforms'];
 };
-export { IOSProjectConfig, IOSProjectParams, IOSDependencyConfig, IOSDependencyParams, };
+export { IOSProjectConfig, IOSProjectParams, IOSDependencyConfig, IOSDependencyParams, IOSNativeModulesConfig, };
 export { AndroidProjectConfig, AndroidProjectParams, AndroidDependencyConfig, AndroidDependencyParams, };
 //# sourceMappingURL=index.d.ts.map

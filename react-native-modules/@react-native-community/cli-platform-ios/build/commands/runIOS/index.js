@@ -65,6 +65,16 @@ function _cliTools() {
   return data;
 }
 
+function _ora() {
+  const data = _interopRequireDefault(require("ora"));
+
+  _ora = function () {
+    return data;
+  };
+
+  return data;
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -231,6 +241,7 @@ async function runOnDevice(selectedDevice, scheme, xcodeProject, args) {
 function buildProject(xcodeProject, udid, scheme, args) {
   return new Promise((resolve, reject) => {
     const xcodebuildArgs = [xcodeProject.isWorkspace ? '-workspace' : '-project', xcodeProject.name, '-configuration', args.configuration, '-scheme', scheme, '-destination', `id=${udid}`];
+    const loader = (0, _ora().default)();
 
     _cliTools().logger.info(`Building ${_chalk().default.dim(`(using "xcodebuild ${xcodebuildArgs.join(' ')}")`)}`);
 
@@ -256,7 +267,7 @@ function buildProject(xcodeProject, udid, scheme, args) {
         if (_cliTools().logger.isVerbose()) {
           _cliTools().logger.debug(stringData);
         } else {
-          process.stdout.write('.');
+          loader.start(`Building the app${'.'.repeat(buildOutput.length % 10)}`);
         }
       }
     });
@@ -267,7 +278,7 @@ function buildProject(xcodeProject, udid, scheme, args) {
       if (xcpretty) {
         xcpretty.stdin.end();
       } else {
-        process.stdout.write('\n');
+        loader.stop();
       }
 
       if (code !== 0) {
@@ -280,6 +291,8 @@ function buildProject(xcodeProject, udid, scheme, args) {
           `, buildOutput + '\n' + errorOutput));
         return;
       }
+
+      _cliTools().logger.success('Successfully built the app');
 
       resolve(getProductName(buildOutput) || scheme);
     });
@@ -298,18 +311,21 @@ function bootSimulator(selectedSimulator) {
   }
 }
 
-function getTargetBuildDir(buildSettings) {
+function getTargetPaths(buildSettings) {
   const settings = JSON.parse(buildSettings); // Find app in all building settings - look for WRAPPER_EXTENSION: 'app',
 
   for (const i in settings) {
     const wrapperExtension = settings[i].buildSettings.WRAPPER_EXTENSION;
 
     if (wrapperExtension === 'app') {
-      return settings[i].buildSettings.TARGET_BUILD_DIR;
+      return {
+        targetBuildDir: settings[i].buildSettings.TARGET_BUILD_DIR,
+        executableFolderPath: settings[i].buildSettings.EXECUTABLE_FOLDER_PATH
+      };
     }
   }
 
-  return null;
+  return {};
 }
 
 function getBuildPath(xcodeProject, configuration, appName, isDevice, scheme) {
@@ -327,13 +343,20 @@ function getBuildPath(xcodeProject, configuration, appName, isDevice, scheme) {
     encoding: 'utf8'
   });
 
-  const targetBuildDir = getTargetBuildDir(buildSettings);
+  const {
+    targetBuildDir,
+    executableFolderPath
+  } = getTargetPaths(buildSettings);
 
   if (!targetBuildDir) {
     throw new (_cliTools().CLIError)('Failed to get the target build directory.');
   }
 
-  return `${targetBuildDir}/${appName}.app`;
+  if (!executableFolderPath) {
+    throw new (_cliTools().CLIError)('Failed to get the app name.');
+  }
+
+  return `${targetBuildDir}/${executableFolderPath}`;
 }
 
 function getProductName(buildOutput) {
@@ -412,8 +435,8 @@ var _default = {
   description: 'builds your app and starts it on iOS simulator',
   func: runIOS,
   examples: [{
-    desc: 'Run on a different simulator, e.g. iPhone 5',
-    cmd: 'react-native run-ios --simulator "iPhone 5"'
+    desc: 'Run on a different simulator, e.g. iPhone SE',
+    cmd: 'react-native run-ios --simulator "iPhone SE"'
   }, {
     desc: 'Pass a non-standard location of iOS directory',
     cmd: 'react-native run-ios --project-path "./app/ios"'
@@ -426,7 +449,7 @@ var _default = {
   }],
   options: [{
     name: '--simulator [string]',
-    description: 'Explicitly set simulator to use. Optionally include iOS version between' + 'parenthesis at the end to match an exact version: "iPhone 6 (10.0)"',
+    description: 'Explicitly set simulator to use. Optionally include iOS version between ' + 'parenthesis at the end to match an exact version: "iPhone 6 (10.0)"',
     default: 'iPhone 11'
   }, {
     name: '--configuration [string]',

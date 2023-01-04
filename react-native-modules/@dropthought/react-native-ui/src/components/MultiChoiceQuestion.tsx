@@ -1,16 +1,28 @@
-import React, { PureComponent } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React from 'react';
+import { StyleSheet, Platform, ScrollView as RNScrollView } from 'react-native';
+import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import { last } from 'ramda';
-
-import MandatoryTitle from './MandatoryTitle';
-import OptionWithHighlight from './OptionWithHighlight';
-import OtherOptionWithHighlight from './OtherOptionWithHighlight';
-import GlobalStyles from '../styles';
+import type { Question as OriginQuestion, Option, Feedback } from '../data';
 import { getOptionsFromQuestion } from '../utils/data';
-import type { Question, Option, Feedback as OriginFeedback } from '../data';
+import NewOptionWithHighlight from './NewOptionWithHighlight';
+import NewOtherOptionWithHighlight from './NewOtherOptionWithHighlight';
+import MandatoryTitle from './MandatoryTitle';
 
-type Feedback = OriginFeedback & {
-  answers: (string | number)[];
+const ScrollView =
+  Platform.OS === 'ios' ? KeyboardAvoidingScrollView : RNScrollView;
+
+type Question = OriginQuestion & {
+  options: string[];
+  otherText: string;
+};
+
+type Props = {
+  anonymous: boolean;
+  question: Question;
+  onFeedback: (feedback: Feedback) => void;
+  forgot: boolean;
+  feedback: Feedback;
+  themeColor: string;
 };
 
 const getInitialSelectedValuesFromFeedbackProps = (
@@ -42,50 +54,34 @@ const getInitialSelectedValuesFromFeedbackProps = (
   return { values, otherText };
 };
 
-type Props = {
-  question: Question;
-  onFeedback: (feedback: Feedback) => void;
-  forgot: boolean;
-  feedback: Feedback;
-  themeColor: string;
-};
+const MultiChoiceQuestion = ({
+  anonymous,
+  question,
+  onFeedback,
+  // need add new design about if user forgot answer
+  forgot,
+  feedback,
+  themeColor,
+}: Props) => {
+  const { questionId } = question;
+  const options = getOptionsFromQuestion(question);
+  const initialSelected = getInitialSelectedValuesFromFeedbackProps(
+    options,
+    feedback
+  );
 
-type State = {
-  values: boolean[];
-  options: Option[];
-  otherText: string | undefined;
-};
+  const [selected, setSelected] = React.useState(initialSelected);
 
-class MultiChoiceQuestion extends PureComponent<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    const options = getOptionsFromQuestion(props.question);
-
-    this.onChangeValueHandler = this.onChangeValueHandler.bind(this);
-    this.onOptionPressHandler = this.onOptionPressHandler.bind(this);
-    const { values, otherText } = getInitialSelectedValuesFromFeedbackProps(
-      options,
-      props.feedback
-    );
-
-    this.state = {
-      values,
-      options,
-      otherText,
-    };
-  }
-
-  feedback(values: boolean[], otherText: string | undefined) {
-    this.props.onFeedback({
-      questionId: this.props.question.questionId,
+  const handleFeedback = (values: boolean[], otherText: string | undefined) => {
+    onFeedback({
+      questionId: questionId,
       // @ts-ignore
       answers: values
         .map((value, index) => {
           // only return the answer if checked
           if (value) {
             // for 'other option', return the text
-            if (this.state.options[index].isOther) {
+            if (options[index].isOther) {
               return otherText;
             }
             return index;
@@ -97,89 +93,80 @@ class MultiChoiceQuestion extends PureComponent<Props, State> {
 
       // otherFlag if the last option is other type and the last values is true and otherText is not undefined
       otherFlag:
-        last(this.state.options)?.isOther &&
-        last(values) &&
-        otherText !== undefined,
+        last(options)?.isOther && last(values) && otherText !== undefined,
     });
-    this.setState({
+
+    setSelected({
       values: values,
       otherText,
     });
-  }
+  };
 
-  onOptionPressHandler(index: number) {
+  const onOptionPressHandler = (index: number) => {
     // copy the values, and toggle the checked value
-    let values = [...this.state.values];
-    values[index] = !this.state.values[index];
+    let values = [...selected.values];
+    values[index] = !selected.values[index];
 
-    this.feedback(values, this.state.otherText);
-  }
+    handleFeedback(values, selected.otherText);
+  };
 
-  onChangeValueHandler(
+  const onChangeValueHandler = (
     index: number,
     newValue: {
       value: string | undefined;
       checked: boolean;
     }
-  ) {
+  ) => {
     // copy the values, and set the value
-    let values = [...this.state.values];
+    let values = [...selected.values];
     values[index] = newValue.checked;
 
-    // DK-864, if "other" is not selected, reset the other input's value to ''
-    this.feedback(values, newValue.checked ? newValue.value : '');
-  }
+    handleFeedback(values, newValue.value);
+  };
 
-  renderOptions() {
-    return this.state.options.map(({ title: option, isOther }, index) => {
-      if (isOther) {
-        return (
-          <OtherOptionWithHighlight
-            key={index}
-            id={index}
-            textValue={this.state.otherText}
-            checked={this.state.values[index]}
-            checkedColor={this.props.themeColor}
-            title={option}
-            type="checkbox"
-            onPress={this.onOptionPressHandler}
-            onChangeValue={this.onChangeValueHandler}
-          />
-        );
-      }
+  const buttonList = options.map(({ title, isOther }, index) =>
+    isOther ? (
+      <NewOtherOptionWithHighlight
+        key={index}
+        id={index}
+        type={'checkbox'}
+        title={title}
+        checked={selected.values[index]}
+        themeColor={themeColor}
+        onPress={onOptionPressHandler}
+        onChangeValue={onChangeValueHandler}
+        textValue={selected.otherText}
+        feedback={feedback}
+        question={question}
+        anonymous={anonymous}
+      />
+    ) : (
+      <NewOptionWithHighlight
+        key={index}
+        id={index}
+        type={'checkbox'}
+        title={title}
+        checked={selected.values[index]}
+        themeColor={themeColor}
+        onPress={onOptionPressHandler}
+      />
+    )
+  );
 
-      return (
-        <OptionWithHighlight
-          key={index}
-          id={index}
-          checked={this.state.values[index]}
-          checkedColor={this.props.themeColor}
-          title={option}
-          type="checkbox"
-          onPress={this.onOptionPressHandler}
-        />
-      );
-    });
-  }
+  return (
+    // @ts-ignore
+    <ScrollView extraAvoidingSpace={30} style={commonStyles.container}>
+      <MandatoryTitle forgot={forgot} question={question} />
+      {buttonList}
+    </ScrollView>
+  );
+};
 
-  render() {
-    return (
-      <View style={GlobalStyles.questionContainer}>
-        <MandatoryTitle
-          forgot={this.props.forgot}
-          question={this.props.question}
-        />
-        <View style={styles.title} />
-        {this.renderOptions()}
-      </View>
-    );
-  }
-}
+export default React.memo(MultiChoiceQuestion);
 
-const styles = StyleSheet.create({
-  title: {
-    marginBottom: 20,
+const commonStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 42,
   },
 });
-
-export default MultiChoiceQuestion;

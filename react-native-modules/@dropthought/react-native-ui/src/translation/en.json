@@ -1,56 +1,73 @@
 {
-    "common": {
-        "no-wifi": "No WIFI signal detected. Please check your network connection and try again.",
-        "logout_title": "Are you sure you want to log out of the application?",
-        "cancel": "Cancel",
-        "logout": "Log Out",
-        "version": "Version",
-        "yes-btn": "Yes",
-        "exit_survey": "Exit Survey",
-        "upload_failed": "We couldn't upload all feedbacks. Please try again later."
-    },
-    "placeholder-title": {
-        "NoInternet": "No Internet Connection",
-        "ProgramScheduled": "This program has not started yet",
-        "ProgramExpired": "This program has expired",
-        "ProgramDeleted": "This program has been deleted",
-        "ProgramDeactivated": "This program has been deactivated",
-        "ProgramUnavailable": "This program is not available"
-    },
-    "start-survey": {
-        "start-btn": "Take Survey",
-        "start-btn-desc": "Press on this button",
-        "qrcode-desc": "Scan this QR",
-        "or": "OR",
-        "placeholder-message": "Sorry for the inconvenience.\nPlease come back and check later on."
-    },
-    "survey": {
-        "survey-back": "Back",
-        "survey-next": "Next",
-        "survey-submit": "Submit",
-        "mandatory": "Oops! You Forgot To Answer This Question",
-        "progress-bar": "{{percentage}}% Completed",
-        "char-left": "Characters left: {{left}}",
-        "idle-warning": "Do you want to continue the survey?",
-        "other-option": "Other:",
-        "other-placeholder": "What's on your mind?",
-        "metadata-anonymous-warning": "Personal information will not be shared."
-    },
-    "metadata-question-desc": {
-        "Name": "e.g. John Doe / Please type Name only",
-        "Email": "e.g. test@test.com / Please type Email only",
-        "Phone": "e.g. +15555555555 / Please type Phone only",
-        "Number": "e.g. 1001 / Please type Number only",
-        "Date": "e.g. 2020/03/19 or 2020-03-19 / Please type Date only",
-        "String": "e.g. Hello123! / Please type Text only"
-    },
-    "metadata-invalid-message": {
-        "Email": "Please respond with email.",
-        "Phone": "Please respond with phone.",
-        "Number": "Please respond with numbers.",
-        "Date": "Please respond with date."
-    },
-    "end-survey": {
-        "thank": "Thank you for taking our survey"
-    }
+  "common": {
+    "no-wifi": "No WIFI signal detected. Please check your network connection and try again.",
+    "logout_title": "Are you sure you want to log out of the application?",
+    "cancel": "Cancel",
+    "logout": "Log Out",
+    "version": "Version",
+    "yes-btn": "Yes",
+    "exit_survey": "Exit Survey",
+    "upload_failed": "We couldn't upload all feedbacks. Please try again later."
+  },
+  "placeholder-title": {
+    "NoInternet": "No Internet Connection",
+    "ProgramScheduled": "This program has not started yet",
+    "ProgramExpired": "This program has expired",
+    "ProgramDeleted": "This program has been deleted",
+    "ProgramDeactivated": "This program has been deactivated",
+    "ProgramUnavailable": "This program is not available"
+  },
+  "start-survey": {
+    "start-btn": "Take Survey",
+    "start-btn-desc": "Press on this button",
+    "qrcode-desc": "Scan this QR",
+    "or": "OR",
+    "placeholder-message": "Sorry for the inconvenience.\nPlease come back and check later on."
+  },
+  "survey": {
+    "survey-back": "Back",
+    "survey-next": "Next",
+    "survey-submit": "Submit",
+    "mandatory": "Oops! You Forgot To Answer This Question",
+    "progress-bar": "{{percentage}}% Completed",
+    "char-left": "Characters left: {{left}}",
+    "idle-warning": "Do you want to continue the survey?",
+    "other-option": "Other:",
+    "other-placeholder": "What's on your mind?",
+    "metadata-anonymous-warning": "Personal information will not be shared.",
+    "new-progress-bar": "Question"
+  },
+  "metadata-question-desc": {
+    "Name": "e.g. John Doe / Please type Name only",
+    "Email": "e.g. test@test.com / Please type Email only",
+    "Phone": "e.g. +15555555555 / Please type Phone only",
+    "Number": "e.g. 1001 / Please type Number only",
+    "Date": "e.g. 2020/03/19 or 2020-03-19 / Please type Date only",
+    "String": "e.g. Hello123! / Please type Text only"
+  },
+  "metadata-invalid-message": {
+    "Email": "Please respond with email.",
+    "Phone": "Please respond with phone.",
+    "Number": "Please respond with numbers.",
+    "Date": "Please respond with date."
+  },
+  "open-question-invalid-message": {
+    "characters": "Please type at least {{count}} characters"
+  },
+  "end-survey": {
+    "thank": "Thank you for taking our survey"
+  },
+  "option1HintDescription": {
+    "title": "Please select your ratings below"
+  },
+  "option3HintDescription": {
+    "title": "Drag up and down to rate"
+  },
+  "option4HintDescription": {
+    "title": "Tap to add starts & Tap on stars to remove it",
+    "subTitle": "You can add upto {{count}} stars"
+  },
+  "option6HintDescription": {
+    "title":"Rotate the dialer to rate"
+  }
 }

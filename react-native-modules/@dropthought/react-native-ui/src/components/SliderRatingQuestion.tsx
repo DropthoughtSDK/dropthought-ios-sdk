@@ -1,24 +1,17 @@
-import React from 'react';
-import {
-  View,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  Platform,
-} from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, ScrollView } from 'react-native';
 import MandatoryTitle from './MandatoryTitle';
-import GlobalStyle, { Colors } from '../styles';
-import { isNil } from 'ramda';
-import i18n from '../translation';
+import { Colors, addOpacityToColor } from '../styles';
 import {
   DimensionWidthType,
   useDimensionWidthType,
 } from '../hooks/useWindowDimensions';
-import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import type {
-  Feedback as OriginFeedback,
   Question as OriginQuestion,
+  Feedback as OriginFeedback,
 } from '../data';
+import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
+import { isNil } from 'ramda';
 
 type Feedback = OriginFeedback & {
   answers: string[];
@@ -27,6 +20,22 @@ type Feedback = OriginFeedback & {
 type Question = OriginQuestion & {
   options: string[];
   scale: string;
+};
+
+type Props = {
+  question: Question;
+  onFeedback: ({
+    questionId,
+    answers,
+    type,
+  }: {
+    questionId: string;
+    answers: number[];
+    type: string;
+  }) => void;
+  feedback: Feedback;
+  forgot: boolean;
+  themeColor: string;
 };
 
 const MIN_VALUE = 1;
@@ -64,22 +73,6 @@ const getLabelText = ({
   return labelText;
 };
 
-type Props = {
-  question: Question;
-  onFeedback: ({
-    questionId,
-    answers,
-    type,
-  }: {
-    questionId: string;
-    answers: number[];
-    type: string;
-  }) => void;
-  feedback: Feedback;
-  forgot: boolean;
-  themeColor: string;
-};
-
 const SliderRatingQuestion = ({
   question,
   onFeedback,
@@ -87,66 +80,56 @@ const SliderRatingQuestion = ({
   forgot,
   themeColor,
 }: Props) => {
-  const {
-    colorScheme,
-    fontColor,
-    backgroundColor: themeBackgroundColor,
-  } = useTheme();
-  const [value, setValue] = React.useState(getInitialSelectedValue(feedback));
-  const maximumValue = parseInt(question.scale, 10);
+  const { questionId, scale } = question;
 
   const dimensionWidthType = useDimensionWidthType();
   const isPhone = dimensionWidthType === DimensionWidthType.phone;
+  const styles = isPhone ? phoneStyles : tabletStyles;
 
-  const getBackgroundColorStyle = ({
-    selected,
-    darkMode,
-  }: {
-    selected: boolean;
-    darkMode: boolean;
-  }) => {
-    if (selected) {
-      return {
-        backgroundColor: themeColor,
-        resizeMode: 'contain',
-      };
-    }
-    if (darkMode) {
-      return styles.backgroundDark;
-    }
-    return { backgroundColor: themeBackgroundColor };
+  const { colorScheme, fontColor, backgroundColor } = useTheme();
+
+  const appearanceBackgroundColor = addOpacityToColor(
+    colorScheme === COLOR_SCHEMES.dark ? Colors.appearanceSubBlack : themeColor,
+    0.08
+  );
+
+  const buttonTextSelected = {
+    backgroundColor:
+      colorScheme === COLOR_SCHEMES.dark
+        ? addOpacityToColor(themeColor, 0.3)
+        : appearanceBackgroundColor,
+    borderColor: themeColor,
+    color: colorScheme === COLOR_SCHEMES.dark ? fontColor : themeColor,
   };
 
+  const buttonTextStyle = {
+    backgroundColor: appearanceBackgroundColor,
+    borderColor: backgroundColor,
+    color: fontColor,
+  };
+
+  const [value, setValue] = useState(getInitialSelectedValue(feedback));
+
+  const onSelected = (index: number) => {
+    onFeedback({
+      questionId,
+      answers: [index],
+      type: 'nps',
+    });
+    setValue(index);
+  };
+
+  const maximumValue = parseInt(scale, 10);
+
   const getSliderIndicator = () => {
-    return [...Array(maximumValue).keys()].map((valueData, index) => (
-      <TouchableHighlight
-        underlayColor={themeBackgroundColor}
-        key={index.toString()}
-        onPress={() => {
-          onFeedback({
-            questionId: question.questionId,
-            answers: [index],
-            type: question.type,
-          });
-          setValue(index);
-        }}
-      >
-        <View
-          style={[
-            isPhone ? styles.backgroundPhone : styles.backgroundTablet,
-            getBackgroundColorStyle({
-              selected: index === value,
-              darkMode: colorScheme === COLOR_SCHEMES.dark,
-            }),
-          ]}
-        >
-          <Text
-            style={[
-              styles.label,
-              { color: fontColor },
-              index === value ? styles.selectedLabel : {},
-            ]}
-          >
+    return [...Array(maximumValue).keys()].map((valueData, index) => {
+      const textStyle =
+        value === index
+          ? [styles.buttonText, buttonTextStyle, buttonTextSelected]
+          : [styles.buttonText, buttonTextStyle];
+      return (
+        <TouchableOpacity key={index} onPress={() => onSelected(index)}>
+          <Text style={textStyle}>
             {getLabelText({
               isPhone,
               question,
@@ -154,142 +137,60 @@ const SliderRatingQuestion = ({
               valueData,
             })}
           </Text>
-        </View>
-      </TouchableHighlight>
-    ));
+        </TouchableOpacity>
+      );
+    });
   };
 
-  const getWidthStyle = () => {
-    let width =
-      (maximumValue / 10.0) * 100 > 100 ? 100 : (maximumValue / 10.0) * 100;
-    return {
-      maxWidth: width + '%',
-      marginTop: 22,
-      paddingHorizontal: 10,
-    };
-  };
-
-  const rtl = i18n.dir() === 'rtl';
   return (
-    <View style={GlobalStyle.questionContainer}>
-      <MandatoryTitle
-        forgot={forgot}
-        style={styles.marginBottom25}
-        question={question}
-      />
-      {isPhone ? (
-        <View style={[styles.vertical]}>{getSliderIndicator()}</View>
-      ) : (
-        <>
-          <View style={rtl && GlobalStyle.flexRowReverse}>
-            <View style={getWidthStyle()}>
-              <View style={styles.line} />
-              <View
-                style={[styles.horizontal, rtl && GlobalStyle.flexRowReverse]}
-              >
-                {getSliderIndicator()}
-              </View>
-            </View>
-          </View>
-          <View style={rtl && GlobalStyle.flexRowReverse}>
-            <View
-              style={[
-                styles.horizontal,
-                styles.marginTop10,
-                getWidthStyle(),
-                rtl && GlobalStyle.flexRowReverse,
-              ]}
-            >
-              <Text style={styles.options}>{question.options[0]}</Text>
-              <Text style={styles.options}>
-                {question.options[question.options.length - 1]}
-              </Text>
-            </View>
-          </View>
-        </>
-      )}
-    </View>
+    <ScrollView style={commonStyles.container}>
+      <MandatoryTitle forgot={forgot} question={question} />
+      {getSliderIndicator()}
+    </ScrollView>
   );
 };
 
 export default React.memo(SliderRatingQuestion);
 
-const styles = StyleSheet.create({
-  backgroundPhone: {
-    backgroundColor: Colors.white,
-    borderColor: Colors.sliderShadowColor,
-    borderRadius: 2,
-    elevation: 5,
-    height: 33,
-    justifyContent: 'center',
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.16,
-    shadowRadius: 3,
-    width: '100%',
-    marginBottom: 8,
-  },
-  backgroundTablet: {
-    backgroundColor: Colors.white,
-    borderColor: Colors.sliderShadowColor,
-    borderRadius: 1000,
-    elevation: 5,
-    height: 45,
-    justifyContent: 'center',
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    width: 45,
-  },
-  backgroundDark: {
-    backgroundColor: Colors.sliderBackgroundDark,
-    elevation: 0,
-  },
-  horizontal: {
+const commonStyles = StyleSheet.create({
+  container: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
+    paddingHorizontal: 42,
   },
-  vertical: {
-    flex: 1,
-    justifyContent: 'space-between',
-    width: '100%',
-    ...Platform.select({
-      android: {
-        paddingHorizontal: 7,
-      },
-    }),
-  },
-  label: {
+});
+
+const phoneStyles = StyleSheet.create({
+  title: {
+    fontSize: 26,
+    fontWeight: '600',
+    lineHeight: 32,
     textAlign: 'center',
+    marginBottom: 24,
   },
-  line: {
-    backgroundColor: Colors.sliderShadowColor,
-    height: 1,
-    top: '50%',
-    width: '100%',
-  },
-  marginBottom10: {
+  buttonText: {
+    textAlign: 'center',
+    paddingVertical: 9,
     marginBottom: 10,
+    borderRadius: 17,
+    overflow: 'hidden',
+    borderWidth: 1,
   },
-  marginBottom25: {
-    marginBottom: 25,
-  },
-  marginTop10: {
-    marginTop: 10,
-  },
-  options: {
-    fontSize: 12,
-  },
-  selectedLabel: {
+});
+
+const tabletStyles = StyleSheet.create({
+  title: {
+    fontSize: 26,
+    fontWeight: '600',
+    lineHeight: 32,
     textAlign: 'center',
+    marginBottom: 24,
+  },
+  buttonText: {
+    textAlign: 'center',
+    paddingVertical: 9,
+    marginBottom: 10,
+    borderRadius: 17,
+    overflow: 'hidden',
+    borderWidth: 1,
   },
 });

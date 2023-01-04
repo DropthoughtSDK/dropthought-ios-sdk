@@ -1,3 +1,4 @@
+/* eslint-env browser */
 import * as React from 'react';
 import { View } from 'react-native';
 
@@ -109,7 +110,7 @@ function getSupportedEnv() {
 }
 
 function getInset(side) {
-  return "".concat(getSupportedEnv(), "(safe-area-inset-").concat(side, ")");
+  return `${getSupportedEnv()}(safe-area-inset-${side})`;
 }
 
 function createContextElement() {

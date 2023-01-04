@@ -1,8 +1,16 @@
-export default StartScreen;
-declare function StartScreen({ onLanguageSelect, onStart, survey }: {
+export default function StartScreenLayout({ onLanguageSelect, onClose, onStart, survey }: {
     onLanguageSelect: any;
+    onClose: any;
     onStart: any;
     survey: any;
-}): React.CElement<import("react-native").ViewProps, View>;
-import { View } from "react-native";
+}): React.FunctionComponentElement<{
+    survey: any;
+    onLanguageSelect: any;
+    onStart: any;
+}> | React.FunctionComponentElement<{
+    survey: any;
+    onLanguageSelect: any;
+    onClose: any;
+    onStart: any;
+}>;
 import React from "react";

@@ -38,8 +38,15 @@ export namespace Colors {
     const backgroundColorLight: string;
     const backgroundColorDark: string;
     const sliderBackgroundDark: string;
+    const unSelectedBackground: string;
+    const smileyRatingScoreGray: string;
+    const appearanceSubBlack: string;
+    const warningRed: string;
 }
+export function addOpacityToColor(hexColor: any, opacity: any): string;
 export function opacity10(color: any): string;
 export function opacity15(color: any): string;
 export function opacity30(color: any): string;
 export function opacity60(color: any): string;
+export const Option1BackgroundColor: string[];
+export const Option1BackgroundColorDark: string[];

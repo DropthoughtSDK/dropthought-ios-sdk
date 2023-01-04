@@ -3,25 +3,26 @@ import { useColorScheme, ColorSchemeName } from 'react-native';
 import { Colors } from '../../styles';
 import { ThemeContext } from './ThemeContext';
 import {
-  THEME_OPTIONS,
+  APPEARANCE,
   COLOR_SCHEMES,
-  IThemeOptionsType,
+  IAppearanceType,
   IColorSchemesType,
   FontColor,
   BackgroundColor,
+  IThemeOptionType,
 } from './theme.const';
 
 function getColorScheme(
-  theme: IThemeOptionsType,
+  appearance: IAppearanceType,
   systemColorScheme: ColorSchemeName
 ): IColorSchemesType {
   let colorScheme;
-  if (theme === THEME_OPTIONS.SYSTEM) {
+  if (appearance === APPEARANCE.SYSTEM) {
     if (systemColorScheme) {
       colorScheme = COLOR_SCHEMES[systemColorScheme];
     }
-  } else if ([THEME_OPTIONS.LIGHT, THEME_OPTIONS.DARK].includes(theme)) {
-    colorScheme = COLOR_SCHEMES[theme];
+  } else if ([APPEARANCE.LIGHT, APPEARANCE.DARK].includes(appearance)) {
+    colorScheme = COLOR_SCHEMES[appearance];
   }
   return colorScheme ?? COLOR_SCHEMES.light;
 }
@@ -53,16 +54,18 @@ function getBackgroundColor(
 }
 
 function useTheme({
-  theme,
+  themeOption,
+  appearance,
   fontColor: customFontColor,
   backgroundColor: customBackgroundColor,
 }: {
-  theme: IThemeOptionsType;
+  themeOption: IThemeOptionType;
+  appearance: IAppearanceType;
   fontColor: FontColor;
   backgroundColor: BackgroundColor;
 }) {
   const systemColorScheme = useColorScheme();
-  const colorScheme = getColorScheme(theme, systemColorScheme);
+  const colorScheme = getColorScheme(appearance, systemColorScheme);
   const fontColor = getFontColor(customFontColor, colorScheme);
   const backgroundColor = getBackgroundColor(
     customBackgroundColor,
@@ -71,27 +74,44 @@ function useTheme({
 
   return React.useMemo(() => {
     return {
+      themeOption,
       colorScheme,
       fontColor,
       backgroundColor,
+      customFontColor,
+      customBackgroundColor,
     };
-  }, [colorScheme, fontColor, backgroundColor]);
+  }, [
+    themeOption,
+    colorScheme,
+    fontColor,
+    backgroundColor,
+    customFontColor,
+    customBackgroundColor,
+  ]);
 }
 
 type Props = {
   children: React.ReactNode;
-  theme: IThemeOptionsType;
+  themeOption: IThemeOptionType;
+  appearance: IAppearanceType;
   fontColor: FontColor;
   backgroundColor: BackgroundColor;
 };
 
 export function ThemeProvider({
   children,
-  theme,
+  themeOption,
+  appearance,
   fontColor,
   backgroundColor,
 }: Props) {
-  const themeValue = useTheme({ theme, fontColor, backgroundColor });
+  const themeValue = useTheme({
+    themeOption,
+    appearance,
+    fontColor,
+    backgroundColor,
+  });
 
   return (
     <ThemeContext.Provider value={themeValue}>{children}</ThemeContext.Provider>

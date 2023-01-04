@@ -1,8 +1,9 @@
 export type {
   IColorSchemesType,
-  IThemeOptionsType,
+  IAppearanceType,
   FontColor,
   BackgroundColor,
+  IThemeOptionType,
 } from './contexts/theme';
 
 export type QuestionType =
@@ -42,7 +43,7 @@ export interface Question {
   options?: string[];
   type: QuestionType;
   subType?: QuestionSubType;
-  scale?: number;
+  scale?: string;
 }
 
 export interface Page {

@@ -4,13 +4,18 @@ import * as React from 'react';
 import { View } from 'react-native';
 import { mandatoryQuestionValidator } from '../utils/data';
 import { useFeedbackByQid, useFeedbackDispatch, updateFeedback } from '../contexts/feedback';
+import SmileyRatingQuestionOption1 from '../components/SmileyRatingQuestionOption1';
+import SmileyRatingQuestionOption2 from '../components/SmileyRatingQuestionOption2';
+import SmileyRatingQuestionOption3 from '../components/SmileyRatingQuestionOption3';
+import SmileyRatingQuestionOption4 from '../components/SmileyRatingQuestionOption4';
+import SmileyRatingQuestionOption6 from '../components/SmileyRatingQuestionOption6';
 import SingleChoiceQuestion from '../components/SingleChoiceQuestion';
 import MultiChoiceQuestion from '../components/MultiChoiceQuestion';
-import SmileyRatingQuestion from '../components/SmileyRatingQuestion';
 import SliderRatingQuestion from '../components/SliderRatingQuestion';
 import OpenQuestion from '../components/OpenQuestion';
 import MandatoryTitle from '../components/MandatoryTitle';
 import GlobalStyle from '../styles';
+import { useTheme } from '..';
 
 const TempComponent = ({
   question,
@@ -29,6 +34,9 @@ const QuestionContainer = props => {
     onFeedback: propsOnFeedback,
     validationStarted
   } = props;
+  const {
+    themeOption
+  } = useTheme();
   let QuestionComponent = TempComponent; // get/update feedback to context
 
   const feedback = useFeedbackByQid(props.question.questionId);
@@ -54,8 +62,36 @@ const QuestionContainer = props => {
 
     case 'rating':
       if (props.question.subType === 'smiley') {
-        // @ts-ignore
-        QuestionComponent = SmileyRatingQuestion;
+        switch (themeOption) {
+          case 'option1':
+            // @ts-ignore
+            QuestionComponent = SmileyRatingQuestionOption1;
+            break;
+
+          case 'option2':
+            // @ts-ignore
+            QuestionComponent = SmileyRatingQuestionOption2;
+            break;
+
+          case 'option3':
+            // @ts-ignore
+            QuestionComponent = SmileyRatingQuestionOption3;
+            break;
+
+          case 'option4':
+            // @ts-ignore
+            QuestionComponent = SmileyRatingQuestionOption4;
+            break;
+
+          case 'option6':
+            // @ts-ignore
+            QuestionComponent = SmileyRatingQuestionOption6;
+            break;
+
+          default:
+            // @ts-ignore
+            QuestionComponent = SmileyRatingQuestionOption1;
+        }
       } else {
         // @ts-ignore
         QuestionComponent = SliderRatingQuestion;

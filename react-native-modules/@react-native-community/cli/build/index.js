@@ -211,6 +211,12 @@ async function run() {
 
 async function setupAndRun() {
   // Commander is not available yet
+  // when we run `config`, we don't want to output anything to the console. We
+  // expect it to return valid JSON
+  if (process.argv.includes('config')) {
+    _cliTools().logger.disable();
+  }
+
   _cliTools().logger.setVerbose(process.argv.includes('--verbose')); // We only have a setup script for UNIX envs currently
 
 
@@ -235,25 +241,27 @@ async function setupAndRun() {
   }
 
   try {
-    // when we run `config`, we don't want to output anything to the console. We
-    // expect it to return valid JSON
-    if (process.argv.includes('config')) {
-      _cliTools().logger.disable();
-    }
-
-    const ctx = (0, _config.default)();
+    const config = (0, _config.default)();
 
     _cliTools().logger.enable();
 
-    for (const command of [..._commands.projectCommands, ...ctx.commands]) {
-      attachCommand(command, ctx);
+    for (const command of [..._commands.projectCommands, ...config.commands]) {
+      attachCommand(command, config);
     }
-  } catch (e) {
-    _cliTools().logger.enable();
+  } catch (error) {
+    /**
+     * When there is no `package.json` found, the CLI will enter `detached` mode and a subset
+     * of commands will be available. That's why we don't throw on such kind of error.
+     */
+    if (error.message.includes("We couldn't find a package.json")) {
+      _cliTools().logger.enable();
 
-    _cliTools().logger.debug(e.message);
+      _cliTools().logger.debug(error.message);
 
-    _cliTools().logger.debug('Failed to load configuration of your project. Only a subset of commands will be available.');
+      _cliTools().logger.debug('Failed to load configuration of your project. Only a subset of commands will be available.');
+    } else {
+      throw new (_cliTools().CLIError)('Failed to load configuration of your project.', error);
+    }
   }
 
   _commander().default.parse(process.argv);

@@ -17,12 +17,14 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 
 const KioskProvider = ({
   children,
-  theme,
+  themeOption,
+  appearance,
   fontColor,
   backgroundColor
 }) => {
   return /*#__PURE__*/React.createElement(_theme.ThemeProvider, {
-    theme: theme,
+    themeOption: themeOption,
+    appearance: appearance,
     fontColor: fontColor,
     backgroundColor: backgroundColor
   }, /*#__PURE__*/React.createElement(_feedback.FeedbackProvider, null, children));

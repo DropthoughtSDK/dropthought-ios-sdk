@@ -1,8 +1,10 @@
-export default SingleChoiceQuestion;
-declare class SingleChoiceQuestion extends React.PureComponent<any, any, any> {
-    constructor(props: any);
-    onFeedback(id: any): void;
-    onChangeValueHandler(index: any, newValue: any): void;
-    renderRadios(): any;
-}
+declare var _default: React.MemoExoticComponent<({ anonymous, question, onFeedback, forgot, feedback, themeColor }: {
+    anonymous: any;
+    question: any;
+    onFeedback: any;
+    forgot: any;
+    feedback: any;
+    themeColor: any;
+}) => React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>>;
+export default _default;
 import React from "react";

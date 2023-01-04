@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { i18n, useDimensionWidthType, DimensionWidthType } from '@dropthought/react-native-ui';
+import { i18n, useDimensionWidthType, DimensionWidthType, useTheme, THEME_OPTION } from '@dropthought/react-native-ui';
 import CloseButton, { ICON_SIZE } from '../components/CloseButton';
 /**
  * @typedef {object} Props
@@ -20,10 +20,13 @@ const Header = ({
   themeColor,
   onClose
 }) => {
+  const {
+    themeOption
+  } = useTheme();
   const insets = useSafeAreaInsets();
   const isRtl = i18n.dir() === 'rtl';
   const isPhone = useDimensionWidthType() === DimensionWidthType.phone;
-  return /*#__PURE__*/React.createElement(View, {
+  const classicHeader = /*#__PURE__*/React.createElement(View, {
     style: [styles.container, {
       backgroundColor: themeColor,
       paddingTop: insets.top
@@ -38,6 +41,7 @@ const Header = ({
   }, /*#__PURE__*/React.createElement(CloseButton, {
     onPress: onClose
   }))));
+  return themeOption === THEME_OPTION.CLASSIC ? classicHeader : null;
 };
 
 export default Header;

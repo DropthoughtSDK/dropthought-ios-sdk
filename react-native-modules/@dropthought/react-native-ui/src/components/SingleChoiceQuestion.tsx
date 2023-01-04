@@ -1,103 +1,98 @@
-import React, { PureComponent } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { isNil } from 'ramda';
-
-import GlobalStyle from '../styles';
+import React from 'react';
+import { StyleSheet, Platform, ScrollView as RNScrollView } from 'react-native';
+import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import MandatoryTitle from './MandatoryTitle';
-import OptionWithHighlight from './OptionWithHighlight';
-import OtherOptionWithHighlight from './OtherOptionWithHighlight';
-import { getOptionsFromQuestion } from '../utils/data';
 import type {
   Feedback as OriginFeedback,
   Question as OriginQuestion,
-  Option,
 } from '../data';
+import { getOptionsFromQuestion } from '../utils/data';
+import { isNil } from 'ramda';
+import NewOtherOptionWithHighlight from './NewOtherOptionWithHighlight';
+import NewOptionWithHighlight from './NewOptionWithHighlight';
+
+const ScrollView =
+  Platform.OS === 'ios' ? KeyboardAvoidingScrollView : RNScrollView;
+
+type Question = OriginQuestion & {
+  options: string[];
+  otherText: string;
+};
 
 type Feedback = OriginFeedback & {
   answers: (string | number)[];
 };
 
-type Question = OriginQuestion & {
-  options: string[];
-  scale: string;
-};
-
 type Props = {
+  anonymous: boolean;
   question: Question;
-  feedback: Feedback;
   onFeedback: (feedback: Feedback) => void;
   forgot: boolean;
-  themeColor: string; // use hex color string
+  feedback: Feedback;
+  themeColor: string;
 };
 
-type State = {
-  options: Option[];
-  value: number | undefined;
-  otherText: string | undefined;
-};
+const SingleChoiceQuestion = ({
+  anonymous,
+  question,
+  onFeedback,
+  // need add new design about if user forgot answer
+  forgot,
+  feedback,
+  themeColor,
+}: Props) => {
+  const { questionId } = question;
+  const options = getOptionsFromQuestion(question);
 
-class SingleChoiceQuestion extends PureComponent<Props, State> {
-  constructor(props: Props) {
-    super(props);
+  function getInitialValueFromFeedbackProps() {
+    let value;
+    let otherText;
+    if (feedback && feedback.answers && !isNil(feedback.answers[0])) {
+      const answer = feedback.answers[0];
 
-    let otherText = '';
-    function getInitialValueFromFeedbackProps() {
-      if (
-        props.feedback &&
-        props.feedback.answers &&
-        !isNil(props.feedback.answers[0])
-      ) {
-        const answer = props.feedback.answers[0];
-        if (Number.isInteger(answer)) {
-          return answer;
-        } else {
-          // if the answer is not a number type,
-          // it is for other label, return the last index
-          // @ts-ignore
-          otherText = answer;
-          return props.question.options.length;
-        }
+      if (Number.isInteger(answer)) {
+        value = answer;
+      } else {
+        // if the answer is not a number type,
+        // it is for other label, return the last index
+        // @ts-ignore
+        otherText = answer;
+        value = question.options.length;
       }
-      return undefined;
     }
-
-    this.onFeedback = this.onFeedback.bind(this);
-    this.onChangeValueHandler = this.onChangeValueHandler.bind(this);
-    this.state = {
-      // @ts-ignore
-      value: getInitialValueFromFeedbackProps(),
-      options: getOptionsFromQuestion(props.question),
+    return {
+      value: value,
       otherText,
     };
   }
+  const initialSelected = getInitialValueFromFeedbackProps();
 
-  // when normal option is pressed, set the id(index) as answer
-  onFeedback(id: number) {
-    this.setState({
+  const [selected, setSelected] = React.useState(initialSelected);
+
+  const handleFeedback = (id: number) => {
+    setSelected({
       value: id,
-
-      // DK-864, when selecting normal options, reset the other input's value
-      otherText: '',
+      otherText: selected.otherText,
     });
-    this.props.onFeedback({
-      questionId: this.props.question.questionId,
+    onFeedback({
+      questionId: questionId,
       answers: [id],
       type: 'singleChoice',
     });
-  }
+  };
 
   // when other option's value is changed, newValues is {checked: boolean, value: string}
-  onChangeValueHandler(
+  const onChangeValueHandler = (
     index: any,
     newValue: { checked: boolean; value: string | undefined }
-  ) {
-    this.setState({
+  ) => {
+    setSelected({
       // if newValues is checked, set value to this index
       value: newValue.checked ? index : undefined,
       otherText: newValue.checked ? newValue.value : '',
     });
-    this.props.onFeedback({
-      questionId: this.props.question.questionId,
+    onFeedback({
+      questionId: questionId,
       // the answer of this feedback is the text value
       // @ts-ignore
       answers: newValue.checked ? [newValue.value] : [],
@@ -106,57 +101,60 @@ class SingleChoiceQuestion extends PureComponent<Props, State> {
       // set otherFlag if newValue is checked
       otherFlag: newValue.checked,
     });
-  }
+  };
 
-  renderRadios() {
-    return this.state.options.map(({ title: option, isOther }, index) => {
-      const isActive = this.state.value === index;
+  const buttonList = options.map(({ title, isOther }, index) => {
+    const isActive = selected.value === index;
 
-      if (isOther) {
-        return (
-          <OtherOptionWithHighlight
-            id={index}
-            key={index}
-            onPress={this.onFeedback}
-            title={option}
-            checked={isActive}
-            checkedColor={this.props.themeColor}
-            onChangeValue={this.onChangeValueHandler}
-            textValue={this.state.otherText}
-          />
-        );
-      }
-
-      return (
-        <OptionWithHighlight
-          id={index}
-          key={index}
-          onPress={this.onFeedback}
-          title={option}
-          checked={isActive}
-          checkedColor={this.props.themeColor}
-        />
-      );
-    });
-  }
-
-  render() {
-    return (
-      <View style={GlobalStyle.questionContainer}>
-        <MandatoryTitle
-          forgot={this.props.forgot}
-          question={this.props.question}
-        />
-        <View style={styles.radioForm}>{this.renderRadios()}</View>
-      </View>
+    return isOther ? (
+      <NewOtherOptionWithHighlight
+        key={index}
+        id={index}
+        type={'radio'}
+        title={title}
+        checked={isActive}
+        themeColor={themeColor}
+        onPress={handleFeedback}
+        onChangeValue={onChangeValueHandler}
+        textValue={selected.otherText?.toString()}
+        question={question}
+        feedback={feedback}
+        anonymous={anonymous}
+      />
+    ) : (
+      <NewOptionWithHighlight
+        key={index}
+        id={index}
+        type={'radio'}
+        title={title}
+        checked={isActive}
+        themeColor={themeColor}
+        onPress={handleFeedback}
+      />
     );
-  }
-}
+  });
 
-const styles = StyleSheet.create({
-  radioForm: {
-    marginTop: 20,
+  return (
+    // @ts-ignore
+    <ScrollView extraAvoidingSpace={30} style={commonStyles.container}>
+      <MandatoryTitle forgot={forgot} question={question} />
+      {buttonList}
+    </ScrollView>
+  );
+};
+
+export default React.memo(SingleChoiceQuestion);
+
+const commonStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 42,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: '600',
+    lineHeight: 32,
+    textAlign: 'center',
+    marginBottom: 54,
   },
 });
-
-export default SingleChoiceQuestion;

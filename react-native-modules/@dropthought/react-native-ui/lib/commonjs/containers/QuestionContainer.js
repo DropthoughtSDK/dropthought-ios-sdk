@@ -13,11 +13,19 @@ var _data = require("../utils/data");
 
 var _feedback = require("../contexts/feedback");
 
+var _SmileyRatingQuestionOption = _interopRequireDefault(require("../components/SmileyRatingQuestionOption1"));
+
+var _SmileyRatingQuestionOption2 = _interopRequireDefault(require("../components/SmileyRatingQuestionOption2"));
+
+var _SmileyRatingQuestionOption3 = _interopRequireDefault(require("../components/SmileyRatingQuestionOption3"));
+
+var _SmileyRatingQuestionOption4 = _interopRequireDefault(require("../components/SmileyRatingQuestionOption4"));
+
+var _SmileyRatingQuestionOption5 = _interopRequireDefault(require("../components/SmileyRatingQuestionOption6"));
+
 var _SingleChoiceQuestion = _interopRequireDefault(require("../components/SingleChoiceQuestion"));
 
 var _MultiChoiceQuestion = _interopRequireDefault(require("../components/MultiChoiceQuestion"));
-
-var _SmileyRatingQuestion = _interopRequireDefault(require("../components/SmileyRatingQuestion"));
 
 var _SliderRatingQuestion = _interopRequireDefault(require("../components/SliderRatingQuestion"));
 
@@ -26,6 +34,8 @@ var _OpenQuestion = _interopRequireDefault(require("../components/OpenQuestion")
 var _MandatoryTitle = _interopRequireDefault(require("../components/MandatoryTitle"));
 
 var _styles = _interopRequireDefault(require("../styles"));
+
+var _ = require("..");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -52,6 +62,9 @@ const QuestionContainer = props => {
     onFeedback: propsOnFeedback,
     validationStarted
   } = props;
+  const {
+    themeOption
+  } = (0, _.useTheme)();
   let QuestionComponent = TempComponent; // get/update feedback to context
 
   const feedback = (0, _feedback.useFeedbackByQid)(props.question.questionId);
@@ -77,8 +90,36 @@ const QuestionContainer = props => {
 
     case 'rating':
       if (props.question.subType === 'smiley') {
-        // @ts-ignore
-        QuestionComponent = _SmileyRatingQuestion.default;
+        switch (themeOption) {
+          case 'option1':
+            // @ts-ignore
+            QuestionComponent = _SmileyRatingQuestionOption.default;
+            break;
+
+          case 'option2':
+            // @ts-ignore
+            QuestionComponent = _SmileyRatingQuestionOption2.default;
+            break;
+
+          case 'option3':
+            // @ts-ignore
+            QuestionComponent = _SmileyRatingQuestionOption3.default;
+            break;
+
+          case 'option4':
+            // @ts-ignore
+            QuestionComponent = _SmileyRatingQuestionOption4.default;
+            break;
+
+          case 'option6':
+            // @ts-ignore
+            QuestionComponent = _SmileyRatingQuestionOption5.default;
+            break;
+
+          default:
+            // @ts-ignore
+            QuestionComponent = _SmileyRatingQuestionOption.default;
+        }
       } else {
         // @ts-ignore
         QuestionComponent = _SliderRatingQuestion.default;

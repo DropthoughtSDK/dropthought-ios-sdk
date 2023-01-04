@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 var _exportNames = {
+  ClassicQuestionContainer: true,
   QuestionContainer: true,
   SurveyScreenLayout: true,
   SurveyProgressBarPosition: true,
@@ -11,14 +12,22 @@ var _exportNames = {
   StartScreenLayout: true,
   PlaceholderScreen: true,
   KioskProvider: true,
+  KioskProviderProps: true,
   i18n: true,
   Colors: true,
   GlobalStyle: true,
-  THEME_OPTIONS: true,
+  APPEARANCE: true,
   COLOR_SCHEMES: true,
+  THEME_OPTION: true,
   useTheme: true,
   ActivityIndicatorMask: true
 };
+Object.defineProperty(exports, "APPEARANCE", {
+  enumerable: true,
+  get: function () {
+    return _theme.APPEARANCE;
+  }
+});
 Object.defineProperty(exports, "ActivityIndicatorMask", {
   enumerable: true,
   get: function () {
@@ -29,6 +38,12 @@ Object.defineProperty(exports, "COLOR_SCHEMES", {
   enumerable: true,
   get: function () {
     return _theme.COLOR_SCHEMES;
+  }
+});
+Object.defineProperty(exports, "ClassicQuestionContainer", {
+  enumerable: true,
+  get: function () {
+    return _ClassicQuestionContainer.default;
   }
 });
 Object.defineProperty(exports, "Colors", {
@@ -53,6 +68,12 @@ Object.defineProperty(exports, "KioskProvider", {
   enumerable: true,
   get: function () {
     return _KioskProvider.KioskProvider;
+  }
+});
+Object.defineProperty(exports, "KioskProviderProps", {
+  enumerable: true,
+  get: function () {
+    return _KioskProvider.KioskProviderProps;
   }
 });
 Object.defineProperty(exports, "PlaceholderScreen", {
@@ -85,10 +106,10 @@ Object.defineProperty(exports, "SurveyScreenLayout", {
     return _SurveyScreenLayout.default;
   }
 });
-Object.defineProperty(exports, "THEME_OPTIONS", {
+Object.defineProperty(exports, "THEME_OPTION", {
   enumerable: true,
   get: function () {
-    return _theme.THEME_OPTIONS;
+    return _theme.THEME_OPTION;
   }
 });
 Object.defineProperty(exports, "i18n", {
@@ -103,6 +124,8 @@ Object.defineProperty(exports, "useTheme", {
     return _theme.useTheme;
   }
 });
+
+var _ClassicQuestionContainer = _interopRequireDefault(require("./containers/ClassicQuestionContainer"));
 
 var _QuestionContainer = _interopRequireDefault(require("./containers/QuestionContainer"));
 

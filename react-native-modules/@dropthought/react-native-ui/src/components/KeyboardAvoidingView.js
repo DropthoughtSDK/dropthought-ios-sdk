@@ -53,7 +53,7 @@ export const useKeyboardListener = (keyboardChangeHandler = () => {}) => {
 
     return function cleanup() {
       subscriptions.forEach((subscription) => {
-        subscription.remove();
+        subscription?.remove();
       });
     };
   }, [keyboardChangeHandler]);

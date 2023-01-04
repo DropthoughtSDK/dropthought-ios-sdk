@@ -39,4 +39,11 @@ export declare const getPageIndexFromPageId: import("Function/Curry").Curry<(pag
 export declare function nextPage(pageIndex: number, pageId: string, feedbacksMap: {
     [questionId: string]: Feedback;
 }, survey: Survey): number;
+export declare const scaleLogic: {
+    [name in string]: number[];
+};
+export declare const option3LoopFaceTable: Map<string, any>;
+export declare const option3TransformTable: Map<string, any>;
+export declare const option4LoopFaceTable: Map<string, any>;
+export declare const option4TransformTable: Map<string, any>;
 /** @typedef {import('./dt-common-lib/IfcRule').IQAData} IQAData */

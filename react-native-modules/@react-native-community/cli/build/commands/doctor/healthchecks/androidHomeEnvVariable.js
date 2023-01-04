@@ -38,6 +38,12 @@ var _default = {
   runAutomaticFix: async ({
     loader
   }) => {
+    // Variable could have been added if installing Android Studio so double checking
+    if (process.env.ANDROID_HOME) {
+      loader.succeed();
+      return;
+    }
+
     loader.fail();
     (0, _common.logManualInstallation)({
       message

@@ -6,6 +6,7 @@ export declare const SurveyProgressBarPosition: {
 declare type Props = {
     pageIndex: number;
     survey: Survey;
+    onClose?: () => void;
     onSubmit: (surveyFeedback: SurveyFeedback) => void;
     onNextPage: (nextPageIndex: number) => void;
     onPrevPage?: () => void;

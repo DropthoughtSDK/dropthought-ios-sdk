@@ -27,6 +27,12 @@ Object.defineProperty(exports, "IOSDependencyParams", {
     return _ios.IOSDependencyParams;
   }
 });
+Object.defineProperty(exports, "IOSNativeModulesConfig", {
+  enumerable: true,
+  get: function () {
+    return _ios.IOSNativeModulesConfig;
+  }
+});
 Object.defineProperty(exports, "AndroidProjectConfig", {
   enumerable: true,
   get: function () {

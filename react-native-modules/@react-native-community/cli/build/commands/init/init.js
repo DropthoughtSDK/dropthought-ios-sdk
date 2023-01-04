@@ -129,7 +129,8 @@ async function createFromTemplate({
   templateName,
   npm,
   directory,
-  projectTitle
+  projectTitle,
+  skipInstall
 }) {
   _cliTools().logger.debug('Initializing new project');
 
@@ -175,12 +176,16 @@ async function createFromTemplate({
       loader.succeed();
     }
 
-    await installDependencies({
-      projectName,
-      npm,
-      loader,
-      root: projectDirectory
-    });
+    if (!skipInstall) {
+      await installDependencies({
+        projectName,
+        npm,
+        loader,
+        root: projectDirectory
+      });
+    } else {
+      loader.succeed('Dependencies installation skipped');
+    }
   } catch (e) {
     loader.fail();
     throw new Error(e);
@@ -219,7 +224,8 @@ async function createProject(projectName, directory, version, options) {
     templateName,
     npm: options.npm,
     directory,
-    projectTitle: options.title
+    projectTitle: options.title,
+    skipInstall: options.skipInstall
   });
 }
 

@@ -9,8 +9,6 @@ var React = _interopRequireWildcard(require("react"));
 
 var _reactNative = require("react-native");
 
-var _useWindowDimensions = require("../hooks/useWindowDimensions");
-
 var _styles = require("../styles");
 
 var _translation = _interopRequireDefault(require("../translation"));
@@ -25,12 +23,12 @@ const ProgressBar = ({
   value,
   maxValue,
   themeColor,
+  color,
   rtl
 }) => {
-  const dimensionWidthType = (0, _useWindowDimensions.useDimensionWidthType)(); // compute the percentage value: (value/maxValue)*100
-
+  // compute the percentage value: (value/maxValue)*100
   const percentage = Math.round(value * 100 / maxValue);
-  const containerStyle = [styles.container, _styles.GlobalStyle.row, rtl && _styles.GlobalStyle.flexRowReverse];
+  const containerStyle = [styles.container, rtl && _styles.GlobalStyle.flexRowReverse];
   const trackStyle = [styles.track, {
     backgroundColor: (0, _styles.opacity30)(themeColor)
   }];
@@ -38,49 +36,35 @@ const ProgressBar = ({
     width: `${percentage}%`,
     backgroundColor: themeColor
   }];
+  const textStyle = [styles.title, rtl && _styles.GlobalStyle.textAlignRight, {
+    color
+  }];
   return /*#__PURE__*/React.createElement(_reactNative.View, {
     style: containerStyle
-  }, /*#__PURE__*/React.createElement(_reactNative.View, {
-    style: _styles.GlobalStyle.flex1
   }, /*#__PURE__*/React.createElement(_reactNative.View, {
     style: trackStyle
   }), /*#__PURE__*/React.createElement(_reactNative.View, {
     style: progressBarStyle
-  })), /*#__PURE__*/React.createElement(_reactNative.Text, {
-    style: [styles.title, rtl && _styles.GlobalStyle.textAlignRight, titleSize[dimensionWidthType]]
-  }, _translation.default.t('survey:progress-bar', {
-    percentage
-  })));
+  }), /*#__PURE__*/React.createElement(_reactNative.Text, {
+    style: textStyle
+  }, `${_translation.default.t('survey:new-progress-bar')} ${value}/${maxValue}`));
 };
 
 const styles = _reactNative.StyleSheet.create({
   container: {
-    paddingVertical: 12
+    marginTop: 25
   },
   title: {
-    color: `${_styles.Colors.progressBarText}99`,
-    fontWeight: '500'
+    fontSize: 14,
+    fontWeight: '500',
+    marginTop: 12
   },
   track: {
-    width: '100%',
-    borderRadius: 3,
-    height: 6
+    borderRadius: 1,
+    height: 2
   },
   progressBar: {
     position: 'absolute'
-  }
-});
-
-const titleSize = _reactNative.StyleSheet.create({
-  [_useWindowDimensions.DimensionWidthType.phone]: {
-    marginLeft: 10,
-    marginRight: 10,
-    fontSize: 12
-  },
-  [_useWindowDimensions.DimensionWidthType.tablet]: {
-    marginLeft: 15,
-    marginRight: 15,
-    fontSize: 14
   }
 });
 

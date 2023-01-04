@@ -29,6 +29,9 @@ const QuestionWarningMessage = ({
   } = (0, _theme.useTheme)();
   const isDarkMode = colorScheme === _theme.COLOR_SCHEMES.dark;
   const rtl = _translation.default.dir() === 'rtl';
+  const hintStyle = [styles.hint, {
+    color: _styles.Colors.warningRed
+  }, rtl && _styles.default.horizontalFlip];
   if (!message) return null;
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: [styles.container, rtl && _styles.default.horizontalFlip]
@@ -37,7 +40,7 @@ const QuestionWarningMessage = ({
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: [styles.bubble, isDarkMode && styles.darkModeBubble]
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-    style: [styles.hint, isDarkMode && styles.darkModeHint, rtl && _styles.default.horizontalFlip]
+    style: hintStyle
   }, message)));
 };
 
@@ -46,27 +49,27 @@ exports.default = _default;
 
 const styles = _reactNative.StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: 'column',
+    alignItems: 'center',
     marginTop: 12
   },
   tip: {
-    top: 13,
     width: 0,
     height: 0,
     backgroundColor: 'transparent',
     borderStyle: 'solid',
-    borderTopWidth: 7,
-    borderBottomWidth: 7,
-    borderRightWidth: 12,
-    borderTopColor: 'transparent',
-    borderBottomColor: 'transparent',
-    borderRightColor: '#FFDEE4'
+    borderLeftWidth: 7,
+    borderRightWidth: 7,
+    borderBottomWidth: 12,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#f9ebeb'
   },
   darkModeTip: {
-    borderRightColor: '#39393a'
+    borderBottomColor: '#39393a'
   },
   bubble: {
-    backgroundColor: '#FFDEE4',
+    backgroundColor: '#f9ebeb',
     minWidth: 280,
     paddingHorizontal: 18,
     paddingVertical: 10,
@@ -76,11 +79,8 @@ const styles = _reactNative.StyleSheet.create({
     backgroundColor: '#39393a'
   },
   hint: {
-    color: _styles.Colors.black,
-    fontSize: 13
-  },
-  darkModeHint: {
-    color: '#FFE0E5'
+    fontSize: 13,
+    fontWeight: '600'
   }
 });
 //# sourceMappingURL=QuestionWarningMessage.js.map

@@ -21,7 +21,7 @@ var _checkInstallation = require("../checkInstallation");
 
 var _common = require("./common");
 
-var _environmentVariables = require("../../../tools/environmentVariables");
+var _environmentVariables = require("../../../tools/windows/environmentVariables");
 
 function _path() {
   const data = require("path");
@@ -33,7 +33,7 @@ function _path() {
   return data;
 }
 
-var _executeWinCommand = require("../../../tools/executeWinCommand");
+var _executeWinCommand = require("../../../tools/windows/executeWinCommand");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 

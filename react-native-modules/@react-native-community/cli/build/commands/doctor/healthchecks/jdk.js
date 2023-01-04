@@ -23,7 +23,7 @@ var _common = require("./common");
 
 var _downloadAndUnzip = require("../../../tools/downloadAndUnzip");
 
-var _environmentVariables = require("../../../tools/environmentVariables");
+var _environmentVariables = require("../../../tools/windows/environmentVariables");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 

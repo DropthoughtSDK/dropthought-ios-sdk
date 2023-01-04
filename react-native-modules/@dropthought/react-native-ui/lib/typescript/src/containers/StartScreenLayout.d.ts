@@ -4,8 +4,9 @@ declare type Survey = OriginSurvey & {
 };
 declare type Props = {
     onLanguageSelect: (language: string) => void;
+    onClose: () => void;
     onStart: () => void;
     survey: Survey;
 };
-declare const StartScreen: ({ onLanguageSelect, onStart, survey }: Props) => JSX.Element;
-export default StartScreen;
+export default function StartScreenLayout({ onLanguageSelect, onClose, onStart, survey, }: Props): JSX.Element;
+export {};

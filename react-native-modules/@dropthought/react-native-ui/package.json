@@ -1,6 +1,6 @@
 {
   "name": "@dropthought/react-native-ui",
-  "version": "1.0.3",
+  "version": "1.3.2",
   "description": "UI element for Dropthought React Native SDK",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -69,6 +69,7 @@
     "typescript": "^4.1.3"
   },
   "peerDependencies": {
+    "lottie-react-native": "^5.1.4",
     "react": "*",
     "react-native": "*",
     "react-native-safe-area-context": "^3.0.2"
@@ -148,8 +149,9 @@
   },
   "dependencies": {
     "@react-native-community/hooks": "^2.6.0",
-    "lodash": "^4.17.11",
     "i18next": "^21.3.0",
+    "lodash": "^4.17.11",
+    "lottie-react-native": "^5.1.4",
     "ramda": "^0.27.1"
   }
 }

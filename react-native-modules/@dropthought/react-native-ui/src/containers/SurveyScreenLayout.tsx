@@ -8,15 +8,21 @@ import {
 } from 'react-native';
 
 import { SurveyPageProvider } from '../contexts/survey-page';
+import ClassicQuestionContainer from './ClassicQuestionContainer';
 import QuestionContainer from './QuestionContainer';
 import DefaultSurveyProgressBar from './SurveyProgressBar';
+import ClassicSurveyFooter from './ClassicSurveyFooter';
 import SurveyFooter from './SurveyFooter';
 import DefaultSurveyPageIndicator from '../components/SurveyPageIndicator';
 import { KeyboardAvoidingScrollView } from '../components/KeyboardAvoidingView';
 import GlobalStyle from '../styles';
 import i18n from '../translation';
-import { useTheme } from '../contexts/theme';
-import type { Survey, SurveyFeedback } from 'src/data';
+import { THEME_OPTION, useTheme } from '../contexts/theme';
+import type { Survey, SurveyFeedback, Page, Feedback } from 'src/data';
+import { questionFeedbackValidator, nextPage } from '../utils/data';
+import { useFeedbackState } from '../contexts/feedback';
+import { useSurveyPageContext } from '../contexts/survey-page';
+import SurveyHeader from './SurveyHeader';
 
 export const SurveyProgressBarPosition = {
   FixedBottom: 0,
@@ -26,9 +32,39 @@ export const SurveyProgressBarPosition = {
 const ScrollView =
   Platform.OS === 'ios' ? KeyboardAvoidingScrollView : RNScrollView;
 
+type FeedbackReducerState = any;
+/**
+ * check if the feedbacks of questions of the page is valid
+ * returns the 1st invalid question id or undefined (means all valid)
+ */
+const firstInvalidQuestionId = (
+  page: Page,
+  feedbackState: FeedbackReducerState
+): string | undefined => {
+  let invalidQuestionId;
+  for (const question of page.questions) {
+    const feedback = feedbackState.feedbacksMap[question.questionId];
+    if (!questionFeedbackValidator(question, feedback)) {
+      invalidQuestionId = question.questionId;
+      break;
+    }
+  }
+  return invalidQuestionId;
+};
+
+/**
+ * get feedbacks array from feedback state
+ */
+const getFeedbacks = (feedbackState: FeedbackReducerState): Feedback[] => {
+  return feedbackState.answeredQuestionIds.map(
+    (qid: string) => feedbackState.feedbacksMap[qid]
+  );
+};
+
 type Props = {
   pageIndex: number; //current page index (start from 0)
   survey: Survey;
+  onClose?: () => void;
   onSubmit: (surveyFeedback: SurveyFeedback) => void;
   onNextPage: (nextPageIndex: number) => void;
   onPrevPage?: () => void;
@@ -41,15 +77,41 @@ type Props = {
 };
 
 const SurveyScreenLayout = (props: Props) => {
-  const { backgroundColor } = useTheme();
+  const { themeOption, backgroundColor } = useTheme();
   const {
     pageIndex = 0,
     survey,
+    onClose,
+    onPrevPage,
+    onNextPage,
+    onSubmit,
     SurveyPageIndicator = DefaultSurveyPageIndicator,
     SurveyProgressBar = DefaultSurveyProgressBar,
     surveyProgressBarPosition = SurveyProgressBarPosition.FixedBottom,
   } = props;
   const scrollViewRef = React.useRef<RNScrollView>(null);
+
+  const questions = survey.pages[pageIndex].questions.map((question) => {
+    return (
+      <ClassicQuestionContainer
+        key={question.questionId}
+        anonymous={survey.anonymous}
+        question={question}
+        validationStarted={validationStarted}
+        themeColor={survey.surveyProperty.hexCode}
+      />
+    );
+  });
+
+  const surveyProgressBar = (
+    <SurveyProgressBar
+      survey={survey}
+      pageIndex={pageIndex}
+      rtl={i18n.dir() === 'rtl'}
+    />
+  );
+
+  const singleQuestion = survey.pages[pageIndex].questions[0];
 
   // when validation start, set the state
   const [validationStarted, setValidationStarted] = React.useState(false);
@@ -75,28 +137,68 @@ const SurveyScreenLayout = (props: Props) => {
     }
   }, []);
 
-  const questions = survey.pages[pageIndex].questions.map((question) => {
-    return (
-      <QuestionContainer
-        key={question.questionId}
-        anonymous={survey.anonymous}
-        question={question}
-        validationStarted={validationStarted}
-        themeColor={survey.surveyProperty.hexCode}
-      />
+  const onPrevPageHandler = () => {
+    onPrevPage && onPrevPage();
+  };
+
+  const feedbackState = useFeedbackState();
+  const { mandatoryQuestionTitleRefs } = useSurveyPageContext();
+  const currentPage = survey.pages[pageIndex];
+  const surveyId = survey.surveyId;
+
+  // check if feedbacks are valid
+  const validatePageFeedbacks = React.useCallback(() => {
+    onValidationStartHandler();
+    const invalidQuestionId = firstInvalidQuestionId(
+      currentPage,
+      feedbackState
     );
-  });
+    // if there's an invalid question, call onValidationFailed
+    if (invalidQuestionId)
+      onValidationFailedHandler(
+        invalidQuestionId,
+        mandatoryQuestionTitleRefs[invalidQuestionId]
+      );
+    return !invalidQuestionId;
+  }, [
+    onValidationStartHandler,
+    currentPage,
+    feedbackState,
+    onValidationFailedHandler,
+    mandatoryQuestionTitleRefs,
+  ]);
 
-  const surveyProgressBar = (
-    <SurveyProgressBar
-      survey={survey}
-      pageIndex={pageIndex}
-      rtl={i18n.dir() === 'rtl'}
-    />
-  );
+  const onNextPageHandler = React.useCallback(() => {
+    const isValid = validatePageFeedbacks();
+    if (isValid) {
+      const nextPageIndex = nextPage(
+        pageIndex,
+        currentPage.pageId,
+        feedbackState.feedbacksMap,
+        survey
+      );
+      if (nextPageIndex === -1) {
+        onSubmit({
+          surveyId,
+          feedbacks: getFeedbacks(feedbackState),
+        });
+      } else {
+        onNextPage(nextPageIndex);
+      }
+    }
+  }, [
+    validatePageFeedbacks,
+    pageIndex,
+    currentPage.pageId,
+    feedbackState,
+    survey,
+    onSubmit,
+    onNextPage,
+    surveyId,
+  ]);
 
-  return (
-    <View style={[GlobalStyle.flex1, { backgroundColor }]}>
+  const classicLayout = (
+    <>
       <SurveyPageIndicator
         pageIndex={pageIndex}
         survey={survey}
@@ -112,12 +214,11 @@ const SurveyScreenLayout = (props: Props) => {
       >
         <View style={styles.bodyContent}>
           {questions}
-          {/* @ts-ignore */}
-          <SurveyFooter
-            {...props}
+          <ClassicSurveyFooter
             survey={survey}
-            onValidationFailed={onValidationFailedHandler}
-            onValidationStart={onValidationStartHandler}
+            pageIndex={pageIndex}
+            onPrevPage={onPrevPageHandler}
+            onNextPage={onNextPageHandler}
           />
           {surveyProgressBarPosition === SurveyProgressBarPosition.BelowBody &&
             surveyProgressBar}
@@ -125,6 +226,54 @@ const SurveyScreenLayout = (props: Props) => {
       </ScrollView>
       {surveyProgressBarPosition === SurveyProgressBarPosition.FixedBottom &&
         surveyProgressBar}
+    </>
+  );
+
+  const onCloseHandler = () => {
+    onClose && onClose();
+  };
+
+  // Can rename this if have better name
+  const newLayout = (
+    <>
+      {singleQuestion.type === 'rating' &&
+      singleQuestion.subType === 'smiley' ? null : (
+        <SurveyHeader
+          survey={survey}
+          pageIndex={pageIndex}
+          backgroundColor={backgroundColor}
+          onClose={onCloseHandler}
+        />
+      )}
+      <QuestionContainer
+        key={singleQuestion.questionId}
+        anonymous={survey.anonymous}
+        question={singleQuestion}
+        validationStarted={validationStarted}
+        themeColor={survey.surveyProperty.hexCode}
+        onClose={onCloseHandler}
+        onPrevPage={onPrevPageHandler}
+        onNextPage={onNextPageHandler}
+        survey={survey}
+        pageIndex={pageIndex}
+      />
+      {singleQuestion.type === 'rating' &&
+      singleQuestion.subType === 'smiley' ? null : (
+        <SurveyFooter
+          surveyColor={survey.surveyProperty.hexCode}
+          isFirstPage={pageIndex === 0}
+          isLastPage={pageIndex === survey.pageOrder.length - 1}
+          onPrevPage={onPrevPageHandler}
+          onNextPage={onNextPageHandler}
+          backgroundColor={backgroundColor}
+        />
+      )}
+    </>
+  );
+
+  return (
+    <View style={[GlobalStyle.flex1, { backgroundColor }]}>
+      {themeOption === THEME_OPTION.CLASSIC ? classicLayout : newLayout}
     </View>
   );
 };

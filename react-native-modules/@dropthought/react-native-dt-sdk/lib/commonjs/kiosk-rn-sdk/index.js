@@ -5,7 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 var _exportNames = {
   SDKEntry: true,
-  THEME_OPTIONS: true
+  APPEARANCE: true,
+  THEME_OPTION: true
 };
 Object.defineProperty(exports, "SDKEntry", {
   enumerable: true,
@@ -13,10 +14,16 @@ Object.defineProperty(exports, "SDKEntry", {
     return _SDKEntry.default;
   }
 });
-Object.defineProperty(exports, "THEME_OPTIONS", {
+Object.defineProperty(exports, "APPEARANCE", {
   enumerable: true,
   get: function () {
-    return _reactNativeUi.THEME_OPTIONS;
+    return _reactNativeUi.APPEARANCE;
+  }
+});
+Object.defineProperty(exports, "THEME_OPTION", {
+  enumerable: true,
+  get: function () {
+    return _reactNativeUi.THEME_OPTION;
   }
 });
 

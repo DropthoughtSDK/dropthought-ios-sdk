@@ -5,153 +5,112 @@
  *  - Next, displayed when page is not end
  *  - Submit, displayed when page is the last page
  * When "Back" is pressed, call props.onPrevPage
- * When "Next" is pressed,
- *     would check if the answers are valid, and then apply the Skip Logic, get the next page id, call props.onNextPage(nextPageIndex)
- *     or it would call props.onSubmit, when the rule says it should go to end
- * When "Submit" is pressed,
- *     would check if the answers are valid, and then call props.onSubmit
- *
- * when the validation process failed, call props.onValidationFailed
+ * When "Next" or "Submit" is pressed, call props.onNextPage
  */
 import * as React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { questionFeedbackValidator, nextPage } from '../utils/data';
-import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
-import Button from '../components/Button';
-import { useFeedbackState } from '../contexts/feedback';
-import { useSurveyPageContext } from '../contexts/survey-page';
-import { GlobalStyle } from '../styles';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Colors, GlobalStyle } from '../styles';
 import i18n from '../translation';
-
-const noop = () => undefined;
-
-const DummyButton = ({
-  width
-}) => /*#__PURE__*/React.createElement(View, {
-  style: {
-    width
-  }
-});
-
-/**
- * check if the feedbacks of questions of the page is valid
- * returns the 1st invalid question id or undefined (means all valid)
- */
-const firstInvalidQuestionId = (page, feedbackState) => {
-  let invalidQuestionId;
-
-  for (const question of page.questions) {
-    const feedback = feedbackState.feedbacksMap[question.questionId];
-
-    if (!questionFeedbackValidator(question, feedback)) {
-      invalidQuestionId = question.questionId;
-      break;
-    }
-  }
-
-  return invalidQuestionId;
-};
-/**
- * get feedbacks array from feedback state
- */
-
-
-const getFeedbacks = feedbackState => {
-  return feedbackState.answeredQuestionIds.map(qid => feedbackState.feedbacksMap[qid]);
-};
+import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 
 const SurveyFooter = props => {
-  const feedbackState = useFeedbackState();
-  const {
-    mandatoryQuestionTitleRefs
-  } = useSurveyPageContext();
-  const dimensionWidthType = useDimensionWidthType();
   const rtl = i18n.dir() === 'rtl';
   const {
-    survey,
-    pageIndex = 0,
+    surveyColor,
+    isFirstPage,
+    isLastPage,
     onPrevPage,
     onNextPage,
-    onSubmit,
-    onValidationStart = noop,
-    onValidationFailed = noop
+    backgroundColor
   } = props;
-  const lastPage = pageIndex === survey.pageOrder.length - 1;
-  const currentPage = survey.pages[pageIndex];
-  const surveyId = survey.surveyId; // check if feedbacks are valid
-
-  const validatePageFeedbacks = React.useCallback(() => {
-    onValidationStart();
-    const invalidQuestionId = firstInvalidQuestionId(currentPage, feedbackState); // if there's an invalid question, call onValidationFailed
-
-    if (invalidQuestionId) onValidationFailed(invalidQuestionId, mandatoryQuestionTitleRefs[invalidQuestionId]);
-    return !invalidQuestionId;
-  }, [currentPage, feedbackState, mandatoryQuestionTitleRefs, onValidationStart, onValidationFailed]); // check if feedbacks are valid, apply the skip-logic rule, only call onNextPage when valid
-
-  const onNextPressHandler = React.useCallback(() => {
-    const isValid = validatePageFeedbacks();
-
-    if (isValid) {
-      const nextPageIndex = nextPage(pageIndex, currentPage.pageId, feedbackState.feedbacksMap, survey);
-
-      if (nextPageIndex === -1) {
-        onSubmit({
-          surveyId,
-          feedbacks: getFeedbacks(feedbackState)
-        });
-      } else {
-        onNextPage(nextPageIndex);
-      }
+  const containerStyle = [styles.container, rtl && GlobalStyle.flexRowReverse, {
+    backgroundColor
+  }];
+  const {
+    colorScheme
+  } = useTheme();
+  const isDarkMode = colorScheme === COLOR_SCHEMES.dark;
+  const iconStyle = [styles.icon, {
+    tintColor: isDarkMode ? Colors.white : surveyColor
+  }];
+  const iconBgStyle = [styles.iconBg, {
+    tintColor: surveyColor,
+    opacity: isDarkMode ? 1 : 0.1
+  }];
+  const submitButtonStyle = [styles.centerButtonContainer, {
+    backgroundColor: surveyColor
+  }];
+  const [submitDisabled, setSubmitDisabled] = React.useState(false);
+  const submitButton = /*#__PURE__*/React.createElement(TouchableOpacity, {
+    style: submitButtonStyle,
+    disabled: submitDisabled,
+    onPress: () => {
+      setSubmitDisabled(true);
+      onNextPage();
     }
-  }, [validatePageFeedbacks, pageIndex, currentPage.pageId, feedbackState, survey, onSubmit, onNextPage, surveyId]);
-  const onSubmitPressHandler = React.useCallback(() => {
-    const isValid = validatePageFeedbacks();
-
-    if (isValid) {
-      onSubmit({
-        surveyId,
-        feedbacks: getFeedbacks(feedbackState)
-      });
-    }
-  }, [onSubmit, validatePageFeedbacks, feedbackState, surveyId]);
-  const onBackPressHandler = React.useCallback(() => {
-    onPrevPage();
-  }, [onPrevPage]); // why use a dummy button here? we use 'space-between' to layout the buttons
-
-  let LeftButtonComponent = Button;
-
-  if (!pageIndex || pageIndex <= 0) {
-    // @ts-ignore
-    LeftButtonComponent = DummyButton;
-  }
-
-  const themeColor = props.survey.surveyProperty.hexCode;
-  const btnWidth = dimensionWidthType === DimensionWidthType.phone ? 76 : 100;
+  }, /*#__PURE__*/React.createElement(Text, {
+    style: styles.submitText
+  }, i18n.t('survey:survey-submit')));
+  const leftButton = /*#__PURE__*/React.createElement(TouchableOpacity, {
+    style: styles.leftButtonContainer,
+    onPress: onPrevPage
+  }, /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Image, {
+    style: iconBgStyle,
+    source: require('../assets/icPreviousButtonBg.png')
+  }), /*#__PURE__*/React.createElement(Image, {
+    style: iconStyle,
+    source: require('../assets/icPreviousButton.png')
+  })));
+  const rightButton = /*#__PURE__*/React.createElement(TouchableOpacity, {
+    style: styles.rightButtonContainer,
+    onPress: onNextPage
+  }, /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Image, {
+    style: iconBgStyle,
+    source: require('../assets/icNextButtonBg.png')
+  }), /*#__PURE__*/React.createElement(Image, {
+    style: iconStyle,
+    source: require('../assets/icNextButton.png')
+  })));
   return /*#__PURE__*/React.createElement(View, {
-    style: [styles.container, rtl && GlobalStyle.flexRowReverse]
-  }, /*#__PURE__*/React.createElement(LeftButtonComponent, {
-    width: btnWidth,
-    title: i18n.t('survey:survey-back'),
-    color: themeColor,
-    onPress: onBackPressHandler // @ts-ignore
-    ,
-    containerStyle: styles.leftBtnContainer
-  }), /*#__PURE__*/React.createElement(Button, {
-    width: btnWidth,
-    title: lastPage ? i18n.t('survey:survey-submit') : i18n.t('survey:survey-next'),
-    color: themeColor,
-    onPress: lastPage ? onSubmitPressHandler : onNextPressHandler // @ts-ignore
-    ,
-    containerStyle: styles.rightBtnContainer
-  }));
+    style: containerStyle
+  }, isFirstPage ? null : leftButton, isLastPage ? submitButton : rightButton);
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    ...GlobalStyle.row,
-    justifyContent: 'space-between',
-    marginVertical: 30
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%',
+    height: 100
+  },
+  leftButtonContainer: {
+    position: 'absolute',
+    left: 0
+  },
+  rightButtonContainer: {
+    position: 'absolute',
+    right: 0
+  },
+  centerButtonContainer: {
+    width: 100,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
+    top: 14
+  },
+  submitText: {
+    color: Colors.white,
+    fontSize: 17,
+    fontWeight: '600'
+  },
+  icon: {
+    position: 'absolute',
+    top: 21,
+    left: 13
+  },
+  iconBg: {
+    opacity: 0.5
   }
 });
 export default /*#__PURE__*/React.memo(SurveyFooter);

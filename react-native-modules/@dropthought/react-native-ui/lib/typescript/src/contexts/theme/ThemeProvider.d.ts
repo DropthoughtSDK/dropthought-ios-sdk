@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { IThemeOptionsType, FontColor, BackgroundColor } from './theme.const';
+import { IAppearanceType, FontColor, BackgroundColor, IThemeOptionType } from './theme.const';
 declare type Props = {
     children: React.ReactNode;
-    theme: IThemeOptionsType;
+    themeOption: IThemeOptionType;
+    appearance: IAppearanceType;
     fontColor: FontColor;
     backgroundColor: BackgroundColor;
 };
-export declare function ThemeProvider({ children, theme, fontColor, backgroundColor, }: Props): JSX.Element;
+export declare function ThemeProvider({ children, themeOption, appearance, fontColor, backgroundColor, }: Props): JSX.Element;
 export {};

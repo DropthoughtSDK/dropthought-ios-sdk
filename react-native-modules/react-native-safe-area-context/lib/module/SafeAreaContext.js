@@ -3,9 +3,9 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
 import * as React from 'react';
 import { Dimensions, StyleSheet } from 'react-native';
 import NativeSafeAreaProvider from './NativeSafeAreaProvider';
-export const SafeAreaInsetsContext = React.createContext(null);
+export const SafeAreaInsetsContext = /*#__PURE__*/React.createContext(null);
 SafeAreaInsetsContext.displayName = 'SafeAreaInsetsContext';
-export const SafeAreaFrameContext = React.createContext(null);
+export const SafeAreaFrameContext = /*#__PURE__*/React.createContext(null);
 SafeAreaFrameContext.displayName = 'SafeAreaFrameContext';
 export function SafeAreaProvider({
   children,

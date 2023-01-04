@@ -77,7 +77,8 @@ const Stack = ({
     visible: true,
     isOnTop: !endScreenvisible && visiblePageIds.length === 0
   }, /*#__PURE__*/React.createElement(StartScreen, {
-    onStart: handleStart
+    onStart: handleStart,
+    onClose: onClose
   })), survey.pageOrder.map((pageId, pageIndex) => {
     return /*#__PURE__*/React.createElement(ScreenWrapper, {
       key: pageId,
@@ -86,6 +87,7 @@ const Stack = ({
     }, /*#__PURE__*/React.createElement(SurveyScreenLayout, {
       survey: survey,
       pageIndex: pageIndex,
+      onClose: onClose,
       onNextPage: handleNextPage,
       onPrevPage: handlePrevPage,
       onSubmit: handleSubmit

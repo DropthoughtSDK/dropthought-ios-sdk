@@ -5,6 +5,8 @@ import {
   i18n,
   useDimensionWidthType,
   DimensionWidthType,
+  useTheme,
+  THEME_OPTION,
 } from '@dropthought/react-native-ui';
 import CloseButton, { ICON_SIZE } from '../components/CloseButton';
 
@@ -20,11 +22,12 @@ import CloseButton, { ICON_SIZE } from '../components/CloseButton';
  * @param {Props} props
  */
 const Header = ({ title, themeColor, onClose }) => {
+  const { themeOption } = useTheme();
   const insets = useSafeAreaInsets();
   const isRtl = i18n.dir() === 'rtl';
   const isPhone = useDimensionWidthType() === DimensionWidthType.phone;
 
-  return (
+  const classicHeader = (
     <View
       style={[
         styles.container,
@@ -52,6 +55,8 @@ const Header = ({ title, themeColor, onClose }) => {
       </View>
     </View>
   );
+
+  return themeOption === THEME_OPTION.CLASSIC ? classicHeader : null;
 };
 
 export default Header;

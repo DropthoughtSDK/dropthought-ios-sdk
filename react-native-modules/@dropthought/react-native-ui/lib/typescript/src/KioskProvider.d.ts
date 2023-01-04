@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { IThemeOptionsType, FontColor, BackgroundColor } from './contexts/theme';
-declare type Props = {
+import { IThemeOptionType, IAppearanceType, FontColor, BackgroundColor } from './contexts/theme';
+export declare type KioskProviderProps = {
     children: React.ReactNode;
-    theme: IThemeOptionsType;
+    themeOption: IThemeOptionType;
+    appearance: IAppearanceType;
     fontColor: FontColor;
     backgroundColor: BackgroundColor;
 };
-export declare const KioskProvider: ({ children, theme, fontColor, backgroundColor, }: Props) => JSX.Element;
-export {};
+export declare const KioskProvider: ({ children, themeOption, appearance, fontColor, backgroundColor, }: KioskProviderProps) => JSX.Element;

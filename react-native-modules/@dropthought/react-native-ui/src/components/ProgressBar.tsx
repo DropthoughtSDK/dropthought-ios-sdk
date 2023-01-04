@@ -1,11 +1,7 @@
 import * as React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
-import {
-  DimensionWidthType,
-  useDimensionWidthType,
-} from '../hooks/useWindowDimensions';
-import { Colors, GlobalStyle, opacity30 } from '../styles';
+import { GlobalStyle, opacity30 } from '../styles';
 import i18n from '../translation';
 
 /**
@@ -17,20 +13,15 @@ type Props = {
   value: number; // the current value
   maxValue: number; // the max
   themeColor: string; // the bar color
+  color: string; // the bar text color
   rtl: boolean;
 };
 
-const ProgressBar = ({ value, maxValue, themeColor, rtl }: Props) => {
-  const dimensionWidthType = useDimensionWidthType();
-
+const ProgressBar = ({ value, maxValue, themeColor, color, rtl }: Props) => {
   // compute the percentage value: (value/maxValue)*100
   const percentage = Math.round((value * 100) / maxValue);
 
-  const containerStyle = [
-    styles.container,
-    GlobalStyle.row,
-    rtl && GlobalStyle.flexRowReverse,
-  ];
+  const containerStyle = [styles.container, rtl && GlobalStyle.flexRowReverse];
 
   const trackStyle = [
     styles.track,
@@ -48,22 +39,18 @@ const ProgressBar = ({ value, maxValue, themeColor, rtl }: Props) => {
     },
   ];
 
+  const textStyle = [
+    styles.title,
+    rtl && GlobalStyle.textAlignRight,
+    { color },
+  ];
+
   return (
     <View style={containerStyle}>
-      {/* the progress bar */}
-      <View style={GlobalStyle.flex1}>
-        <View style={trackStyle} />
-        <View style={progressBarStyle} />
-      </View>
-      <Text
-        style={[
-          styles.title,
-          rtl && GlobalStyle.textAlignRight,
-          titleSize[dimensionWidthType],
-        ]}
-      >
-        {/* {percentage}% of 100% completed */}
-        {i18n.t('survey:progress-bar', { percentage })}
+      <View style={trackStyle} />
+      <View style={progressBarStyle} />
+      <Text style={textStyle}>
+        {`${i18n.t('survey:new-progress-bar')} ${value}/${maxValue}`}
       </Text>
     </View>
   );
@@ -71,32 +58,19 @@ const ProgressBar = ({ value, maxValue, themeColor, rtl }: Props) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 12,
+    marginTop: 25,
   },
   title: {
-    color: `${Colors.progressBarText}99`,
+    fontSize: 14,
     fontWeight: '500',
+    marginTop: 12,
   },
   track: {
-    width: '100%',
-    borderRadius: 3,
-    height: 6,
+    borderRadius: 1,
+    height: 2,
   },
   progressBar: {
     position: 'absolute',
-  },
-});
-
-const titleSize = StyleSheet.create({
-  [DimensionWidthType.phone]: {
-    marginLeft: 10,
-    marginRight: 10,
-    fontSize: 12,
-  },
-  [DimensionWidthType.tablet]: {
-    marginLeft: 15,
-    marginRight: 15,
-    fontSize: 14,
   },
 });
 

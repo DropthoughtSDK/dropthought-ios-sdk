@@ -124,7 +124,7 @@ const getAutomaticFixForPlatform = (healthcheck, platform) => {
   }
 };
 
-var _default = async (_, __, options) => {
+var _default = async (_, options) => {
   const Loader = (0, _loader.getLoader)();
   const loader = new Loader();
   loader.start('Running diagnostics...');

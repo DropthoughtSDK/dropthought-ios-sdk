@@ -49,10 +49,10 @@ function useWindowDimensions() {
       window: _reactNative.Dimensions.get('window')
     });
 
-    _reactNative.Dimensions.addEventListener('change', onChange);
+    const listener = _reactNative.Dimensions.addEventListener('change', onChange);
 
     return () => {
-      _reactNative.Dimensions.removeEventListener('change', onChange);
+      listener === null || listener === void 0 ? void 0 : listener.remove();
     };
   }, []);
   return dimensions;

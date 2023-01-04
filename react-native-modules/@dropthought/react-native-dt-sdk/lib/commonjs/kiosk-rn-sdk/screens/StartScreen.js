@@ -63,7 +63,8 @@ const checkSurveyStatus = (surveyState, surveyStartDate, surveyEndDate) => {
 
 const StartScreen = props => {
   const {
-    onStart
+    onStart,
+    onClose
   } = props;
   const {
     survey,
@@ -94,6 +95,7 @@ const StartScreen = props => {
 
   return /*#__PURE__*/_react.default.createElement(_reactNativeUi.StartScreenLayout, {
     survey: survey,
+    onClose: onClose,
     onStart: onStart,
     onLanguageSelect: onLanguageSelectHandler
   });
@@ -103,6 +105,7 @@ var _default = StartScreen;
 /**
  * @typedef {Object} ScreenProps
  * @property {() => void} onStart
+ * @property {() => void} onClose
  */
 
 exports.default = _default;

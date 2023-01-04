@@ -9,7 +9,7 @@ import {
   DimensionWidthType,
   useDimensionWidthType,
 } from '../hooks/useWindowDimensions';
-import { useTheme } from '../contexts/theme';
+import { useTheme, THEME_OPTION } from '../contexts/theme';
 import type { Question } from '../data';
 
 type Props = {
@@ -27,35 +27,47 @@ const MandatoryTitle = ({
 }: Props) => {
   const rtl = i18n.dir() === 'rtl';
   const dimensionWidthType = useDimensionWidthType();
-  const { fontColor } = useTheme();
+  const { fontColor, themeOption, customFontColor } = useTheme();
+  const { questionId, questionTitle, mandatory, type, subType } = question;
 
   const ref = React.useRef<View>(null);
   const addMandatoryRef = useAddMandatoryRef();
 
   React.useEffect(() => {
     if (ref.current) {
-      addMandatoryRef(question.questionId, ref.current);
+      addMandatoryRef(questionId, ref.current);
     }
-  }, [addMandatoryRef, question.questionId]);
+  }, [addMandatoryRef, questionId]);
+
+  let color = fontColor;
+
+  const isOption6Smiley =
+    themeOption === THEME_OPTION.OPTION6 &&
+    type === 'rating' &&
+    subType === 'smiley';
+
+  if (
+    (customFontColor === undefined || customFontColor === '') &&
+    isOption6Smiley
+  ) {
+    color = Colors.white;
+  }
 
   return (
     <View
       ref={ref}
       style={[styles.horizontal, style, rtl && GlobalStyle.flexRowReverse]}
     >
-      {question.questionTitle.split(' ').map((text, index) => (
-        <Text
-          key={index}
-          style={[
-            styles.questionTitle,
-            questionTitleSize[dimensionWidthType],
-            { color: fontColor },
-          ]}
-        >
-          {text + ' '}
-        </Text>
-      ))}
-      {question.mandatory && <Text style={styles.hint}>*</Text>}
+      <Text
+        style={[
+          styles.questionTitle,
+          questionTitleSize[dimensionWidthType],
+          { color },
+        ]}
+      >
+        {questionTitle}
+        {mandatory && <Text style={styles.hint}>*</Text>}
+      </Text>
       <QuestionWarningMessage
         // forgot message has higher priority than custom invalid message
         message={forgot ? i18n.t('survey:mandatory') : invalidMessage}
@@ -68,10 +80,10 @@ export default MandatoryTitle;
 
 const questionTitleSize = StyleSheet.create({
   [DimensionWidthType.phone]: {
-    fontSize: 16,
+    fontSize: 26,
   },
   [DimensionWidthType.tablet]: {
-    fontSize: 18,
+    fontSize: 26,
   },
 });
 
@@ -83,11 +95,12 @@ const styles = StyleSheet.create({
   horizontal: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginBottom: 24,
   },
   questionTitle: {
-    fontSize: 18,
-    marginBottom: 2,
-    textAlignVertical: 'center',
-    alignSelf: 'center',
+    fontSize: 26,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });

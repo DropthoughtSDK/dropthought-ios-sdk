@@ -67,6 +67,8 @@ function _cliTools() {
 
 var _warnAboutManuallyLinkedLibs = _interopRequireDefault(require("../../link/warnAboutManuallyLinkedLibs"));
 
+var _getAndroidProject = require("../../utils/getAndroidProject");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -76,20 +78,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * LICENSE file in the root directory of this source tree.
  *
  */
-// Validates that the package name is correct
-function validatePackageName(packageName) {
-  return /^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$/.test(packageName);
-}
-
 function displayWarnings(config, args) {
   (0, _warnAboutManuallyLinkedLibs.default)(config);
 
-  if (args.appId) {
-    _cliTools().logger.warn('Using deprecated "--appId" flag. Use "platforms.android.appName" in react-native.config.js instead.');
-  }
-
   if (args.appFolder) {
-    _cliTools().logger.warn('Using deprecated "--appFolder" flag. Use "platforms.android.appName" in react-native.config.js instead.');
+    _cliTools().logger.warn('Using deprecated "--appFolder" flag. Use "project.android.appName" in react-native.config.js instead.');
   }
 
   if (args.root) {
@@ -102,15 +95,7 @@ function displayWarnings(config, args) {
  */
 async function runAndroid(_argv, config, args) {
   displayWarnings(config, args);
-  const androidProject = config.project.android;
-
-  if (!androidProject) {
-    throw new (_cliTools().CLIError)(`
-  Android project not found. Are you sure this is a React Native project?
-  If your Android files are located in a non-standard location (e.g. not inside \'android\' folder), consider setting
-  \`project.android.sourceDir\` option to point to a new location.
-`);
-  }
+  const androidProject = (0, _getAndroidProject.getAndroidProject)(config);
 
   if (args.jetifier) {
     _cliTools().logger.info(`Running ${_chalk().default.bold('jetifier')} to migrate libraries to AndroidX. ${_chalk().default.dim('You can disable it using "--no-jetifier" flag.')}`);
@@ -151,30 +136,11 @@ async function runAndroid(_argv, config, args) {
 
 function buildAndRun(args, androidProject) {
   process.chdir(androidProject.sourceDir);
-  const cmd = process.platform.startsWith('win') ? 'gradlew.bat' : './gradlew'; // "app" is usually the default value for Android apps with only 1 app
-
-  const {
-    appName
-  } = androidProject;
+  const cmd = process.platform.startsWith('win') ? 'gradlew.bat' : './gradlew';
   const {
     appFolder
-  } = args; // @ts-ignore
-
-  const androidManifest = _fs().default.readFileSync(`${appFolder || appName}/src/main/AndroidManifest.xml`, 'utf8');
-
-  let packageNameMatchArray = androidManifest.match(/package="(.+?)"/);
-
-  if (!packageNameMatchArray || packageNameMatchArray.length === 0) {
-    throw new (_cliTools().CLIError)(`Failed to build the app: No package name found. Found errors in ${_chalk().default.underline.dim(`${appFolder || appName}/src/main/AndroidManifest.xml`)}`);
-  }
-
-  let packageName = packageNameMatchArray[1];
-
-  if (!validatePackageName(packageName)) {
-    _cliTools().logger.warn(`Invalid application's package name "${_chalk().default.bgRed(packageName)}" in 'AndroidManifest.xml'. Read guidelines for setting the package name here: ${_chalk().default.underline.dim('https://developer.android.com/studio/build/application-id')}`); // we can also directly add the package naming rules here
-
-  }
-
+  } = args;
+  const packageName = (0, _getAndroidProject.getPackageName)(androidProject, appFolder);
   const adbPath = (0, _getAdbPath.default)();
 
   if (args.deviceId) {
@@ -359,10 +325,10 @@ var _default = {
     default: 'debug'
   }, {
     name: '--appFolder [string]',
-    description: '[DEPRECATED – use "platforms.android.appName" in react-native.config.js] Specify a different application folder name for the android source. If not, we assume is "app"'
+    description: '[DEPRECATED – use "project.android.appName" in react-native.config.js] Specify a different application folder name for the android source. If not, we assume is "app"'
   }, {
     name: '--appId [string]',
-    description: '[DEPRECATED – use "platforms.android.appName" in react-native.config.js] Specify an applicationId to launch after build.',
+    description: 'Specify an applicationId to launch after build. If not specified, `package` from AndroidManifest.xml will be used.',
     default: ''
   }, {
     name: '--appIdSuffix [string]',

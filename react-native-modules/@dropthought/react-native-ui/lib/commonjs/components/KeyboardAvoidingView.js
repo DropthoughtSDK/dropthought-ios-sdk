@@ -57,7 +57,7 @@ const useKeyboardListener = (keyboardChangeHandler = () => {}) => {
     });
     return function cleanup() {
       subscriptions.forEach(subscription => {
-        subscription.remove();
+        subscription === null || subscription === void 0 ? void 0 : subscription.remove();
       });
     };
   }, [keyboardChangeHandler]);

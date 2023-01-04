@@ -17,6 +17,8 @@ var _watchman = _interopRequireDefault(require("./watchman"));
 
 var _androidHomeEnvVariable = _interopRequireDefault(require("./androidHomeEnvVariable"));
 
+var _androidStudio = _interopRequireDefault(require("./androidStudio"));
+
 var _androidSDK = _interopRequireDefault(require("./androidSDK"));
 
 var _androidNDK = _interopRequireDefault(require("./androidNDK"));
@@ -44,7 +46,7 @@ const getHealthchecks = ({
   },
   android: {
     label: 'Android',
-    healthchecks: [_jdk.default, _androidHomeEnvVariable.default, _androidSDK.default, ...(contributor ? [_androidNDK.default] : [])]
+    healthchecks: [_jdk.default, _androidStudio.default, _androidSDK.default, _androidHomeEnvVariable.default, ...(contributor ? [_androidNDK.default] : [])]
   },
   ...(process.platform === 'darwin' ? {
     ios: {

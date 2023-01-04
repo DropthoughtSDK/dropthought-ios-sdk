@@ -1,3 +1,4 @@
+import React from 'react';
 import type { Question, Feedback } from '../data';
 declare type Props = {
     anonymous: boolean;
@@ -7,5 +8,5 @@ declare type Props = {
     forgot: boolean;
     themeColor: string;
 };
-declare const OpenQuestion: ({ anonymous, question, onFeedback, feedback, forgot, themeColor, }: Props) => JSX.Element;
-export default OpenQuestion;
+declare const _default: React.MemoExoticComponent<({ anonymous, question, onFeedback, feedback, forgot, themeColor, }: Props) => JSX.Element>;
+export default _default;

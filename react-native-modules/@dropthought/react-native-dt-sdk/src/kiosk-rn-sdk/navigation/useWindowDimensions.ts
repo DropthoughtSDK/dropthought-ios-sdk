@@ -31,10 +31,10 @@ function useWindowDimensions() {
     onChange({
       window: Dimensions.get('window'),
     });
-    Dimensions.addEventListener('change', onChange);
+    const listener = Dimensions.addEventListener('change', onChange);
 
     return () => {
-      Dimensions.removeEventListener('change', onChange);
+      listener?.remove();
     };
   }, []);
 

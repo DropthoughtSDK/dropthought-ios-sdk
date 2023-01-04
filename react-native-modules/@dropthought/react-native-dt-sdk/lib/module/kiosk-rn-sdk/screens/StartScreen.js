@@ -51,7 +51,8 @@ const checkSurveyStatus = (surveyState, surveyStartDate, surveyEndDate) => {
 
 const StartScreen = props => {
   const {
-    onStart
+    onStart,
+    onClose
   } = props;
   const {
     survey,
@@ -80,6 +81,7 @@ const StartScreen = props => {
 
   return /*#__PURE__*/React.createElement(StartScreenLayout, {
     survey: survey,
+    onClose: onClose,
     onStart: onStart,
     onLanguageSelect: onLanguageSelectHandler
   });
@@ -89,5 +91,6 @@ export default StartScreen;
 /**
  * @typedef {Object} ScreenProps
  * @property {() => void} onStart
+ * @property {() => void} onClose
  */
 //# sourceMappingURL=StartScreen.js.map

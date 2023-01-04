@@ -2,19 +2,19 @@ import * as React from 'react';
 import { useColorScheme } from 'react-native';
 import { Colors } from '../../styles';
 import { ThemeContext } from './ThemeContext';
-import { THEME_OPTIONS, COLOR_SCHEMES } from './theme.const';
+import { APPEARANCE, COLOR_SCHEMES } from './theme.const';
 
-function getColorScheme(theme, systemColorScheme) {
+function getColorScheme(appearance, systemColorScheme) {
   var _colorScheme;
 
   let colorScheme;
 
-  if (theme === THEME_OPTIONS.SYSTEM) {
+  if (appearance === APPEARANCE.SYSTEM) {
     if (systemColorScheme) {
       colorScheme = COLOR_SCHEMES[systemColorScheme];
     }
-  } else if ([THEME_OPTIONS.LIGHT, THEME_OPTIONS.DARK].includes(theme)) {
-    colorScheme = COLOR_SCHEMES[theme];
+  } else if ([APPEARANCE.LIGHT, APPEARANCE.DARK].includes(appearance)) {
+    colorScheme = COLOR_SCHEMES[appearance];
   }
 
   return (_colorScheme = colorScheme) !== null && _colorScheme !== void 0 ? _colorScheme : COLOR_SCHEMES.light;
@@ -45,31 +45,37 @@ function getBackgroundColor(customBackgroundColor, colorScheme) {
 }
 
 function useTheme({
-  theme,
+  themeOption,
+  appearance,
   fontColor: customFontColor,
   backgroundColor: customBackgroundColor
 }) {
   const systemColorScheme = useColorScheme();
-  const colorScheme = getColorScheme(theme, systemColorScheme);
+  const colorScheme = getColorScheme(appearance, systemColorScheme);
   const fontColor = getFontColor(customFontColor, colorScheme);
   const backgroundColor = getBackgroundColor(customBackgroundColor, colorScheme);
   return React.useMemo(() => {
     return {
+      themeOption,
       colorScheme,
       fontColor,
-      backgroundColor
+      backgroundColor,
+      customFontColor,
+      customBackgroundColor
     };
-  }, [colorScheme, fontColor, backgroundColor]);
+  }, [themeOption, colorScheme, fontColor, backgroundColor, customFontColor, customBackgroundColor]);
 }
 
 export function ThemeProvider({
   children,
-  theme,
+  themeOption,
+  appearance,
   fontColor,
   backgroundColor
 }) {
   const themeValue = useTheme({
-    theme,
+    themeOption,
+    appearance,
     fontColor,
     backgroundColor
   });

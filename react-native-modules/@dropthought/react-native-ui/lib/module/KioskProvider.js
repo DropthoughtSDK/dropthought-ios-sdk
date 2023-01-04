@@ -3,12 +3,14 @@ import { FeedbackProvider } from './contexts/feedback';
 import { ThemeProvider } from './contexts/theme';
 export const KioskProvider = ({
   children,
-  theme,
+  themeOption,
+  appearance,
   fontColor,
   backgroundColor
 }) => {
   return /*#__PURE__*/React.createElement(ThemeProvider, {
-    theme: theme,
+    themeOption: themeOption,
+    appearance: appearance,
     fontColor: fontColor,
     backgroundColor: backgroundColor
   }, /*#__PURE__*/React.createElement(FeedbackProvider, null, children));
