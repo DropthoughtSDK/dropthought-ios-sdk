@@ -35,6 +35,11 @@ RCT_EXPORT_MODULE();
     return instance;
 }
 
+- (void)init:(NSDictionary * _Nullable)launchOptions {
+    self.app = [[SurveyApplication alloc] init];
+    [self.app setupBridge:launchOptions];
+}
+
 - (void)init:(NSDictionary * _Nullable)launchOptions apiKey:(NSString * _Nonnull)apiKey {
     self.app = [[SurveyApplication alloc] init];
     [self.app setupBridge:launchOptions];
@@ -43,33 +48,61 @@ RCT_EXPORT_MODULE();
     [self uploadOfflineFeedbacks];
 }
 
-- (void)present:(UIViewController * _Nonnull)from surveyId:(NSString * _Nonnull)surveyId {
-    [self present:from surveyId:surveyId theme:ThemeSystem fontColor:NULL backgroundColor:NULL];
+- (void)setupApiKey:(NSString * _Nonnull)apiKey {
+    self.apiKey = apiKey;
 }
 
-- (void)present:(UIViewController * _Nonnull)from surveyId:(NSString * _Nonnull)surveyId theme:(Theme)theme {
-    [self present:from surveyId:surveyId theme:theme fontColor:NULL backgroundColor:NULL];
+- (void)present:(UIViewController * _Nonnull)from visibilityId:(NSString * _Nonnull)visibilityId {
+    self.from = from;
+
+    NSMutableDictionary *initialProperties = [NSMutableDictionary new];
+    [initialProperties setObject:self.apiKey forKey:@"apiKey"];
+    [initialProperties setObject:visibilityId forKey:@"visibilityId"];
+    
+    if (self.metadata != NULL) {
+        [initialProperties setObject:self.metadata forKey:@"metadata"];
+    }
+
+    RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:self.app.bridge moduleName:@"dropthought-sdk" initialProperties:initialProperties];
+    rootView.frame = [UIScreen mainScreen].bounds;
+
+    SurveyViewController *vc = [[SurveyViewController alloc] init];
+    vc.view = rootView;
+    vc.modalPresentationStyle = UIModalPresentationFullScreen;
+
+    [self.from presentViewController:vc animated:YES completion:NULL];
+}
+
+- (void)present:(UIViewController * _Nonnull)from surveyId:(NSString * _Nonnull)surveyId {
+    [self present:from surveyId:surveyId appearance:System fontColor:NULL backgroundColor:NULL];
+}
+
+- (void)present:(UIViewController * _Nonnull)from surveyId:(NSString * _Nonnull)surveyId appearance:(Appearance)appearance {
+    [self present:from surveyId:surveyId appearance:appearance fontColor:NULL backgroundColor:NULL];
 }
 
 - (void)present:(UIViewController * _Nonnull)from surveyId:(NSString * _Nonnull)surveyId fontColor:(UIColor * _Nullable)fontColor backgroundColor:(UIColor * _Nullable)backgroundColor {
-    [self present:from surveyId:surveyId theme:ThemeSystem fontColor:fontColor backgroundColor:backgroundColor];
+    [self present:from surveyId:surveyId appearance:System fontColor:fontColor backgroundColor:backgroundColor];
 }
 
-- (void)present:(UIViewController * _Nonnull)from surveyId:(NSString * _Nonnull)surveyId theme:(Theme)theme fontColor:(UIColor * _Nullable)fontColor backgroundColor:(UIColor * _Nullable)backgroundColor {
+- (void)present:(UIViewController * _Nonnull)from surveyId:(NSString * _Nonnull)surveyId appearance:(Appearance)appearance fontColor:(UIColor * _Nullable)fontColor backgroundColor:(UIColor * _Nullable)backgroundColor {
+    if (self.apiKey.length == 0) {
+        return;
+    }
     self.from = from;
 
     NSMutableDictionary *initialProperties = [NSMutableDictionary new];
     [initialProperties setObject:self.apiKey forKey:@"apiKey"];
     [initialProperties setObject:surveyId forKey:@"surveyId"];
-    switch (theme) {
-        case ThemeSystem:
-            [initialProperties setObject:@"system" forKey:@"theme"];
+    switch (appearance) {
+        case System:
+            [initialProperties setObject:@"system" forKey:@"appearance"];
             break;
-        case ThemeLight:
-            [initialProperties setObject:@"light" forKey:@"theme"];
+        case Light:
+            [initialProperties setObject:@"light" forKey:@"appearance"];
             break;
-        case ThemeDark:
-            [initialProperties setObject:@"dark" forKey:@"theme"];
+        case Dark:
+            [initialProperties setObject:@"dark" forKey:@"appearance"];
             break;
     }
 
@@ -84,6 +117,8 @@ RCT_EXPORT_MODULE();
         [initialProperties setObject:self.metadata forKey:@"metadata"];
     }
 
+    [initialProperties setObject:@"classic" forKey:@"themeOption"];
+    
     RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:self.app.bridge moduleName:@"dropthought-sdk" initialProperties:initialProperties];
     rootView.frame = [UIScreen mainScreen].bounds;
 
@@ -99,9 +134,10 @@ RCT_EXPORT_MODULE();
 }
 
 - (void)uploadOfflineFeedbacks {
-    [self.app.bridge enqueueJSCall:@"RCTDeviceEventEmitter" method:@"emit" args:@[@"UploadQueuedFeedback", @{@"apiKey": self.apiKey}] completion:NULL];
+    if (self.apiKey.length > 0) {
+        [self.app.bridge enqueueJSCall:@"RCTDeviceEventEmitter" method:@"emit" args:@[@"UploadQueuedFeedback", @{@"apiKey": self.apiKey}] completion:NULL];
+    }
 }
-
 
 RCT_EXPORT_METHOD(dismiss)
 {
