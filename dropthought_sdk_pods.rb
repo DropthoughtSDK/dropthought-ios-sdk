@@ -1,10 +1,10 @@
 def use_dropthought_sdk
     
     # for actual user usage
-    # pod 'Dropthought', :path => './Dropthought'
+    pod 'Dropthought', :path => './Dropthought'
 
     # for local testing usage
-    pod 'Dropthought', :path => '../iosSDK'
+    # pod 'Dropthought', :path => '../iosSDK'
   
     # The prefix to the react-native
     prefix = "./react-native-modules/react-native"
