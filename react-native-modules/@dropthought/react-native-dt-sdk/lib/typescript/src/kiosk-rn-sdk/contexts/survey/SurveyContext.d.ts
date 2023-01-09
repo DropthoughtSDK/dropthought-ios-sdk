@@ -1,6 +1,6 @@
 export function useSurveyContext(): SurveyContextValue;
 export function useSurvey(): import("../../../data").Survey;
-export function SurveyContextProvider({ visibilityId, surveyId, children, defaultLanguage, onClose, themeOption, appearance, fontColor, backgroundColor, }: Props): JSX.Element;
+export function SurveyContextProvider({ visibilityId, surveyId, children, defaultLanguage, onClose, themeOption, appearance, fontColor, backgroundColor, timezone, }: Props): JSX.Element;
 export type Props = import('../../SDKEntry').SDKEntryProps;
 export type SurveyContextValue = {
     survey: Survey;

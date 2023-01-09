@@ -3,34 +3,23 @@ declare module "lottie-react-native" {
   /**
    * Serialized animation as generated from After Effects
    */
-  export interface AnimationObject {
+  interface AnimationObject {
     v: string;
     fr: number;
     ip: number;
     op: number;
     w: number;
     h: number;
-    nm?: string;
-    ddd?: number;
+    nm: string;
+    ddd: number;
     assets: any[];
     layers: any[];
-    markers?: any[];
   }
 
   type ColorFilter = {
     keypath: string;
     color: string;
-  };
-
-  type TextFilterIOS = {
-    keypath: string;
-    text: string;
-  };
-
-  type TextFilterAndroid = {
-    find: string;
-    replace: string;
-  };
+  }
 
   /**
    * Properties of the AnimatedLottieView component
@@ -138,23 +127,10 @@ declare module "lottie-react-native" {
     enableMergePathsAndroidForKitKatAndAbove?: boolean;
 
     /**
-     * A boolean flag to enable use of platform-level looping on Windows. This improves loop smoothness, 
-     * but onAnimationLoop will not fire and changing the loop prop will restart playback.
-     * Supported on: Windows
-     */
-    useNativeLooping?: boolean;
-
-    /**
-     * A callback function which will be called when the animation loops.
-     * Supported on: Windows
-     */
-    onAnimationLoop ?: () => void;
-
-    /**
      * A callback function which will be called when animation is finished. Note that this
      * callback will be called only when `loop` is set to false.
      */
-    onAnimationFinish?: (isCancelled: boolean) => void;
+    onAnimationFinish ?: (isCancelled: boolean) => void;
 
     /**
      * A callback function which will be called when the view has been laid out.
@@ -164,19 +140,7 @@ declare module "lottie-react-native" {
     /**
      * An array of layers you want to override its color filter.
      */
-    colorFilters?: Array<ColorFilter>;
-
-    /**
-     * [Android]. An array of objects denoting text values to find and replace.
-     * @platform android
-     */
-    textFiltersAndroid?: Array<TextFilterAndroid>;
-
-    /**
-     * [iOS] An array of objects denoting text layers by KeyPath and a new string value.
-     * @platform ios
-     */
-    textFiltersIOS?: Array<TextFilterIOS>;
+    colorFilters ?: Array<ColorFilter>;
 
     /**
      * A string to identify the component during testing

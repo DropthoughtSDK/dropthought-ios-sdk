@@ -56,10 +56,11 @@ const ClassicQuestionContainer = props => {
       if (props.question.subType === 'smiley') {
         // @ts-ignore
         QuestionComponent = ClassicSmileyRatingQuestion;
-      } // @ts-ignore
+      } else {
+        // @ts-ignore
+        QuestionComponent = ClassicSliderRatingQuestion;
+      }
 
-
-      QuestionComponent = ClassicSliderRatingQuestion;
       break;
 
     case 'nps':

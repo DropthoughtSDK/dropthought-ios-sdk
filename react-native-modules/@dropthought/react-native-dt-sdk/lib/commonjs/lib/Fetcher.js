@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Fetcher = exports.isNoInternetError = exports.isRequestTimeoutError = exports.throwRequestError = void 0;
 
+var _reactNative = require("react-native");
+
 var _jwtDecode = _interopRequireDefault(require("jwt-decode"));
 
 var _ramda = require("ramda");
@@ -119,7 +121,7 @@ class Fetcher {
       baseURL: '',
       timeout: DEFAULT_TIMEOUT,
       headers: {
-        Accept: 'application/json',
+        'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
     });

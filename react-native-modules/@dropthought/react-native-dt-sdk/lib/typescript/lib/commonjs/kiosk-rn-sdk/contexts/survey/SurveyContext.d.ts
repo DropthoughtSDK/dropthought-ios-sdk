@@ -13,4 +13,4 @@ export function useSurvey(): any;
 /**
  * @param {Props} param0
  */
-export function SurveyContextProvider({ visibilityId, surveyId, children, defaultLanguage, onClose, themeOption, appearance, fontColor, backgroundColor }: Props): any;
+export function SurveyContextProvider({ visibilityId, surveyId, children, defaultLanguage, onClose, themeOption, appearance, fontColor, backgroundColor, timezone }: Props): any;

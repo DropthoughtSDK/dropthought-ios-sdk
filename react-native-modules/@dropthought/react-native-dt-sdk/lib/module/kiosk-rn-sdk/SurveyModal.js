@@ -42,7 +42,11 @@ export const SurveyModalContainer = ({
   ...props
 }) => {
   const [visible, setVisible] = React.useState(false);
-  const openSurvey = React.useCallback(() => {
+  const [openSurveyProps, setOpenSurveyProps] = React.useState();
+  const openSurvey = React.useCallback((
+  /** @type {SDKEntryProps} */
+  inputProps) => {
+    setOpenSurveyProps(inputProps);
     setVisible(true);
   }, []);
   const onCloseSurveyHandler = React.useCallback(() => {
@@ -51,7 +55,7 @@ export const SurveyModalContainer = ({
   }, [onClose]);
   return /*#__PURE__*/React.createElement(SurveyModalOpenSurveyContext.Provider, {
     value: openSurvey
-  }, children, visible ? /*#__PURE__*/React.createElement(SurveyModal, _extends({}, props, {
+  }, children, visible ? /*#__PURE__*/React.createElement(SurveyModal, _extends({}, props, openSurveyProps, {
     visible: visible,
     onClose: onCloseSurveyHandler
   })) : null);

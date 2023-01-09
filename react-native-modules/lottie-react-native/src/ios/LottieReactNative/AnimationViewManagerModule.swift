@@ -22,6 +22,7 @@ class AnimationViewManagerModule: RCTViewManager {
         return ["VERSION": 1]
     }
 
+
     @objc(play:fromFrame:toFrame:)
     public func play(_ reactTag: NSNumber, startFrame: NSNumber, endFrame: NSNumber) {
         self.bridge.uiManager.addUIBlock { (uiManager, viewRegistry) in
@@ -32,10 +33,16 @@ class AnimationViewManagerModule: RCTViewManager {
                 return
             }
 
+            let callback: LottieCompletionBlock = { animationFinished in
+                if let onFinish = view.onAnimationFinish {
+                    onFinish(["isCancelled": !animationFinished])
+                }
+            }
+
             if (startFrame.intValue != -1 && endFrame.intValue != -1) {
-                view.play(fromFrame: AnimationFrameTime(truncating: startFrame), toFrame: AnimationFrameTime(truncating: endFrame))
+                view.play(fromFrame: AnimationFrameTime(truncating: startFrame), toFrame: AnimationFrameTime(truncating: endFrame), completion: callback)
             } else {
-                view.play()
+                view.play(completion: callback)
             }
         }
     }

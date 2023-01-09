@@ -1,6 +1,6 @@
 export function useSurveyContext(): SurveyContextValue;
 export function useSurvey(): any;
-export function SurveyContextProvider({ visibilityId, surveyId, children, defaultLanguage, onClose, themeOption, appearance, fontColor, backgroundColor }: Props): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> | React.FunctionComponentElement<React.ProviderProps<SurveyContextValue>>;
+export function SurveyContextProvider({ visibilityId, surveyId, children, defaultLanguage, onClose, themeOption, appearance, fontColor, backgroundColor, timezone }: Props): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> | React.FunctionComponentElement<React.ProviderProps<SurveyContextValue>>;
 export type Props = import('../../SDKEntry').SDKEntryProps;
 export type SurveyContextValue = {
     survey: any;

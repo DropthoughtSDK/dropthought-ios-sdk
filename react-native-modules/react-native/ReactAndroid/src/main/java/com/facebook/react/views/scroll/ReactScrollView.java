@@ -12,7 +12,6 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,13 +20,18 @@ import android.widget.OverScroller;
 import android.widget.ScrollView;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
+import com.facebook.common.logging.FLog;
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.common.ReactConstants;
 import com.facebook.react.config.ReactFeatureFlags;
 import com.facebook.react.uimanager.MeasureSpecAssertions;
+import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.ReactClippingViewGroup;
 import com.facebook.react.uimanager.ReactClippingViewGroupHelper;
+import com.facebook.react.uimanager.StateWrapper;
 import com.facebook.react.uimanager.ViewProps;
 import com.facebook.react.uimanager.events.NativeGestureUtil;
 import com.facebook.react.views.view.ReactViewBackgroundManager;
@@ -48,6 +52,10 @@ public class ReactScrollView extends ScrollView
 
   private static @Nullable Field sScrollerField;
   private static boolean sTriedToGetScrollerField = false;
+  private static final String CONTENT_OFFSET_LEFT = "contentOffsetLeft";
+  private static final String CONTENT_OFFSET_TOP = "contentOffsetTop";
+
+  private static final int UNSET_CONTENT_OFFSET = -1;
 
   private final OnScrollDispatchHelper mOnScrollDispatchHelper = new OnScrollDispatchHelper();
   private final @Nullable OverScroller mScroller;
@@ -67,6 +75,7 @@ public class ReactScrollView extends ScrollView
   private @Nullable String mScrollPerfTag;
   private @Nullable Drawable mEndBackground;
   private int mEndFillColor = Color.TRANSPARENT;
+  private boolean mDisableIntervalMomentum = false;
   private int mSnapInterval = 0;
   private float mDecelerationRate = 0.985f;
   private @Nullable List<Integer> mSnapOffsets;
@@ -74,6 +83,9 @@ public class ReactScrollView extends ScrollView
   private boolean mSnapToEnd = true;
   private View mContentView;
   private ReactViewBackgroundManager mReactBackgroundManager;
+  private int pendingContentOffsetX = UNSET_CONTENT_OFFSET;
+  private int pendingContentOffsetY = UNSET_CONTENT_OFFSET;
+  private @Nullable StateWrapper mStateWrapper;
 
   public ReactScrollView(ReactContext context) {
     this(context, null);
@@ -99,7 +111,7 @@ public class ReactScrollView extends ScrollView
         sScrollerField = ScrollView.class.getDeclaredField("mScroller");
         sScrollerField.setAccessible(true);
       } catch (NoSuchFieldException e) {
-        Log.w(
+        FLog.w(
             ReactConstants.TAG,
             "Failed to get mScroller field for ScrollView! "
                 + "This app will exhibit the bounce-back scrolling bug :(");
@@ -112,7 +124,7 @@ public class ReactScrollView extends ScrollView
         if (scrollerValue instanceof OverScroller) {
           scroller = (OverScroller) scrollerValue;
         } else {
-          Log.w(
+          FLog.w(
               ReactConstants.TAG,
               "Failed to cast mScroller field in ScrollView (probably due to OEM changes to AOSP)! "
                   + "This app will exhibit the bounce-back scrolling bug :(");
@@ -126,6 +138,10 @@ public class ReactScrollView extends ScrollView
     }
 
     return scroller;
+  }
+
+  public void setDisableIntervalMomentum(boolean disableIntervalMomentum) {
+    mDisableIntervalMomentum = disableIntervalMomentum;
   }
 
   public void setSendMomentumEvents(boolean sendMomentumEvents) {
@@ -188,7 +204,13 @@ public class ReactScrollView extends ScrollView
   @Override
   protected void onLayout(boolean changed, int l, int t, int r, int b) {
     // Call with the present values in order to re-layout if necessary
-    scrollTo(getScrollX(), getScrollY());
+    // If a "pending" value has been set, we restore that value.
+    // That value gets cleared by reactScrollTo.
+    int scrollToX =
+        pendingContentOffsetX != UNSET_CONTENT_OFFSET ? pendingContentOffsetX : getScrollX();
+    int scrollToY =
+        pendingContentOffsetY != UNSET_CONTENT_OFFSET ? pendingContentOffsetY : getScrollY();
+    reactScrollTo(scrollToX, scrollToY);
   }
 
   @Override
@@ -272,7 +294,7 @@ public class ReactScrollView extends ScrollView
       // Log and ignore the error. This seems to be a bug in the android SDK and
       // this is the commonly accepted workaround.
       // https://tinyurl.com/mw6qkod (Stack Overflow)
-      Log.w(ReactConstants.TAG, "Error intercepting touch event.", e);
+      FLog.w(ReactConstants.TAG, "Error intercepting touch event.", e);
     }
 
     return false;
@@ -287,6 +309,8 @@ public class ReactScrollView extends ScrollView
     mVelocityHelper.calculateVelocity(ev);
     int action = ev.getAction() & MotionEvent.ACTION_MASK;
     if (action == MotionEvent.ACTION_UP && mDragging) {
+      updateStateOnScroll(getScrollX(), getScrollY());
+
       float velocityX = mVelocityHelper.getXVelocity();
       float velocityY = mVelocityHelper.getYVelocity();
       ReactScrollViewHelper.emitScrollEndDragEvent(this, velocityX, velocityY);
@@ -488,6 +512,8 @@ public class ReactScrollView extends ScrollView
               ViewCompat.postOnAnimationDelayed(
                   ReactScrollView.this, this, ReactScrollViewHelper.MOMENTUM_DELAY);
             } else {
+              updateStateOnScroll(getScrollX(), getScrollY());
+
               if (mPagingEnabled && !mSnappingToPage) {
                 // Only if we have pagingEnabled and we have not snapped to the page do we
                 // need to continue checking for the scroll.  And we cause that scroll by asking for
@@ -581,7 +607,7 @@ public class ReactScrollView extends ScrollView
     targetOffset = currentPage * interval;
     if (targetOffset != currentOffset) {
       mActivelyScrolling = true;
-      smoothScrollTo(getScrollX(), (int) targetOffset);
+      reactSmoothScrollTo(getScrollX(), (int) targetOffset);
     }
   }
 
@@ -598,6 +624,10 @@ public class ReactScrollView extends ScrollView
 
     int maximumOffset = getMaxScrollY();
     int targetOffset = predictFinalScrollPosition(velocityY);
+    if (mDisableIntervalMomentum) {
+      targetOffset = getScrollY();
+    }
+
     int smallerOffset = 0;
     int largerOffset = maximumOffset;
     int firstOffset = 0;
@@ -695,7 +725,7 @@ public class ReactScrollView extends ScrollView
 
       postInvalidateOnAnimation();
     } else {
-      smoothScrollTo(getScrollX(), targetOffset);
+      reactSmoothScrollTo(getScrollX(), targetOffset);
     }
   }
 
@@ -749,6 +779,48 @@ public class ReactScrollView extends ScrollView
   }
 
   /**
+   * Calls `smoothScrollTo` and updates state.
+   *
+   * <p>`smoothScrollTo` changes `contentOffset` and we need to keep `contentOffset` in sync between
+   * scroll view and state. Calling raw `smoothScrollTo` doesn't update state.
+   */
+  public void reactSmoothScrollTo(int x, int y) {
+    smoothScrollTo(x, y);
+    updateStateOnScroll(x, y);
+    setPendingContentOffsets(x, y);
+  }
+
+  /**
+   * Calls `reactScrollTo` and updates state.
+   *
+   * <p>`reactScrollTo` changes `contentOffset` and we need to keep `contentOffset` in sync between
+   * scroll view and state. Calling raw `reactScrollTo` doesn't update state.
+   */
+  public void reactScrollTo(int x, int y) {
+    scrollTo(x, y);
+    updateStateOnScroll(x, y);
+    setPendingContentOffsets(x, y);
+  }
+
+  /**
+   * If contentOffset is set before the View has been laid out, store the values and set them when
+   * `onLayout` is called.
+   *
+   * @param x
+   * @param y
+   */
+  private void setPendingContentOffsets(int x, int y) {
+    View child = getChildAt(0);
+    if (child != null && child.getWidth() != 0 && child.getHeight() != 0) {
+      pendingContentOffsetX = UNSET_CONTENT_OFFSET;
+      pendingContentOffsetY = UNSET_CONTENT_OFFSET;
+    } else {
+      pendingContentOffsetX = x;
+      pendingContentOffsetY = y;
+    }
+  }
+
+  /**
    * Called when a mContentView's layout has changed. Fixes the scroll position if it's too large
    * after the content resizes. Without this, the user would see a blank ScrollView when the scroll
    * position is larger than the ScrollView's max scroll position after the content shrinks.
@@ -771,7 +843,7 @@ public class ReactScrollView extends ScrollView
     int currentScrollY = getScrollY();
     int maxScrollY = getMaxScrollY();
     if (currentScrollY > maxScrollY) {
-      scrollTo(getScrollX(), maxScrollY);
+      reactScrollTo(getScrollX(), maxScrollY);
     }
   }
 
@@ -798,5 +870,24 @@ public class ReactScrollView extends ScrollView
 
   public void setBorderStyle(@Nullable String style) {
     mReactBackgroundManager.setBorderStyle(style);
+  }
+
+  public void updateState(@Nullable StateWrapper stateWrapper) {
+    mStateWrapper = stateWrapper;
+  }
+
+  /**
+   * Called on any stabilized onScroll change to propagate content offset value to a Shadow Node.
+   */
+  private void updateStateOnScroll(int scrollX, int scrollY) {
+    if (mStateWrapper == null) {
+      return;
+    }
+
+    WritableMap map = new WritableNativeMap();
+    map.putDouble(CONTENT_OFFSET_LEFT, PixelUtil.toDIPFromPixel(scrollX));
+    map.putDouble(CONTENT_OFFSET_TOP, PixelUtil.toDIPFromPixel(scrollY));
+
+    mStateWrapper.updateState(map);
   }
 }

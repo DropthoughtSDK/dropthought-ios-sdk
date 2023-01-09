@@ -31,12 +31,13 @@ export const useSurvey = () => {
 };
 /**
  * load the visibility data from cache or api
- * @param {{visibilityId: string, language: string}} param0
+ * @param {{visibilityId: string, language: string, timezone: string}} param0
  */
 
 const getVisibility = async ({
   visibilityId,
-  language
+  language,
+  timezone
 }) => {
   if (!visibilityId) {
     throw new Error(DT_ERR_MISSING_PARAMS);
@@ -63,6 +64,7 @@ const getVisibility = async ({
   return getProgram({
     surveyId: visibility.program.programId,
     language,
+    timezone,
     theme
   });
 };
@@ -113,13 +115,14 @@ const preFetchImage = survey => new Promise(resolve => {
 });
 /**
  * load the program data from cache or api
- * @param {{surveyId: string, language: string, theme?: ThemeData }} param0
+ * @param {{surveyId: string, language: string, timezone?: string, theme?: ThemeData }} param0
  */
 
 
 const getProgram = async ({
   surveyId,
   language,
+  timezone,
   theme
 }) => {
   const programCacheKey = `survey-${surveyId}-${language}`;
@@ -127,11 +130,8 @@ const getProgram = async ({
   if (!surveyId) {
     throw new Error(DT_ERR_MISSING_PARAMS);
   }
-
-  const {
-    timeZone
-  } = NativeModules.DtSdk.getConstants();
   /** @type {Survey} */
+
 
   let survey = await loadCache(programCacheKey);
 
@@ -139,7 +139,7 @@ const getProgram = async ({
     survey = await apiGetProgramById({
       programId: surveyId,
       language,
-      timezone: timeZone
+      timezone
     }, {
       timeout: 10000
     });
@@ -238,7 +238,8 @@ export const SurveyContextProvider = ({
   themeOption,
   appearance,
   fontColor,
-  backgroundColor
+  backgroundColor,
+  timezone
 }) => {
   const themeDataFromSDKEntry = {
     themeOption,
@@ -265,6 +266,7 @@ export const SurveyContextProvider = ({
     visibilityId,
     surveyId,
     language: selectedLanguage,
+    timezone,
     // watch, only re-run the promise, when language is changed or visibilityId is changed
     watchFn: (props, prevProps) => props.visibilityId !== prevProps.visibilityId || props.language !== prevProps.language && props.language !== prevSelectedLanguage || props.surveyId !== prevProps.surveyId
   });

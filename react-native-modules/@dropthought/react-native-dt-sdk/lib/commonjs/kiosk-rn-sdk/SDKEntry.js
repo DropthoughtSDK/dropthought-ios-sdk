@@ -28,8 +28,8 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 /**
  * @typedef {object} SDKEntryOwnProps
  * @property {string} apiKey
- * @property {string} visibilityId
- * @property {string} surveyId
+ * @property {string=} visibilityId
+ * @property {string=} surveyId
  * @property {string=} defaultLanguage if not provided, default is "en"
  * @property {string=} baseURL if not provided, default is ...
  * @property {()=>void=} onClose when the close icon is pressed in the header
@@ -37,6 +37,7 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
  * @property {ThemeType=} appearance
  * @property {string=} fontColor
  * @property {string=} backgroundColor
+ * @property {string=} timezone
  */
 
 /**
