@@ -2,9 +2,21 @@
 
 This repository contains all Dropthought iOS SDK sources.
 
+### Before integrate Dropthought SDK
+
+First, You need to enable to SDK Control Center on Dropthought Enterprise App.
+
+Second, create an application and a visibility. You can assign a program or change style for this visibility. 
+
+Third, copy the visibility ID for SDK integration.
+
+Now you can start to integrate Dropthought SDK
+
 ## Latest Version
 
 -   4.2.0
+
+## iOS SDK Resources
 
 There are two main repositories:
 
@@ -30,10 +42,6 @@ The ruby script **dropthought_sdk_pods.rb** contains all the CocoaPods scripts f
 ## Requirement
 
 -   iOS 12.0+
-
-## Precondition
-
-Contact Customer Support at cs@dropthought.com to get help on how to publish your program through SDK.
 
 ## Installation
 
@@ -98,13 +106,6 @@ And execute **pod install**
 [[Dropthought instance] present:self visibilityId:{VISIBILITY_ID}];
 ```
 
-### Open a survey from a view controller (Old Fashioned)
-
-```objc
-// self represent a UIViewController where you what to present a survey
-[[Dropthought instance] present:self surveyId:{SURVEY_ID}];
-```
-
 ### Set Survey Metadata
 
 ```objc
@@ -148,13 +149,6 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 Dropthought.instance().present(self, visibilityId: "VISIBILITY_ID")
 ```
 
-### Open a survey from a view controller (Old Fashioned)
-
-```swift
-// self represent a UIViewController where you what to present a survey
-Dropthought.instance().present(self, surveyId: "SURVEY_ID", theme: "default" | "light" | "dark", fontColor: "FONT_COLOR", backgroundColor: "BACKGROUND_COLOR")
-```
-
 ### Set Survey Metadata
 
 ```swift
@@ -170,3 +164,13 @@ You can call this function and we will check and submit again.
 ```swift
 Dropthought.instance().uploadOfflineFeedbacks()
 ```
+
+### Additional feature: offline mode
+
+When user finishes a survey under no network or a bad network, the survey result is saved offline. Every time when `Dropthought.instance().init()` is called, Dropthought SDK would try to upload the saved results(if any) again once.
+
+Or, you could call `Dropthought.instance().uploadOfflineFeedbacks()` manually to try to upload the saved results once if your app has network status monitor.
+
+## FAQ
+
+Contact Customer Support at cs@dropthought.com to get help on how to publish your program through SDK
