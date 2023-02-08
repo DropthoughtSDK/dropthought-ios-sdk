@@ -20,6 +20,7 @@ import { FeedbackProvider } from '@dropthought/react-native-ui/src/contexts/feed
  * @property {string=} fontColor
  * @property {string=} backgroundColor
  * @property {string=} timezone
+ * @property {boolean=} preview
  */
 
 /**
@@ -35,7 +36,7 @@ export default function SDKEntry(props) {
       <FeedbackProvider>
         <CustomPropsContextProvider {...props}>
           <SurveyContextProvider {...props}>
-            <SurveyStackContainer />
+            <SurveyStackContainer preview={props.preview} />
           </SurveyContextProvider>
         </CustomPropsContextProvider>
       </FeedbackProvider>

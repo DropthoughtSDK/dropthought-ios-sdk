@@ -16,28 +16,12 @@ var _exportNames = {
   i18n: true,
   Colors: true,
   GlobalStyle: true,
-  APPEARANCE: true,
-  COLOR_SCHEMES: true,
-  THEME_OPTION: true,
-  useTheme: true,
   ActivityIndicatorMask: true
 };
-Object.defineProperty(exports, "APPEARANCE", {
-  enumerable: true,
-  get: function () {
-    return _theme.APPEARANCE;
-  }
-});
 Object.defineProperty(exports, "ActivityIndicatorMask", {
   enumerable: true,
   get: function () {
     return _ActivityIndicatorMask.default;
-  }
-});
-Object.defineProperty(exports, "COLOR_SCHEMES", {
-  enumerable: true,
-  get: function () {
-    return _theme.COLOR_SCHEMES;
   }
 });
 Object.defineProperty(exports, "ClassicQuestionContainer", {
@@ -106,22 +90,10 @@ Object.defineProperty(exports, "SurveyScreenLayout", {
     return _SurveyScreenLayout.default;
   }
 });
-Object.defineProperty(exports, "THEME_OPTION", {
-  enumerable: true,
-  get: function () {
-    return _theme.THEME_OPTION;
-  }
-});
 Object.defineProperty(exports, "i18n", {
   enumerable: true,
   get: function () {
     return _translation.default;
-  }
-});
-Object.defineProperty(exports, "useTheme", {
-  enumerable: true,
-  get: function () {
-    return _theme.useTheme;
   }
 });
 
@@ -170,6 +142,18 @@ Object.keys(_useWindowDimensions).forEach(function (key) {
 });
 
 var _theme = require("./contexts/theme");
+
+Object.keys(_theme).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  if (key in exports && exports[key] === _theme[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _theme[key];
+    }
+  });
+});
 
 var _ActivityIndicatorMask = _interopRequireDefault(require("./components/ActivityIndicatorMask"));
 

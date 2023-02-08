@@ -21,7 +21,7 @@ const useBackForDismiss = () => {
  * @type {React.FunctionComponent<ScreenProps>}
  * @param {ScreenProps} props
  */
-const EndScreen = ({ error, surveyFeedback }) => {
+const EndScreen = ({ error, surveyFeedback, onClose }) => {
   const survey = useSurvey();
   const onSubmitSuccessCallback = useOnSubmitSuccessCallback();
   const onSubmitCallback = useOnSubmitCallback();
@@ -41,7 +41,7 @@ const EndScreen = ({ error, surveyFeedback }) => {
   }, []);
 
   useBackForDismiss();
-  return <EndScreenLayout survey={survey} />;
+  return <EndScreenLayout survey={survey} onClose={onClose} />;
 };
 
 export default EndScreen;
@@ -54,4 +54,5 @@ export default EndScreen;
  * @typedef {Object} ScreenProps
  * @property {Error=} error
  * @property {SurveyFeedback=} surveyFeedback
+ * @property {() => void} onClose
  */

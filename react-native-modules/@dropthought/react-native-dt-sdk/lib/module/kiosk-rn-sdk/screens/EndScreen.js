@@ -22,7 +22,8 @@ const useBackForDismiss = () => {
 
 const EndScreen = ({
   error,
-  surveyFeedback
+  surveyFeedback,
+  onClose
 }) => {
   const survey = useSurvey();
   const onSubmitSuccessCallback = useOnSubmitSuccessCallback();
@@ -42,7 +43,8 @@ const EndScreen = ({
   }, []);
   useBackForDismiss();
   return /*#__PURE__*/React.createElement(EndScreenLayout, {
-    survey: survey
+    survey: survey,
+    onClose: onClose
   });
 };
 
@@ -55,5 +57,6 @@ export default EndScreen;
  * @typedef {Object} ScreenProps
  * @property {Error=} error
  * @property {SurveyFeedback=} surveyFeedback
+ * @property {() => void} onClose
  */
 //# sourceMappingURL=EndScreen.js.map

@@ -16,9 +16,10 @@ import { fromJSToAPIDateStr } from '../../lib/DateTimerParser';
 const noData = a => isNil(a) || isEmpty(a);
 
 const Stack = ({
-  survey
+  preview
 }) => {
   const {
+    survey,
     onClose
   } = useSurveyContext();
   const themeColor = survey.surveyProperty.hexCode;
@@ -55,16 +56,20 @@ const Stack = ({
     setVisiblePageIds(prevPageIds => prevPageIds.slice(0, -1));
   }, []);
   const handleSubmit = React.useCallback(feedback => {
-    const {
-      timeZone
-    } = NativeModules.DtSdk.getConstants();
-    setSurveyFeedback(feedback);
-    run({ ...feedback,
-      metadata,
-      createdTime: fromJSToAPIDateStr(Date.now()),
-      timeZone
-    });
-  }, [metadata, run]);
+    if (preview) {
+      setEndScreenvisible(true);
+    } else {
+      const {
+        timeZone
+      } = NativeModules.DtSdk.getConstants();
+      setSurveyFeedback(feedback);
+      run({ ...feedback,
+        metadata,
+        createdTime: fromJSToAPIDateStr(Date.now()),
+        timeZone
+      });
+    }
+  }, [metadata, preview, run]);
   return /*#__PURE__*/React.createElement(View, {
     style: styles.flexOne
   }, /*#__PURE__*/React.createElement(Header, {
@@ -97,13 +102,16 @@ const Stack = ({
     isOnTop: endScreenvisible
   }, /*#__PURE__*/React.createElement(EndScreen, {
     error: error,
-    surveyFeedback: surveyFeedback
+    surveyFeedback: surveyFeedback,
+    onClose: onClose
   }))), /*#__PURE__*/React.createElement(ActivityIndicatorMask, {
     loading: loading
   }));
 };
 
-const SurveyStack = () => {
+const SurveyStack = ({
+  preview
+}) => {
   const {
     survey,
     onClose
@@ -120,7 +128,7 @@ const SurveyStack = () => {
   }
 
   return /*#__PURE__*/React.createElement(Stack, {
-    survey: survey
+    preview: preview
   });
 };
 

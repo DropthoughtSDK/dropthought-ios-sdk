@@ -11,7 +11,7 @@ def use_dropthought_sdk
 
      # The Pods which should be included in all projects
     pod 'FBLazyVector', :path => "#{prefix}/Libraries/FBLazyVector"
-    pod 'FBReactNativeSpec', :path => "#{prefix}/Libraries/FBReactNativeSpec"
+    pod 'FBReactNativeSpec', :path => "#{prefix}/React/FBReactNativeSpec"
     pod 'RCTRequired', :path => "#{prefix}/Libraries/RCTRequired"
     pod 'RCTTypeSafety', :path => "#{prefix}/Libraries/TypeSafety"
     pod 'React', :path => "#{prefix}/"
@@ -33,12 +33,14 @@ def use_dropthought_sdk
     pod 'React-jsiexecutor', :path => "#{prefix}/ReactCommon/jsiexecutor"
     pod 'React-jsinspector', :path => "#{prefix}/ReactCommon/jsinspector"
     pod 'React-callinvoker', :path => "#{prefix}/ReactCommon/callinvoker"
+    pod 'React-runtimeexecutor', :path => "#{prefix}/ReactCommon/runtimeexecutor"
+    pod 'React-perflogger', :path => "#{prefix}/ReactCommon/reactperflogger"
     pod 'ReactCommon/turbomodule/core', :path => "#{prefix}/ReactCommon"
     pod 'Yoga', :path => "#{prefix}/ReactCommon/yoga", :modular_headers => true
 
     pod 'DoubleConversion', :podspec => "#{prefix}/third-party-podspecs/DoubleConversion.podspec"
     pod 'glog', :podspec => "#{prefix}/third-party-podspecs/glog.podspec"
-    pod 'Folly', :podspec => "#{prefix}/third-party-podspecs/Folly.podspec"
+    pod 'RCT-Folly', :podspec => "#{prefix}/third-party-podspecs/RCT-Folly.podspec"
 
     # The prefix to the 3rd party lib
     third_party_prefix = "./react-native-modules"
@@ -50,5 +52,7 @@ def use_dropthought_sdk
     pod 'RNSecureKeyStore', :path => "#{third_party_prefix}/react-native-secure-key-store/ios"
     pod 'lottie-react-native', :path =>  "#{third_party_prefix}/lottie-react-native"
     pod 'lottie-ios', :path =>  "#{third_party_prefix}/lottie-ios"
+    pod 'RNGestureHandler', :path =>  "#{third_party_prefix}/react-native-gesture-handler"
+    pod 'RNReanimated', :path =>  "#{third_party_prefix}/react-native-reanimated"
 
 end

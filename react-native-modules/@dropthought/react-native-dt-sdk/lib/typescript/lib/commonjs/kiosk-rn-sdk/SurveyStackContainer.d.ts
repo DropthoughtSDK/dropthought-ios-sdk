@@ -1,3 +1,8 @@
 export var __esModule: boolean;
 export default _default;
-declare function _default(props: any): any;
+/**
+ * @param {{preview: boolean}} param0
+ */
+declare function _default({ preview }: {
+    preview: boolean;
+}): any;

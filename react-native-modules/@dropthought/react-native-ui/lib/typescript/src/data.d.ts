@@ -1,5 +1,5 @@
 export type { IColorSchemesType, IAppearanceType, FontColor, BackgroundColor, IThemeOptionType, } from './contexts/theme';
-export declare type QuestionType = 'rating' | 'open' | 'multiChoice' | 'singleChoice' | 'nps';
+export declare type QuestionType = 'rating' | 'open' | 'multiChoice' | 'singleChoice' | 'nps' | 'ranking';
 export declare type QuestionSubType = 'smiley' | 'slider';
 export declare type QuestionBrandType = 'other';
 export declare type QuestionMetaDataType = 'Name' | 'Email' | 'Phone' | 'Number' | 'Date' | 'String';

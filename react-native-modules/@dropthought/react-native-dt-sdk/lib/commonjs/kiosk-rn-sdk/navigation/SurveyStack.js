@@ -42,9 +42,10 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 const noData = a => (0, _ramda.isNil)(a) || (0, _ramda.isEmpty)(a);
 
 const Stack = ({
-  survey
+  preview
 }) => {
   const {
+    survey,
     onClose
   } = (0, _survey.useSurveyContext)();
   const themeColor = survey.surveyProperty.hexCode;
@@ -81,17 +82,21 @@ const Stack = ({
     setVisiblePageIds(prevPageIds => prevPageIds.slice(0, -1));
   }, []);
   const handleSubmit = React.useCallback(feedback => {
-    const {
-      timeZone
-    } = _reactNative.NativeModules.DtSdk.getConstants();
+    if (preview) {
+      setEndScreenvisible(true);
+    } else {
+      const {
+        timeZone
+      } = _reactNative.NativeModules.DtSdk.getConstants();
 
-    setSurveyFeedback(feedback);
-    run({ ...feedback,
-      metadata,
-      createdTime: (0, _DateTimerParser.fromJSToAPIDateStr)(Date.now()),
-      timeZone
-    });
-  }, [metadata, run]);
+      setSurveyFeedback(feedback);
+      run({ ...feedback,
+        metadata,
+        createdTime: (0, _DateTimerParser.fromJSToAPIDateStr)(Date.now()),
+        timeZone
+      });
+    }
+  }, [metadata, preview, run]);
   return /*#__PURE__*/React.createElement(_reactNative.View, {
     style: styles.flexOne
   }, /*#__PURE__*/React.createElement(_Header.default, {
@@ -124,13 +129,16 @@ const Stack = ({
     isOnTop: endScreenvisible
   }, /*#__PURE__*/React.createElement(_EndScreen.default, {
     error: error,
-    surveyFeedback: surveyFeedback
+    surveyFeedback: surveyFeedback,
+    onClose: onClose
   }))), /*#__PURE__*/React.createElement(_reactNativeUi.ActivityIndicatorMask, {
     loading: loading
   }));
 };
 
-const SurveyStack = () => {
+const SurveyStack = ({
+  preview
+}) => {
   const {
     survey,
     onClose
@@ -147,7 +155,7 @@ const SurveyStack = () => {
   }
 
   return /*#__PURE__*/React.createElement(Stack, {
-    survey: survey
+    preview: preview
   });
 };
 

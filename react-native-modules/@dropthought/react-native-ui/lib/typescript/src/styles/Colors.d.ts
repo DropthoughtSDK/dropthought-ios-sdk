@@ -41,6 +41,15 @@ export declare const Colors: {
     smileyRatingScoreGray: string;
     appearanceSubBlack: string;
     warningRed: string;
+    rankingBorder: string;
+    rankingBorderDark: string;
+    rankingBG: string;
+    rankingBGDark: string;
+    rankingContainerBorder: string;
+    rankingContainerBorderDark: string;
+    rankingContainerBgDark: string;
+    divider: string;
+    rankingCheckBoxBorder: string;
 };
 export declare const addOpacityToColor: (hexColor: string, opacity: number) => string;
 export declare const opacity10: (color: string) => string;

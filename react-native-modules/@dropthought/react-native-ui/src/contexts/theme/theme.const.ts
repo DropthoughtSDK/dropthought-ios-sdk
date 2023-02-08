@@ -25,7 +25,6 @@ export enum THEME_OPTION {
   OPTION2 = 'option2',
   OPTION3 = 'option3',
   OPTION4 = 'option4',
-  OPTION5 = 'option5',
   OPTION6 = 'option6',
 }
 
@@ -35,5 +34,4 @@ export type IThemeOptionType =
   | THEME_OPTION.OPTION2
   | THEME_OPTION.OPTION3
   | THEME_OPTION.OPTION4
-  | THEME_OPTION.OPTION5
   | THEME_OPTION.OPTION6;

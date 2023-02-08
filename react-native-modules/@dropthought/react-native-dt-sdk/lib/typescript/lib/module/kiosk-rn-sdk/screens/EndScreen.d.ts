@@ -3,6 +3,7 @@ export type SurveyFeedback = any;
 export type ScreenProps = {
     error?: Error | undefined;
     surveyFeedback?: any;
+    onClose: () => void;
 };
 /**
  * @type {React.FunctionComponent<ScreenProps>}

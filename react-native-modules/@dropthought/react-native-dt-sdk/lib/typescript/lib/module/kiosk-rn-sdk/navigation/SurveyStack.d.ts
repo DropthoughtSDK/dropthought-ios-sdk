@@ -1,5 +1,7 @@
 export default SurveyStack;
-declare function SurveyStack(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> | React.FunctionComponentElement<{
-    survey: any;
+declare function SurveyStack({ preview }: {
+    preview: any;
+}): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> | React.FunctionComponentElement<{
+    preview: any;
 }>;
 import * as React from "react";

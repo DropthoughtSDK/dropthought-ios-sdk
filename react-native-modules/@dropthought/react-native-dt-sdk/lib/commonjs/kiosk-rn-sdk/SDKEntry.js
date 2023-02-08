@@ -38,6 +38,7 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
  * @property {string=} fontColor
  * @property {string=} backgroundColor
  * @property {string=} timezone
+ * @property {boolean=} preview
  */
 
 /**
@@ -48,6 +49,8 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
  * @param {SDKEntryProps} props
  */
 function SDKEntry(props) {
-  return /*#__PURE__*/React.createElement(_reactNativeSafeAreaContext.SafeAreaProvider, null, /*#__PURE__*/React.createElement(_feedback.FeedbackProvider, null, /*#__PURE__*/React.createElement(_customProps.CustomPropsContextProvider, props, /*#__PURE__*/React.createElement(_survey.SurveyContextProvider, props, /*#__PURE__*/React.createElement(_SurveyStackContainer.default, null)))));
+  return /*#__PURE__*/React.createElement(_reactNativeSafeAreaContext.SafeAreaProvider, null, /*#__PURE__*/React.createElement(_feedback.FeedbackProvider, null, /*#__PURE__*/React.createElement(_customProps.CustomPropsContextProvider, props, /*#__PURE__*/React.createElement(_survey.SurveyContextProvider, props, /*#__PURE__*/React.createElement(_SurveyStackContainer.default, {
+    preview: props.preview
+  })))));
 }
 //# sourceMappingURL=SDKEntry.js.map

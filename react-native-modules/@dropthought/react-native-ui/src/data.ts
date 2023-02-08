@@ -11,7 +11,8 @@ export type QuestionType =
   | 'open'
   | 'multiChoice'
   | 'singleChoice'
-  | 'nps';
+  | 'nps'
+  | 'ranking';
 
 export type QuestionSubType = 'smiley' | 'slider';
 

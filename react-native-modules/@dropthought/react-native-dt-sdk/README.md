@@ -23,6 +23,9 @@ yarn add @dropthought/react-native-dt-sdk
 - [react-native-secure-key-store](https://www.npmjs.com/package/react-native-secure-key-store)
 - [lottie-react-native](https://github.com/lottie-react-native/lottie-react-native)
 - [ramda](https://github.com/ramda/ramda)
+- [react-native-draggable-flatlist](https://github.com/computerjazz/react-native-draggable-flatlist)
+- [react-native-gesture-handler](https://github.com/software-mansion/react-native-gesture-handler)
+- [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated)
 
 ## Usage
 
@@ -31,22 +34,16 @@ import {
   SurveyModalContainer,
   useOpenSurvey,
   initialize,
+  APPEARANCE,
   THEME_OPTIONS,
-} from 'react-native-dt-sdk';
+} from '@dropthought/react-native-dt-sdk';
 
 initialize({
   apiKey: API_KEY,
   storage: AsyncStorage,
 });
 
-<SurveyModalContainer
-  surveyId={surveyId}
-  themeOption={themeOption} // THEME_OPTION.CLASSIC|THEME_OPTION.OPTION1|...
-  appearance={appearance} // APPEARANCE.SYSTEM|APPEARANCE.LIGHT|APPEARANCE.DARK
-  fontColor={fontColor} // (Optional) '#5e9ae2'|'black'
-  backgroundColor={backgroundColor} // (Optional) '#5e9ae2'|'white'
-  onClose={() => {}}
->
+<SurveyModalContainer>
   {/* ... */}
 </SurveyModalContainer>;
 ```
@@ -56,7 +53,7 @@ initialize({
 Used to initialize Dropthought with your apiKey & preferred storage
 
 ```js
-import { initialize } from 'react-native-dt-sdk';
+import { initialize } from '@dropthought/react-native-dt-sdk';
 import AsyncStorage from '@react-native-community/async-storage';
 
 initialize({
@@ -90,6 +87,25 @@ import { SurveyModalContainer, THEME_OPTIONS } from 'react-native-dt-sdk';
 >
   {/* ... */}
 </SurveyModalContainer>;
+```
+It's not necessary to pass these props at `SurveyModalContainer`. You can pass them though `openSurvey`
+
+```js
+const openSurvey = useOpenSurvey();
+
+// use visibility
+openSurvey({
+  visibilityId,
+});
+
+// use surveyId
+openSurvey({
+  surveyId,
+  themeOption,
+  appearance,
+  fontColor,
+  backgroundColor,
+});
 ```
 
 ### useOpenSurvey

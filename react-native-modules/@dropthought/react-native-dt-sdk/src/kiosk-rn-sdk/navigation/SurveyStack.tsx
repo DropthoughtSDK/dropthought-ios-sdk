@@ -18,16 +18,15 @@ import { submitFeedback } from '../../lib/Feedback';
 import ScreenWrapper from './ScreenWrapper';
 import Header from './Header';
 import { fromJSToAPIDateStr } from '../../lib/DateTimerParser';
-import type { Survey } from '../../data';
 
 type StackProps = {
-  survey: Survey;
+  preview: boolean;
 };
 
 const noData = (a: any) => isNil(a) || isEmpty(a);
 
-const Stack: React.FunctionComponent<StackProps> = ({ survey }) => {
-  const { onClose } = useSurveyContext();
+const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
+  const { survey, onClose } = useSurveyContext();
   const themeColor = survey.surveyProperty.hexCode;
   const [visiblePageIds, setVisiblePageIds] = React.useState([]);
   const [endScreenvisible, setEndScreenvisible] = React.useState(false);
@@ -72,16 +71,20 @@ const Stack: React.FunctionComponent<StackProps> = ({ survey }) => {
 
   const handleSubmit = React.useCallback(
     (feedback) => {
-      const { timeZone } = NativeModules.DtSdk.getConstants();
-      setSurveyFeedback(feedback);
-      run({
-        ...feedback,
-        metadata,
-        createdTime: fromJSToAPIDateStr(Date.now()),
-        timeZone,
-      });
+      if (preview) {
+        setEndScreenvisible(true);
+      } else {
+        const { timeZone } = NativeModules.DtSdk.getConstants();
+        setSurveyFeedback(feedback);
+        run({
+          ...feedback,
+          metadata,
+          createdTime: fromJSToAPIDateStr(Date.now()),
+          timeZone,
+        });
+      }
     },
-    [metadata, run]
+    [metadata, preview, run]
   );
 
   return (
@@ -117,7 +120,11 @@ const Stack: React.FunctionComponent<StackProps> = ({ survey }) => {
           );
         })}
         <ScreenWrapper visible={endScreenvisible} isOnTop={endScreenvisible}>
-          <EndScreen error={error} surveyFeedback={surveyFeedback} />
+          <EndScreen
+            error={error}
+            surveyFeedback={surveyFeedback}
+            onClose={onClose}
+          />
         </ScreenWrapper>
       </View>
       <ActivityIndicatorMask loading={loading} />
@@ -126,10 +133,12 @@ const Stack: React.FunctionComponent<StackProps> = ({ survey }) => {
 };
 
 type SurveyStackProps = {
-  survey: Survey;
+  preview: boolean;
 };
 
-const SurveyStack: React.FunctionComponent<SurveyStackProps> = () => {
+const SurveyStack: React.FunctionComponent<SurveyStackProps> = ({
+  preview,
+}) => {
   const { survey, onClose } = useSurveyContext();
   // check if survey data is valid
   if (
@@ -148,7 +157,7 @@ const SurveyStack: React.FunctionComponent<SurveyStackProps> = () => {
       </FakeScreen>
     );
   }
-  return <Stack survey={survey} />;
+  return <Stack preview={preview} />;
 };
 
 export default SurveyStack;

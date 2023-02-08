@@ -4,7 +4,10 @@ import { useTheme, COLOR_SCHEMES } from '@dropthought/react-native-ui';
 import { useSurvey } from './contexts/survey';
 import SurveyStackNavigator from './navigation/SurveyStack';
 
-const SurveyStackContainer = (props) => {
+/**
+ * @param {{preview: boolean}} param0
+ */
+const SurveyStackContainer = ({ preview = false }) => {
   const { colorScheme } = useTheme();
   const survey = useSurvey();
   const themeColor = survey.surveyProperty.hexCode;
@@ -17,7 +20,7 @@ const SurveyStackContainer = (props) => {
           colorScheme === COLOR_SCHEMES.dark ? 'light-content' : 'dark-content'
         }
       />
-      <SurveyStackNavigator {...props} />
+      <SurveyStackNavigator preview={preview} />
     </>
   );
 };

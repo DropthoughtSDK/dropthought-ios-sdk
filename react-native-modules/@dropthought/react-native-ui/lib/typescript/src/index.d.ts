@@ -9,7 +9,7 @@ import { KioskProvider, KioskProviderProps } from './KioskProvider';
 import i18n from './translation';
 export { Colors, GlobalStyle } from './styles';
 export * from './hooks/useWindowDimensions';
-export { APPEARANCE, COLOR_SCHEMES, THEME_OPTION, useTheme, } from './contexts/theme';
+export * from './contexts/theme';
 import ActivityIndicatorMask from './components/ActivityIndicatorMask';
 export { ClassicQuestionContainer, QuestionContainer, SurveyScreenLayout, EndScreenLayout, StartScreenLayout, PlaceholderScreen, KioskProvider, KioskProviderProps, ActivityIndicatorMask, i18n, SurveyProgressBarPosition, };
 export * from './data';

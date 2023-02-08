@@ -9,13 +9,13 @@ import SmileyRatingQuestionOption2 from '../components/SmileyRatingQuestionOptio
 import SmileyRatingQuestionOption3 from '../components/SmileyRatingQuestionOption3';
 import SmileyRatingQuestionOption4 from '../components/SmileyRatingQuestionOption4';
 import SmileyRatingQuestionOption6 from '../components/SmileyRatingQuestionOption6';
+import RankingQuestion from '../components/RankingQuestion';
 import SingleChoiceQuestion from '../components/SingleChoiceQuestion';
 import MultiChoiceQuestion from '../components/MultiChoiceQuestion';
 import SliderRatingQuestion from '../components/SliderRatingQuestion';
 import OpenQuestion from '../components/OpenQuestion';
 import MandatoryTitle from '../components/MandatoryTitle';
 import GlobalStyle from '../styles';
-import { useTheme } from '..';
 
 const TempComponent = ({
   question,
@@ -32,11 +32,9 @@ const TempComponent = ({
 const QuestionContainer = props => {
   const {
     onFeedback: propsOnFeedback,
-    validationStarted
-  } = props;
-  const {
+    validationStarted,
     themeOption
-  } = useTheme();
+  } = props;
   let QuestionComponent = TempComponent; // get/update feedback to context
 
   const feedback = useFeedbackByQid(props.question.questionId);
@@ -107,6 +105,11 @@ const QuestionContainer = props => {
     case 'open':
       // @ts-ignore
       QuestionComponent = OpenQuestion;
+      break;
+
+    case 'ranking':
+      // @ts-ignore
+      QuestionComponent = RankingQuestion;
       break;
 
     default:

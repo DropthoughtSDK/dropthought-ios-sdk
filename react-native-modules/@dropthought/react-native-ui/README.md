@@ -27,7 +27,8 @@ yarn add @dropthought/react-native-ui
 This component provides the theme (classic) setting to all components.
 
 - Props:
-  - `appearance`: system | light | dark
+  - `themeOption`: THEME_OPTION.CLASSIC | THEME_OPTION.OPTION1 | THEME_OPTION.OPTION2 | THEME_OPTION.OPTION3 | THEME_OPTION.OPTION4 | THEME_OPTION.OPTION6
+  - `appearance`: APPEARANCE.SYSTEM | APPEARANCE.LIGHT | APPEARANCE.DARK
   - `fontColor`: [React Native Color Reference](https://reactnative.dev/docs/colors)
   - `backgroundColor`: [React Native Color Reference](https://reactnative.dev/docs/colors)
 
@@ -35,6 +36,7 @@ This component provides the theme (classic) setting to all components.
 import { KioskProvider, APPEARANCE } from '@dropthought/react-native-ui';
 
 <KioskProvider
+  themeOption={THEME_OPTION.CLASSIC}
   appearance={APPEARANCE.SYSTEM}
   fontColor="white"
   backgroundColor="#4c3794"

@@ -175,7 +175,8 @@ const SurveyScreenLayout = props => {
     onPrevPage: onPrevPageHandler,
     onNextPage: onNextPageHandler,
     survey: survey,
-    pageIndex: pageIndex
+    pageIndex: pageIndex,
+    themeOption: themeOption
   }), singleQuestion.type === 'rating' && singleQuestion.subType === 'smiley' ? null : /*#__PURE__*/React.createElement(SurveyFooter, {
     surveyColor: survey.surveyProperty.hexCode,
     isFirstPage: pageIndex === 0,

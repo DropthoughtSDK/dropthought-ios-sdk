@@ -21,7 +21,6 @@ export let THEME_OPTION;
   THEME_OPTION["OPTION2"] = "option2";
   THEME_OPTION["OPTION3"] = "option3";
   THEME_OPTION["OPTION4"] = "option4";
-  THEME_OPTION["OPTION5"] = "option5";
   THEME_OPTION["OPTION6"] = "option6";
 })(THEME_OPTION || (THEME_OPTION = {}));
 //# sourceMappingURL=theme.const.js.map

@@ -15,6 +15,16 @@ function _fs() {
   return data;
 }
 
+function _glob() {
+  const data = _interopRequireDefault(require("glob"));
+
+  _glob = function () {
+    return data;
+  };
+
+  return data;
+}
+
 function _path() {
   const data = _interopRequireDefault(require("path"));
 
@@ -34,12 +44,23 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * LICENSE file in the root directory of this source tree.
  *
  */
-function findPodfilePath(projectFolder) {
+function findPodfilePath(folder, projectFolder) {
   const podFilePath = _path().default.join(projectFolder, '..', 'Podfile');
 
-  const podFileExists = _fs().default.existsSync(podFilePath);
+  if (_fs().default.existsSync(podFilePath)) {
+    return podFilePath;
+  }
 
-  return podFileExists ? podFilePath : null;
+  const podfiles = _glob().default.sync('**/Podfile', {
+    cwd: folder,
+    ignore: 'node_modules/**'
+  });
+
+  if (podfiles.length > 0) {
+    return _path().default.join(folder, podfiles[0]);
+  }
+
+  return null;
 }
 
 //# sourceMappingURL=findPodfilePath.js.map

@@ -1,2 +1,7 @@
 export default SurveyStackContainer;
-declare function SurveyStackContainer(props: any): JSX.Element;
+/**
+ * @param {{preview: boolean}} param0
+ */
+declare function SurveyStackContainer({ preview }: {
+    preview: boolean;
+}): JSX.Element;

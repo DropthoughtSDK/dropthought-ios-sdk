@@ -8,6 +8,7 @@ import ClassicSingleChoiceQuestion from '../components/ClassicSingleChoiceQuesti
 import ClassicMultiChoiceQuestion from '../components/ClassicMultiChoiceQuestion';
 import ClassicSmileyRatingQuestion from '../components/ClassicSmileyRatingQuestion';
 import ClassicSliderRatingQuestion from '../components/ClassicSliderRatingQuestion';
+import ClassicRankingQuestion from '../components/ClassicRankingQuestion';
 import ClassicOpenQuestion from '../components/ClassicOpenQuestion';
 import ClassicMandatoryTitle from '../components/ClassicMandatoryTitle';
 import GlobalStyle from '../styles';
@@ -71,6 +72,11 @@ const ClassicQuestionContainer = props => {
     case 'open':
       // @ts-ignore
       QuestionComponent = ClassicOpenQuestion;
+      break;
+
+    case 'ranking':
+      // @ts-ignore
+      QuestionComponent = ClassicRankingQuestion;
       break;
 
     default:

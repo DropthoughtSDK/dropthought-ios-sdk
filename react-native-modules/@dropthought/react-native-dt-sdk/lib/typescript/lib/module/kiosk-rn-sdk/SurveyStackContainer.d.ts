@@ -1,3 +1,8 @@
 export default SurveyStackContainer;
-declare function SurveyStackContainer(props: any): React.FunctionComponentElement<null>;
+/**
+ * @param {{preview: boolean}} param0
+ */
+declare function SurveyStackContainer({ preview }: {
+    preview: boolean;
+}): React.FunctionComponentElement<null>;
 import * as React from "react";

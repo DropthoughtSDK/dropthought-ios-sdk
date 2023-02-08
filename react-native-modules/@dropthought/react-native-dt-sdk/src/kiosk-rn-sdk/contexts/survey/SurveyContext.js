@@ -5,13 +5,7 @@
  * therefore, the children would always be sure to have "survey" in context
  */
 import * as React from 'react';
-import {
-  View,
-  ActivityIndicator,
-  Image,
-  Alert,
-  NativeModules,
-} from 'react-native';
+import { View, ActivityIndicator, Image, Alert } from 'react-native';
 
 import { evolve, merge, isNil } from 'ramda';
 import { useAsync } from 'react-async';
@@ -27,7 +21,11 @@ import { ThemeProvider } from '@dropthought/react-native-ui/src/contexts/theme';
 
 import FakeScreen from '../../screens/FakeScreen';
 import { saveCache, loadCache } from '../../../lib/Storage';
-import { apiGetProgramById, apiGetVisibilityById } from '../../../lib/API';
+import {
+  apiGetProgramById,
+  apiGetVisibilityById,
+  sdkFetcher,
+} from '../../../lib/API';
 import { isRequestTimeoutError, isNoInternetError } from '../../../lib/Fetcher';
 
 const DT_ERR_MISSING_PARAMS = 'dt-missing-parameters';
@@ -232,6 +230,8 @@ const defaultOnCloseHandler = () => {
  * @param {Props} param0
  */
 export const SurveyContextProvider = ({
+  baseURL,
+  apiKey,
   visibilityId,
   surveyId,
   children,
@@ -243,6 +243,9 @@ export const SurveyContextProvider = ({
   backgroundColor,
   timezone,
 }) => {
+  if (baseURL || apiKey) {
+    sdkFetcher.init({ baseURL, apiKey });
+  }
   const themeDataFromSDKEntry = {
     themeOption,
     appearance,

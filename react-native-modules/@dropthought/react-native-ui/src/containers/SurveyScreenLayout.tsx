@@ -256,6 +256,7 @@ const SurveyScreenLayout = (props: Props) => {
         onNextPage={onNextPageHandler}
         survey={survey}
         pageIndex={pageIndex}
+        themeOption={themeOption}
       />
       {singleQuestion.type === 'rating' &&
       singleQuestion.subType === 'smiley' ? null : (

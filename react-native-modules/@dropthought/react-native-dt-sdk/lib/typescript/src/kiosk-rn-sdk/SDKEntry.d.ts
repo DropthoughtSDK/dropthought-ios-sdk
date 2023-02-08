@@ -12,6 +12,7 @@
  * @property {string=} fontColor
  * @property {string=} backgroundColor
  * @property {string=} timezone
+ * @property {boolean=} preview
  */
 /**
  * @typedef {import('./contexts/custom-props').CustomProps & SDKEntryOwnProps} SDKEntryProps
@@ -42,5 +43,6 @@ export type SDKEntryOwnProps = {
     fontColor?: string | undefined;
     backgroundColor?: string | undefined;
     timezone?: string | undefined;
+    preview?: boolean | undefined;
 };
 export type SDKEntryProps = import('./contexts/custom-props').CustomProps & SDKEntryOwnProps;

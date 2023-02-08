@@ -19,6 +19,7 @@ import { FeedbackProvider } from '@dropthought/react-native-ui/src/contexts/feed
  * @property {string=} fontColor
  * @property {string=} backgroundColor
  * @property {string=} timezone
+ * @property {boolean=} preview
  */
 
 /**
@@ -30,6 +31,8 @@ import { FeedbackProvider } from '@dropthought/react-native-ui/src/contexts/feed
  */
 
 export default function SDKEntry(props) {
-  return /*#__PURE__*/React.createElement(SafeAreaProvider, null, /*#__PURE__*/React.createElement(FeedbackProvider, null, /*#__PURE__*/React.createElement(CustomPropsContextProvider, props, /*#__PURE__*/React.createElement(SurveyContextProvider, props, /*#__PURE__*/React.createElement(SurveyStackContainer, null)))));
+  return /*#__PURE__*/React.createElement(SafeAreaProvider, null, /*#__PURE__*/React.createElement(FeedbackProvider, null, /*#__PURE__*/React.createElement(CustomPropsContextProvider, props, /*#__PURE__*/React.createElement(SurveyContextProvider, props, /*#__PURE__*/React.createElement(SurveyStackContainer, {
+    preview: props.preview
+  })))));
 }
 //# sourceMappingURL=SDKEntry.js.map

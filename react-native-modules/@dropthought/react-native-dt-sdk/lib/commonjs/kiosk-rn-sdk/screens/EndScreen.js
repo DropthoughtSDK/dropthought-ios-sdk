@@ -37,7 +37,8 @@ const useBackForDismiss = () => {
 
 const EndScreen = ({
   error,
-  surveyFeedback
+  surveyFeedback,
+  onClose
 }) => {
   const survey = (0, _survey.useSurvey)();
   const onSubmitSuccessCallback = (0, _customProps.useOnSubmitSuccessCallback)();
@@ -59,7 +60,8 @@ const EndScreen = ({
 
   useBackForDismiss();
   return /*#__PURE__*/_react.default.createElement(_reactNativeUi.EndScreenLayout, {
-    survey: survey
+    survey: survey,
+    onClose: onClose
   });
 };
 
@@ -72,6 +74,7 @@ var _default = EndScreen;
  * @typedef {Object} ScreenProps
  * @property {Error=} error
  * @property {SurveyFeedback=} surveyFeedback
+ * @property {() => void} onClose
  */
 
 exports.default = _default;

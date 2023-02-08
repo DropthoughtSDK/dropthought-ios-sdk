@@ -46,7 +46,16 @@ const Colors = {
   unSelectedBackground: '#f1f4f9',
   smileyRatingScoreGray: '#adadb2',
   appearanceSubBlack: '#f5f5f7',
-  warningRed: '#cb4647'
+  warningRed: '#cb4647',
+  rankingBorder: '#e1e4eb',
+  rankingBorderDark: '#343434',
+  rankingBG: '#fafbfc',
+  rankingBGDark: '#272727',
+  rankingContainerBorder: '#c7cad1',
+  rankingContainerBorderDark: '#404040',
+  rankingContainerBgDark: '#39393a',
+  divider: 'rgba(60, 60, 67, 0.36)',
+  rankingCheckBoxBorder: '#a8a8a8'
 };
 exports.Colors = Colors;
 

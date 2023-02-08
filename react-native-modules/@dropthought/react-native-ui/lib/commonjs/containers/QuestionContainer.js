@@ -23,6 +23,8 @@ var _SmileyRatingQuestionOption4 = _interopRequireDefault(require("../components
 
 var _SmileyRatingQuestionOption5 = _interopRequireDefault(require("../components/SmileyRatingQuestionOption6"));
 
+var _RankingQuestion = _interopRequireDefault(require("../components/RankingQuestion"));
+
 var _SingleChoiceQuestion = _interopRequireDefault(require("../components/SingleChoiceQuestion"));
 
 var _MultiChoiceQuestion = _interopRequireDefault(require("../components/MultiChoiceQuestion"));
@@ -34,8 +36,6 @@ var _OpenQuestion = _interopRequireDefault(require("../components/OpenQuestion")
 var _MandatoryTitle = _interopRequireDefault(require("../components/MandatoryTitle"));
 
 var _styles = _interopRequireDefault(require("../styles"));
-
-var _ = require("..");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -60,11 +60,9 @@ const TempComponent = ({
 const QuestionContainer = props => {
   const {
     onFeedback: propsOnFeedback,
-    validationStarted
-  } = props;
-  const {
+    validationStarted,
     themeOption
-  } = (0, _.useTheme)();
+  } = props;
   let QuestionComponent = TempComponent; // get/update feedback to context
 
   const feedback = (0, _feedback.useFeedbackByQid)(props.question.questionId);
@@ -135,6 +133,11 @@ const QuestionContainer = props => {
     case 'open':
       // @ts-ignore
       QuestionComponent = _OpenQuestion.default;
+      break;
+
+    case 'ranking':
+      // @ts-ignore
+      QuestionComponent = _RankingQuestion.default;
       break;
 
     default:

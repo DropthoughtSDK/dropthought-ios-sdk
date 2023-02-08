@@ -3,6 +3,7 @@ export type SurveyFeedback = import('../../data').SurveyFeedback;
 export type ScreenProps = {
     error?: Error | undefined;
     surveyFeedback?: SurveyFeedback | undefined;
+    onClose: () => void;
 };
 /**
  * @type {React.FunctionComponent<ScreenProps>}

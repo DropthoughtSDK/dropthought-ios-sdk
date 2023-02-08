@@ -1,7 +1,5 @@
 export var __esModule: boolean;
-export var APPEARANCE: any;
 export var ActivityIndicatorMask: any;
-export var COLOR_SCHEMES: any;
 export var ClassicQuestionContainer: any;
 export var Colors: any;
 export var EndScreenLayout: any;
@@ -19,6 +17,4 @@ export var QuestionContainer: any;
 export var StartScreenLayout: any;
 export var SurveyProgressBarPosition: any;
 export var SurveyScreenLayout: any;
-export var THEME_OPTION: any;
 export var i18n: any;
-export var useTheme: any;

@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:true});exports.useStableCallback=useStableCallback;var _react=require("react");function useStableCallback(fn){var fnRef=(0,_react.useRef)(fn);fnRef.current=fn;var identityRetainingFn=(0,_react.useCallback)(function(){return fnRef.current.apply(fnRef,arguments);},[]);return identityRetainingFn;}
+//# sourceMappingURL=useStableCallback.js.map

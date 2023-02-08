@@ -261,6 +261,8 @@ const defaultOnCloseHandler = () => {
 
 
 const SurveyContextProvider = ({
+  baseURL,
+  apiKey,
   visibilityId,
   surveyId,
   children,
@@ -272,6 +274,13 @@ const SurveyContextProvider = ({
   backgroundColor,
   timezone
 }) => {
+  if (baseURL || apiKey) {
+    _API.sdkFetcher.init({
+      baseURL,
+      apiKey
+    });
+  }
+
   const themeDataFromSDKEntry = {
     themeOption,
     appearance,

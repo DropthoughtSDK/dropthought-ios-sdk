@@ -12,14 +12,16 @@ import SmileyRatingQuestionOption2 from '../components/SmileyRatingQuestionOptio
 import SmileyRatingQuestionOption3 from '../components/SmileyRatingQuestionOption3';
 import SmileyRatingQuestionOption4 from '../components/SmileyRatingQuestionOption4';
 import SmileyRatingQuestionOption6 from '../components/SmileyRatingQuestionOption6';
+import RankingQuestion from '../components/RankingQuestion';
 import SingleChoiceQuestion from '../components/SingleChoiceQuestion';
 import MultiChoiceQuestion from '../components/MultiChoiceQuestion';
 import SliderRatingQuestion from '../components/SliderRatingQuestion';
 import OpenQuestion from '../components/OpenQuestion';
 import MandatoryTitle from '../components/MandatoryTitle';
 import GlobalStyle from '../styles';
-import { useTheme } from '..';
+
 import type { Question, Feedback, Survey } from '../data';
+import type { THEME_OPTION } from '../contexts/theme';
 
 const TempComponent = ({
   question,
@@ -46,11 +48,11 @@ type Props = {
   onFeedback?: (feedback: Feedback) => void;
   survey: Survey;
   pageIndex: number;
+  themeOption: THEME_OPTION;
 };
 
 const QuestionContainer = (props: Props) => {
-  const { onFeedback: propsOnFeedback, validationStarted } = props;
-  const { themeOption } = useTheme();
+  const { onFeedback: propsOnFeedback, validationStarted, themeOption } = props;
 
   let QuestionComponent = TempComponent;
 
@@ -118,6 +120,10 @@ const QuestionContainer = (props: Props) => {
     case 'open':
       // @ts-ignore
       QuestionComponent = OpenQuestion;
+      break;
+    case 'ranking':
+      // @ts-ignore
+      QuestionComponent = RankingQuestion;
       break;
     default:
       QuestionComponent = TempComponent;

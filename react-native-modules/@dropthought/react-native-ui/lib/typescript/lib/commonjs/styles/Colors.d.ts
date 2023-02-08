@@ -42,6 +42,15 @@ export namespace Colors {
     const smileyRatingScoreGray: string;
     const appearanceSubBlack: string;
     const warningRed: string;
+    const rankingBorder: string;
+    const rankingBorderDark: string;
+    const rankingBG: string;
+    const rankingBGDark: string;
+    const rankingContainerBorder: string;
+    const rankingContainerBorderDark: string;
+    const rankingContainerBgDark: string;
+    const divider: string;
+    const rankingCheckBoxBorder: string;
 }
 export function addOpacityToColor(hexColor: any, opacity: any): string;
 export function opacity10(color: any): string;
