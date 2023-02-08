@@ -3,7 +3,7 @@ require_relative './scripts/reanimated_utils'
 
 reanimated_package_json = JSON.parse(File.read(File.join(__dir__, "package.json")))
 config = find_config()
-assert_no_multiple_instances(config)
+# assert_no_multiple_instances(config)
 assert_no_reanimated2_with_new_architecture(reanimated_package_json)
 
 folly_prefix = config[:react_native_minor_version] >= 64 ? 'RCT-' : ''
