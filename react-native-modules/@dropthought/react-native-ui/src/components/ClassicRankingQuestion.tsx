@@ -21,7 +21,7 @@ import type {
   Feedback as OriginFeedback,
   Question as OriginQuestion,
 } from '../data';
-import DraggableFlatList from 'react-native-draggable-flatlist';
+// import DraggableFlatList from 'react-native-draggable-flatlist';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 
 type TransformedOption = {
@@ -356,7 +356,7 @@ const ClassicRankingQuestion = ({
               style={styles.mandatoryTitle}
             />
             {/* Do not add the margin or padding in to the DraggableFlatList, it could may list item component get wrong location */}
-            <DraggableFlatList
+            {/* <DraggableFlatList
               scrollEnabled={false}
               data={normalList}
               onDragEnd={({ data }) => {
@@ -365,7 +365,7 @@ const ClassicRankingQuestion = ({
               // @ts-ignore
               renderItem={renderItem}
               keyExtractor={(item) => item.index.toString()}
-            />
+            /> */}
             <FlatList
               scrollEnabled={false}
               data={naList}

@@ -52,7 +52,5 @@ def use_dropthought_sdk
     pod 'RNSecureKeyStore', :path => "#{third_party_prefix}/react-native-secure-key-store/ios"
     pod 'lottie-react-native', :path =>  "#{third_party_prefix}/lottie-react-native"
     pod 'lottie-ios', :path =>  "#{third_party_prefix}/lottie-ios"
-    pod 'RNGestureHandler', :path =>  "#{third_party_prefix}/react-native-gesture-handler"
-    pod 'RNReanimated', :path =>  "#{third_party_prefix}/react-native-reanimated"
 
 end

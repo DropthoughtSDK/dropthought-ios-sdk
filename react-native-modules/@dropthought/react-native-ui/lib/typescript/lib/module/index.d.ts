@@ -1,6 +1,7 @@
 export * from "./components/PlaceholderScreen";
 export * from "./hooks/useWindowDimensions";
 export * from "./contexts/theme";
+export * from "./data";
 import ClassicQuestionContainer from "./containers/ClassicQuestionContainer";
 import QuestionContainer from "./containers/QuestionContainer";
 import SurveyScreenLayout from "./containers/SurveyScreenLayout";

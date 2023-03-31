@@ -15,8 +15,6 @@ var _ClassicMandatoryTitle = _interopRequireDefault(require("./ClassicMandatoryT
 
 var _styles = _interopRequireWildcard(require("../styles"));
 
-var _reactNativeDraggableFlatlist = _interopRequireDefault(require("react-native-draggable-flatlist"));
-
 var _theme = require("../contexts/theme");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -25,6 +23,7 @@ function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "functio
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
+// import DraggableFlatList from 'react-native-draggable-flatlist';
 const swapElements = (array, index1, index2) => {
   let newArray = [...array];
   newArray[index1] = newArray.splice(index2, 1, newArray[index1])[0];
@@ -305,17 +304,6 @@ const ClassicRankingQuestion = ({
     forgot: forgot,
     question: question,
     style: styles.mandatoryTitle
-  }), /*#__PURE__*/_react.default.createElement(_reactNativeDraggableFlatlist.default, {
-    scrollEnabled: false,
-    data: normalList,
-    onDragEnd: ({
-      data
-    }) => {
-      setList([...data, ...naList]);
-    } // @ts-ignore
-    ,
-    renderItem: renderItem,
-    keyExtractor: item => item.index.toString()
   }), /*#__PURE__*/_react.default.createElement(_reactNative.FlatList, {
     scrollEnabled: false,
     data: naList // @ts-ignore

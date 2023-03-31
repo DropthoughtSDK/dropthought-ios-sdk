@@ -49,7 +49,9 @@ export const Colors = {
   rankingContainerBorderDark: '#404040',
   rankingContainerBgDark: '#39393a',
   divider: 'rgba(60, 60, 67, 0.36)',
-  rankingCheckBoxBorder: '#a8a8a8'
+  rankingCheckBoxBorder: '#a8a8a8',
+  sliderLabel: '#848a93',
+  sliderTrack: '#4b3694'
 };
 export const addOpacityToColor = (hexColor, opacity) => {
   const o = Math.max(0, Math.min(1, opacity)); // bound opacity from 0 to 1

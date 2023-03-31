@@ -17,6 +17,8 @@ import SingleChoiceQuestion from '../components/SingleChoiceQuestion';
 import MultiChoiceQuestion from '../components/MultiChoiceQuestion';
 import SliderRatingQuestion from '../components/SliderRatingQuestion';
 import OpenQuestion from '../components/OpenQuestion';
+import IconRatingQuestion from '../components/IconRatingQuestion';
+import SliderDragRatingQuestion from '../components/SliderDragRatingQuestion';
 import MandatoryTitle from '../components/MandatoryTitle';
 import GlobalStyle from '../styles';
 
@@ -108,9 +110,12 @@ const QuestionContainer = (props: Props) => {
             // @ts-ignore
             QuestionComponent = SmileyRatingQuestionOption1;
         }
-      } else {
+      } else if (props.question.subType === 'slider') {
         // @ts-ignore
         QuestionComponent = SliderRatingQuestion;
+      } else {
+        // @ts-ignore
+        QuestionComponent = IconRatingQuestion;
       }
       break;
     case 'nps':
@@ -124,6 +129,10 @@ const QuestionContainer = (props: Props) => {
     case 'ranking':
       // @ts-ignore
       QuestionComponent = RankingQuestion;
+      break;
+    case 'ratingSlider':
+      // @ts-ignore
+      QuestionComponent = SliderDragRatingQuestion;
       break;
     default:
       QuestionComponent = TempComponent;

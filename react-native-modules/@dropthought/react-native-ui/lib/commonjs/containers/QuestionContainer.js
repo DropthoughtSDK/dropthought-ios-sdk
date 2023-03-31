@@ -33,6 +33,10 @@ var _SliderRatingQuestion = _interopRequireDefault(require("../components/Slider
 
 var _OpenQuestion = _interopRequireDefault(require("../components/OpenQuestion"));
 
+var _IconRatingQuestion = _interopRequireDefault(require("../components/IconRatingQuestion"));
+
+var _SliderDragRatingQuestion = _interopRequireDefault(require("../components/SliderDragRatingQuestion"));
+
 var _MandatoryTitle = _interopRequireDefault(require("../components/MandatoryTitle"));
 
 var _styles = _interopRequireDefault(require("../styles"));
@@ -118,9 +122,12 @@ const QuestionContainer = props => {
             // @ts-ignore
             QuestionComponent = _SmileyRatingQuestionOption.default;
         }
-      } else {
+      } else if (props.question.subType === 'slider') {
         // @ts-ignore
         QuestionComponent = _SliderRatingQuestion.default;
+      } else {
+        // @ts-ignore
+        QuestionComponent = _IconRatingQuestion.default;
       }
 
       break;
@@ -138,6 +145,11 @@ const QuestionContainer = props => {
     case 'ranking':
       // @ts-ignore
       QuestionComponent = _RankingQuestion.default;
+      break;
+
+    case 'ratingSlider':
+      // @ts-ignore
+      QuestionComponent = _SliderDragRatingQuestion.default;
       break;
 
     default:

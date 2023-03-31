@@ -3,7 +3,7 @@ import { View, Image, TouchableOpacity, Text, StyleSheet, Modal, ScrollView, Fla
 import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
 import ClassicMandatoryTitle from './ClassicMandatoryTitle';
 import GlobalStyle, { Colors } from '../styles';
-import DraggableFlatList from 'react-native-draggable-flatlist';
+// import DraggableFlatList from 'react-native-draggable-flatlist';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 
 const swapElements = (array, index1, index2) => {
@@ -285,17 +285,6 @@ const ClassicRankingQuestion = ({
     forgot: forgot,
     question: question,
     style: styles.mandatoryTitle
-  }), /*#__PURE__*/React.createElement(DraggableFlatList, {
-    scrollEnabled: false,
-    data: normalList,
-    onDragEnd: ({
-      data
-    }) => {
-      setList([...data, ...naList]);
-    } // @ts-ignore
-    ,
-    renderItem: renderItem,
-    keyExtractor: item => item.index.toString()
   }), /*#__PURE__*/React.createElement(FlatList, {
     scrollEnabled: false,
     data: naList // @ts-ignore

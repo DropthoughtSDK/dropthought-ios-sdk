@@ -50,6 +50,8 @@ export declare const Colors: {
     rankingContainerBgDark: string;
     divider: string;
     rankingCheckBoxBorder: string;
+    sliderLabel: string;
+    sliderTrack: string;
 };
 export declare const addOpacityToColor: (hexColor: string, opacity: number) => string;
 export declare const opacity10: (color: string) => string;

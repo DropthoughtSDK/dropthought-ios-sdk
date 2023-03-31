@@ -1,10 +1,6 @@
 import React from 'react';
 import type { Feedback as OriginFeedback, Question as OriginQuestion } from '../data';
-declare type TransformedOption = {
-    option: string;
-    index: number;
-    isNA: boolean;
-};
+import type { TransformedOption } from '../utils/react-native-draggable-list/DraggableList';
 declare type Feedback = OriginFeedback & {
     listForRankingQuestion: TransformedOption[];
 };

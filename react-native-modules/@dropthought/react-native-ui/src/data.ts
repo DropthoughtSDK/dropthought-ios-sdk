@@ -5,6 +5,7 @@ export type {
   BackgroundColor,
   IThemeOptionType,
 } from './contexts/theme';
+import type { RatingIconType } from './constants/RatingQuestionConstants';
 
 export type QuestionType =
   | 'rating'
@@ -12,9 +13,10 @@ export type QuestionType =
   | 'multiChoice'
   | 'singleChoice'
   | 'nps'
-  | 'ranking';
+  | 'ranking'
+  | 'ratingSlider';
 
-export type QuestionSubType = 'smiley' | 'slider';
+export type QuestionSubType = 'smiley' | 'slider' | RatingIconType;
 
 export type QuestionBrandType = 'other';
 

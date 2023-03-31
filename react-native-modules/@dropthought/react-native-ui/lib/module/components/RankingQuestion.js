@@ -1,16 +1,102 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Platform, ScrollView, View, Image, TouchableOpacity, Text, Modal, FlatList, ActionSheetIOS } from 'react-native';
+import { StyleSheet, Platform, ScrollView, View, Image, TouchableOpacity, Text, Modal, ActionSheetIOS, FlatList } from 'react-native';
 import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
 import MandatoryTitle from './MandatoryTitle';
 import GlobalStyle, { Colors, addOpacityToColor } from '../styles';
-import DraggableFlatList from 'react-native-draggable-flatlist';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
+import DraggableList from '../utils/react-native-draggable-list/DraggableList';
 
 const swapElements = (array, index1, index2) => {
   let newArray = [...array];
   newArray[index1] = newArray.splice(index2, 1, newArray[index1])[0];
   return newArray;
 };
+
+function RankingItem({
+  item,
+  index,
+  allowNAForRanking,
+  themeColor,
+  onRankPress,
+  onNAPress
+}) {
+  const {
+    fontColor,
+    colorScheme
+  } = useTheme();
+  const isDarkMode = colorScheme === COLOR_SCHEMES.dark;
+  const {
+    option,
+    isNA
+  } = item;
+  const dragIconStyle = {
+    tintColor: isDarkMode ? undefined : themeColor,
+    opacity: isNA ? 0.3 : 1
+  };
+  const hitSlop = {
+    top: 12,
+    bottom: 12,
+    left: 5,
+    right: 5
+  };
+  const checkBoxStyle = {
+    tintColor: themeColor
+  };
+  const naComponent = allowNAForRanking ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(View, {
+    style: styles.divider
+  }), /*#__PURE__*/React.createElement(TouchableOpacity, {
+    style: GlobalStyle.row,
+    hitSlop: hitSlop,
+    onPress: () => onNAPress(item)
+  }, isNA ? /*#__PURE__*/React.createElement(Image, {
+    style: checkBoxStyle,
+    source: require('../assets/icCheckBoxRounded.png')
+  }) : /*#__PURE__*/React.createElement(View, {
+    style: [styles.unCheckBox, {
+      borderColor: isDarkMode ? Colors.rankingCheckBoxBorder : themeColor !== null && themeColor !== void 0 ? themeColor : Colors.rankingCheckBoxBorder
+    }]
+  }), /*#__PURE__*/React.createElement(Text, {
+    style: [styles.naText, {
+      color: fontColor
+    }]
+  }, 'N/A'))) : null;
+  const rankText = isNA ? 'NA' : `${index + 1}`;
+  const renderItemStyle = isDarkMode ? {
+    backgroundColor: Colors.rankingBGDark,
+    borderColor: Colors.rankingBorderDark
+  } : {
+    backgroundColor: themeColor ? addOpacityToColor(themeColor, 0.05) : Colors.rankingBGDark,
+    borderColor: themeColor ? addOpacityToColor(themeColor, 0.1) : Colors.rankingBorderDark
+  };
+  const rankingContainerStyle = isDarkMode ? {
+    backgroundColor: Colors.rankingContainerBgDark,
+    borderColor: Colors.rankingContainerBorderDark
+  } : {
+    borderColor: themeColor ? addOpacityToColor(themeColor, 0.3) : Colors.rankingBorderDark
+  };
+  return /*#__PURE__*/React.createElement(View, {
+    style: [styles.renderItem, renderItemStyle]
+  }, /*#__PURE__*/React.createElement(Image, {
+    style: dragIconStyle,
+    source: require('../assets/icDrag.png')
+  }), /*#__PURE__*/React.createElement(Text, {
+    style: [styles.rankTitle, {
+      color: fontColor
+    }],
+    numberOfLines: 0
+  }, `${option}`), /*#__PURE__*/React.createElement(TouchableOpacity, {
+    style: [styles.rankingContainer, rankingContainerStyle],
+    hitSlop: hitSlop,
+    disabled: isNA,
+    onPress: () => onRankPress(item)
+  }, /*#__PURE__*/React.createElement(Text, {
+    style: [styles.rankText, {
+      color: fontColor
+    }]
+  }, rankText), /*#__PURE__*/React.createElement(Image, {
+    source: require('../assets/ic-expand-more-24-px.png')
+  })), naComponent);
+}
 
 const RankingQuestion = ({
   question,
@@ -20,7 +106,6 @@ const RankingQuestion = ({
   themeColor
 }) => {
   const {
-    fontColor,
     colorScheme
   } = useTheme();
   const isDarkMode = colorScheme === COLOR_SCHEMES.dark;
@@ -39,8 +124,15 @@ const RankingQuestion = ({
     };
   }));
   const [list, setList] = useState(originListRef.current);
+  const [normalList, setNormalList] = useState(list);
+  const [naList, setNaList] = useState([]);
   const [visible, setVisible] = useState(false);
   const [selectedOption, setSelectedOption] = useState();
+  useEffect(() => {
+    console.log('recalculate');
+    setNormalList(list.filter(current => !current.isNA));
+    setNaList(list.filter(current => current.isNA));
+  }, [list]);
   useEffect(() => {
     const {
       listForRankingQuestion
@@ -87,7 +179,12 @@ const RankingQuestion = ({
     onFeedback(result);
   }, [list, onFeedback, questionId]);
 
-  const onNAPress = item => {
+  const onRankPressHandler = item => {
+    setSelectedOption(item);
+    isIPhone ? oniOSModal(item) : setVisible(true);
+  };
+
+  const onNAPressHandler = item => {
     if (list) {
       item.isNA = !item.isNA;
       setList(prev => {
@@ -100,93 +197,6 @@ const RankingQuestion = ({
       });
     }
   };
-
-  const renderItem = ({
-    item,
-    index = 0,
-    drag
-  }) => {
-    const {
-      option,
-      isNA
-    } = item;
-    const dragIconStyle = {
-      tintColor: isDarkMode ? undefined : themeColor,
-      opacity: isNA ? 0.3 : 1
-    };
-    const hitSlop = {
-      top: 12,
-      bottom: 12,
-      left: 5,
-      right: 5
-    };
-    const checkBoxStyle = {
-      tintColor: themeColor
-    };
-    const naComponent = allowNAForRanking ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(View, {
-      style: styles.divider
-    }), /*#__PURE__*/React.createElement(TouchableOpacity, {
-      style: GlobalStyle.row,
-      hitSlop: hitSlop,
-      onPress: () => onNAPress(item)
-    }, isNA ? /*#__PURE__*/React.createElement(Image, {
-      style: checkBoxStyle,
-      source: require('../assets/icCheckBoxRounded.png')
-    }) : /*#__PURE__*/React.createElement(View, {
-      style: [styles.unCheckBox, {
-        borderColor: isDarkMode ? Colors.rankingCheckBoxBorder : themeColor !== null && themeColor !== void 0 ? themeColor : Colors.rankingCheckBoxBorder
-      }]
-    }), /*#__PURE__*/React.createElement(Text, {
-      style: [styles.naText, {
-        color: fontColor
-      }]
-    }, 'N/A'))) : null;
-    const rankText = isNA ? 'NA' : `${index + 1}`;
-    const renderItemStyle = isDarkMode ? {
-      backgroundColor: Colors.rankingBGDark,
-      borderColor: Colors.rankingBorderDark
-    } : {
-      backgroundColor: themeColor ? addOpacityToColor(themeColor, 0.05) : Colors.rankingBGDark,
-      borderColor: themeColor ? addOpacityToColor(themeColor, 0.1) : Colors.rankingBorderDark
-    };
-    const rankingContainerStyle = isDarkMode ? {
-      backgroundColor: Colors.rankingContainerBgDark,
-      borderColor: Colors.rankingContainerBorderDark
-    } : {
-      borderColor: themeColor ? addOpacityToColor(themeColor, 0.3) : Colors.rankingBorderDark
-    };
-    return /*#__PURE__*/React.createElement(TouchableOpacity, {
-      style: [styles.renderItem, renderItemStyle],
-      disabled: isNA,
-      delayLongPress: 200,
-      onLongPress: drag
-    }, /*#__PURE__*/React.createElement(Image, {
-      style: dragIconStyle,
-      source: require('../assets/icDrag.png')
-    }), /*#__PURE__*/React.createElement(Text, {
-      style: [styles.rankTitle, {
-        color: fontColor
-      }],
-      numberOfLines: 2
-    }, option), /*#__PURE__*/React.createElement(TouchableOpacity, {
-      style: [styles.rankingContainer, rankingContainerStyle],
-      hitSlop: hitSlop,
-      disabled: isNA,
-      onPress: () => {
-        setSelectedOption(item);
-        isIPhone ? oniOSModal(item) : setVisible(true);
-      }
-    }, /*#__PURE__*/React.createElement(Text, {
-      style: [styles.rankText, {
-        color: fontColor
-      }]
-    }, rankText), /*#__PURE__*/React.createElement(Image, {
-      source: require('../assets/ic-expand-more-24-px.png')
-    })), naComponent);
-  };
-
-  const normalList = list.filter(current => !current.isNA);
-  const naList = list.filter(current => current.isNA);
 
   const oniOSModal = selectedItem => {
     const actionSheetOptions = ['Cancel', ...normalList.map((_, index) => (index + 1).toString()), 'N/A'];
@@ -201,7 +211,7 @@ const RankingQuestion = ({
       if (buttonIndex === 0) {
         return;
       } else if (buttonIndex === actionSheetOptions.length - 1) {
-        onNAPress(selectedItem);
+        onNAPressHandler(selectedItem);
       } else {
         setList(prev => {
           // swap
@@ -254,7 +264,7 @@ const RankingQuestion = ({
   }), allowNAForRanking ? /*#__PURE__*/React.createElement(TouchableOpacity, {
     onPress: () => {
       if (selectedOption) {
-        onNAPress(selectedOption);
+        onNAPressHandler(selectedOption);
       }
 
       setVisible(false);
@@ -264,8 +274,27 @@ const RankingQuestion = ({
   }), /*#__PURE__*/React.createElement(Text, {
     style: styles.modalTitle
   }, 'N/A')) : null))));
+
+  const renderItem = ({
+    item,
+    index
+  }) => {
+    return /*#__PURE__*/React.createElement(RankingItem, {
+      item: item,
+      index: index,
+      allowNAForRanking: allowNAForRanking,
+      themeColor: themeColor,
+      onRankPress: onRankPressHandler,
+      onNAPress: onNAPressHandler
+    });
+  };
+
+  useEffect(() => {
+    console.log('==== na list changed: ', naList);
+  }, [naList]);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ScrollView, {
-    style: styles.container
+    style: styles.container,
+    scrollEnabled: false
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     style: styles.mandatoryTitle,
     forgot: forgot,
@@ -276,19 +305,18 @@ const RankingQuestion = ({
     contentContainerStyle: styles.scrollViewContainer
   }, /*#__PURE__*/React.createElement(View, {
     style: styles.questionContainer
-  }, /*#__PURE__*/React.createElement(DraggableFlatList, {
-    scrollEnabled: false,
+  }, /*#__PURE__*/React.createElement(DraggableList, {
     data: normalList,
-    onDragEnd: ({
-      data
-    }) => setList([...data, ...naList]) // @ts-ignore
-    ,
     renderItem: renderItem,
-    keyExtractor: item => item.index.toString()
+    onDragEnd: newList => {
+      setList(prev => {
+        const localNAList = prev.filter(current => current.isNA);
+        return [...newList, ...localNAList];
+      });
+    }
   }), /*#__PURE__*/React.createElement(FlatList, {
     scrollEnabled: false,
-    data: naList // @ts-ignore
-    ,
+    data: naList,
     renderItem: renderItem,
     keyExtractor: (_, index) => index.toString()
   })))), rankingModal);
@@ -308,14 +336,14 @@ const styles = StyleSheet.create({
     marginBottom: 54
   },
   renderItem: { ...GlobalStyle.row,
-    minHeight: 48,
+    minHeight: 50,
     marginVertical: 4,
     borderWidth: 1,
     borderRadius: 12,
     borderColor: Colors.rankingBorder,
     paddingHorizontal: 12,
     backgroundColor: Colors.rankingBG,
-    paddingVertical: 15
+    paddingVertical: 12
   },
   rankTitle: {
     flex: 1,
@@ -392,8 +420,7 @@ const styles = StyleSheet.create({
     marginHorizontal: -23
   },
   questionContainer: {
-    width: '100%',
-    height: '100%'
+    width: '100%'
   },
   modalDismissArea: {
     width: '100%',

@@ -50,6 +50,8 @@ export namespace Colors {
     const rankingContainerBgDark: string;
     const divider: string;
     const rankingCheckBoxBorder: string;
+    const sliderLabel: string;
+    const sliderTrack: string;
 }
 export function addOpacityToColor(hexColor: any, opacity: any): string;
 export function opacity10(color: any): string;

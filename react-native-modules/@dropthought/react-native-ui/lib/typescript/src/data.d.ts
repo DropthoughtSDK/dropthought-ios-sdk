@@ -1,6 +1,7 @@
 export type { IColorSchemesType, IAppearanceType, FontColor, BackgroundColor, IThemeOptionType, } from './contexts/theme';
-export declare type QuestionType = 'rating' | 'open' | 'multiChoice' | 'singleChoice' | 'nps' | 'ranking';
-export declare type QuestionSubType = 'smiley' | 'slider';
+import type { RatingIconType } from './constants/RatingQuestionConstants';
+export declare type QuestionType = 'rating' | 'open' | 'multiChoice' | 'singleChoice' | 'nps' | 'ranking' | 'ratingSlider';
+export declare type QuestionSubType = 'smiley' | 'slider' | RatingIconType;
 export declare type QuestionBrandType = 'other';
 export declare type QuestionMetaDataType = 'Name' | 'Email' | 'Phone' | 'Number' | 'Date' | 'String';
 export declare type ProgramStateType = 'expired' | 'drafts' | 'active' | 'scheduled';

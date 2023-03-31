@@ -11,6 +11,8 @@ import ClassicSingleChoiceQuestion from '../components/ClassicSingleChoiceQuesti
 import ClassicMultiChoiceQuestion from '../components/ClassicMultiChoiceQuestion';
 import ClassicSmileyRatingQuestion from '../components/ClassicSmileyRatingQuestion';
 import ClassicSliderRatingQuestion from '../components/ClassicSliderRatingQuestion';
+import ClassicSliderDragRatingQuestion from '../components/ClassicSliderDragRatingQuestion';
+import ClassicIconRatingQuestion from '../components/ClassicIconRatingQuestion';
 import ClassicRankingQuestion from '../components/ClassicRankingQuestion';
 import ClassicOpenQuestion from '../components/ClassicOpenQuestion';
 import ClassicMandatoryTitle from '../components/ClassicMandatoryTitle';
@@ -73,9 +75,12 @@ const ClassicQuestionContainer = (props: Props) => {
       if (props.question.subType === 'smiley') {
         // @ts-ignore
         QuestionComponent = ClassicSmileyRatingQuestion;
-      } else {
+      } else if (props.question.subType === 'slider') {
         // @ts-ignore
         QuestionComponent = ClassicSliderRatingQuestion;
+      } else {
+        // @ts-ignore
+        QuestionComponent = ClassicIconRatingQuestion;
       }
       break;
     case 'nps':
@@ -89,6 +94,10 @@ const ClassicQuestionContainer = (props: Props) => {
     case 'ranking':
       // @ts-ignore
       QuestionComponent = ClassicRankingQuestion;
+      break;
+    case 'ratingSlider':
+      // @ts-ignore
+      QuestionComponent = ClassicSliderDragRatingQuestion;
       break;
     default:
       QuestionComponent = TempComponent;

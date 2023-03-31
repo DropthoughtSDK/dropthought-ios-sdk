@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   Text,
   Modal,
-  FlatList,
   ActionSheetIOS,
+  FlatList,
 } from 'react-native';
 import {
   DimensionWidthType,
@@ -21,20 +21,16 @@ import type {
   Feedback as OriginFeedback,
   Question as OriginQuestion,
 } from '../data';
-import DraggableFlatList from 'react-native-draggable-flatlist';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
+import DraggableList from '../utils/react-native-draggable-list/DraggableList';
+import type {
+  DraggableListRenderItem,
+  TransformedOption,
+} from '../utils/react-native-draggable-list/DraggableList';
 
-type TransformedOption = {
-  option: string;
-  index: number;
-  isNA: boolean;
-};
-
-type RenderItemParams = {
+type RenderItemProps = {
   item: TransformedOption;
-  index?: number;
-  drag: () => void;
-  isActive: boolean;
+  index: number;
 };
 
 interface SwapElements {
@@ -61,6 +57,108 @@ const swapElements: SwapElements = (array, index1, index2) => {
   return newArray;
 };
 
+type RankingItemProps = {
+  item: TransformedOption;
+  index: number;
+  allowNAForRanking: boolean;
+  themeColor: string;
+  onRankPress: (item: TransformedOption) => void;
+  onNAPress: (item: TransformedOption) => void;
+};
+
+function RankingItem({
+  item,
+  index,
+  allowNAForRanking,
+  themeColor,
+  onRankPress,
+  onNAPress,
+}: RankingItemProps) {
+  const { fontColor, colorScheme } = useTheme();
+  const isDarkMode = colorScheme === COLOR_SCHEMES.dark;
+
+  const { option, isNA } = item;
+  const dragIconStyle = {
+    tintColor: isDarkMode ? undefined : themeColor,
+    opacity: isNA ? 0.3 : 1,
+  };
+
+  const hitSlop = { top: 12, bottom: 12, left: 5, right: 5 };
+  const checkBoxStyle = { tintColor: themeColor };
+  const naComponent = allowNAForRanking ? (
+    <>
+      <View style={styles.divider} />
+      <TouchableOpacity
+        style={GlobalStyle.row}
+        hitSlop={hitSlop}
+        onPress={() => onNAPress(item)}
+      >
+        {isNA ? (
+          <Image
+            style={checkBoxStyle}
+            source={require('../assets/icCheckBoxRounded.png')}
+          />
+        ) : (
+          <View
+            style={[
+              styles.unCheckBox,
+              {
+                borderColor: isDarkMode
+                  ? Colors.rankingCheckBoxBorder
+                  : themeColor ?? Colors.rankingCheckBoxBorder,
+              },
+            ]}
+          />
+        )}
+        <Text style={[styles.naText, { color: fontColor }]}>{'N/A'}</Text>
+      </TouchableOpacity>
+    </>
+  ) : null;
+
+  const rankText = isNA ? 'NA' : `${index + 1}`;
+  const renderItemStyle = isDarkMode
+    ? {
+        backgroundColor: Colors.rankingBGDark,
+        borderColor: Colors.rankingBorderDark,
+      }
+    : {
+        backgroundColor: themeColor
+          ? addOpacityToColor(themeColor, 0.05)
+          : Colors.rankingBGDark,
+        borderColor: themeColor
+          ? addOpacityToColor(themeColor, 0.1)
+          : Colors.rankingBorderDark,
+      };
+  const rankingContainerStyle = isDarkMode
+    ? {
+        backgroundColor: Colors.rankingContainerBgDark,
+        borderColor: Colors.rankingContainerBorderDark,
+      }
+    : {
+        borderColor: themeColor
+          ? addOpacityToColor(themeColor, 0.3)
+          : Colors.rankingBorderDark,
+      };
+  return (
+    <View style={[styles.renderItem, renderItemStyle]}>
+      <Image style={dragIconStyle} source={require('../assets/icDrag.png')} />
+      <Text style={[styles.rankTitle, { color: fontColor }]} numberOfLines={0}>
+        {`${option}`}
+      </Text>
+      <TouchableOpacity
+        style={[styles.rankingContainer, rankingContainerStyle]}
+        hitSlop={hitSlop}
+        disabled={isNA}
+        onPress={() => onRankPress(item)}
+      >
+        <Text style={[styles.rankText, { color: fontColor }]}>{rankText}</Text>
+        <Image source={require('../assets/ic-expand-more-24-px.png')} />
+      </TouchableOpacity>
+      {naComponent}
+    </View>
+  );
+}
+
 type Props = {
   question: Question;
   onFeedback: (feedback: Feedback) => void;
@@ -76,7 +174,7 @@ const RankingQuestion = ({
   feedback,
   themeColor,
 }: Props) => {
-  const { fontColor, colorScheme } = useTheme();
+  const { colorScheme } = useTheme();
   const isDarkMode = colorScheme === COLOR_SCHEMES.dark;
 
   const dimensionWidthType = useDimensionWidthType();
@@ -92,8 +190,19 @@ const RankingQuestion = ({
   );
 
   const [list, setList] = useState(originListRef.current);
+
+  const [normalList, setNormalList] = useState(list);
+  const [naList, setNaList] = useState<TransformedOption[]>([]);
+
   const [visible, setVisible] = useState(false);
   const [selectedOption, setSelectedOption] = useState<TransformedOption>();
+
+  useEffect(() => {
+    console.log('recalculate');
+
+    setNormalList(list.filter((current) => !current.isNA));
+    setNaList(list.filter((current) => current.isNA));
+  }, [list]);
 
   useEffect(() => {
     const { listForRankingQuestion } = feedback ?? {};
@@ -131,7 +240,12 @@ const RankingQuestion = ({
     onFeedback(result);
   }, [list, onFeedback, questionId]);
 
-  const onNAPress = (item: TransformedOption) => {
+  const onRankPressHandler = (item: TransformedOption) => {
+    setSelectedOption(item);
+    isIPhone ? oniOSModal(item) : setVisible(true);
+  };
+
+  const onNAPressHandler = (item: TransformedOption) => {
     if (list) {
       item.isNA = !item.isNA;
       setList((prev) => {
@@ -144,104 +258,6 @@ const RankingQuestion = ({
       });
     }
   };
-
-  const renderItem = ({ item, index = 0, drag }: RenderItemParams) => {
-    const { option, isNA } = item;
-    const dragIconStyle = {
-      tintColor: isDarkMode ? undefined : themeColor,
-      opacity: isNA ? 0.3 : 1,
-    };
-
-    const hitSlop = { top: 12, bottom: 12, left: 5, right: 5 };
-    const checkBoxStyle = { tintColor: themeColor };
-    const naComponent = allowNAForRanking ? (
-      <>
-        <View style={styles.divider} />
-        <TouchableOpacity
-          style={GlobalStyle.row}
-          hitSlop={hitSlop}
-          onPress={() => onNAPress(item)}
-        >
-          {isNA ? (
-            <Image
-              style={checkBoxStyle}
-              source={require('../assets/icCheckBoxRounded.png')}
-            />
-          ) : (
-            <View
-              style={[
-                styles.unCheckBox,
-                {
-                  borderColor: isDarkMode
-                    ? Colors.rankingCheckBoxBorder
-                    : themeColor ?? Colors.rankingCheckBoxBorder,
-                },
-              ]}
-            />
-          )}
-          <Text style={[styles.naText, { color: fontColor }]}>{'N/A'}</Text>
-        </TouchableOpacity>
-      </>
-    ) : null;
-
-    const rankText = isNA ? 'NA' : `${index + 1}`;
-    const renderItemStyle = isDarkMode
-      ? {
-          backgroundColor: Colors.rankingBGDark,
-          borderColor: Colors.rankingBorderDark,
-        }
-      : {
-          backgroundColor: themeColor
-            ? addOpacityToColor(themeColor, 0.05)
-            : Colors.rankingBGDark,
-          borderColor: themeColor
-            ? addOpacityToColor(themeColor, 0.1)
-            : Colors.rankingBorderDark,
-        };
-    const rankingContainerStyle = isDarkMode
-      ? {
-          backgroundColor: Colors.rankingContainerBgDark,
-          borderColor: Colors.rankingContainerBorderDark,
-        }
-      : {
-          borderColor: themeColor
-            ? addOpacityToColor(themeColor, 0.3)
-            : Colors.rankingBorderDark,
-        };
-    return (
-      <TouchableOpacity
-        style={[styles.renderItem, renderItemStyle]}
-        disabled={isNA}
-        delayLongPress={200}
-        onLongPress={drag}
-      >
-        <Image style={dragIconStyle} source={require('../assets/icDrag.png')} />
-        <Text
-          style={[styles.rankTitle, { color: fontColor }]}
-          numberOfLines={2}
-        >
-          {option}
-        </Text>
-        <TouchableOpacity
-          style={[styles.rankingContainer, rankingContainerStyle]}
-          hitSlop={hitSlop}
-          disabled={isNA}
-          onPress={() => {
-            setSelectedOption(item);
-            isIPhone ? oniOSModal(item) : setVisible(true);
-          }}
-        >
-          <Text style={[styles.rankText, { color: fontColor }]}>
-            {rankText}
-          </Text>
-          <Image source={require('../assets/ic-expand-more-24-px.png')} />
-        </TouchableOpacity>
-        {naComponent}
-      </TouchableOpacity>
-    );
-  };
-  const normalList = list.filter((current) => !current.isNA);
-  const naList = list.filter((current) => current.isNA);
 
   const oniOSModal = (selectedItem: TransformedOption) => {
     const actionSheetOptions = [
@@ -262,7 +278,7 @@ const RankingQuestion = ({
         if (buttonIndex === 0) {
           return;
         } else if (buttonIndex === actionSheetOptions.length - 1) {
-          onNAPress(selectedItem);
+          onNAPressHandler(selectedItem);
         } else {
           setList((prev) => {
             // swap
@@ -319,7 +335,7 @@ const RankingQuestion = ({
               <TouchableOpacity
                 onPress={() => {
                   if (selectedOption) {
-                    onNAPress(selectedOption);
+                    onNAPressHandler(selectedOption);
                   }
                   setVisible(false);
                 }}
@@ -334,38 +350,57 @@ const RankingQuestion = ({
     </Modal>
   );
 
+  const renderItem: DraggableListRenderItem = ({
+    item,
+    index,
+  }: RenderItemProps) => {
+    return (
+      <RankingItem
+        item={item}
+        index={index}
+        allowNAForRanking={allowNAForRanking}
+        themeColor={themeColor}
+        onRankPress={onRankPressHandler}
+        onNAPress={onNAPressHandler}
+      />
+    );
+  };
+
+  useEffect(() => {
+    console.log('==== na list changed: ', naList);
+  }, [naList]);
+
   return (
     <>
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container} scrollEnabled={false}>
         <MandatoryTitle
           style={styles.mandatoryTitle}
           forgot={forgot}
           question={question}
         />
+        {/* keep the ScrollView below to prevent error => "VirtualizedLists 
+            should never be nested inside plain ScrollViews with the same 
+            orientation because it can break windowing and other functionality
+            - use another VirtualizedList-backed container instead" */}
         <ScrollView
           horizontal={true}
           scrollEnabled={false}
           contentContainerStyle={styles.scrollViewContainer}
         >
-          {/* keep above ScrollView to prevent error => "VirtualizedLists 
-              should never be nested inside plain ScrollViews with the same 
-              orientation because it can break windowing and other functionality
-              - use another VirtualizedList-backed container instead" */}
           <View style={styles.questionContainer}>
-            {/* Do not add the margin or padding in to the DraggableFlatList, 
-                it could may list item component get wrong location */}
-            <DraggableFlatList
-              scrollEnabled={false}
+            <DraggableList
               data={normalList}
-              onDragEnd={({ data }) => setList([...data, ...naList])}
-              // @ts-ignore
               renderItem={renderItem}
-              keyExtractor={(item) => item.index.toString()}
+              onDragEnd={(newList) => {
+                setList((prev) => {
+                  const localNAList = prev.filter((current) => current.isNA);
+                  return [...newList, ...localNAList];
+                });
+              }}
             />
             <FlatList
               scrollEnabled={false}
               data={naList}
-              // @ts-ignore
               renderItem={renderItem}
               keyExtractor={(_, index) => index.toString()}
             />
@@ -393,14 +428,14 @@ const styles = StyleSheet.create({
   },
   renderItem: {
     ...GlobalStyle.row,
-    minHeight: 48,
+    minHeight: 50,
     marginVertical: 4,
     borderWidth: 1,
     borderRadius: 12,
     borderColor: Colors.rankingBorder,
     paddingHorizontal: 12,
     backgroundColor: Colors.rankingBG,
-    paddingVertical: 15,
+    paddingVertical: 12,
   },
   rankTitle: {
     flex: 1,
@@ -480,7 +515,6 @@ const styles = StyleSheet.create({
   },
   questionContainer: {
     width: '100%',
-    height: '100%',
   },
   modalDismissArea: {
     width: '100%',

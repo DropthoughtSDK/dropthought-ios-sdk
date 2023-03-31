@@ -1,0 +1,69 @@
+import type * as React from 'react';
+import type { Animated, ImageSourcePropType, ViewStyle } from 'react-native';
+export declare type Dimensions = {
+    height: number;
+    width: number;
+};
+/**
+ * Callback for slider change events. The second number value will be only if provided an array with two values in `value` prop
+ */
+export declare type SliderOnChangeCallback = (value: number | Array<number>) => void;
+export declare type SliderProps = {
+    animateTransitions?: boolean;
+    animationConfig?: {
+        spring?: Animated.AnimatedProps<ViewStyle>;
+        timing?: Animated.AnimatedProps<ViewStyle>;
+    };
+    animationType: 'spring' | 'timing';
+    containerStyle?: ViewStyle;
+    debugTouchArea?: boolean;
+    disabled?: boolean;
+    maximumTrackTintColor?: string;
+    maximumValue: number;
+    minimumTrackTintColor?: string;
+    minimumValue: number;
+    onSlidingComplete?: SliderOnChangeCallback;
+    onSlidingStart?: SliderOnChangeCallback;
+    onValueChange?: SliderOnChangeCallback;
+    renderAboveThumbComponent?: (value: number, index: number) => React.ReactNode;
+    renderBelowThumbComponent?: (value: number, index: number) => React.ReactNode;
+    renderThumbComponent?: () => React.ReactNode | Array<() => React.ReactNode>;
+    renderTrackMarkComponent?: (index: number) => React.ReactNode;
+    step?: number;
+    thumbImage?: ImageSourcePropType;
+    thumbStyle?: ViewStyle;
+    thumbTintColor?: string;
+    thumbTouchSize?: Dimensions;
+    trackClickable?: boolean;
+    trackMarks?: Array<number>;
+    trackStyle?: ViewStyle;
+    minimumTrackStyle?: ViewStyle;
+    maximumTrackStyle?: ViewStyle;
+    value?: Animated.Value | number | Array<number>;
+    /**
+     * Allows the start from the zero value. The minimum value track can be rendered in two directions from zero.
+     * Can be applied only with a single numeric value, negative minimum value, and positive maximum value.
+     */
+    startFromZero?: boolean;
+    vertical?: boolean;
+};
+export declare type SliderState = {
+    allMeasured: boolean;
+    containerSize: Dimensions;
+    thumbSize: Dimensions;
+    trackMarksValues?: Array<Animated.Value>;
+    values: Array<Animated.Value>;
+};
+export declare type SliderContainerProps = {
+    children?: React.ReactElement;
+    value: number;
+    setValue: React.Dispatch<React.SetStateAction<number[]>>;
+    trackMarks?: number[];
+    trackMarkStyles?: {
+        activeMark: ViewStyle;
+        inactiveMark: ViewStyle;
+    };
+    containerStyle?: ViewStyle;
+    onCustomValueChange: () => void;
+};
+export declare type CustomSliderProps = SliderProps & SliderContainerProps;
