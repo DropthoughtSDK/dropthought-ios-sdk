@@ -4,23 +4,26 @@ import { Animated, PanResponder, LayoutChangeEvent } from 'react-native';
 type DraggableItemProps = {
   children: React.ReactNode;
   index: number;
-  onDrag: (y: number) => void;
+  onDragStart: () => void;
+  onDrag: (pan: Animated.ValueXY, y: number) => void;
   onDragEnd: (pan: Animated.ValueXY) => void;
   onLayout: (event: LayoutChangeEvent) => void;
   forceReset: boolean;
   movements: number;
+  draggable: boolean;
 };
 
 function DraggableItem({
   children,
   index,
+  onDragStart,
   onDrag,
   onDragEnd,
   onLayout,
   forceReset,
   movements,
+  draggable,
 }: DraggableItemProps) {
-  const valRef = useRef({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const isDraggingRef = useRef(false);
 
@@ -30,7 +33,10 @@ function DraggableItem({
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => {
-        return true;
+        return draggable;
+      },
+      onPanResponderStart: (_e, _gestureState) => {
+        onDragStart();
       },
       onPanResponderGrant: (_e, _gesture) => {
         longPressTimeout.current = setTimeout(() => {
@@ -43,7 +49,7 @@ function DraggableItem({
       },
       onPanResponderMove: (_, gesture) => {
         if (isDraggingRef.current) {
-          pan.y.setValue(gesture.dy);
+          onDrag && onDrag(pan, gesture.dy);
         }
       },
       onPanResponderRelease: (_e, _gesture) => {
@@ -63,15 +69,6 @@ function DraggableItem({
       },
     })
   );
-
-  useEffect(() => {
-    pan.addListener((value) => {
-      valRef.current = value;
-      if (isDraggingRef.current) {
-        onDrag && onDrag(value.y);
-      }
-    });
-  }, [onDrag, pan]);
 
   const shouldMoveRef = useRef(movements);
   useEffect(() => {

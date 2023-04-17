@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 var _exportNames = {
+  BASE_URL: true,
   initialize: true,
   feedbackUploader: true,
   initializeWithAPIKey: true
@@ -15,7 +16,7 @@ Object.defineProperty(exports, "initializeWithAPIKey", {
     return _initialize.initializeWithAPIKey;
   }
 });
-exports.feedbackUploader = void 0;
+exports.feedbackUploader = exports.BASE_URL = void 0;
 
 var _initialize = require("./initialize");
 
@@ -35,7 +36,8 @@ Object.keys(_kioskRnSdk).forEach(function (key) {
   });
 });
 // @ts-ignore
-const BASE_URL = 'https://stage-api.dropthought.com/dtapp';
+const BASE_URL = 'https://api.dropthought.com/dtapp';
+exports.BASE_URL = BASE_URL;
 
 function initialize(params) {
   (0, _initialize.initializeWithAPIKey)({ ...params,

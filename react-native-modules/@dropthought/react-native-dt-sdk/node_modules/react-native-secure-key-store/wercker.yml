@@ -1,0 +1,18 @@
+box:
+ id: node:latest
+ ports:
+   - "8080"
+
+build:
+  steps:
+    - script:
+        name: Version Bump
+        code: |
+          npm version patch
+          git push --tags
+
+    - script:
+        name: publish
+        code: |
+          echo "//<npm-registry>:8080/:_authToken=$NPM_AUTH_TOKEN" > ~/.npmrc
+          npm whoami

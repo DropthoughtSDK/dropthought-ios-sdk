@@ -55,12 +55,15 @@ const TempComponent = ({
 
 const ClassicQuestionContainer = props => {
   const {
+    question,
     onFeedback: propsOnFeedback,
-    validationStarted
+    validationStarted,
+    onDragStart,
+    onDragEnd
   } = props;
   let QuestionComponent = TempComponent; // get/update feedback to context
 
-  const feedback = (0, _feedback.useFeedbackByQid)(props.question.questionId);
+  const feedback = (0, _feedback.useFeedbackByQid)(question.questionId);
   const feedbackDispatch = (0, _feedback.useFeedbackDispatch)();
   const onFeedbackHandler = React.useCallback(updatedFeedback => {
     (0, _feedback.updateFeedback)(feedbackDispatch, updatedFeedback); // @ts-ignore
@@ -68,9 +71,9 @@ const ClassicQuestionContainer = props => {
     propsOnFeedback && propsOnFeedback(_feedback.updateFeedback);
   }, [feedbackDispatch, propsOnFeedback]); // whether to display the forgot warning message
 
-  const forgot = validationStarted && !(0, _data.mandatoryQuestionValidator)(props.question, feedback);
+  const forgot = validationStarted && !(0, _data.mandatoryQuestionValidator)(question, feedback);
 
-  switch (props.question.type) {
+  switch (question.type) {
     case 'singleChoice':
       // @ts-ignore
       QuestionComponent = _ClassicSingleChoiceQuestion.default;
@@ -82,10 +85,10 @@ const ClassicQuestionContainer = props => {
       break;
 
     case 'rating':
-      if (props.question.subType === 'smiley') {
+      if (question.subType === 'smiley') {
         // @ts-ignore
         QuestionComponent = _ClassicSmileyRatingQuestion.default;
-      } else if (props.question.subType === 'slider') {
+      } else if (question.subType === 'slider') {
         // @ts-ignore
         QuestionComponent = _ClassicSliderRatingQuestion.default;
       } else {
@@ -123,7 +126,9 @@ const ClassicQuestionContainer = props => {
     // @ts-ignore
     feedback: feedback,
     onFeedback: onFeedbackHandler,
-    forgot: forgot
+    forgot: forgot,
+    onDragStart: onDragStart,
+    onDragEnd: onDragEnd
   }));
 };
 

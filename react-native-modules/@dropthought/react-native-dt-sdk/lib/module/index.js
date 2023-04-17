@@ -1,7 +1,7 @@
 import { initializeWithAPIKey } from './initialize'; // @ts-ignore
 
 import { feedbackUploader as jsFeedbackUploader } from './lib/FeedbacksUploader';
-const BASE_URL = 'https://stage-api.dropthought.com/dtapp';
+export const BASE_URL = 'https://api.dropthought.com/dtapp';
 export function initialize(params) {
   initializeWithAPIKey({ ...params,
     baseURL: BASE_URL

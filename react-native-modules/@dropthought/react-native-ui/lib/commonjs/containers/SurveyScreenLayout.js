@@ -94,13 +94,20 @@ const SurveyScreenLayout = props => {
     surveyProgressBarPosition = SurveyProgressBarPosition.FixedBottom
   } = props;
   const scrollViewRef = React.useRef(null);
+  const [scrollEnabled, setScrollEnabled] = React.useState(true);
   const questions = survey.pages[pageIndex].questions.map(question => {
     return /*#__PURE__*/React.createElement(_ClassicQuestionContainer.default, {
       key: question.questionId,
       anonymous: survey.anonymous,
       question: question,
       validationStarted: validationStarted,
-      themeColor: survey.surveyProperty.hexCode
+      themeColor: survey.surveyProperty.hexCode,
+      onDragStart: () => {
+        setScrollEnabled(false);
+      },
+      onDragEnd: () => {
+        setScrollEnabled(true);
+      }
     });
   });
   const surveyProgressBar = /*#__PURE__*/React.createElement(SurveyProgressBar, {
@@ -174,7 +181,8 @@ const SurveyScreenLayout = props => {
       backgroundColor
     }],
     extraAvoidingSpace: 30,
-    contentContainerStyle: styles.scrollViewContentContainer
+    contentContainerStyle: styles.scrollViewContentContainer,
+    scrollEnabled: scrollEnabled
   }, /*#__PURE__*/React.createElement(_reactNative.View, {
     style: styles.bodyContent
   }, questions, /*#__PURE__*/React.createElement(_ClassicSurveyFooter.default, {

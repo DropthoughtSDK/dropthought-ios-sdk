@@ -4,7 +4,7 @@ import { initializeWithAPIKey } from './initialize';
 import { feedbackUploader as jsFeedbackUploader } from './lib/FeedbacksUploader';
 import type { Storage } from './lib/Storage';
 
-const BASE_URL = 'https://stage-api.dropthought.com/dtapp';
+export const BASE_URL = 'https://api.dropthought.com/dtapp';
 export function initialize(params: { apiKey: string; storage: Storage }) {
   initializeWithAPIKey({
     ...params,

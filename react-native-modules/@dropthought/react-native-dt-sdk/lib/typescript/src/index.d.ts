@@ -1,5 +1,6 @@
 import { initializeWithAPIKey } from './initialize';
 import type { Storage } from './lib/Storage';
+export declare const BASE_URL = "https://api.dropthought.com/dtapp";
 export declare function initialize(params: {
     apiKey: string;
     storage: Storage;

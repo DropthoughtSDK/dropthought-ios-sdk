@@ -9,7 +9,6 @@ import {
   Text,
   Modal,
   ActionSheetIOS,
-  FlatList,
 } from 'react-native';
 import {
   DimensionWidthType,
@@ -192,16 +191,12 @@ const RankingQuestion = ({
   const [list, setList] = useState(originListRef.current);
 
   const [normalList, setNormalList] = useState(list);
-  const [naList, setNaList] = useState<TransformedOption[]>([]);
 
   const [visible, setVisible] = useState(false);
   const [selectedOption, setSelectedOption] = useState<TransformedOption>();
 
   useEffect(() => {
-    console.log('recalculate');
-
     setNormalList(list.filter((current) => !current.isNA));
-    setNaList(list.filter((current) => current.isNA));
   }, [list]);
 
   useEffect(() => {
@@ -250,11 +245,11 @@ const RankingQuestion = ({
       item.isNA = !item.isNA;
       setList((prev) => {
         const withoutItem = prev.filter(({ option }) => option !== item.option);
-        const normalList = withoutItem.filter((current) => !current.isNA);
-        const naList = withoutItem.filter((current) => current.isNA);
+        const localNormalList = withoutItem.filter((current) => !current.isNA);
+        const localNaList = withoutItem.filter((current) => current.isNA);
         return item.isNA
-          ? [...normalList, ...naList, item]
-          : [...normalList, item, ...naList];
+          ? [...localNormalList, ...localNaList, item]
+          : [...localNormalList, item, ...localNaList];
       });
     }
   };
@@ -366,9 +361,17 @@ const RankingQuestion = ({
     );
   };
 
-  useEffect(() => {
-    console.log('==== na list changed: ', naList);
-  }, [naList]);
+  const onDragEndHandler = (newList: TransformedOption[]) => {
+    setList((prev) => {
+      const result = newList.map((newData) => {
+        const { isNA } = prev.filter(
+          ({ option }) => option === newData.option
+        )[0];
+        return { ...newData, isNA };
+      });
+      return result;
+    });
+  };
 
   return (
     <>
@@ -383,26 +386,16 @@ const RankingQuestion = ({
             orientation because it can break windowing and other functionality
             - use another VirtualizedList-backed container instead" */}
         <ScrollView
-          horizontal={true}
+          horizontal
           scrollEnabled={false}
           contentContainerStyle={styles.scrollViewContainer}
         >
           <View style={styles.questionContainer}>
             <DraggableList
-              data={normalList}
+              data={list}
               renderItem={renderItem}
-              onDragEnd={(newList) => {
-                setList((prev) => {
-                  const localNAList = prev.filter((current) => current.isNA);
-                  return [...newList, ...localNAList];
-                });
-              }}
-            />
-            <FlatList
-              scrollEnabled={false}
-              data={naList}
-              renderItem={renderItem}
-              keyExtractor={(_, index) => index.toString()}
+              onDragStart={() => {}}
+              onDragEnd={onDragEndHandler}
             />
           </View>
         </ScrollView>

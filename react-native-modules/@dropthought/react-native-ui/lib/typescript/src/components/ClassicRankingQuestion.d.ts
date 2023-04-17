@@ -1,10 +1,6 @@
 import React from 'react';
 import type { Feedback as OriginFeedback, Question as OriginQuestion } from '../data';
-declare type TransformedOption = {
-    option: string;
-    index: number;
-    isNA: boolean;
-};
+import type { TransformedOption } from '../utils/react-native-draggable-list/DraggableList';
 declare type Feedback = OriginFeedback & {
     listForRankingQuestion: TransformedOption[];
 };
@@ -16,8 +12,11 @@ declare type Question = OriginQuestion & {
 declare type Props = {
     question: Question;
     onFeedback: (feedback: Feedback) => void;
-    feedback: Feedback;
     forgot: boolean;
+    feedback: Feedback;
+    themeColor: string;
+    onDragStart: () => void;
+    onDragEnd: () => void;
 };
-declare const _default: React.MemoExoticComponent<({ question, onFeedback, feedback, forgot, }: Props) => JSX.Element>;
+declare const _default: React.MemoExoticComponent<({ question, onFeedback, forgot, feedback, themeColor, onDragStart, onDragEnd, }: Props) => JSX.Element>;
 export default _default;

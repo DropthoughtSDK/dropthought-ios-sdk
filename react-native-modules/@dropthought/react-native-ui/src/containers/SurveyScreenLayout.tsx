@@ -90,6 +90,7 @@ const SurveyScreenLayout = (props: Props) => {
     surveyProgressBarPosition = SurveyProgressBarPosition.FixedBottom,
   } = props;
   const scrollViewRef = React.useRef<RNScrollView>(null);
+  const [scrollEnabled, setScrollEnabled] = React.useState(true);
 
   const questions = survey.pages[pageIndex].questions.map((question) => {
     return (
@@ -99,6 +100,12 @@ const SurveyScreenLayout = (props: Props) => {
         question={question}
         validationStarted={validationStarted}
         themeColor={survey.surveyProperty.hexCode}
+        onDragStart={() => {
+          setScrollEnabled(false);
+        }}
+        onDragEnd={() => {
+          setScrollEnabled(true);
+        }}
       />
     );
   });
@@ -211,6 +218,7 @@ const SurveyScreenLayout = (props: Props) => {
         style={[styles.scrollView, { backgroundColor }]}
         extraAvoidingSpace={30}
         contentContainerStyle={styles.scrollViewContentContainer}
+        scrollEnabled={scrollEnabled}
       >
         <View style={styles.bodyContent}>
           {questions}

@@ -23,9 +23,6 @@ yarn add @dropthought/react-native-dt-sdk
 - [react-native-secure-key-store](https://www.npmjs.com/package/react-native-secure-key-store)
 - [lottie-react-native](https://github.com/lottie-react-native/lottie-react-native)
 - [ramda](https://github.com/ramda/ramda)
-- [react-native-draggable-flatlist](https://github.com/computerjazz/react-native-draggable-flatlist)
-- [react-native-gesture-handler](https://github.com/software-mansion/react-native-gesture-handler)
-- [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated)
 
 ## Usage
 
@@ -43,9 +40,7 @@ initialize({
   storage: AsyncStorage,
 });
 
-<SurveyModalContainer>
-  {/* ... */}
-</SurveyModalContainer>;
+<SurveyModalContainer>{/* ... */}</SurveyModalContainer>;
 ```
 
 ### initialize
@@ -88,6 +83,7 @@ import { SurveyModalContainer, THEME_OPTIONS } from 'react-native-dt-sdk';
   {/* ... */}
 </SurveyModalContainer>;
 ```
+
 It's not necessary to pass these props at `SurveyModalContainer`. You can pass them though `openSurvey`
 
 ```js

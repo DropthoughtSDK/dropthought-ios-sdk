@@ -34,10 +34,16 @@ export type DraggableListRenderItem = (
 type DraggableListProps = {
   data: ReadonlyArray<TransformedOption>;
   renderItem: DraggableListRenderItem;
+  onDragStart: () => void;
   onDragEnd: (newList: TransformedOption[]) => void;
 };
 
-function DraggableList({ data, renderItem, onDragEnd }: DraggableListProps) {
+function DraggableList({
+  data,
+  renderItem,
+  onDragStart,
+  onDragEnd,
+}: DraggableListProps) {
   const backupListRef = useRef([...data]);
   const tempListRef = useRef([...data]);
 
@@ -167,11 +173,38 @@ function DraggableList({ data, renderItem, onDragEnd }: DraggableListProps) {
     [setHelpToRerender]
   );
 
+  let minRef = useRef(0);
+  let maxRef = useRef(0);
+
+  const onDragStartHandler = (index: number) => {
+    onDragStart && onDragStart();
+    const nonNACount = data.filter(({ isNA }) => !isNA).length;
+    minRef.current = 0;
+    maxRef.current = 0;
+    for (let i = 0; i < index; i++) {
+      minRef.current = minRef.current - (tempListRef.current[i].rowHeight ?? 0);
+    }
+
+    for (let i = index; i < nonNACount - 1; i++) {
+      const origin = data.filter(
+        ({ option }) => option === tempListRef.current[index].option
+      );
+      if (origin.length > 0 && !origin[0].isNA) {
+        maxRef.current =
+          maxRef.current + (tempListRef.current[i].rowHeight ?? 0);
+      }
+    }
+  };
+
   const onDragHandler = useCallback(
-    (y: number, listIndex: number) => {
-      draggingIndexRef.current = listIndex;
-      calculateHeightLevel();
-      calculatePositionChange(y);
+    (pan: Animated.ValueXY, y: number, listIndex: number) => {
+      if (y > minRef.current && y < maxRef.current) {
+        pan.y.setValue(y);
+
+        draggingIndexRef.current = listIndex;
+        calculateHeightLevel();
+        calculatePositionChange(y);
+      }
     },
     [calculateHeightLevel, calculatePositionChange]
   );
@@ -195,6 +228,7 @@ function DraggableList({ data, renderItem, onDragEnd }: DraggableListProps) {
           draggingIndexRef.current = -1;
           setForceReset(true);
           onDragEnd(newList);
+
           tempListRef.current = newList;
           setTimeout(() => {
             setForceReset(false);
@@ -206,22 +240,19 @@ function DraggableList({ data, renderItem, onDragEnd }: DraggableListProps) {
     [calculateReleaseDragMovements, onDragEnd]
   );
 
-  const onLayoutHandler = useCallback(
-    (event: LayoutChangeEvent, listIndex: number) => {
-      var { height } = event.nativeEvent.layout;
-      tempListRef.current[listIndex] = {
+  const onLayoutHandler = (event: LayoutChangeEvent, listIndex: number) => {
+    var { height } = event.nativeEvent.layout;
+    tempListRef.current[listIndex] = {
+      ...tempListRef.current[listIndex],
+      rowHeight: parseInt(`${height}`, 10),
+    };
+    if (!backupListRef.current[listIndex].rowHeight) {
+      backupListRef.current[listIndex] = {
         ...tempListRef.current[listIndex],
         rowHeight: parseInt(`${height}`, 10),
       };
-      if (!backupListRef.current[listIndex].rowHeight) {
-        backupListRef.current[listIndex] = {
-          ...tempListRef.current[listIndex],
-          rowHeight: parseInt(`${height}`, 10),
-        };
-      }
-    },
-    []
-  );
+    }
+  };
 
   return (
     <View style={styles.questionContainer}>
@@ -229,12 +260,14 @@ function DraggableList({ data, renderItem, onDragEnd }: DraggableListProps) {
         return (
           <DraggableItem
             index={index}
-            onDrag={(y) => onDragHandler(y, index)}
+            onDragStart={() => onDragStartHandler(index)}
+            onDrag={(pan, y) => onDragHandler(pan, y, index)}
             onDragEnd={(pan) => onDragEndHandler(pan, index)}
             onLayout={(event) => onLayoutHandler(event, index)}
             forceReset={forceReset}
             movements={calculateMovements(index)}
             key={JSON.stringify(item) + index.toString()}
+            draggable={!item.isNA}
           >
             {renderItem({ item, index })}
           </DraggableItem>

@@ -1,4 +1,5 @@
 export function initialize(params: any): void;
+export const BASE_URL: "https://api.dropthought.com/dtapp";
 export namespace feedbackUploader {
     function upload(): Promise<void>;
     function upload(): Promise<void>;

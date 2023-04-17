@@ -39,15 +39,23 @@ type Props = {
   validationStarted: boolean;
   themeColor: string;
   onFeedback?: (feedback: Feedback) => void;
+  onDragStart: () => void;
+  onDragEnd: () => void;
 };
 
 const ClassicQuestionContainer = (props: Props) => {
-  const { onFeedback: propsOnFeedback, validationStarted } = props;
+  const {
+    question,
+    onFeedback: propsOnFeedback,
+    validationStarted,
+    onDragStart,
+    onDragEnd,
+  } = props;
 
   let QuestionComponent = TempComponent;
 
   // get/update feedback to context
-  const feedback = useFeedbackByQid(props.question.questionId);
+  const feedback = useFeedbackByQid(question.questionId);
   const feedbackDispatch = useFeedbackDispatch();
   const onFeedbackHandler = React.useCallback(
     (updatedFeedback) => {
@@ -60,9 +68,9 @@ const ClassicQuestionContainer = (props: Props) => {
 
   // whether to display the forgot warning message
   const forgot =
-    validationStarted && !mandatoryQuestionValidator(props.question, feedback);
+    validationStarted && !mandatoryQuestionValidator(question, feedback);
 
-  switch (props.question.type) {
+  switch (question.type) {
     case 'singleChoice':
       // @ts-ignore
       QuestionComponent = ClassicSingleChoiceQuestion;
@@ -72,10 +80,10 @@ const ClassicQuestionContainer = (props: Props) => {
       QuestionComponent = ClassicMultiChoiceQuestion;
       break;
     case 'rating':
-      if (props.question.subType === 'smiley') {
+      if (question.subType === 'smiley') {
         // @ts-ignore
         QuestionComponent = ClassicSmileyRatingQuestion;
-      } else if (props.question.subType === 'slider') {
+      } else if (question.subType === 'slider') {
         // @ts-ignore
         QuestionComponent = ClassicSliderRatingQuestion;
       } else {
@@ -110,6 +118,8 @@ const ClassicQuestionContainer = (props: Props) => {
       feedback={feedback}
       onFeedback={onFeedbackHandler}
       forgot={forgot}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
     />
   );
 };

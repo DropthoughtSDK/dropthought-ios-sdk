@@ -31,6 +31,7 @@ function moveElement(array, from, to) {
 function DraggableList({
   data,
   renderItem,
+  onDragStart,
   onDragEnd
 }) {
   const backupListRef = (0, _react.useRef)([...data]);
@@ -146,10 +147,43 @@ function DraggableList({
       }
     }
   }, [setHelpToRerender]);
-  const onDragHandler = (0, _react.useCallback)((y, listIndex) => {
-    draggingIndexRef.current = listIndex;
-    calculateHeightLevel();
-    calculatePositionChange(y);
+  let minRef = (0, _react.useRef)(0);
+  let maxRef = (0, _react.useRef)(0);
+
+  const onDragStartHandler = index => {
+    onDragStart && onDragStart();
+    const nonNACount = data.filter(({
+      isNA
+    }) => !isNA).length;
+    minRef.current = 0;
+    maxRef.current = 0;
+
+    for (let i = 0; i < index; i++) {
+      var _tempListRef$current$2;
+
+      minRef.current = minRef.current - ((_tempListRef$current$2 = tempListRef.current[i].rowHeight) !== null && _tempListRef$current$2 !== void 0 ? _tempListRef$current$2 : 0);
+    }
+
+    for (let i = index; i < nonNACount - 1; i++) {
+      const origin = data.filter(({
+        option
+      }) => option === tempListRef.current[index].option);
+
+      if (origin.length > 0 && !origin[0].isNA) {
+        var _tempListRef$current$3;
+
+        maxRef.current = maxRef.current + ((_tempListRef$current$3 = tempListRef.current[i].rowHeight) !== null && _tempListRef$current$3 !== void 0 ? _tempListRef$current$3 : 0);
+      }
+    }
+  };
+
+  const onDragHandler = (0, _react.useCallback)((pan, y, listIndex) => {
+    if (y > minRef.current && y < maxRef.current) {
+      pan.y.setValue(y);
+      draggingIndexRef.current = listIndex;
+      calculateHeightLevel();
+      calculatePositionChange(y);
+    }
   }, [calculateHeightLevel, calculatePositionChange]);
   const onDragEndHandler = (0, _react.useCallback)((pan, listIndex) => {
     const movements = calculateReleaseDragMovements();
@@ -176,7 +210,8 @@ function DraggableList({
       });
     }
   }, [calculateReleaseDragMovements, onDragEnd]);
-  const onLayoutHandler = (0, _react.useCallback)((event, listIndex) => {
+
+  const onLayoutHandler = (event, listIndex) => {
     var {
       height
     } = event.nativeEvent.layout;
@@ -189,18 +224,21 @@ function DraggableList({
         rowHeight: parseInt(`${height}`, 10)
       };
     }
-  }, []);
+  };
+
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.questionContainer
   }, data.map((item, index) => {
     return /*#__PURE__*/_react.default.createElement(_DraggableItem.default, {
       index: index,
-      onDrag: y => onDragHandler(y, index),
+      onDragStart: () => onDragStartHandler(index),
+      onDrag: (pan, y) => onDragHandler(pan, y, index),
       onDragEnd: pan => onDragEndHandler(pan, index),
       onLayout: event => onLayoutHandler(event, index),
       forceReset: forceReset,
       movements: calculateMovements(index),
-      key: JSON.stringify(item) + index.toString()
+      key: JSON.stringify(item) + index.toString(),
+      draggable: !item.isNA
     }, renderItem({
       item,
       index

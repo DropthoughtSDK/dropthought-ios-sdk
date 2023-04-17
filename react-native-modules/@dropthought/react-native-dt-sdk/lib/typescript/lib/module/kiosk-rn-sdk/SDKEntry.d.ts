@@ -20,7 +20,7 @@
 /**
  * @param {SDKEntryProps} props
  */
-export default function SDKEntry(props: SDKEntryProps): React.CElement<null, React.Component<null, any, any>>;
+export default function SDKEntry(props: SDKEntryProps): React.FunctionComponentElement<import("react-native-safe-area-context").SafeAreaViewProps>;
 export type ThemeType = "system" | "light" | "dark";
 export type SDKEntryOwnProps = {
     apiKey: string;

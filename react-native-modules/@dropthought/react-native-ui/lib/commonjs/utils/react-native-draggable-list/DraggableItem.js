@@ -18,23 +18,24 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
 function DraggableItem({
   children,
   index,
+  onDragStart,
   onDrag,
   onDragEnd,
   onLayout,
   forceReset,
-  movements
+  movements,
+  draggable
 }) {
-  const valRef = (0, _react.useRef)({
-    x: 0,
-    y: 0
-  });
   const [isDragging, setIsDragging] = (0, _react.useState)(false);
   const isDraggingRef = (0, _react.useRef)(false);
   const longPressTimeout = (0, _react.useRef)();
   const pan = (0, _react.useState)(new _reactNative.Animated.ValueXY())[0];
   const panResponder = (0, _react.useRef)(_reactNative.PanResponder.create({
     onStartShouldSetPanResponder: () => {
-      return true;
+      return draggable;
+    },
+    onPanResponderStart: (_e, _gestureState) => {
+      onDragStart();
     },
     onPanResponderGrant: (_e, _gesture) => {
       longPressTimeout.current = setTimeout(() => {
@@ -53,7 +54,7 @@ function DraggableItem({
     },
     onPanResponderMove: (_, gesture) => {
       if (isDraggingRef.current) {
-        pan.y.setValue(gesture.dy);
+        onDrag && onDrag(pan, gesture.dy);
       }
     },
     onPanResponderRelease: (_e, _gesture) => {
@@ -75,15 +76,6 @@ function DraggableItem({
     }
 
   }));
-  (0, _react.useEffect)(() => {
-    pan.addListener(value => {
-      valRef.current = value;
-
-      if (isDraggingRef.current) {
-        onDrag && onDrag(value.y);
-      }
-    });
-  }, [onDrag, pan]);
   const shouldMoveRef = (0, _react.useRef)(movements);
   (0, _react.useEffect)(() => {
     if (shouldMoveRef.current !== 0 && movements === 0) {

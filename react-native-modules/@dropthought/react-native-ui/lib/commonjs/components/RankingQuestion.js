@@ -144,13 +144,10 @@ const RankingQuestion = ({
   }));
   const [list, setList] = (0, _react.useState)(originListRef.current);
   const [normalList, setNormalList] = (0, _react.useState)(list);
-  const [naList, setNaList] = (0, _react.useState)([]);
   const [visible, setVisible] = (0, _react.useState)(false);
   const [selectedOption, setSelectedOption] = (0, _react.useState)();
   (0, _react.useEffect)(() => {
-    console.log('recalculate');
     setNormalList(list.filter(current => !current.isNA));
-    setNaList(list.filter(current => current.isNA));
   }, [list]);
   (0, _react.useEffect)(() => {
     const {
@@ -210,9 +207,9 @@ const RankingQuestion = ({
         const withoutItem = prev.filter(({
           option
         }) => option !== item.option);
-        const normalList = withoutItem.filter(current => !current.isNA);
-        const naList = withoutItem.filter(current => current.isNA);
-        return item.isNA ? [...normalList, ...naList, item] : [...normalList, item, ...naList];
+        const localNormalList = withoutItem.filter(current => !current.isNA);
+        const localNaList = withoutItem.filter(current => current.isNA);
+        return item.isNA ? [...localNormalList, ...localNaList, item] : [...localNormalList, item, ...localNaList];
       });
     }
   };
@@ -309,9 +306,22 @@ const RankingQuestion = ({
     });
   };
 
-  (0, _react.useEffect)(() => {
-    console.log('==== na list changed: ', naList);
-  }, [naList]);
+  const onDragEndHandler = newList => {
+    setList(prev => {
+      const result = newList.map(newData => {
+        const {
+          isNA
+        } = prev.filter(({
+          option
+        }) => option === newData.option)[0];
+        return { ...newData,
+          isNA
+        };
+      });
+      return result;
+    });
+  };
+
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_reactNative.ScrollView, {
     style: styles.container,
     scrollEnabled: false
@@ -326,19 +336,10 @@ const RankingQuestion = ({
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.questionContainer
   }, /*#__PURE__*/_react.default.createElement(_DraggableList.default, {
-    data: normalList,
+    data: list,
     renderItem: renderItem,
-    onDragEnd: newList => {
-      setList(prev => {
-        const localNAList = prev.filter(current => current.isNA);
-        return [...newList, ...localNAList];
-      });
-    }
-  }), /*#__PURE__*/_react.default.createElement(_reactNative.FlatList, {
-    scrollEnabled: false,
-    data: naList,
-    renderItem: renderItem,
-    keyExtractor: (_, index) => index.toString()
+    onDragStart: () => {},
+    onDragEnd: onDragEndHandler
   })))), rankingModal);
 };
 
