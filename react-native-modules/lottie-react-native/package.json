@@ -1,6 +1,6 @@
 {
   "name": "lottie-react-native",
-  "version": "4.0.3",
+  "version": "5.1.6",
   "description": "React Native bindings for Lottie",
   "main": "lib/index.js",
   "types": "src/js/index.d.ts",
@@ -22,7 +22,9 @@
     "docs:build": "npm run docs:prepare && gitbook build",
     "docs:watch": "npm run docs:prepare && gitbook serve",
     "docs:publish": "npm run docs:clean && npm run docs:build && cd _book && git init && git commit --allow-empty -m 'update book' && git fetch git@github.com:airbnb/lottie-react-native.git gh-pages && git checkout -b gh-pages && git add . && git commit -am 'update book' && git push git@github.com:airbnb/lottie-react-native.git gh-pages --force",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "vscpp": "start example/windows/cppwinrt/Example.sln",
+    "vssharp": "start example/windows/csharp/Example.sln"
   },
   "repository": {
     "type": "git",
@@ -42,18 +44,26 @@
   },
   "homepage": "https://github.com/airbnb/lottie-react-native#readme",
   "peerDependencies": {
-    "lottie-ios": "^3.2.3",
+    "lottie-ios": "^3.4.0",
     "react": "*",
-    "react-native": ">=0.46"
+    "react-native": ">=0.46",
+    "react-native-windows": ">=0.63.x"
+  },
+  "peerDependenciesMeta": {
+    "react-native-windows": {
+      "optional": true
+    }
   },
   "dependencies": {
     "invariant": "^2.2.2",
-    "prop-types": "^15.5.10",
     "react-native-safe-modules": "^1.0.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
-    "@babel/core": "^7.0.0",
+    "@babel/core": "^7.12.9",
+    "@babel/runtime": "^7.12.5",
+    "@react-native-community/slider": "^4.1.10",
+    "@react-native-picker/picker": "^2.1.0",
     "babel-eslint": "^9.0.0",
     "babel-plugin-module-resolver": "^4.0.0",
     "babel-preset-airbnb": "^1.1.1",
@@ -67,10 +77,11 @@
     "eslint-plugin-prettier": "^2.3.1",
     "eslint-plugin-react": "^6.1.2",
     "gitbook-cli": "^1.0.1",
-    "metro-react-native-babel-preset": "^0.59.0",
+    "metro-react-native-babel-preset": "^0.66.2",
     "prettier": "^1.8.2",
     "prettier-eslint": "^8.2.2",
-    "react": "16.11.0",
-    "react-native": "0.62.2"
+    "react": "17.0.2",
+    "react-native": "0.66.1",
+    "react-native-windows": "0.66.6"
   }
 }

@@ -1,3 +1,60 @@
+## 5.1.5
+
+- Fix versioning issue
+
+## 5.1.4
+
+- Support for lottie-ios version 3.4.0
+- Update tvOS deployment target to 11.0
+
+## 5.1.3
+
+- Fix Android compilation issue
+
+## 5.1.2
+
+- Fix compilation issues on Android
+
+## 5.1.1
+
+- Remove deprecated-react-native-prop-types import
+
+## 5.1.0
+
+- Upgrade lottie-android dependency to 5.1.1
+- Fix ViewPropTypes imports
+- Support for remote animations
+- Support for dynamic text
+- Support changing lottie props for ongoing animations
+- Regular chore tasks
+
+## 5.0.1
+
+- Fix SimpleColorFilter casting error
+
+## 5.0.0
+
+- Upgraded to RN 0.66.1
+- Support for PlatformColor
+
+## 4.1.3
+
+- Added pod support for tvOS
+
+## 4.1.2
+
+- iOS target moved to 11.0 to align with React Native 64
+
+## 4.1.1
+
+- Updating Documentation
+
+## 4.1.0
+
+- Upgrading Native lottie-android to 4.0.0
+- Migrated to maven_publish
+- Migrated to gradle 7
+
 ## 4.0.3
 
 - Updated `lottie-ios` dependency to 3.2.3
