@@ -99,7 +99,8 @@ const WheelPickerItem = ({
       }]
     }]
   }, /*#__PURE__*/React.createElement(Text, {
-    style: textStyle
+    style: textStyle,
+    numberOfLines: 1
   }, option));
 };
 

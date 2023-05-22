@@ -4,7 +4,7 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
  * @description Option with a TextInput, this is for other option in multi-choice/single-choice question
  */
 import * as React from 'react';
-import { StyleSheet, TextInput, View, Text, Platform } from 'react-native';
+import { StyleSheet, TextInput, View, Text, Platform, Keyboard } from 'react-native';
 import GlobalStyles, { Colors, QuestionContentTextSize } from '../styles';
 import i18n from '../translation';
 import OptionWithHighlight from './OptionWithHighlight';
@@ -34,8 +34,13 @@ function OtherOptionWithHighlightProps(props) {
     checked,
     textValue,
     onChangeValue,
-    checkedColor
+    checkedColor,
+    question
   } = props;
+  const {
+    otherText = '',
+    questionBrand = ''
+  } = question;
   const {
     fontColor
   } = useTheme();
@@ -83,6 +88,16 @@ function OtherOptionWithHighlightProps(props) {
   });
 
   const rtl = i18n.dir() === 'rtl';
+  React.useEffect(() => {
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      var _inputRef$current;
+
+      (_inputRef$current = inputRef.current) === null || _inputRef$current === void 0 ? void 0 : _inputRef$current.blur();
+    });
+    return () => {
+      hideSubscription.remove();
+    }; // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const textInput = /*#__PURE__*/React.createElement(View, {
     style: [styles.textInputContainer, rtl && GlobalStyles.flexRowReverse]
   }, /*#__PURE__*/React.createElement(Text, {
@@ -96,7 +111,7 @@ function OtherOptionWithHighlightProps(props) {
     }, rtl && GlobalStyles.textAlignRight, isFocused ? {
       borderBottomColor: checkedColor
     } : {}, QuestionContentTextSize[dimensionWidthType]],
-    placeholder: i18n.t('survey:other-placeholder'),
+    placeholder: otherText.length > 0 ? otherText : questionBrand.length > 0 ? questionBrand : i18n.t('survey:other-placeholder'),
     placeholderTextColor: Colors.inputPlaceholder,
     onChangeText: onChangeTextHandler,
     underlineColorAndroid: Colors.transparent,

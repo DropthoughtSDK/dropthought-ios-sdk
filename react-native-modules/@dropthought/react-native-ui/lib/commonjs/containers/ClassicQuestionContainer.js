@@ -29,6 +29,8 @@ var _ClassicRankingQuestion = _interopRequireDefault(require("../components/Clas
 
 var _ClassicOpenQuestion = _interopRequireDefault(require("../components/ClassicOpenQuestion"));
 
+var _ClassicDropdownQuestion = _interopRequireDefault(require("../components/ClassicDropdownQuestion"));
+
 var _ClassicMandatoryTitle = _interopRequireDefault(require("../components/ClassicMandatoryTitle"));
 
 var _styles = _interopRequireDefault(require("../styles"));
@@ -116,6 +118,11 @@ const ClassicQuestionContainer = props => {
     case 'ratingSlider':
       // @ts-ignore
       QuestionComponent = _ClassicSliderDragRatingQuestion.default;
+      break;
+
+    case 'dropdown':
+      // @ts-ignore
+      QuestionComponent = _ClassicDropdownQuestion.default;
       break;
 
     default:

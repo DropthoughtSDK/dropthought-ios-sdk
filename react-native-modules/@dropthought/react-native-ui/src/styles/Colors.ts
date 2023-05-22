@@ -1,5 +1,6 @@
 export const Colors = {
   purple: '#4c3794',
+  secondary: '#ECEFF4',
   borderColor: '#c2c2c2',
   borderColorDark: '#5454548F',
   borderFocusedColor: '#4c3794',
@@ -9,6 +10,7 @@ export const Colors = {
   dateGrey: '#8b8b8b',
   buttonGrey: '#dcdcdc',
   black: '#000000',
+  backdropBG: '#rgba(0,0,0,0.24)',
   dividerGrey: '#d1d1d1',
   errorHintColor: '#a30000',
   statusBarDivider: '#CCC',
@@ -52,6 +54,7 @@ export const Colors = {
   rankingCheckBoxBorder: '#a8a8a8',
   sliderLabel: '#848a93',
   sliderTrack: '#4b3694',
+  contentBackground: '#F3F5F8',
 };
 
 export const addOpacityToColor = (hexColor: string, opacity: number) => {

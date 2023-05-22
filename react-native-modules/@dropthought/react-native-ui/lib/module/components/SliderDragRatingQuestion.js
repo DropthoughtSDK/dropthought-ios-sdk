@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, ImageBackground, Keyboard, TextInput, Image } from 'react-native';
+import { View, StyleSheet, Text, ImageBackground, Keyboard, TextInput, Image, ScrollView } from 'react-native';
 import MandatoryTitle from './MandatoryTitle';
 import GlobalStyle, { Colors } from '../styles';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
@@ -92,7 +92,7 @@ const SliderDragRatingQuestion = ({
   const [hasEdited, setHasEdited] = React.useState(false);
   const [focus, setFocus] = React.useState(false);
   const total = maxScale - minScale + 1;
-  const middle = maxScale - total / 2 + 1;
+  const middle = Math.round((maxScale + minScale) / 2);
   const isDark = colorScheme === COLOR_SCHEMES.dark;
   const onFeedbackHandler = React.useCallback(() => {
     setHasEdited(true);
@@ -137,7 +137,6 @@ const SliderDragRatingQuestion = ({
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
       if (focus) {
         onFeedbackHandler();
-        setFocus(false);
       }
     });
     return () => {
@@ -162,17 +161,19 @@ const SliderDragRatingQuestion = ({
     onChangeText: text => {
       const formatText = Number(text.replace(/[^0-9]/g, ''));
       setInputValue(formatText);
+      setFocus(true);
     },
     onFocus: () => setFocus(true),
     defaultValue: "",
     value: valueInput === null || valueInput === void 0 ? void 0 : valueInput.toString(),
     placeholder: "--",
+    placeholderTextColor: fontColor,
     keyboardType: "numeric"
   });
   const slider = /*#__PURE__*/React.createElement(CustomSlider, {
     value: value[0],
     setValue: setValue,
-    trackMarks: total % 2 === 0 ? [middle - 0.5] : [Math.floor(middle)],
+    trackMarks: total % 2 === 0 ? [middle - 0.5] : [middle],
     trackMarkStyles: {
       inactiveMark: {},
       activeMark: includeCenterLabel ? activeMarkStyle : styles.disappearMark
@@ -211,8 +212,8 @@ const SliderDragRatingQuestion = ({
     },
     animationType: "timing"
   });
-  return /*#__PURE__*/React.createElement(View, {
-    style: styles.container
+  return /*#__PURE__*/React.createElement(ScrollView, {
+    contentContainerStyle: styles.container
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     forgot: forgot,
     question: question,
@@ -245,7 +246,7 @@ const SliderDragRatingQuestion = ({
     style: styles.hintContainer
   }, /*#__PURE__*/React.createElement(Text, {
     style: hintTextStyle
-  }, 'Slide left of right to rate')));
+  }, 'Slide left or right to rate')));
 };
 
 export default /*#__PURE__*/React.memo(SliderDragRatingQuestion);
@@ -266,7 +267,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   mandatoryTitle: {
-    marginBottom: 50
+    marginBottom: 50,
+    marginHorizontal: 16
   },
   sliderLabelContainer: {
     flexDirection: 'row'

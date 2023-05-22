@@ -1,4 +1,4 @@
-import { isEmpty, prop, pipe, findIndex, equals, curry, nth, map } from 'ramda';
+import { isEmpty, prop, pipe, findIndex, equals, curry, nth, map, isNil } from 'ramda';
 import { EvaluateRuleSet } from './dt-common-lib';
 
 /** @enum {'other'} */
@@ -8,33 +8,36 @@ export const QuestionBrandType = {
 /** @enum {'Date'|'Name'|'Email'|'Phone'|'Number'|'String'} */
 
 export const QuestionMetaDataType = {
-  Name: 'Name',
-  Email: 'Email',
-  Phone: 'Phone',
-  Number: 'Number',
-  Date: 'Date',
-  String: 'String'
+  Name: 'name',
+  Email: 'email',
+  Phone: 'phone',
+  Number: 'number',
+  Date: 'date',
+  String: 'string'
 };
+
 /**
  * given a Question type, return ['option label1', 'option label2', 'option label3', true]
  * if the type is boolean at the last, it means it is an "other" option
  */
-
 export const getOptionsFromQuestion = question => {
   var _question$options;
 
   // copy the original array
-  // @ts-ignore
-  const options = ((_question$options = question.options) !== null && _question$options !== void 0 ? _question$options : []).map(option => ({
+  const options = ((_question$options = question.options) !== null && _question$options !== void 0 ? _question$options : []).map((option, index) => ({
     isOther: false,
-    title: option
+    title: option,
+    placeholder: '',
+    index
   })); // add additional option when the question brand type is "other"
 
   if (question.questionBrand === QuestionBrandType.Other) {
     options.push({
       isOther: true,
       // @ts-ignore
-      title: ''
+      title: '',
+      placeholder: '',
+      index: options.length
     });
   } // @ts-ignore
 
@@ -46,16 +49,17 @@ export const getOptionsFromQuestion = question => {
  */
 
 export const metaDataTypeQuestionValidator = (question, value) => {
-  // if it is not a open ended question no need to check, return valid
-  if (question.type !== 'open') return true; // no need to check the value when no value or no type
+  // if it is not a open ended or dropdown question no need to check, return valid
+  if (question.type !== 'open' && question.type !== 'dropdown') return true; // no need to check the value when no value or no type
 
   if (!value || !question.metaDataType) return true;
   let reg = null;
 
-  switch (question.metaDataType) {
+  switch (question.metaDataType.toLocaleLowerCase()) {
     case QuestionMetaDataType.Number:
-      // @ts-ignore
-      return !isNaN(value);
+      reg = /^\d+$/; // if need negative integer someday, reg = /^-?\d+$/
+
+      return reg.test(value);
 
     case QuestionMetaDataType.Date:
       reg = /^((?:\d{4}-\d{2}-\d{2})|(?:\d{4}\/\d{2}\/\d{2})|(?:\d{4}:\d{2}:\d{2}))?( )?(\d{2}:\d{2}:\d{2})?$/;
@@ -79,17 +83,23 @@ export const metaDataTypeQuestionValidator = (question, value) => {
  */
 
 export const mandatoryQuestionValidator = (question, feedback = {}) => {
-  if (!question.mandatory) return true; // @ts-ignore
-
+  // @ts-ignore
   const {
-    answers
-  } = feedback; // check if feedback has answer
+    answers,
+    otherFlag
+  } = feedback;
 
-  const isAnswered = answers !== undefined;
-  const answer = isAnswered ? answers[answers.length - 1] : ''; // check if answer is vaild
+  if (!question.mandatory) {
+    if (otherFlag && answers.length > 0 && (isEmpty(answers[answers.length - 1]) || isNil(answers[answers.length - 1]))) {
+      return false;
+    }
 
-  const isVaildTextInput = typeof answer === 'string' ? answer.length >= 3 : true;
-  return isAnswered && isVaildTextInput;
+    return true;
+  } // check if feedback has answer
+
+
+  const isAnswered = answers !== undefined && answers.length > 0 && !isEmpty(answers[answers.length - 1]) && !isNil(answers[answers.length - 1]);
+  return isAnswered;
 };
 /**
  * validate if question's feedback is valid:
@@ -174,9 +184,10 @@ export const scaleLogic = {
   '4': [0, 2, 3, 4],
   '5': [0, 1, 2, 3, 4]
 };
+export const option4FaceTable = ['A', 'B', 'C', 'D', 'E'];
 export const option3LoopFaceTable = new Map([['1', require('../assets/animations/smiley_option3/option3_smile_1_loop.json')], ['2', require('../assets/animations/smiley_option3/option3_smile_2_loop.json')], ['3', require('../assets/animations/smiley_option3/option3_smile_3_loop.json')], ['4', require('../assets/animations/smiley_option3/option3_smile_4_loop.json')], ['5', require('../assets/animations/smiley_option3/option3_smile_5_loop.json')]]);
 export const option3TransformTable = new Map([['1-2', require('../assets/animations/smiley_option3/option3_smile_1-2_transform.json')], ['2-3', require('../assets/animations/smiley_option3/option3_smile_2-3_transform.json')], ['3-4', require('../assets/animations/smiley_option3/option3_smile_3-4_transform.json')], ['4-5', require('../assets/animations/smiley_option3/option3_smile_4-5_transform.json')], ['1-3', require('../assets/animations/smiley_option3/option3_smile_1-3_transform.json')], ['1-5', require('../assets/animations/smiley_option3/option3_smile_1-5_transform.json')], ['3-5', require('../assets/animations/smiley_option3/option3_smile_3-5_transform.json')]]);
-export const option4LoopFaceTable = new Map([['1A', require('../assets/animations/smiley_option4/option4_star_1_loop.json')], ['2B', require('../assets/animations/smiley_option4/option4_star_2_loop.json')], ['2C', 'Star 2C'], ['2E', 'Star 2E'], ['3C', require('../assets/animations/smiley_option4/option4_star_3_loop.json')], ['3D', 'Star 3D'], ['3E', 'Star 3E'], ['4D', require('../assets/animations/smiley_option4/option4_star_4_loop.json')], ['4E', 'Star 4E'], ['5E', require('../assets/animations/smiley_option4/option4_star_5_loop.json')]]);
-export const option4TransformTable = new Map([['1A-2B', require('../assets/animations/smiley_option4/option4_star_2_transform.json')], ['2B-3C', require('../assets/animations/smiley_option4/option4_star_3_transform.json')], ['3C-4D', require('../assets/animations/smiley_option4/option4_star_4_transform.json')], ['4D-5E', require('../assets/animations/smiley_option4/option4_star_5_transform.json')], ['1A-2E', 'From 1A to 2E'], ['1A-2C', 'From 1A to 2C'], ['2C-3E', 'From 2C to 3E'], ['2C-3D', 'From 2C to 3D'], ['3D-4E', 'From 3D to 4E']]);
+export const option4LoopFaceTable = new Map([['1A', require('../assets/animations/smiley_option4/1A.json')], ['2B', require('../assets/animations/smiley_option4/2B.json')], ['2C', require('../assets/animations/smiley_option4/2C.json')], ['2E', require('../assets/animations/smiley_option4/2E.json')], ['3C', require('../assets/animations/smiley_option4/3C.json')], ['3D', require('../assets/animations/smiley_option4/3D.json')], ['3E', require('../assets/animations/smiley_option4/3E.json')], ['4D', require('../assets/animations/smiley_option4/4D.json')], ['4E', require('../assets/animations/smiley_option4/4E.json')], ['5E', require('../assets/animations/smiley_option4/5E.json')]]);
+export const option4TransformTable = new Map([['1A-2B', require('../assets/animations/smiley_option4/1A-2B.json')], ['2B-3C', require('../assets/animations/smiley_option4/2B-3C.json')], ['3C-4D', require('../assets/animations/smiley_option4/3C-4D.json')], ['4D-5E', require('../assets/animations/smiley_option4/4D-5E.json')], ['1A-2E', require('../assets/animations/smiley_option4/1A-2E.json')], ['1A-2C', require('../assets/animations/smiley_option4/1A-2C.json')], ['2C-3E', require('../assets/animations/smiley_option4/2C-3E.json')], ['2C-3D', require('../assets/animations/smiley_option4/2C-3D.json')], ['3D-4E', require('../assets/animations/smiley_option4/3D-4E.json')]]);
 /** @typedef {import('./dt-common-lib/IfcRule').IQAData} IQAData */
 //# sourceMappingURL=data.js.map

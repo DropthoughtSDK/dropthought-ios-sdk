@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { View, Modal } from 'react-native';
+import { View, Modal, Dimensions } from 'react-native';
 import { pick, omit } from 'ramda';
-import { GlobalStyle } from '@dropthought/react-native-ui';
+import { GlobalStyle, Colors } from '@dropthought/react-native-ui';
 import SDKEntry from './SDKEntry';
 
 const ModalProps = [
@@ -18,18 +18,36 @@ const ModalProps = [
   'hardwareAccelerated',
 ];
 
+const height = Dimensions.get('window').height;
+const width = Dimensions.get('window').width;
 /**
  * @param {SurveyModalProps & SDKEntryProps & ModalProps } props
  */
 export function SurveyModal(props) {
   const sdkProps = omit(ModalProps, props);
   const modalProps = pick(ModalProps, props);
+  //[DK-3764] add backgroundColor to prevent the broken ui issue
+  const { backgroundColor, appearance } = props;
+  let dummyBackgroundColor = Colors.white;
+  if (backgroundColor) {
+    dummyBackgroundColor = backgroundColor;
+  } else if (appearance === 'dark') {
+    dummyBackgroundColor = Colors.backgroundColorDark;
+  }
+  const containerStyle = {
+    height,
+    width,
+    backgroundColor: dummyBackgroundColor,
+  };
   return (
-    <Modal presentationStyle="overFullScreen" transparent {...modalProps}>
-      <View style={GlobalStyle.flex1}>
-        <SDKEntry {...sdkProps} />
-      </View>
-    </Modal>
+    <>
+      <View style={containerStyle} />
+      <Modal presentationStyle="overFullScreen" transparent {...modalProps}>
+        <View style={GlobalStyle.flex1}>
+          <SDKEntry {...sdkProps} />
+        </View>
+      </Modal>
+    </>
   );
 }
 

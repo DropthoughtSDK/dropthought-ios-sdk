@@ -1,16 +1,13 @@
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
-import React from 'react';
-import { View, Text, TextInput, Platform } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, TextInput, Platform, Keyboard } from 'react-native';
 import styles from './MultiLineTextInput.styles';
 import { QuestionMetaDataType } from '../../utils/data';
 import i18n from '../../translation';
 import { Colors, addOpacityToColor, GlobalStyle } from '../../styles';
 import { useTheme } from '../../contexts/theme';
 import { COLOR_SCHEMES } from '../../contexts/theme/theme.const';
-
-const metadataTypeKeyboard = metadataType => {
-  switch (metadataType) {
+export const metadataTypeKeyboard = metadataType => {
+  switch (metadataType === null || metadataType === void 0 ? void 0 : metadataType.toLocaleLowerCase()) {
     case QuestionMetaDataType.Email:
       return 'email-address';
 
@@ -28,9 +25,8 @@ const metadataTypeKeyboard = metadataType => {
       return 'default';
   }
 };
-
-const metadataTypeAutoCapitalize = metadataType => {
-  switch (metadataType) {
+export const metadataTypeAutoCapitalize = metadataType => {
+  switch (metadataType === null || metadataType === void 0 ? void 0 : metadataType.toLocaleLowerCase()) {
     case QuestionMetaDataType.Name:
       return 'words';
 
@@ -53,9 +49,10 @@ const MultiLineTextInput = ({
   question,
   anonymous,
   inputRef,
-  showErrorHint = true,
+  showErrorHint = false,
   checked = true,
-  ...props
+  onBlurHandler = () => {},
+  onFocusHandler = () => {}
 }) => {
   const {
     colorScheme,
@@ -63,40 +60,44 @@ const MultiLineTextInput = ({
   } = useTheme();
   const {
     metaDataType,
-    questionBrand,
+    otherText = '',
+    questionBrand = '',
     scale = 64,
     type
   } = question;
   const MAX_CHARACTER = type === 'open' ? Number(scale) : 100;
   const appearanceTextColorStyle = {
     color: fontColor
-  };
-  const [hasEdited, setHasEdited] = React.useState(false);
-  const [text, setText] = React.useState(feedback !== null && feedback !== void 0 && feedback.answers[0] ? `${feedback === null || feedback === void 0 ? void 0 : feedback.answers[0]}` : '');
+  }; // to keep answer always select the last one
+
+  const answersIndex = (feedback === null || feedback === void 0 ? void 0 : feedback.answers.length) - 1;
+  const [text, setText] = React.useState(typeof (feedback === null || feedback === void 0 ? void 0 : feedback.answers[answersIndex]) === 'string' ? `${feedback === null || feedback === void 0 ? void 0 : feedback.answers[answersIndex]}` : '');
+  const [focus, setFocus] = React.useState(false);
   const rtl = i18n.dir() === 'rtl';
   const showAnonymousWarning = anonymous && metaDataType && (metaDataType === 'Email' || metaDataType === 'Name' || metaDataType === 'Phone');
-
-  const onEndEditing = () => {
-    setHasEdited(true);
-    onEndEditingHandler && onEndEditingHandler();
-  };
+  useEffect(() => {
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      onEndEditingHandler && onEndEditingHandler();
+    });
+    return () => {
+      hideSubscription.remove();
+    }; // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onChangeText = t => {
-    setText(t);
+    // [DK-3756] if the text is close to the maxLength it will be rendered twice in the iOS, so we add the focus to prevent the issue.
+    if (focus) {
+      setText(t);
+    }
+
     onChangeTextHandler && onChangeTextHandler(t);
   };
 
   const characterLeft = MAX_CHARACTER - text.length;
-  const AT_LEAST_CHARACTER = 3;
-  const isInputInValid = hasEdited && text.length < AT_LEAST_CHARACTER;
   let bottomText = '';
   let bottomTextColor = Colors.warningRed;
 
-  if (isInputInValid && showErrorHint) {
-    bottomText = i18n.t('open-question-invalid-message:characters', {
-      count: AT_LEAST_CHARACTER
-    });
-  } else if (showAnonymousWarning) {
+  if (showAnonymousWarning) {
     bottomText = i18n.t('survey:metadata-anonymous-warning');
     bottomTextColor = addOpacityToColor(Colors.black, 0.6);
   }
@@ -108,26 +109,33 @@ const MultiLineTextInput = ({
     borderWidth: 1,
     borderColor: Colors.warningRed
   };
-  const textInputStyle = [styles.inputContainer, appearanceTextColorStyle, appearanceSubBackgroundColorStyle, isInputInValid && showErrorHint ? inputValidStyle : null, rtl && GlobalStyle.textAlignRight];
+  const textInputStyle = [styles.inputContainer, appearanceTextColorStyle, appearanceSubBackgroundColorStyle, showErrorHint ? inputValidStyle : null, rtl && GlobalStyle.textAlignRight];
   const rightDescTextStyle = [styles.descText, styles.descRight, appearanceTextColorStyle, {
     opacity: 0.8
   }];
   const leftDescTextStyle = [styles.descText, styles.descLeft, {
     color: bottomTextColor
   }];
-  const inputView = /*#__PURE__*/React.createElement(TextInput, _extends({
+  const inputView = /*#__PURE__*/React.createElement(TextInput, {
     ref: inputRef,
     style: textInputStyle,
     multiline: true,
     onChangeText: onChangeText,
-    placeholder: questionBrand,
+    onFocus: () => {
+      setFocus(true);
+      onFocusHandler();
+    },
+    onBlur: () => {
+      setFocus(false);
+      onBlurHandler();
+    },
+    placeholder: otherText.length > 0 ? otherText : questionBrand.length > 0 ? questionBrand : i18n.t('survey:other-placeholder'),
     placeholderTextColor: Colors.inputPlaceholder,
-    onEndEditing: onEndEditing,
     value: text,
     maxLength: MAX_CHARACTER,
     keyboardType: metadataTypeKeyboard(metaDataType),
     autoCapitalize: metadataTypeAutoCapitalize(metaDataType)
-  }, props));
+  });
   const bottomView = /*#__PURE__*/React.createElement(View, {
     style: [styles.subTextRow, rtl && GlobalStyle.flexRowReverse]
   }, /*#__PURE__*/React.createElement(Text, {

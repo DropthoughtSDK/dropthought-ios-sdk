@@ -27,6 +27,7 @@ export const scaleLogic: {
     '4': number[];
     '5': number[];
 };
+export const option4FaceTable: string[];
 export const option3LoopFaceTable: Map<string, {
     v: string;
     meta: {
@@ -170,10 +171,8 @@ export const option3LoopFaceTable: Map<string, {
                 bm: number;
                 nm: string;
                 mn: string;
-                hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
+                hd: boolean; /**
+                 * validate if value match metaDataType question' rule
                  */
                 ind?: undefined;
                 ix?: undefined;
@@ -258,10 +257,6 @@ export const option3LoopFaceTable: Map<string, {
                     ix: number;
                 };
                 nm: string;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -343,15 +338,7 @@ export const option3LoopFaceTable: Map<string, {
                     bm: number;
                     nm: string;
                     mn: string;
-                    /**
-                     * validate if question's feedback is valid:
-                     * metadata type value check, mandatory check
-                     */
                     hd: boolean;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -398,10 +385,6 @@ export const option3LoopFaceTable: Map<string, {
                         ix: number;
                     };
                     nm: string;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -587,10 +570,6 @@ export const option3LoopFaceTable: Map<string, {
                     nm: string;
                     mn: string;
                     hd: boolean;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -638,10 +617,6 @@ export const option3LoopFaceTable: Map<string, {
                         ix: number;
                     };
                     nm: string;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -792,10 +767,6 @@ export const option3LoopFaceTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -841,10 +812,6 @@ export const option3LoopFaceTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -892,10 +859,6 @@ export const option3LoopFaceTable: Map<string, {
                     ix: number;
                 };
                 nm: string;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -1023,10 +986,6 @@ export const option3LoopFaceTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -1110,10 +1069,6 @@ export const option3LoopFaceTable: Map<string, {
                     ix: number;
                 };
                 nm: string;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -1196,10 +1151,6 @@ export const option3LoopFaceTable: Map<string, {
                     nm: string;
                     mn: string;
                     hd: boolean;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -1246,10 +1197,6 @@ export const option3LoopFaceTable: Map<string, {
                         ix: number;
                     };
                     nm: string;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -1435,10 +1382,6 @@ export const option3LoopFaceTable: Map<string, {
                     nm: string;
                     mn: string;
                     hd: boolean;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -1486,10 +1429,6 @@ export const option3LoopFaceTable: Map<string, {
                         ix: number;
                     };
                     nm: string;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -1640,10 +1579,6 @@ export const option3LoopFaceTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -1689,10 +1624,6 @@ export const option3LoopFaceTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -1740,10 +1671,6 @@ export const option3LoopFaceTable: Map<string, {
                     ix: number;
                 };
                 nm: string;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -1855,10 +1782,6 @@ export const option3LoopFaceTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -1942,10 +1865,6 @@ export const option3LoopFaceTable: Map<string, {
                     ix: number;
                 };
                 nm: string;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -2012,10 +1931,6 @@ export const option3LoopFaceTable: Map<string, {
                     nm: string;
                     mn: string;
                     hd: boolean;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -2062,10 +1977,6 @@ export const option3LoopFaceTable: Map<string, {
                         ix: number;
                     };
                     nm: string;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -2235,10 +2146,6 @@ export const option3LoopFaceTable: Map<string, {
                     nm: string;
                     mn: string;
                     hd: boolean;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -2286,10 +2193,6 @@ export const option3LoopFaceTable: Map<string, {
                         ix: number;
                     };
                     nm: string;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -2440,10 +2343,6 @@ export const option3LoopFaceTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -2473,10 +2372,6 @@ export const option3LoopFaceTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -2524,10 +2419,6 @@ export const option3LoopFaceTable: Map<string, {
                     ix: number;
                 };
                 nm: string;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -2605,10 +2496,6 @@ export const option3LoopFaceTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -2655,10 +2542,6 @@ export const option3LoopFaceTable: Map<string, {
                     ix: number;
                 };
                 nm: string;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -2825,10 +2708,8 @@ export const option3TransformTable: Map<string, {
                 bm: number;
                 nm: string;
                 mn: string;
-                hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
+                hd: boolean; /**
+                 * validate if value match metaDataType question' rule
                  */
                 ind?: undefined;
                 ix?: undefined;
@@ -2913,10 +2794,6 @@ export const option3TransformTable: Map<string, {
                     ix: number;
                 };
                 nm: string;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -2998,15 +2875,7 @@ export const option3TransformTable: Map<string, {
                     bm: number;
                     nm: string;
                     mn: string;
-                    /**
-                     * validate if question's feedback is valid:
-                     * metadata type value check, mandatory check
-                     */
                     hd: boolean;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -3053,10 +2922,6 @@ export const option3TransformTable: Map<string, {
                         ix: number;
                     };
                     nm: string;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -3242,10 +3107,6 @@ export const option3TransformTable: Map<string, {
                     nm: string;
                     mn: string;
                     hd: boolean;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -3293,10 +3154,6 @@ export const option3TransformTable: Map<string, {
                         ix: number;
                     };
                     nm: string;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -3447,10 +3304,6 @@ export const option3TransformTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -3496,10 +3349,6 @@ export const option3TransformTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -3547,10 +3396,6 @@ export const option3TransformTable: Map<string, {
                     ix: number;
                 };
                 nm: string;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -3678,10 +3523,6 @@ export const option3TransformTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -3765,10 +3606,6 @@ export const option3TransformTable: Map<string, {
                     ix: number;
                 };
                 nm: string;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -3851,10 +3688,6 @@ export const option3TransformTable: Map<string, {
                     nm: string;
                     mn: string;
                     hd: boolean;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -3901,10 +3734,6 @@ export const option3TransformTable: Map<string, {
                         ix: number;
                     };
                     nm: string;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -4090,10 +3919,6 @@ export const option3TransformTable: Map<string, {
                     nm: string;
                     mn: string;
                     hd: boolean;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -4141,10 +3966,6 @@ export const option3TransformTable: Map<string, {
                         ix: number;
                     };
                     nm: string;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -4295,10 +4116,6 @@ export const option3TransformTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -4344,10 +4161,6 @@ export const option3TransformTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -4395,10 +4208,6 @@ export const option3TransformTable: Map<string, {
                     ix: number;
                 };
                 nm: string;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -4510,10 +4319,6 @@ export const option3TransformTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -4597,10 +4402,6 @@ export const option3TransformTable: Map<string, {
                     ix: number;
                 };
                 nm: string;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -4667,10 +4468,6 @@ export const option3TransformTable: Map<string, {
                     nm: string;
                     mn: string;
                     hd: boolean;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -4717,10 +4514,6 @@ export const option3TransformTable: Map<string, {
                         ix: number;
                     };
                     nm: string;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -4890,10 +4683,6 @@ export const option3TransformTable: Map<string, {
                     nm: string;
                     mn: string;
                     hd: boolean;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -4941,10 +4730,6 @@ export const option3TransformTable: Map<string, {
                         ix: number;
                     };
                     nm: string;
-                    /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
                     ind?: undefined;
                     ix?: undefined;
                     ks?: undefined;
@@ -5095,10 +4880,6 @@ export const option3TransformTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -5128,10 +4909,6 @@ export const option3TransformTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -5179,10 +4956,6 @@ export const option3TransformTable: Map<string, {
                     ix: number;
                 };
                 nm: string;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -5260,10 +5033,6 @@ export const option3TransformTable: Map<string, {
                 nm: string;
                 mn: string;
                 hd: boolean;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -5310,10 +5079,6 @@ export const option3TransformTable: Map<string, {
                     ix: number;
                 };
                 nm: string;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
                 ind?: undefined;
                 ix?: undefined;
                 ks?: undefined;
@@ -5337,6 +5102,2936 @@ export const option3TransformTable: Map<string, {
     })[];
     markers: never[];
 }>;
-export const option4LoopFaceTable: Map<string, string>;
-export const option4TransformTable: Map<string, string>;
+export const option4LoopFaceTable: Map<string, {
+    v: string;
+    meta: {
+        g: string;
+        a: string;
+        k: string;
+        d: string;
+        tc: string;
+    };
+    fr: number;
+    ip: number;
+    op: number;
+    w: number;
+    h: number;
+    nm: string;
+    ddd: number;
+    assets: never[];
+    layers: {
+        ddd: number;
+        ind: number;
+        ty: number;
+        nm: string;
+        sr: number;
+        ks: {
+            o: {
+                a: number;
+                k: number;
+                ix: number;
+            };
+            r: {
+                a: number;
+                k: number;
+                ix: number;
+            };
+            p: {
+                a: number;
+                k: number[];
+                ix: number;
+            };
+            a: {
+                a: number;
+                k: number[];
+                ix: number;
+            };
+            s: {
+                a: number;
+                k: number[];
+                ix: number;
+            };
+        };
+        ao: number;
+        shapes: ({
+            ty: string;
+            it: ({
+                ind: number;
+                ty: string;
+                ix: number;
+                ks: {
+                    a: number;
+                    k: {
+                        i: number[][];
+                        o: number[][];
+                        v: number[][];
+                        c: boolean;
+                    };
+                    ix: number;
+                };
+                nm: string;
+                mn: string;
+                hd: boolean;
+                c?: undefined;
+                o?: undefined;
+                r?: undefined;
+                bm?: undefined;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                c: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                r: number;
+                bm: number;
+                nm: string;
+                mn: string;
+                hd: boolean;
+                ind?: undefined;
+                ix?: undefined;
+                ks?: undefined;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                p: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number;
+                            y: number;
+                        };
+                        o: {
+                            x: number;
+                            y: number;
+                        };
+                        t: number;
+                        s: number[];
+                        to: number[];
+                        ti: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                        to?: undefined;
+                        ti?: undefined;
+                    })[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number[];
+                            y: number[];
+                        };
+                        o: {
+                            x: number[];
+                            y: number[];
+                        };
+                        t: number;
+                        s: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                    })[];
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number[];
+                            y: number[];
+                        };
+                        o: {
+                            x: number[];
+                            y: number[];
+                        };
+                        t: number;
+                        s: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                    })[];
+                    ix: number;
+                };
+                sk: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sa: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                nm: string;
+                ind?: undefined;
+                ix?: undefined;
+                ks?: undefined;
+                mn?: undefined;
+                hd?: undefined;
+                c?: undefined;
+                bm?: undefined;
+            })[];
+            nm: string;
+            np: number;
+            cix: number;
+            bm: number;
+            ix: number;
+            mn: string;
+            hd: boolean;
+        } | {
+            ty: string;
+            it: ({
+                ind: number;
+                ty: string;
+                ix: number;
+                ks: {
+                    a: number;
+                    k: {
+                        i: number[][];
+                        o: number[][];
+                        v: number[][];
+                        c: boolean;
+                    };
+                    ix: number;
+                };
+                nm: string;
+                mn: string;
+                hd: boolean;
+                c?: undefined;
+                o?: undefined;
+                r?: undefined;
+                bm?: undefined;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                c: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                r: number;
+                bm: number;
+                nm: string;
+                mn: string;
+                hd: boolean;
+                ind?: undefined;
+                ix?: undefined;
+                ks?: undefined;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                p: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number[];
+                            y: number[];
+                        };
+                        o: {
+                            x: number[];
+                            y: number[];
+                        };
+                        t: number;
+                        s: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                    })[];
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sk: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sa: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                nm: string;
+                ind?: undefined;
+                ix?: undefined;
+                ks?: undefined;
+                mn?: undefined;
+                hd?: undefined;
+                c?: undefined;
+                bm?: undefined;
+            })[];
+            nm: string;
+            np: number;
+            cix: number;
+            bm: number;
+            ix: number;
+            mn: string;
+            hd: boolean;
+        } | {
+            ty: string;
+            it: ({
+                ty: string;
+                it: ({
+                    ind: number;
+                    ty: string;
+                    ix: number;
+                    ks: {
+                        a: number;
+                        k: {
+                            i: number[][];
+                            o: number[][];
+                            v: number[][];
+                            c: boolean;
+                        };
+                        ix: number;
+                    };
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    c?: undefined;
+                    o?: undefined;
+                    r?: undefined;
+                    bm?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    c: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    r: number;
+                    bm: number;
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                    c?: undefined;
+                    bm?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
+                ix: number;
+                mn: string;
+                hd: boolean;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                r?: undefined;
+                o?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                /** @type {IQAData[]} */
+                ty: string;
+                p: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number;
+                            y: number;
+                        };
+                        o: {
+                            x: number;
+                            y: number;
+                        };
+                        t: number;
+                        s: number[];
+                        to: number[];
+                        ti: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                        to?: undefined;
+                        ti?: undefined;
+                    })[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number[];
+                            y: number[];
+                        };
+                        o: {
+                            x: number[];
+                            y: number[];
+                        };
+                        t: number;
+                        s: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                    })[];
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number[];
+                            y: number[];
+                        };
+                        o: {
+                            x: number[];
+                            y: number[];
+                        };
+                        t: number;
+                        s: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                    })[];
+                    ix: number;
+                };
+                sk: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sa: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                nm: string;
+                it?: undefined;
+                np?: undefined;
+                cix?: undefined;
+                bm?: undefined;
+                ix?: undefined;
+                mn?: undefined;
+                hd?: undefined;
+            })[];
+            nm: string;
+            np: number;
+            cix: number;
+            bm: number;
+            ix: number;
+            mn: string;
+            hd: boolean;
+        } | {
+            ty: string;
+            it: ({
+                ty: string;
+                it: ({
+                    ind: number;
+                    ty: string;
+                    ix: number;
+                    ks: {
+                        a: number;
+                        k: {
+                            i: number[][];
+                            o: number[][];
+                            v: number[][];
+                            c: boolean;
+                        };
+                        ix: number;
+                    };
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    c?: undefined;
+                    o?: undefined;
+                    r?: undefined;
+                    bm?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    c: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    r: number;
+                    bm: number;
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                    c?: undefined;
+                    bm?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
+                ix: number;
+                mn: string;
+                hd: boolean;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                r?: undefined;
+                o?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                p: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number;
+                            y: number;
+                        };
+                        o: {
+                            x: number;
+                            y: number;
+                        };
+                        t: number;
+                        s: number[];
+                        to: number[];
+                        ti: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                        to?: undefined;
+                        ti?: undefined;
+                    })[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number[];
+                            y: number[];
+                        };
+                        o: {
+                            x: number[];
+                            y: number[];
+                        };
+                        t: number;
+                        s: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                    })[];
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sk: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sa: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                nm: string;
+                it?: undefined;
+                np?: undefined;
+                cix?: undefined;
+                bm?: undefined;
+                ix?: undefined;
+                mn?: undefined;
+                hd?: undefined;
+            })[];
+            nm: string;
+            np: number;
+            cix: number;
+            bm: number;
+            ix: number;
+            mn: string;
+            hd: boolean;
+        } | {
+            ty: string;
+            it: ({
+                ty: string;
+                it: ({
+                    ind: number;
+                    ty: string;
+                    ix: number;
+                    ks: {
+                        a: number;
+                        k: {
+                            i: number[][];
+                            o: number[][];
+                            v: number[][];
+                            c: boolean;
+                        };
+                        ix: number;
+                    };
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    c?: undefined;
+                    o?: undefined;
+                    r?: undefined;
+                    bm?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    c: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    r: number;
+                    bm: number;
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                    c?: undefined;
+                    bm?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
+                ix: number;
+                mn: string;
+                hd: boolean;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                r?: undefined;
+                o?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                p: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sk: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sa: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                nm: string;
+                it?: undefined;
+                np?: undefined;
+                cix?: undefined;
+                bm?: undefined;
+                ix?: undefined;
+                mn?: undefined;
+                hd?: undefined;
+            })[];
+            nm: string;
+            np: number;
+            cix: number;
+            bm: number;
+            ix: number;
+            mn: string;
+            hd: boolean;
+        } | {
+            ty: string;
+            it: ({
+                ind: number;
+                ty: string;
+                ix: number;
+                ks: {
+                    a: number;
+                    k: {
+                        i: number[][];
+                        o: number[][];
+                        v: number[][];
+                        c: boolean;
+                    };
+                    ix: number;
+                };
+                nm: string;
+                mn: string;
+                hd: boolean;
+                c?: undefined;
+                o?: undefined;
+                r?: undefined;
+                bm?: undefined;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                c: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                r: number;
+                bm: number;
+                nm: string;
+                mn: string;
+                hd: boolean;
+                ind?: undefined;
+                ix?: undefined;
+                ks?: undefined;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                p: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sk: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sa: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                nm: string;
+                ind?: undefined;
+                ix?: undefined;
+                ks?: undefined;
+                mn?: undefined;
+                hd?: undefined;
+                c?: undefined;
+                bm?: undefined;
+            })[];
+            nm: string;
+            np: number;
+            cix: number;
+            bm: number;
+            ix: number;
+            mn: string;
+            hd: boolean;
+        })[];
+        ip: number;
+        op: number;
+        st: number;
+        bm: number;
+    }[];
+    markers: never[];
+}>;
+export const option4TransformTable: Map<string, {
+    v: string;
+    meta: {
+        g: string;
+        a: string;
+        k: string;
+        d: string;
+        tc: string;
+    };
+    fr: number;
+    ip: number;
+    op: number;
+    w: number;
+    h: number;
+    nm: string;
+    ddd: number;
+    assets: ({
+        id: string;
+        layers: {
+            ddd: number;
+            ind: number;
+            ty: number;
+            nm: string;
+            sr: number;
+            ks: {
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                p: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+            };
+            ao: number;
+            shapes: ({
+                ty: string;
+                /**
+                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
+                 * if the type is boolean at the last, it means it is an "other" option
+                 */
+                it: ({
+                    ind: number;
+                    ty: string;
+                    ix: number;
+                    ks: {
+                        a: number;
+                        k: {
+                            i: number[][];
+                            o: number[][];
+                            v: number[][];
+                            c: boolean;
+                        };
+                        ix: number;
+                    };
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    c?: undefined;
+                    o?: undefined;
+                    r?: undefined;
+                    bm?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    c: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    r: number;
+                    bm: number;
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number;
+                                y: number;
+                            };
+                            o: {
+                                x: number;
+                                y: number;
+                            };
+                            t: number;
+                            s: number[];
+                            to: number[];
+                            ti: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                            to?: undefined;
+                            ti?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number[];
+                                y: number[];
+                            };
+                            o: {
+                                x: number[];
+                                y: number[];
+                            };
+                            t: number;
+                            s: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number[];
+                                y: number[];
+                            };
+                            o: {
+                                x: number[];
+                                y: number[];
+                            };
+                            t: number;
+                            s: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                    c?: undefined;
+                    bm?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
+                ix: number;
+                mn: string;
+                hd: boolean;
+            } | {
+                ty: string;
+                it: ({
+                    ind: number;
+                    ty: string;
+                    ix: number;
+                    ks: {
+                        a: number;
+                        k: {
+                            i: number[][];
+                            o: number[][];
+                            v: number[][];
+                            c: boolean;
+                        };
+                        ix: number;
+                    };
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    c?: undefined;
+                    o?: undefined;
+                    r?: undefined;
+                    bm?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    c: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    r: number;
+                    bm: number;
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number[];
+                                y: number[];
+                            };
+                            o: {
+                                x: number[];
+                                y: number[];
+                            };
+                            t: number;
+                            s: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number; /**
+                         * if mandatory question has feedback
+                         */
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                    c?: undefined;
+                    bm?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
+                ix: number;
+                mn: string;
+                hd: boolean;
+            } | {
+                ty: string;
+                it: ({
+                    ty: string;
+                    it: ({
+                        ind: number;
+                        ty: string;
+                        ix: number;
+                        ks: {
+                            a: number;
+                            k: {
+                                i: number[][];
+                                o: number[][];
+                                v: number[][];
+                                c: boolean;
+                            };
+                            ix: number;
+                        };
+                        nm: string;
+                        mn: string;
+                        hd: boolean;
+                        c?: undefined;
+                        o?: undefined;
+                        r?: undefined;
+                        bm?: undefined;
+                        p?: undefined;
+                        a?: undefined;
+                        s?: undefined;
+                        sk?: undefined;
+                        sa?: undefined;
+                    } | {
+                        ty: string;
+                        c: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        o: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        r: number;
+                        bm: number;
+                        nm: string;
+                        mn: string;
+                        hd: boolean;
+                        ind?: undefined;
+                        ix?: undefined;
+                        ks?: undefined;
+                        p?: undefined;
+                        a?: undefined;
+                        s?: undefined;
+                        sk?: undefined;
+                        sa?: undefined;
+                    } | {
+                        ty: string;
+                        p: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        a: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        s: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        r: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        o: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        sk: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        sa: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        nm: string;
+                        ind?: undefined;
+                        ix?: undefined;
+                        ks?: undefined;
+                        mn?: undefined;
+                        hd?: undefined;
+                        c?: undefined;
+                        bm?: undefined;
+                    })[];
+                    nm: string;
+                    np: number;
+                    cix: number;
+                    bm: number;
+                    ix: number;
+                    mn: string;
+                    hd: boolean;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    r?: undefined;
+                    o?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number;
+                                y: number;
+                            };
+                            o: {
+                                x: number;
+                                y: number;
+                            };
+                            t: number;
+                            s: number[];
+                            to: number[];
+                            ti: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                            to?: undefined;
+                            ti?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number[];
+                                y: number[];
+                            };
+                            o: {
+                                x: number[];
+                                y: number[];
+                            };
+                            t: number;
+                            s: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number[];
+                                y: number[];
+                            };
+                            o: {
+                                x: number[];
+                                y: number[];
+                            };
+                            t: number;
+                            s: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    it?: undefined;
+                    np?: undefined;
+                    cix?: undefined;
+                    bm?: undefined;
+                    ix?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
+                ix: number;
+                mn: string;
+                hd: boolean;
+            } | {
+                ty: string;
+                it: ({
+                    ty: string;
+                    it: ({
+                        ind: number;
+                        ty: string;
+                        ix: number;
+                        ks: {
+                            a: number;
+                            k: {
+                                i: number[][];
+                                o: number[][];
+                                v: number[][];
+                                c: boolean;
+                            };
+                            ix: number;
+                        };
+                        nm: string;
+                        mn: string;
+                        hd: boolean;
+                        c?: undefined;
+                        o?: undefined;
+                        r?: undefined;
+                        bm?: undefined;
+                        p?: undefined;
+                        a?: undefined;
+                        s?: undefined;
+                        sk?: undefined;
+                        sa?: undefined;
+                    } | {
+                        ty: string;
+                        c: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        o: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        r: number;
+                        bm: number;
+                        nm: string;
+                        mn: string;
+                        hd: boolean;
+                        ind?: undefined;
+                        ix?: undefined;
+                        ks?: undefined;
+                        p?: undefined;
+                        a?: undefined;
+                        s?: undefined;
+                        sk?: undefined;
+                        sa?: undefined;
+                    } | {
+                        ty: string;
+                        p: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        a: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        s: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        r: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        o: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        sk: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        sa: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        nm: string;
+                        ind?: undefined;
+                        ix?: undefined;
+                        ks?: undefined;
+                        mn?: undefined;
+                        hd?: undefined;
+                        c?: undefined;
+                        bm?: undefined;
+                    })[];
+                    nm: string;
+                    np: number;
+                    cix: number;
+                    bm: number;
+                    ix: number;
+                    mn: string;
+                    hd: boolean;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    r?: undefined;
+                    o?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number;
+                                y: number;
+                            };
+                            o: {
+                                x: number;
+                                y: number;
+                            };
+                            t: number;
+                            s: number[];
+                            to: number[];
+                            ti: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                            to?: undefined;
+                            ti?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number[];
+                                y: number[];
+                            };
+                            o: {
+                                x: number[];
+                                y: number[];
+                            };
+                            t: number;
+                            s: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    it?: undefined;
+                    np?: undefined;
+                    cix?: undefined;
+                    bm?: undefined;
+                    ix?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
+                ix: number;
+                mn: string;
+                hd: boolean;
+            } | {
+                ty: string;
+                it: ({
+                    ty: string;
+                    it: ({
+                        ind: number;
+                        ty: string;
+                        ix: number;
+                        ks: {
+                            a: number;
+                            k: {
+                                i: number[][];
+                                o: number[][];
+                                v: number[][];
+                                c: boolean;
+                            };
+                            ix: number;
+                        };
+                        nm: string;
+                        mn: string;
+                        hd: boolean;
+                        c?: undefined;
+                        o?: undefined;
+                        r?: undefined;
+                        bm?: undefined;
+                        p?: undefined;
+                        a?: undefined;
+                        s?: undefined;
+                        sk?: undefined;
+                        sa?: undefined;
+                    } | {
+                        ty: string;
+                        c: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        o: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        r: number;
+                        bm: number;
+                        nm: string;
+                        mn: string;
+                        hd: boolean;
+                        ind?: undefined;
+                        ix?: undefined;
+                        ks?: undefined;
+                        p?: undefined;
+                        a?: undefined;
+                        s?: undefined;
+                        sk?: undefined;
+                        sa?: undefined;
+                    } | {
+                        ty: string;
+                        p: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        a: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        s: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        r: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        o: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        sk: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        sa: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        nm: string;
+                        ind?: undefined;
+                        ix?: undefined;
+                        ks?: undefined;
+                        mn?: undefined;
+                        hd?: undefined;
+                        c?: undefined;
+                        bm?: undefined;
+                    })[];
+                    nm: string;
+                    np: number;
+                    cix: number;
+                    bm: number;
+                    ix: number;
+                    mn: string;
+                    hd: boolean;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    r?: undefined;
+                    o?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    it?: undefined;
+                    np?: undefined;
+                    cix?: undefined;
+                    bm?: undefined;
+                    ix?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
+                ix: number;
+                mn: string;
+                hd: boolean;
+            } | {
+                ty: string;
+                it: ({
+                    ind: number;
+                    ty: string;
+                    ix: number;
+                    ks: {
+                        a: number;
+                        k: {
+                            i: number[][];
+                            o: number[][];
+                            v: number[][];
+                            c: boolean;
+                        };
+                        ix: number;
+                    };
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    c?: undefined;
+                    o?: undefined;
+                    r?: undefined;
+                    bm?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    c: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    r: number;
+                    bm: number;
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                    c?: undefined;
+                    bm?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
+                ix: number;
+                mn: string;
+                hd: boolean;
+            })[];
+            ip: number;
+            op: number;
+            st: number;
+            bm: number;
+        }[];
+    } | {
+        id: string;
+        layers: {
+            ddd: number;
+            ind: number;
+            ty: number;
+            nm: string;
+            sr: number;
+            ks: {
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                p: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+            };
+            ao: number;
+            shapes: ({
+                ty: string;
+                it: ({
+                    ty: string;
+                    it: ({
+                        ind: number;
+                        ty: string;
+                        ix: number;
+                        ks: {
+                            a: number;
+                            k: {
+                                i: number[][];
+                                o: number[][];
+                                v: number[][];
+                                c: boolean;
+                            };
+                            ix: number;
+                        };
+                        nm: string;
+                        mn: string;
+                        hd: boolean;
+                        c?: undefined;
+                        o?: undefined;
+                        r?: undefined;
+                        bm?: undefined;
+                        p?: undefined;
+                        a?: undefined;
+                        s?: undefined;
+                        sk?: undefined;
+                        sa?: undefined;
+                    } | {
+                        ty: string;
+                        c: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        o: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        r: number;
+                        bm: number;
+                        nm: string;
+                        mn: string;
+                        hd: boolean;
+                        ind?: undefined;
+                        ix?: undefined;
+                        ks?: undefined;
+                        p?: undefined;
+                        a?: undefined;
+                        s?: undefined;
+                        sk?: undefined;
+                        sa?: undefined;
+                    } | {
+                        ty: string;
+                        p: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        a: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        s: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        r: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        o: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        sk: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        sa: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        nm: string;
+                        ind?: undefined;
+                        ix?: undefined;
+                        ks?: undefined;
+                        mn?: undefined;
+                        hd?: undefined;
+                        c?: undefined;
+                        bm?: undefined;
+                    })[];
+                    nm: string;
+                    np: number;
+                    cix: number;
+                    bm: number;
+                    ix: number;
+                    mn: string;
+                    hd: boolean;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    r?: undefined;
+                    o?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number;
+                                y: number;
+                            };
+                            o: {
+                                x: number;
+                                y: number;
+                            };
+                            t: number;
+                            s: number[];
+                            to: number[];
+                            ti: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                            to?: undefined;
+                            ti?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number[];
+                                y: number[];
+                            };
+                            o: {
+                                x: number[];
+                                y: number[];
+                            };
+                            t: number;
+                            s: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    it?: undefined;
+                    np?: undefined;
+                    cix?: undefined;
+                    bm?: undefined;
+                    ix?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
+                ix: number;
+                mn: string;
+                hd: boolean;
+            } | {
+                ty: string;
+                it: ({
+                    ind: number;
+                    ty: string;
+                    ix: number;
+                    ks: {
+                        a: number;
+                        k: {
+                            i: number[][];
+                            o: number[][];
+                            v: number[][];
+                            c: boolean;
+                        };
+                        ix: number;
+                    };
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    c?: undefined;
+                    o?: undefined;
+                    r?: undefined;
+                    bm?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    c: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    r: number;
+                    bm: number;
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number;
+                                y: number;
+                            };
+                            o: {
+                                x: number;
+                                y: number;
+                            };
+                            t: number;
+                            s: number[];
+                            to: number[];
+                            ti: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                            to?: undefined;
+                            ti?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number[];
+                                y: number[];
+                            };
+                            o: {
+                                x: number[];
+                                y: number[];
+                            };
+                            t: number;
+                            s: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                    c?: undefined;
+                    bm?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
+                ix: number;
+                mn: string;
+                hd: boolean;
+            } | {
+                ty: string;
+                it: ({
+                    ty: string;
+                    it: ({
+                        ind: number;
+                        ty: string;
+                        ix: number;
+                        ks: {
+                            a: number;
+                            k: {
+                                i: number[][];
+                                o: number[][];
+                                v: number[][];
+                                c: boolean;
+                            };
+                            ix: number;
+                        };
+                        nm: string;
+                        mn: string;
+                        hd: boolean;
+                        c?: undefined;
+                        o?: undefined;
+                        r?: undefined;
+                        bm?: undefined;
+                        p?: undefined;
+                        a?: undefined;
+                        s?: undefined;
+                        sk?: undefined;
+                        sa?: undefined;
+                    } | {
+                        ty: string;
+                        c: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        o: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        r: number;
+                        bm: number;
+                        nm: string;
+                        mn: string;
+                        hd: boolean;
+                        ind?: undefined;
+                        ix?: undefined;
+                        ks?: undefined;
+                        p?: undefined;
+                        a?: undefined;
+                        s?: undefined;
+                        sk?: undefined;
+                        sa?: undefined;
+                    } | {
+                        ty: string;
+                        p: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        a: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        s: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        r: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        o: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        sk: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        sa: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        nm: string;
+                        ind?: undefined;
+                        ix?: undefined;
+                        ks?: undefined;
+                        mn?: undefined;
+                        hd?: undefined;
+                        c?: undefined;
+                        bm?: undefined;
+                    })[];
+                    nm: string;
+                    np: number;
+                    cix: number;
+                    bm: number;
+                    ix: number;
+                    mn: string;
+                    hd: boolean;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    r?: undefined;
+                    o?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number;
+                                y: number;
+                            };
+                            o: {
+                                x: number;
+                                y: number;
+                            };
+                            t: number;
+                            s: number[];
+                            to: number[];
+                            ti: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                            to?: undefined;
+                            ti?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number[];
+                                y: number[];
+                            };
+                            o: {
+                                x: number[];
+                                y: number[];
+                            };
+                            t: number;
+                            s: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: ({
+                            i: {
+                                x: number[];
+                                y: number[];
+                            };
+                            o: {
+                                x: number[];
+                                y: number[];
+                            };
+                            t: number;
+                            s: number[];
+                        } | {
+                            t: number;
+                            s: number[];
+                            i?: undefined;
+                            o?: undefined;
+                        })[];
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    it?: undefined;
+                    np?: undefined;
+                    cix?: undefined;
+                    bm?: undefined;
+                    ix?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
+                ix: number;
+                mn: string;
+                hd: boolean;
+            } | {
+                ty: string;
+                it: ({
+                    ind: number;
+                    ty: string;
+                    ix: number;
+                    ks: {
+                        a: number;
+                        k: {
+                            i: number[][];
+                            o: number[][];
+                            v: number[][];
+                            c: boolean;
+                        };
+                        ix: number;
+                    };
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    c?: undefined;
+                    o?: undefined;
+                    r?: undefined;
+                    bm?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    c: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    r: number;
+                    bm: number;
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                    c?: undefined;
+                    bm?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
+                ix: number;
+                mn: string;
+                hd: boolean;
+            })[];
+            ip: number;
+            op: number;
+            st: number;
+            bm: number;
+        }[];
+    })[];
+    layers: ({
+        ddd: number;
+        ind: number;
+        ty: number;
+        nm: string;
+        refId: string;
+        sr: number;
+        ks: {
+            o: {
+                a: number;
+                k: ({
+                    i: {
+                        x: number[];
+                        y: number[];
+                    };
+                    o: {
+                        x: number[];
+                        y: number[];
+                    };
+                    t: number;
+                    s: number[];
+                } | {
+                    t: number;
+                    s: number[];
+                    i?: undefined;
+                    o?: undefined;
+                })[];
+                ix: number;
+            };
+            r: {
+                a: number;
+                k: number;
+                ix: number;
+            };
+            p: {
+                a: number;
+                k: ({
+                    i: {
+                        x: number;
+                        y: number;
+                    };
+                    o: {
+                        x: number;
+                        y: number;
+                    };
+                    t: number;
+                    s: number[];
+                    to: number[];
+                    ti: number[];
+                } | {
+                    t: number;
+                    s: number[];
+                    i?: undefined;
+                    o?: undefined;
+                    to?: undefined;
+                    ti?: undefined;
+                })[];
+                ix: number;
+            };
+            a: {
+                a: number;
+                k: number[];
+                ix: number;
+            };
+            s: {
+                a: number;
+                k: number[];
+                ix: number;
+            };
+        };
+        ao: number;
+        w: number;
+        h: number;
+        ip: number;
+        op: number;
+        st: number;
+        bm: number;
+    } | {
+        ddd: number;
+        ind: number;
+        ty: number;
+        nm: string;
+        refId: string;
+        sr: number;
+        ks: {
+            o: {
+                a: number;
+                k: ({
+                    i: {
+                        x: number[];
+                        y: number[];
+                    };
+                    o: {
+                        x: number[];
+                        y: number[];
+                    };
+                    t: number;
+                    s: number[];
+                } | {
+                    t: number;
+                    s: number[];
+                    i?: undefined;
+                    o?: undefined;
+                })[];
+                ix: number;
+            };
+            r: {
+                a: number;
+                k: number;
+                ix: number;
+            };
+            p: {
+                a: number;
+                k: number[];
+                ix: number;
+            };
+            a: {
+                a: number;
+                k: number[];
+                ix: number;
+            };
+            s: {
+                a: number;
+                k: number[];
+                ix: number;
+            };
+        };
+        ao: number;
+        w: number;
+        h: number;
+        ip: number;
+        op: number;
+        st: number;
+        bm: number;
+    })[];
+    markers: never[];
+}>;
 export type IQAData = import('./dt-common-lib/IfcRule').IQAData;

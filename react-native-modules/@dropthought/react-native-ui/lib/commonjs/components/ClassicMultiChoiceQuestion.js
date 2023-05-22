@@ -129,7 +129,8 @@ class ClassicMultiChoiceQuestion extends _react.PureComponent {
           title: option,
           type: "checkbox",
           onPress: this.onOptionPressHandler,
-          onChangeValue: this.onChangeValueHandler
+          onChangeValue: this.onChangeValueHandler,
+          question: this.props.question
         });
       }
 

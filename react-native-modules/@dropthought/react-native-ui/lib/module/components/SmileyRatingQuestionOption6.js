@@ -1,5 +1,5 @@
 import { View, StyleSheet, Text, ImageBackground } from 'react-native';
-import React, { useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Colors } from '../styles';
 import i18n from '../translation';
 import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
@@ -10,9 +10,8 @@ import SurveyHeader from '../containers/SurveyHeader';
 import RotaryPhonePicker from './RotaryPhonePicker';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import MandatoryTitle from './MandatoryTitle';
-const animations = [require('../assets/animations/smiley_option6/option6_1.json'), require('../assets/animations/smiley_option6/option6_2.json'), require('../assets/animations/smiley_option6/option6_3.json'), require('../assets/animations/smiley_option6/option6_4.json'), require('../assets/animations/smiley_option6/option6_5.json')]; // We through the null text string to keep blank to make it as same as the rotary dial design.
-
-const lotties = new Array(8).fill('');
+import { isNil, repeat } from 'ramda';
+const animations = [require('../assets/animations/smiley_option6/option6_1.json'), require('../assets/animations/smiley_option6/option6_2.json'), require('../assets/animations/smiley_option6/option6_3.json'), require('../assets/animations/smiley_option6/option6_4.json'), require('../assets/animations/smiley_option6/option6_5.json')];
 
 const SmileyRatingQuestionOption6 = ({
   survey,
@@ -22,37 +21,37 @@ const SmileyRatingQuestionOption6 = ({
   onClose,
   onPrevPage,
   onNextPage,
-  onFeedback
+  onFeedback,
+  feedback
 }) => {
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
-  const [score, setScore] = React.useState(-1);
+  const answered = feedback && feedback.answers && !isNil(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
+  const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
+  const [selectedIndex, setSelectedIndex] = useState(answered ? answeredValue : -1);
   const {
     questionId,
     scale,
     options
   } = question;
   const scaleLogicList = scaleLogic[scale];
-  const descriptions = scaleLogicList.map((_, index) => options[index]);
-  useEffect(() => {
-    lotties.forEach((value, index) => {
-      if (index === 0 || index > scaleLogicList.length) {
-        lotties[index] = value;
-      } else {
-        const scaleIndex = scaleLogicList[index - 1];
-        lotties[index] = animations[scaleIndex];
-      }
+  const descriptions = scaleLogicList.map((_, index) => options[index]); // We through the null text string to keep blank to make it as same as the rotary dial design.
+
+  const lotties = useMemo(() => {
+    let result = [''];
+    scaleLogicList.forEach(scaleIndex => {
+      result = [...result, animations[scaleIndex]];
     });
+    const remainDummy = 7 - scaleLogicList.length;
+    result = [...result, ...repeat('', remainDummy)];
+    return result;
   }, [scaleLogicList]);
   const {
     colorScheme,
     customFontColor
   } = useTheme();
   const totalScore = scale;
-  const renderScore = score;
-  const isAtCoverScreen = score === -1;
+  const isAtCoverScreen = selectedIndex === -1;
   const updateScore = React.useCallback(currentIndex => {
-    setScore(currentIndex);
-    setSelectedIndex(currentIndex);
+    setSelectedIndex(currentIndex - 1);
     onFeedback({
       questionId,
       answers: [currentIndex - 1],
@@ -83,10 +82,10 @@ const SmileyRatingQuestionOption6 = ({
   };
   const lottieContainer = /*#__PURE__*/React.createElement(View, {
     style: commonStyles.lottieContainer
-  }, /*#__PURE__*/React.createElement(LottieView, {
-    source: lotties[selectedIndex],
+  }, selectedIndex > -1 && lotties[selectedIndex + 1] !== '' ? /*#__PURE__*/React.createElement(LottieView, {
+    source: lotties[selectedIndex + 1],
     autoPlay: true
-  }));
+  }) : null);
   const scoreContainer = /*#__PURE__*/React.createElement(View, {
     style: commonStyles.scoreContainer
   }, /*#__PURE__*/React.createElement(View, {
@@ -95,11 +94,11 @@ const SmileyRatingQuestionOption6 = ({
     style: commonStyles.scoreText
   }, /*#__PURE__*/React.createElement(Text, {
     style: scoreSelectedStyle
-  }, renderScore), /*#__PURE__*/React.createElement(Text, {
+  }, selectedIndex + 1), /*#__PURE__*/React.createElement(Text, {
     style: scoreTotalStyle
   }, '/' + totalScore)), /*#__PURE__*/React.createElement(Text, {
     style: descStyle
-  }, descriptions[selectedIndex - 1])));
+  }, descriptions[selectedIndex])));
   return /*#__PURE__*/React.createElement(ImageBackground, {
     source: backgroundImage,
     resizeMethod: "auto",
@@ -132,7 +131,7 @@ const SmileyRatingQuestionOption6 = ({
   }, /*#__PURE__*/React.createElement(RotaryPhonePicker, {
     list: lotties,
     scale: scale,
-    selectedIndex: selectedIndex,
+    selectedIndex: selectedIndex + 1,
     updateScore: updateScore
   })));
 };

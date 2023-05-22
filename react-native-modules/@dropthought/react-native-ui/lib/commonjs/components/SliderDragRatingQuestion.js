@@ -117,7 +117,7 @@ const SliderDragRatingQuestion = ({
   const [focus, setFocus] = _react.default.useState(false);
 
   const total = maxScale - minScale + 1;
-  const middle = maxScale - total / 2 + 1;
+  const middle = Math.round((maxScale + minScale) / 2);
   const isDark = colorScheme === _theme.COLOR_SCHEMES.dark;
 
   const onFeedbackHandler = _react.default.useCallback(() => {
@@ -164,7 +164,6 @@ const SliderDragRatingQuestion = ({
     const keyboardDidHideListener = _reactNative.Keyboard.addListener('keyboardDidHide', () => {
       if (focus) {
         onFeedbackHandler();
-        setFocus(false);
       }
     });
 
@@ -192,18 +191,20 @@ const SliderDragRatingQuestion = ({
     onChangeText: text => {
       const formatText = Number(text.replace(/[^0-9]/g, ''));
       setInputValue(formatText);
+      setFocus(true);
     },
     onFocus: () => setFocus(true),
     defaultValue: "",
     value: valueInput === null || valueInput === void 0 ? void 0 : valueInput.toString(),
     placeholder: "--",
+    placeholderTextColor: fontColor,
     keyboardType: "numeric"
   });
 
   const slider = /*#__PURE__*/_react.default.createElement(_Slider.default, {
     value: value[0],
     setValue: setValue,
-    trackMarks: total % 2 === 0 ? [middle - 0.5] : [Math.floor(middle)],
+    trackMarks: total % 2 === 0 ? [middle - 0.5] : [middle],
     trackMarkStyles: {
       inactiveMark: {},
       activeMark: includeCenterLabel ? activeMarkStyle : styles.disappearMark
@@ -243,8 +244,8 @@ const SliderDragRatingQuestion = ({
     animationType: "timing"
   });
 
-  return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
-    style: styles.container
+  return /*#__PURE__*/_react.default.createElement(_reactNative.ScrollView, {
+    contentContainerStyle: styles.container
   }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
     forgot: forgot,
     question: question,
@@ -277,7 +278,7 @@ const SliderDragRatingQuestion = ({
     style: styles.hintContainer
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: hintTextStyle
-  }, 'Slide left of right to rate')));
+  }, 'Slide left or right to rate')));
 };
 
 var _default = /*#__PURE__*/_react.default.memo(SliderDragRatingQuestion);
@@ -301,7 +302,8 @@ const styles = _reactNative.StyleSheet.create({
     justifyContent: 'center'
   },
   mandatoryTitle: {
-    marginBottom: 50
+    marginBottom: 50,
+    marginHorizontal: 16
   },
   sliderLabelContainer: {
     flexDirection: 'row'

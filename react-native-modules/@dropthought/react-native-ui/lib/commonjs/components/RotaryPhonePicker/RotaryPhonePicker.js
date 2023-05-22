@@ -36,9 +36,9 @@ const RotaryPhonePicker = ({
     height: 0,
     width: 0
   });
-  let renderAnim = (0, _react.useRef)(new _reactNative.Animated.Value(0)).current;
-  const renderAnimValue = (0, _react.useRef)(0);
-  let tempAnim = (0, _react.useRef)(0).current;
+  let renderAnim = (0, _react.useRef)(new _reactNative.Animated.Value(selectedIndex * -45)).current;
+  const renderAnimValue = (0, _react.useRef)(selectedIndex * -45);
+  let tempAnim = (0, _react.useRef)(selectedIndex * -45).current;
 
   const offset = () => Math.trunc(container.width / 2) - radiusOfOrbiting;
 
@@ -129,7 +129,7 @@ const RotaryPhonePicker = ({
     return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
       style: [_RotaryPhonePicker.default.item, itemStyle(index)],
       key: index
-    }, index <= numberScale ? /*#__PURE__*/_react.default.createElement(_lottieReactNative.default, {
+    }, value !== '' && index <= numberScale ? /*#__PURE__*/_react.default.createElement(_lottieReactNative.default, {
       source: value,
       autoPlay: true
     }) : null);

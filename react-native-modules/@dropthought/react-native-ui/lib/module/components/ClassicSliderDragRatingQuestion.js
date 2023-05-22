@@ -92,7 +92,7 @@ const ClassicSliderDragRatingQuestion = ({
   const [hasEdited, setHasEdited] = React.useState(false);
   const [focus, setFocus] = React.useState(false);
   const total = maxScale - minScale + 1;
-  const middle = maxScale - total / 2 + 1;
+  const middle = Math.round((maxScale + minScale) / 2);
   const isDark = colorScheme === COLOR_SCHEMES.dark;
   const onFeedbackHandler = React.useCallback(() => {
     setHasEdited(true);
@@ -133,11 +133,14 @@ const ClassicSliderDragRatingQuestion = ({
   React.useEffect(() => {
     getInitialSelectedValueFromFeedbackProps(); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const inputRef = React.useRef(null);
   React.useEffect(() => {
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
       if (focus) {
+        var _inputRef$current;
+
+        (_inputRef$current = inputRef.current) === null || _inputRef$current === void 0 ? void 0 : _inputRef$current.blur();
         onFeedbackHandler();
-        setFocus(false);
       }
     });
     return () => {
@@ -155,21 +158,24 @@ const ClassicSliderDragRatingQuestion = ({
     opacity: isDark ? 0.3 : 1
   };
   const textField = /*#__PURE__*/React.createElement(TextInput, {
+    ref: inputRef,
     style: [styles.input, inputStyle],
     onChangeText: text => {
       const formatText = Number(text.replace(/[^0-9]/g, ''));
       setInputValue(formatText);
+      setFocus(true);
     },
     onFocus: () => setFocus(true),
     defaultValue: "",
     value: valueInput === null || valueInput === void 0 ? void 0 : valueInput.toString(),
     placeholder: "--",
+    placeholderTextColor: fontColor,
     keyboardType: "numeric"
   });
   const slider = /*#__PURE__*/React.createElement(CustomSlider, {
     value: value[0],
     setValue: setValue,
-    trackMarks: total % 2 === 0 ? [middle - 0.5] : [Math.floor(middle)],
+    trackMarks: total % 2 === 0 ? [middle - 0.5] : [middle],
     trackMarkStyles: {
       inactiveMark: {},
       activeMark: includeCenterLabel ? activeMarkStyle : styles.disappearMark

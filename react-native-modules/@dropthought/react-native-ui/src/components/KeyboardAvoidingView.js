@@ -296,7 +296,7 @@ export default KeyboardAvoidingView;
 
 /**
  * @typedef {object} KeyboardAvoidingProps
- * @property {ViewStyle} contentContainerStyle
+ * @property {ViewStyle=} contentContainerStyle
  * @property {ViewStyle} style
  * @property {number=} extraAvoidingSpace - optional, the default behavior of this keyboard avoiding is to avoid the whole input box, but if you wish to have extra space to avoid
  */

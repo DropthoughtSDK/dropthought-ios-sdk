@@ -33,6 +33,8 @@ const SmileyRatingQuestionOption1 = ({
   onFeedback,
   feedback
 }) => {
+  const answered = feedback && feedback.answers && !isNil(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
+  const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
   const {
     backgroundColor: themeBackgroundColor,
     fontColor,
@@ -43,7 +45,7 @@ const SmileyRatingQuestionOption1 = ({
     options,
     scale
   } = question;
-  const [selectedIndex, setSelectedIndex] = React.useState(-1);
+  const [selectedIndex, setSelectedIndex] = React.useState(answered ? answeredValue : -1);
   const [selected, setSelected] = React.useState(getInitialSelectedValue(feedback, question));
   const lottieSelectedIndex = scaleLogic[scale][selectedIndex];
   const selectedBackgroundColor = colorScheme === COLOR_SCHEMES.dark ? Option1BackgroundColorDark : Option1BackgroundColor;

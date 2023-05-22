@@ -8,7 +8,17 @@
  * When "Next" or "Submit" is pressed, call props.onNextPage
  */
 import * as React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Platform,
+} from 'react-native';
+//@ts-ignore
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useKeyboard } from '@react-native-community/hooks';
 import { Colors, GlobalStyle } from '../styles';
 import i18n from '../translation';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
@@ -24,6 +34,8 @@ type Props = {
   backgroundColor?: string;
 };
 
+const isAndroid = Platform.OS === 'android';
+
 const SurveyFooter = (props: Props) => {
   const rtl = i18n.dir() === 'rtl';
   const {
@@ -35,11 +47,20 @@ const SurveyFooter = (props: Props) => {
     backgroundColor,
   } = props;
 
+  const insets = useSafeAreaInsets();
+  const { keyboardShown } = useKeyboard();
+
+  const insetsBottom =
+    // if it is android, and the insets bottom is not normal,
+    // maybe it is because the keyboard is showed, don't use this insets
+    isAndroid && insets.bottom >= 100 ? 0 : insets.bottom;
+
   const containerStyle = [
     styles.container,
     rtl && GlobalStyle.flexRowReverse,
     {
       backgroundColor,
+      paddingBottom: insetsBottom || 15,
     },
   ];
   const { colorScheme } = useTheme();
@@ -66,6 +87,7 @@ const SurveyFooter = (props: Props) => {
       disabled={submitDisabled}
       onPress={() => {
         setSubmitDisabled(true);
+        setTimeout(() => setSubmitDisabled(false), 1000);
         onNextPage();
       }}
     >
@@ -103,6 +125,8 @@ const SurveyFooter = (props: Props) => {
     </TouchableOpacity>
   );
 
+  // hide this bar when it is android and keyboard is shown
+  if (isAndroid && keyboardShown) return null;
   return (
     <View style={containerStyle}>
       {isFirstPage ? null : leftButton}

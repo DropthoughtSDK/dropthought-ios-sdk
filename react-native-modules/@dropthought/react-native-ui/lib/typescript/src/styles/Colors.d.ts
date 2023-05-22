@@ -1,5 +1,6 @@
 export declare const Colors: {
     purple: string;
+    secondary: string;
     borderColor: string;
     borderColorDark: string;
     borderFocusedColor: string;
@@ -9,6 +10,7 @@ export declare const Colors: {
     dateGrey: string;
     buttonGrey: string;
     black: string;
+    backdropBG: string;
     dividerGrey: string;
     errorHintColor: string;
     statusBarDivider: string;
@@ -52,6 +54,7 @@ export declare const Colors: {
     rankingCheckBoxBorder: string;
     sliderLabel: string;
     sliderTrack: string;
+    contentBackground: string;
 };
 export declare const addOpacityToColor: (hexColor: string, opacity: number) => string;
 export declare const opacity10: (color: string) => string;

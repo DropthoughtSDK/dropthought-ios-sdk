@@ -14,7 +14,8 @@ export type QuestionType =
   | 'singleChoice'
   | 'nps'
   | 'ranking'
-  | 'ratingSlider';
+  | 'ratingSlider'
+  | 'dropdown';
 
 export type QuestionSubType = 'smiley' | 'slider' | RatingIconType;
 
@@ -44,9 +45,12 @@ export interface Question {
   metaDataType?: QuestionMetaDataType;
   mandatory: boolean;
   options?: string[];
+  responseErrorText: string;
   type: QuestionType;
   subType?: QuestionSubType;
   scale?: string;
+  otherText: string;
+  exampleMetadataText?: string;
 }
 
 export interface Page {

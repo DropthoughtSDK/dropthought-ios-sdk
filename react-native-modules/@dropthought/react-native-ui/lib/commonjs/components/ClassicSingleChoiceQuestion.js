@@ -108,7 +108,8 @@ class ClassicSingleChoiceQuestion extends _react.PureComponent {
           checked: isActive,
           checkedColor: this.props.themeColor,
           onChangeValue: this.onChangeValueHandler,
-          textValue: this.state.otherText
+          textValue: this.state.otherText,
+          question: this.props.question
         });
       }
 

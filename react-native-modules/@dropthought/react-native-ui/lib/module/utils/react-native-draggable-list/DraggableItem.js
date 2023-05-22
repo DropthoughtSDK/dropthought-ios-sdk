@@ -8,6 +8,7 @@ function DraggableItem({
   index,
   onDragStart,
   onDrag,
+  onDragRelease,
   onDragEnd,
   onLayout,
   forceReset,
@@ -38,7 +39,7 @@ function DraggableItem({
           x: 0,
           y: 0
         });
-      }, 200);
+      }, 500);
     },
     onPanResponderMove: (_, gesture) => {
       if (isDraggingRef.current) {
@@ -46,6 +47,8 @@ function DraggableItem({
       }
     },
     onPanResponderRelease: (_e, _gesture) => {
+      onDragRelease && onDragRelease();
+
       if (longPressTimeout.current) {
         clearTimeout(longPressTimeout.current);
       }
@@ -58,6 +61,8 @@ function DraggableItem({
     },
 
     onPanResponderTerminate(_e, _gestureState) {
+      onDragRelease && onDragRelease();
+
       if (longPressTimeout.current) {
         clearTimeout(longPressTimeout.current);
       }

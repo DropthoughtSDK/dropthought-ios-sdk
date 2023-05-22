@@ -75,7 +75,7 @@ function NewOtherOptionWithHighlight(props) {
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(NewOptionWithHighlight, _extends({}, props, {
     onPress: onPressHandler,
     title: 'Others'
-  })), /*#__PURE__*/React.createElement(MultiLineTextInput, _extends({
+  })), /*#__PURE__*/React.createElement(MultiLineTextInput, {
     onEndEditingHandler: () => {},
     onChangeTextHandler: onChangeTextHandler,
     themeColor: themeColor,
@@ -83,8 +83,10 @@ function NewOtherOptionWithHighlight(props) {
     question: question,
     inputRef: inputRef,
     checked: checked,
-    anonymous: anonymous
-  }, focusProps)));
+    anonymous: anonymous,
+    onFocusHandler: focusProps.onFocus,
+    onBlurHandler: focusProps.onBlur
+  }));
 }
 
 export default /*#__PURE__*/React.memo(NewOtherOptionWithHighlight);

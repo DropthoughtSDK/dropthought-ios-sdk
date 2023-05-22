@@ -2,7 +2,14 @@
  * @description Option with a TextInput, this is for other option in multi-choice/single-choice question
  */
 import * as React from 'react';
-import { StyleSheet, TextInput, View, Text, Platform } from 'react-native';
+import {
+  StyleSheet,
+  TextInput,
+  View,
+  Text,
+  Platform,
+  Keyboard,
+} from 'react-native';
 
 import GlobalStyles, { Colors, QuestionContentTextSize } from '../styles';
 import i18n from '../translation';
@@ -11,6 +18,7 @@ import OptionWithHighlight, {
 } from './OptionWithHighlight';
 import { useDimensionWidthType } from '../hooks/useWindowDimensions';
 import { useTheme } from '../contexts/theme';
+import type { Question } from '../data';
 
 const useFocus = (onBlur: () => void, onFocus: () => void) => {
   const [isFocused, setIsFocused] = React.useState(false);
@@ -35,10 +43,13 @@ type Props = OptionWithHighlightProps & {
     id: any,
     value: { checked: boolean; value: string | undefined }
   ) => void;
+  question: Question;
 };
 
 function OtherOptionWithHighlightProps(props: Props) {
-  const { id, checked, textValue, onChangeValue, checkedColor } = props;
+  const { id, checked, textValue, onChangeValue, checkedColor, question } =
+    props;
+  const { otherText = '', questionBrand = '' } = question;
   const { fontColor } = useTheme();
 
   const dimensionWidthType = useDimensionWidthType();
@@ -86,6 +97,17 @@ function OtherOptionWithHighlightProps(props: Props) {
 
   const rtl = i18n.dir() === 'rtl';
 
+  React.useEffect(() => {
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      inputRef.current?.blur();
+    });
+
+    return () => {
+      hideSubscription.remove();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const textInput = (
     <View
       style={[styles.textInputContainer, rtl && GlobalStyles.flexRowReverse]}
@@ -113,7 +135,13 @@ function OtherOptionWithHighlightProps(props: Props) {
             : {},
           QuestionContentTextSize[dimensionWidthType],
         ]}
-        placeholder={i18n.t('survey:other-placeholder')}
+        placeholder={
+          otherText.length > 0
+            ? otherText
+            : questionBrand.length > 0
+            ? questionBrand
+            : i18n.t('survey:other-placeholder')
+        }
         placeholderTextColor={Colors.inputPlaceholder}
         onChangeText={onChangeTextHandler}
         underlineColorAndroid={Colors.transparent}

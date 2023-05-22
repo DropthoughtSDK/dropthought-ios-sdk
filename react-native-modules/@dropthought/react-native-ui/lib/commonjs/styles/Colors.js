@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.opacity60 = exports.opacity30 = exports.opacity15 = exports.opacity10 = exports.addOpacityToColor = exports.Option1BackgroundColorDark = exports.Option1BackgroundColor = exports.Colors = void 0;
 const Colors = {
   purple: '#4c3794',
+  secondary: '#ECEFF4',
   borderColor: '#c2c2c2',
   borderColorDark: '#5454548F',
   borderFocusedColor: '#4c3794',
@@ -15,6 +16,7 @@ const Colors = {
   dateGrey: '#8b8b8b',
   buttonGrey: '#dcdcdc',
   black: '#000000',
+  backdropBG: '#rgba(0,0,0,0.24)',
   dividerGrey: '#d1d1d1',
   errorHintColor: '#a30000',
   statusBarDivider: '#CCC',
@@ -57,7 +59,8 @@ const Colors = {
   divider: 'rgba(60, 60, 67, 0.36)',
   rankingCheckBoxBorder: '#a8a8a8',
   sliderLabel: '#848a93',
-  sliderTrack: '#4b3694'
+  sliderTrack: '#4b3694',
+  contentBackground: '#F3F5F8'
 };
 exports.Colors = Colors;
 

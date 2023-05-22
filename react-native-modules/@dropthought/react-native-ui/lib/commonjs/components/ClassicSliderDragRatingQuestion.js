@@ -117,7 +117,7 @@ const ClassicSliderDragRatingQuestion = ({
   const [focus, setFocus] = _react.default.useState(false);
 
   const total = maxScale - minScale + 1;
-  const middle = maxScale - total / 2 + 1;
+  const middle = Math.round((maxScale + minScale) / 2);
   const isDark = colorScheme === _theme.COLOR_SCHEMES.dark;
 
   const onFeedbackHandler = _react.default.useCallback(() => {
@@ -160,11 +160,15 @@ const ClassicSliderDragRatingQuestion = ({
     getInitialSelectedValueFromFeedbackProps(); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const inputRef = _react.default.useRef(null);
+
   _react.default.useEffect(() => {
     const keyboardDidHideListener = _reactNative.Keyboard.addListener('keyboardDidHide', () => {
       if (focus) {
+        var _inputRef$current;
+
+        (_inputRef$current = inputRef.current) === null || _inputRef$current === void 0 ? void 0 : _inputRef$current.blur();
         onFeedbackHandler();
-        setFocus(false);
       }
     });
 
@@ -185,22 +189,25 @@ const ClassicSliderDragRatingQuestion = ({
   };
 
   const textField = /*#__PURE__*/_react.default.createElement(_reactNative.TextInput, {
+    ref: inputRef,
     style: [styles.input, inputStyle],
     onChangeText: text => {
       const formatText = Number(text.replace(/[^0-9]/g, ''));
       setInputValue(formatText);
+      setFocus(true);
     },
     onFocus: () => setFocus(true),
     defaultValue: "",
     value: valueInput === null || valueInput === void 0 ? void 0 : valueInput.toString(),
     placeholder: "--",
+    placeholderTextColor: fontColor,
     keyboardType: "numeric"
   });
 
   const slider = /*#__PURE__*/_react.default.createElement(_Slider.default, {
     value: value[0],
     setValue: setValue,
-    trackMarks: total % 2 === 0 ? [middle - 0.5] : [Math.floor(middle)],
+    trackMarks: total % 2 === 0 ? [middle - 0.5] : [middle],
     trackMarkStyles: {
       inactiveMark: {},
       activeMark: includeCenterLabel ? activeMarkStyle : styles.disappearMark

@@ -29,15 +29,15 @@ var _theme = require("../contexts/theme");
 
 var _MandatoryTitle = _interopRequireDefault(require("./MandatoryTitle"));
 
+var _ramda = require("ramda");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-const animations = [require('../assets/animations/smiley_option6/option6_1.json'), require('../assets/animations/smiley_option6/option6_2.json'), require('../assets/animations/smiley_option6/option6_3.json'), require('../assets/animations/smiley_option6/option6_4.json'), require('../assets/animations/smiley_option6/option6_5.json')]; // We through the null text string to keep blank to make it as same as the rotary dial design.
-
-const lotties = new Array(8).fill('');
+const animations = [require('../assets/animations/smiley_option6/option6_1.json'), require('../assets/animations/smiley_option6/option6_2.json'), require('../assets/animations/smiley_option6/option6_3.json'), require('../assets/animations/smiley_option6/option6_4.json'), require('../assets/animations/smiley_option6/option6_5.json')];
 
 const SmileyRatingQuestionOption6 = ({
   survey,
@@ -47,40 +47,38 @@ const SmileyRatingQuestionOption6 = ({
   onClose,
   onPrevPage,
   onNextPage,
-  onFeedback
+  onFeedback,
+  feedback
 }) => {
-  const [selectedIndex, setSelectedIndex] = _react.default.useState(0);
-
-  const [score, setScore] = _react.default.useState(-1);
-
+  const answered = feedback && feedback.answers && !(0, _ramda.isNil)(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
+  const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
+  const [selectedIndex, setSelectedIndex] = (0, _react.useState)(answered ? answeredValue : -1);
   const {
     questionId,
     scale,
     options
   } = question;
   const scaleLogicList = _data.scaleLogic[scale];
-  const descriptions = scaleLogicList.map((_, index) => options[index]);
-  (0, _react.useEffect)(() => {
-    lotties.forEach((value, index) => {
-      if (index === 0 || index > scaleLogicList.length) {
-        lotties[index] = value;
-      } else {
-        const scaleIndex = scaleLogicList[index - 1];
-        lotties[index] = animations[scaleIndex];
-      }
+  const descriptions = scaleLogicList.map((_, index) => options[index]); // We through the null text string to keep blank to make it as same as the rotary dial design.
+
+  const lotties = (0, _react.useMemo)(() => {
+    let result = [''];
+    scaleLogicList.forEach(scaleIndex => {
+      result = [...result, animations[scaleIndex]];
     });
+    const remainDummy = 7 - scaleLogicList.length;
+    result = [...result, ...(0, _ramda.repeat)('', remainDummy)];
+    return result;
   }, [scaleLogicList]);
   const {
     colorScheme,
     customFontColor
   } = (0, _theme.useTheme)();
   const totalScore = scale;
-  const renderScore = score;
-  const isAtCoverScreen = score === -1;
+  const isAtCoverScreen = selectedIndex === -1;
 
   const updateScore = _react.default.useCallback(currentIndex => {
-    setScore(currentIndex);
-    setSelectedIndex(currentIndex);
+    setSelectedIndex(currentIndex - 1);
     onFeedback({
       questionId,
       answers: [currentIndex - 1],
@@ -113,10 +111,10 @@ const SmileyRatingQuestionOption6 = ({
 
   const lottieContainer = /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: commonStyles.lottieContainer
-  }, /*#__PURE__*/_react.default.createElement(_lottieReactNative.default, {
-    source: lotties[selectedIndex],
+  }, selectedIndex > -1 && lotties[selectedIndex + 1] !== '' ? /*#__PURE__*/_react.default.createElement(_lottieReactNative.default, {
+    source: lotties[selectedIndex + 1],
     autoPlay: true
-  }));
+  }) : null);
 
   const scoreContainer = /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: commonStyles.scoreContainer
@@ -126,11 +124,11 @@ const SmileyRatingQuestionOption6 = ({
     style: commonStyles.scoreText
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: scoreSelectedStyle
-  }, renderScore), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+  }, selectedIndex + 1), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: scoreTotalStyle
   }, '/' + totalScore)), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: descStyle
-  }, descriptions[selectedIndex - 1])));
+  }, descriptions[selectedIndex])));
 
   return /*#__PURE__*/_react.default.createElement(_reactNative.ImageBackground, {
     source: backgroundImage,
@@ -164,7 +162,7 @@ const SmileyRatingQuestionOption6 = ({
   }, /*#__PURE__*/_react.default.createElement(_RotaryPhonePicker.default, {
     list: lotties,
     scale: scale,
-    selectedIndex: selectedIndex,
+    selectedIndex: selectedIndex + 1,
     updateScore: updateScore
   })));
 };

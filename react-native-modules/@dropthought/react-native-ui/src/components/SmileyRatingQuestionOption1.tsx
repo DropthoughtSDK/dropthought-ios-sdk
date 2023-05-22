@@ -81,6 +81,15 @@ const SmileyRatingQuestionOption1 = ({
   onFeedback,
   feedback,
 }: Props) => {
+  const answered =
+    feedback &&
+    feedback.answers &&
+    !isNil(feedback.answers[0]) &&
+    typeof feedback.answers[0] === 'number';
+  const answeredValue: number = answered
+    ? parseInt(feedback.answers[0], 10)
+    : 0;
+
   const {
     backgroundColor: themeBackgroundColor,
     fontColor,
@@ -88,7 +97,9 @@ const SmileyRatingQuestionOption1 = ({
   } = useTheme();
   const { questionId, options, scale } = question;
 
-  const [selectedIndex, setSelectedIndex] = React.useState<number>(-1);
+  const [selectedIndex, setSelectedIndex] = React.useState<number>(
+    answered ? answeredValue : -1
+  );
   const [selected, setSelected] = React.useState<boolean[]>(
     getInitialSelectedValue(feedback, question)
   );

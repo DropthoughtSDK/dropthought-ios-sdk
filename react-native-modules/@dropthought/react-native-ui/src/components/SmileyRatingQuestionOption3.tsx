@@ -6,6 +6,7 @@ import {
   Animated,
   Dimensions,
   PanResponder,
+  Platform,
 } from 'react-native';
 import { Colors } from '../styles';
 import i18n from '../translation';
@@ -28,6 +29,7 @@ import {
   option3LoopFaceTable as loopFaceTable,
   option3TransformTable as transformTable,
 } from '../utils/data';
+import { isNil } from 'ramda';
 
 type Feedback = OriginFeedback & {
   answers: string[];
@@ -67,7 +69,17 @@ const SmileyRatingQuestionOption3 = ({
   onPrevPage,
   onNextPage,
   onFeedback,
+  feedback,
 }: Props) => {
+  const answered =
+    feedback &&
+    feedback.answers &&
+    !isNil(feedback.answers[0]) &&
+    typeof feedback.answers[0] === 'number';
+  const answeredValue: number = answered
+    ? parseInt(feedback.answers[0], 10)
+    : 0;
+
   const {
     backgroundColor: themeBackgroundColor,
     fontColor,
@@ -77,19 +89,29 @@ const SmileyRatingQuestionOption3 = ({
   const windowHeight = Dimensions.get('window').height;
   const { questionId, scale, options } = question;
 
-  const [selectedIndex, setSelectedIndex] = React.useState<number>(0);
-  const [score, setScore] = React.useState<number>(-1);
+  const [selectedIndex, setSelectedIndex] = React.useState<number>(
+    answered ? answeredValue : 0
+  );
+  const [score, setScore] = React.useState<number>(
+    answered ? answeredValue : -1
+  );
   const [isLoop, setIsLoop] = React.useState<boolean>(true);
   const [loopLotties, setLoopLotties] = React.useState<string[]>([]);
   const [transformLotties, setTransformLotties] = React.useState<string[]>([]);
 
-  const scoreContainerOpacity = React.useRef(new Animated.Value(0)).current;
-  const scoreOpacity = React.useRef(new Animated.Value(0)).current;
+  const scoreContainerOpacity = React.useRef(
+    new Animated.Value(answered ? 1 : 0)
+  ).current;
+  const scoreOpacity = React.useRef(
+    new Animated.Value(answered ? 1 : 0)
+  ).current;
   const descriptionYAxis = React.useRef(
-    new Animated.Value(windowHeight / 2 - 246 + 37)
+    new Animated.Value(answered ? 1 : windowHeight / 2 - 246 + 37)
   ).current;
   // 37 -> one text line height
   // 246 -> Padding Vertical 123
+
+  const lottieRef = React.useRef<LottieView>();
 
   const totalScore = Number(scale);
   const renderScore = score + 1;
@@ -145,11 +167,17 @@ const SmileyRatingQuestionOption3 = ({
       const isAtCoverScreen = score === -1;
       const newScore = score + number;
       setScore(newScore);
-      if (number > 0 && !isAtCoverScreen) {
-        setIsLoop(false);
-      }
+
       if (!isAtCoverScreen) {
         setSelectedIndex(newScore);
+        if (number > 0) {
+          setIsLoop(false);
+        } else {
+          setIsLoop(true);
+          setTimeout(() => {
+            lottieRef.current?.play();
+          }, 100);
+        }
       }
 
       //animtaion--
@@ -209,11 +237,6 @@ const SmileyRatingQuestionOption3 = ({
       ? themeBackgroundColor
       : animationBackgroundColor;
 
-  const lottieContainerStyle = [
-    commonStyles.lottieContainer,
-    { opacity: scoreContainerOpacity },
-  ];
-
   const scoreSelectedStyle = [
     styles.scoreSelected,
     { opacity: scoreOpacity, color: fontColor },
@@ -228,9 +251,20 @@ const SmileyRatingQuestionOption3 = ({
     },
   ];
 
+  const slashStyle = [
+    styles.slash,
+    {
+      opacity: scoreContainerOpacity,
+      marginBottom: Platform.OS === 'ios' ? 10 : -1,
+    },
+  ];
+
   const scoreTotalStyle = [
     styles.scoreTotal,
-    { opacity: scoreContainerOpacity },
+    {
+      opacity: scoreContainerOpacity,
+      marginBottom: Platform.OS === 'ios' ? 4 : -3,
+    },
   ];
 
   const containerStyle = [
@@ -241,44 +275,51 @@ const SmileyRatingQuestionOption3 = ({
   ];
 
   const hintContainerStyle =
-    score >= 0
-      ? [commonStyles.hintContainer, commonStyles.flexEnd]
-      : [commonStyles.hintContainer];
+    score >= 0 ? commonStyles.hintContainer : commonStyles.initHintContainer;
 
   const hintTextStyle = [commonStyles.hintText, { color: fontColor }];
 
-  const lottieContainer = (
-    <Animated.View style={lottieContainerStyle}>
+  useEffect(() => {
+    if (isLoop) {
+      setTimeout(() => {
+        lottieRef.current?.play();
+      }, 100);
+    }
+  }, [isLoop]);
+
+  const lottieContainer = isLoop ? (
+    <View style={commonStyles.lottieContainer}>
       <LottieView
-        source={
-          isLoop ? loopLotties[selectedIndex] : transformLotties[selectedIndex]
-        }
+        // @ts-ignore
+        ref={lottieRef}
+        source={loopLotties[selectedIndex]}
         autoPlay
         style={commonStyles.lottieContent}
-        loop={isLoop}
-        onAnimationFinish={(isCancel) => {
-          if (!isCancel) setIsLoop(true);
-        }}
+        loop
         speed={0.5}
       />
-    </Animated.View>
+    </View>
+  ) : (
+    <View style={commonStyles.lottieContainer}>
+      <LottieView
+        source={transformLotties[selectedIndex]}
+        autoPlay
+        style={commonStyles.lottieContent}
+        loop={false}
+        onAnimationFinish={() => setIsLoop(true)}
+        speed={0.5}
+      />
+    </View>
   );
 
   const scoreContainer = (
     <View style={commonStyles.scoreContainer}>
-      <View style={commonStyles.scoreContainer}>
-        <View style={commonStyles.scoreText}>
-          <Animated.Text style={scoreSelectedStyle}>
-            {renderScore}
-          </Animated.Text>
-          <Animated.Text style={scoreTotalStyle}>
-            {'/' + totalScore}
-          </Animated.Text>
-        </View>
-        <Animated.Text style={descStyle}>
-          {options[selectedIndex]}
-        </Animated.Text>
+      <View style={commonStyles.scoreText}>
+        <Animated.Text style={scoreSelectedStyle}>{renderScore}</Animated.Text>
+        <Animated.Text style={slashStyle}>{'/'}</Animated.Text>
+        <Animated.Text style={scoreTotalStyle}>{totalScore}</Animated.Text>
       </View>
+      <Animated.Text style={descStyle}>{options[selectedIndex]}</Animated.Text>
     </View>
   );
 
@@ -338,23 +379,23 @@ const commonStyles = StyleSheet.create({
     alignItems: 'center',
   },
   hintContainer: {
+    width: '100%',
+  },
+  initHintContainer: {
     flex: 1,
     justifyContent: 'center',
-  },
-  flexEnd: {
-    justifyContent: 'flex-end',
+    width: '100%',
   },
   hintText: {
     fontSize: 16,
     fontWeight: '500',
     textAlign: 'center',
-    marginBottom: 6,
   },
   lottieContainer: {
-    flex: 3,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 42,
   },
   lottieContent: {
     width: '60%',
@@ -362,14 +403,15 @@ const commonStyles = StyleSheet.create({
   scoreContainer: {
     flex: 1,
     width: '100%',
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
     alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
   },
   scoreText: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'baseline',
+    alignItems: 'flex-end',
+    height: 61,
+    marginBottom: 10,
   },
 });
 
@@ -380,12 +422,16 @@ const phoneStyles = StyleSheet.create({
     textAlign: 'center',
   },
   scoreSelected: {
-    fontSize: 74,
+    fontSize: 50,
     textAlign: 'center',
     alignItems: 'baseline',
   },
   scoreTotal: {
-    fontSize: 55,
+    fontSize: 37,
+    color: Colors.smileyRatingScoreGray,
+  },
+  slash: {
+    fontSize: 37,
     color: Colors.smileyRatingScoreGray,
   },
 });
@@ -403,6 +449,10 @@ const tabletStyles = StyleSheet.create({
   },
   scoreTotal: {
     fontSize: 55,
+    color: Colors.smileyRatingScoreGray,
+  },
+  slash: {
+    fontSize: 37,
     color: Colors.smileyRatingScoreGray,
   },
 });

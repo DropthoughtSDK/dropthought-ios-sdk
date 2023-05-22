@@ -1,6 +1,7 @@
 export var __esModule: boolean;
 export namespace Colors {
     const purple: string;
+    const secondary: string;
     const borderColor: string;
     const borderColorDark: string;
     const borderFocusedColor: string;
@@ -10,6 +11,7 @@ export namespace Colors {
     const dateGrey: string;
     const buttonGrey: string;
     const black: string;
+    const backdropBG: string;
     const dividerGrey: string;
     const errorHintColor: string;
     const statusBarDivider: string;
@@ -53,6 +55,7 @@ export namespace Colors {
     const rankingCheckBoxBorder: string;
     const sliderLabel: string;
     const sliderTrack: string;
+    const contentBackground: string;
 }
 export function addOpacityToColor(hexColor: any, opacity: any): string;
 export function opacity10(color: any): string;

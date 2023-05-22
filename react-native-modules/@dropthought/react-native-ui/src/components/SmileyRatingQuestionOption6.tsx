@@ -5,14 +5,18 @@ import {
   ImageBackground,
   ImageStyle,
 } from 'react-native';
-import React, { useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Colors } from '../styles';
 import i18n from '../translation';
 import {
   DimensionWidthType,
   useDimensionWidthType,
 } from '../hooks/useWindowDimensions';
-import type { Question as OriginQuestion, Survey } from '../data';
+import type {
+  Feedback as OriginFeedback,
+  Question as OriginQuestion,
+  Survey,
+} from '../data';
 import { scaleLogic } from '../utils/data';
 import LottieView from 'lottie-react-native';
 import SurveyFooter from '../containers/SurveyFooter';
@@ -20,6 +24,11 @@ import SurveyHeader from '../containers/SurveyHeader';
 import RotaryPhonePicker from './RotaryPhonePicker';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import MandatoryTitle from './MandatoryTitle';
+import { isNil, repeat } from 'ramda';
+
+type Feedback = OriginFeedback & {
+  answers: string[];
+};
 
 type Question = OriginQuestion & {
   options: string[];
@@ -33,9 +42,6 @@ const animations = [
   require('../assets/animations/smiley_option6/option6_4.json'),
   require('../assets/animations/smiley_option6/option6_5.json'),
 ];
-
-// We through the null text string to keep blank to make it as same as the rotary dial design.
-const lotties = new Array(8).fill('');
 
 type Props = {
   survey: Survey;
@@ -54,6 +60,7 @@ type Props = {
     answers: number[];
     type: string;
   }) => void;
+  feedback: Feedback;
 };
 
 const SmileyRatingQuestionOption6 = ({
@@ -65,33 +72,43 @@ const SmileyRatingQuestionOption6 = ({
   onPrevPage,
   onNextPage,
   onFeedback,
+  feedback,
 }: Props) => {
-  const [selectedIndex, setSelectedIndex] = React.useState<number>(0);
-  const [score, setScore] = React.useState<number>(-1);
+  const answered =
+    feedback &&
+    feedback.answers &&
+    !isNil(feedback.answers[0]) &&
+    typeof feedback.answers[0] === 'number';
+  const answeredValue: number = answered
+    ? parseInt(feedback.answers[0], 10)
+    : 0;
+
+  const [selectedIndex, setSelectedIndex] = useState<number>(
+    answered ? answeredValue : -1
+  );
   const { questionId, scale, options } = question;
   const scaleLogicList = scaleLogic[scale];
   const descriptions = scaleLogicList.map((_, index) => options[index]);
-  useEffect(() => {
-    lotties.forEach((value, index) => {
-      if (index === 0 || index > scaleLogicList.length) {
-        lotties[index] = value;
-      } else {
-        const scaleIndex = scaleLogicList[index - 1];
-        lotties[index] = animations[scaleIndex];
-      }
+
+  // We through the null text string to keep blank to make it as same as the rotary dial design.
+  const lotties = useMemo(() => {
+    let result = [''];
+    scaleLogicList.forEach((scaleIndex) => {
+      result = [...result, animations[scaleIndex]];
     });
+    const remainDummy = 7 - scaleLogicList.length;
+    result = [...result, ...repeat('', remainDummy)];
+    return result;
   }, [scaleLogicList]);
 
   const { colorScheme, customFontColor } = useTheme();
 
   const totalScore = scale;
-  const renderScore = score;
-  const isAtCoverScreen = score === -1;
+  const isAtCoverScreen = selectedIndex === -1;
 
   const updateScore = React.useCallback(
     (currentIndex) => {
-      setScore(currentIndex);
-      setSelectedIndex(currentIndex);
+      setSelectedIndex(currentIndex - 1);
       onFeedback({
         questionId,
         answers: [currentIndex - 1],
@@ -119,17 +136,19 @@ const SmileyRatingQuestionOption6 = ({
 
   const lottieContainer = (
     <View style={commonStyles.lottieContainer}>
-      <LottieView source={lotties[selectedIndex]} autoPlay />
+      {selectedIndex > -1 && lotties[selectedIndex + 1] !== '' ? (
+        <LottieView source={lotties[selectedIndex + 1]} autoPlay />
+      ) : null}
     </View>
   );
   const scoreContainer = (
     <View style={commonStyles.scoreContainer}>
       <View style={commonStyles.scoreContainer}>
         <View style={commonStyles.scoreText}>
-          <Text style={scoreSelectedStyle}>{renderScore}</Text>
+          <Text style={scoreSelectedStyle}>{selectedIndex + 1}</Text>
           <Text style={scoreTotalStyle}>{'/' + totalScore}</Text>
         </View>
-        <Text style={descStyle}>{descriptions[selectedIndex - 1]}</Text>
+        <Text style={descStyle}>{descriptions[selectedIndex]}</Text>
       </View>
     </View>
   );
@@ -174,7 +193,7 @@ const SmileyRatingQuestionOption6 = ({
         <RotaryPhonePicker
           list={lotties}
           scale={scale}
-          selectedIndex={selectedIndex}
+          selectedIndex={selectedIndex + 1}
           updateScore={updateScore}
         />
       </View>

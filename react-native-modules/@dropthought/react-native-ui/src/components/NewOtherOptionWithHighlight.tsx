@@ -103,7 +103,8 @@ function NewOtherOptionWithHighlight(props: Props) {
         inputRef={inputRef}
         checked={checked}
         anonymous={anonymous}
-        {...focusProps}
+        onFocusHandler={focusProps.onFocus}
+        onBlurHandler={focusProps.onBlur}
       />
     </>
   );

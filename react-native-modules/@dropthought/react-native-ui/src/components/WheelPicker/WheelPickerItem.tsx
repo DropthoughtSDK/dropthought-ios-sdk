@@ -99,7 +99,9 @@ const WheelPickerItem: React.FC<ItemProps> = ({
         { height, opacity, transform: [{ translateY }, { rotateX }] },
       ]}
     >
-      <Text style={textStyle}>{option}</Text>
+      <Text style={textStyle} numberOfLines={1}>
+        {option}
+      </Text>
     </Animated.View>
   );
 };

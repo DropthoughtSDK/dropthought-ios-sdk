@@ -1,5 +1,5 @@
 export default SmileyRatingQuestionOption4;
-declare function SmileyRatingQuestionOption4({ survey, pageIndex, question, forgot, onClose, onPrevPage, onNextPage, onFeedback }: {
+declare function SmileyRatingQuestionOption4({ survey, pageIndex, question, forgot, onClose, onPrevPage, onNextPage, onFeedback, feedback }: {
     survey: any;
     pageIndex: any;
     question: any;
@@ -8,5 +8,6 @@ declare function SmileyRatingQuestionOption4({ survey, pageIndex, question, forg
     onPrevPage: any;
     onNextPage: any;
     onFeedback: any;
+    feedback: any;
 }): React.FunctionComponentElement<{}>;
 import React from "react";

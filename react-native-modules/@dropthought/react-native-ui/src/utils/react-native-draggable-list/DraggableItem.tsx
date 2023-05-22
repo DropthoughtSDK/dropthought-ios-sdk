@@ -6,6 +6,7 @@ type DraggableItemProps = {
   index: number;
   onDragStart: () => void;
   onDrag: (pan: Animated.ValueXY, y: number) => void;
+  onDragRelease: () => void;
   onDragEnd: (pan: Animated.ValueXY) => void;
   onLayout: (event: LayoutChangeEvent) => void;
   forceReset: boolean;
@@ -18,6 +19,7 @@ function DraggableItem({
   index,
   onDragStart,
   onDrag,
+  onDragRelease,
   onDragEnd,
   onLayout,
   forceReset,
@@ -45,7 +47,7 @@ function DraggableItem({
           //@ts-ignore
           pan.setOffset({ x: pan.x._value, y: pan.y._value });
           pan.setValue({ x: 0, y: 0 });
-        }, 200);
+        }, 500);
       },
       onPanResponderMove: (_, gesture) => {
         if (isDraggingRef.current) {
@@ -53,6 +55,7 @@ function DraggableItem({
         }
       },
       onPanResponderRelease: (_e, _gesture) => {
+        onDragRelease && onDragRelease();
         if (longPressTimeout.current) {
           clearTimeout(longPressTimeout.current);
         }
@@ -63,6 +66,7 @@ function DraggableItem({
         }
       },
       onPanResponderTerminate(_e, _gestureState) {
+        onDragRelease && onDragRelease();
         if (longPressTimeout.current) {
           clearTimeout(longPressTimeout.current);
         }

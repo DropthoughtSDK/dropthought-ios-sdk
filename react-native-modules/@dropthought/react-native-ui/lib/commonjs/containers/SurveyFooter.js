@@ -9,6 +9,10 @@ var React = _interopRequireWildcard(require("react"));
 
 var _reactNative = require("react-native");
 
+var _reactNativeSafeAreaContext = require("react-native-safe-area-context");
+
+var _hooks = require("@react-native-community/hooks");
+
 var _styles = require("../styles");
 
 var _translation = _interopRequireDefault(require("../translation"));
@@ -30,6 +34,9 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
  * When "Back" is pressed, call props.onPrevPage
  * When "Next" or "Submit" is pressed, call props.onNextPage
  */
+//@ts-ignore
+const isAndroid = _reactNative.Platform.OS === 'android';
+
 const SurveyFooter = props => {
   const rtl = _translation.default.dir() === 'rtl';
   const {
@@ -40,8 +47,16 @@ const SurveyFooter = props => {
     onNextPage,
     backgroundColor
   } = props;
+  const insets = (0, _reactNativeSafeAreaContext.useSafeAreaInsets)();
+  const {
+    keyboardShown
+  } = (0, _hooks.useKeyboard)();
+  const insetsBottom = // if it is android, and the insets bottom is not normal,
+  // maybe it is because the keyboard is showed, don't use this insets
+  isAndroid && insets.bottom >= 100 ? 0 : insets.bottom;
   const containerStyle = [styles.container, rtl && _styles.GlobalStyle.flexRowReverse, {
-    backgroundColor
+    backgroundColor,
+    paddingBottom: insetsBottom || 15
   }];
   const {
     colorScheme
@@ -63,6 +78,7 @@ const SurveyFooter = props => {
     disabled: submitDisabled,
     onPress: () => {
       setSubmitDisabled(true);
+      setTimeout(() => setSubmitDisabled(false), 1000);
       onNextPage();
     }
   }, /*#__PURE__*/React.createElement(_reactNative.Text, {
@@ -87,7 +103,9 @@ const SurveyFooter = props => {
   }), /*#__PURE__*/React.createElement(_reactNative.Image, {
     style: iconStyle,
     source: require('../assets/icNextButton.png')
-  })));
+  }))); // hide this bar when it is android and keyboard is shown
+
+  if (isAndroid && keyboardShown) return null;
   return /*#__PURE__*/React.createElement(_reactNative.View, {
     style: containerStyle
   }, isFirstPage ? null : leftButton, isLastPage ? submitButton : rightButton);

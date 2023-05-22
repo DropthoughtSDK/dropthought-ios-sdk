@@ -217,7 +217,11 @@ const ClassicRankingQuestion = ({
   };
 
   const oniOSModal = selectedItem => {
-    const actionSheetOptions = ['Cancel', ...normalList.map((_, index) => (index + 1).toString()), 'N/A'];
+    let actionSheetOptions = ['Cancel', ...normalList.map((_, index) => (index + 1).toString())];
+
+    if (allowNAForRanking) {
+      actionSheetOptions = [...actionSheetOptions, 'N/A'];
+    }
 
     _reactNative.ActionSheetIOS.showActionSheetWithOptions({
       title: 'Select your rating',
@@ -229,7 +233,7 @@ const ClassicRankingQuestion = ({
     }, buttonIndex => {
       if (buttonIndex === 0) {
         return;
-      } else if (buttonIndex === actionSheetOptions.length - 1) {
+      } else if (allowNAForRanking && buttonIndex === actionSheetOptions.length - 1) {
         onNAPressHandler(selectedItem);
       } else {
         setList(prev => {
@@ -245,6 +249,16 @@ const ClassicRankingQuestion = ({
     });
   };
 
+  const modalContainerStyle = [styles.modalContainer, {
+    backgroundColor: isDarkMode ? 'rgb(55,55,55)' : _styles.Colors.white
+  }];
+  const modalItemTitleStyle = [styles.modalItemTitle, {
+    color: isDarkMode ? _styles.Colors.white : _styles.Colors.black
+  }];
+  const modalItemStyle = [styles.modalItem, {
+    borderTopColor: isDarkMode ? 'rgba(17,17,17,0.5)' : _styles.Colors.divider
+  }];
+
   const rankingModal = /*#__PURE__*/_react.default.createElement(_reactNative.Modal, {
     transparent: true,
     animationType: "fade",
@@ -255,15 +269,16 @@ const ClassicRankingQuestion = ({
     style: styles.modalDismissArea,
     onPress: () => setVisible(false)
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
-    style: styles.modalContainer
+    style: modalContainerStyle
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+    style: styles.modalTitleContainer
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: styles.modalTitle
-  }, 'Select your rating'), normalList.map((_value, index) => {
+  }, 'Select your rating')), normalList.map((_value, index) => {
     return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
       key: index
-    }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
-      style: styles.modalDivider
-    }), /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+    }, /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+      style: modalItemStyle,
       onPress: () => {
         if (selectedOption) {
           setList(prev => {
@@ -278,9 +293,10 @@ const ClassicRankingQuestion = ({
         }
       }
     }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-      style: styles.modalTitle
+      style: modalItemTitleStyle
     }, `${index + 1}`)));
   }), allowNAForRanking ? /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+    style: modalItemStyle,
     onPress: () => {
       if (selectedOption) {
         onNAPressHandler(selectedOption);
@@ -288,11 +304,14 @@ const ClassicRankingQuestion = ({
 
       setVisible(false);
     }
-  }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
-    style: styles.modalDivider
-  }), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-    style: styles.modalTitle
-  }, 'N/A')) : null))));
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    style: modalItemTitleStyle
+  }, 'N/A')) : null, /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+    style: modalItemStyle,
+    onPress: () => setVisible(false)
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    style: modalItemTitleStyle
+  }, 'Cancel'))))));
 
   const renderItem = ({
     item,
@@ -309,7 +328,6 @@ const ClassicRankingQuestion = ({
   };
 
   const onDragEndHandler = newList => {
-    onDragEnd && onDragEnd();
     setList(prev => {
       const result = newList.map(newData => {
         const {
@@ -345,6 +363,7 @@ const ClassicRankingQuestion = ({
       console.log('start');
       onDragStart && onDragStart();
     },
+    onDragRelease: onDragEnd,
     onDragEnd: onDragEndHandler
   })))), rankingModal);
 };
@@ -412,7 +431,6 @@ const styles = _reactNative.StyleSheet.create({
   },
   modalContainer: {
     width: 268,
-    backgroundColor: _styles.Colors.white,
     borderRadius: 14,
     shadowColor: 'rgba(0, 0, 0, 0.16)',
     shadowOffset: {
@@ -422,16 +440,27 @@ const styles = _reactNative.StyleSheet.create({
     shadowRadius: 16,
     shadowOpacity: 1
   },
-  modalTitle: {
-    height: 24,
-    marginVertical: 10,
-    textAlign: 'center',
-    fontSize: 17,
-    fontWeight: '500'
+  modalItem: {
+    paddingVertical: 10,
+    borderTopColor: _styles.Colors.divider,
+    borderTopWidth: 1
   },
-  modalDivider: {
-    backgroundColor: _styles.Colors.divider,
-    height: 1
+  modalTitleContainer: {
+    paddingVertical: 10,
+    minHeight: 50,
+    justifyContent: 'center'
+  },
+  modalTitle: {
+    textAlign: 'center',
+    fontSize: 13,
+    fontWeight: '600',
+    color: _styles.Colors.dateGrey
+  },
+  modalItemTitle: {
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: '500',
+    color: _styles.Colors.black
   },
   scrollViewContainer: {
     width: '100%',

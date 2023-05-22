@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
   TextInput,
   KeyboardTypeOptions,
   Platform,
+  Keyboard,
 } from 'react-native';
 import styles from './MultiLineTextInput.styles';
 import { QuestionMetaDataType } from '../../utils/data';
@@ -18,10 +19,10 @@ import { Colors, addOpacityToColor, GlobalStyle } from '../../styles';
 import { useTheme } from '../../contexts/theme';
 import { COLOR_SCHEMES } from '../../contexts/theme/theme.const';
 
-const metadataTypeKeyboard = (
+export const metadataTypeKeyboard = (
   metadataType: TypeQuestionMetaDataType | undefined
 ): KeyboardTypeOptions | undefined => {
-  switch (metadataType) {
+  switch (metadataType?.toLocaleLowerCase()) {
     case QuestionMetaDataType.Email:
       return 'email-address';
     case QuestionMetaDataType.Phone:
@@ -37,10 +38,10 @@ const metadataTypeKeyboard = (
   }
 };
 
-const metadataTypeAutoCapitalize = (
+export const metadataTypeAutoCapitalize = (
   metadataType: TypeQuestionMetaDataType | undefined
 ) => {
-  switch (metadataType) {
+  switch (metadataType?.toLocaleLowerCase()) {
     case QuestionMetaDataType.Name:
       return 'words';
     case QuestionMetaDataType.Email:
@@ -56,6 +57,8 @@ const metadataTypeAutoCapitalize = (
 interface Props {
   onEndEditingHandler?: () => void;
   onChangeTextHandler?: (t: string) => void;
+  onBlurHandler?: () => void;
+  onFocusHandler?: () => void;
   themeColor: string;
   feedback: Feedback;
   question: Question;
@@ -73,18 +76,29 @@ const MultiLineTextInput: React.FC<Props> = ({
   question,
   anonymous,
   inputRef,
-  showErrorHint = true,
+  showErrorHint = false,
   checked = true,
-  ...props
+  onBlurHandler = () => {},
+  onFocusHandler = () => {},
 }) => {
   const { colorScheme, fontColor } = useTheme();
-  const { metaDataType, questionBrand, scale = 64, type } = question;
+  const {
+    metaDataType,
+    otherText = '',
+    questionBrand = '',
+    scale = 64,
+    type,
+  } = question;
   const MAX_CHARACTER = type === 'open' ? Number(scale) : 100;
   const appearanceTextColorStyle = { color: fontColor };
-  const [hasEdited, setHasEdited] = React.useState(false);
+  // to keep answer always select the last one
+  const answersIndex = feedback?.answers.length - 1;
   const [text, setText] = React.useState<string>(
-    feedback?.answers[0] ? `${feedback?.answers[0]}` : ''
+    typeof feedback?.answers[answersIndex] === 'string'
+      ? `${feedback?.answers[answersIndex]}`
+      : ''
   );
+  const [focus, setFocus] = React.useState(false);
 
   const rtl = i18n.dir() === 'rtl';
   const showAnonymousWarning =
@@ -94,27 +108,30 @@ const MultiLineTextInput: React.FC<Props> = ({
       metaDataType === 'Name' ||
       metaDataType === 'Phone');
 
-  const onEndEditing = () => {
-    setHasEdited(true);
-    onEndEditingHandler && onEndEditingHandler();
-  };
+  useEffect(() => {
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      onEndEditingHandler && onEndEditingHandler();
+    });
+
+    return () => {
+      hideSubscription.remove();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onChangeText = (t: string) => {
-    setText(t);
+    // [DK-3756] if the text is close to the maxLength it will be rendered twice in the iOS, so we add the focus to prevent the issue.
+    if (focus) {
+      setText(t);
+    }
     onChangeTextHandler && onChangeTextHandler(t);
   };
 
   const characterLeft = MAX_CHARACTER - text.length;
-  const AT_LEAST_CHARACTER = 3;
-  const isInputInValid = hasEdited && text.length < AT_LEAST_CHARACTER;
 
   let bottomText = '';
   let bottomTextColor = Colors.warningRed;
-  if (isInputInValid && showErrorHint) {
-    bottomText = i18n.t('open-question-invalid-message:characters', {
-      count: AT_LEAST_CHARACTER,
-    });
-  } else if (showAnonymousWarning) {
+  if (showAnonymousWarning) {
     bottomText = i18n.t('survey:metadata-anonymous-warning');
     bottomTextColor = addOpacityToColor(Colors.black, 0.6);
   }
@@ -135,7 +152,7 @@ const MultiLineTextInput: React.FC<Props> = ({
     styles.inputContainer,
     appearanceTextColorStyle,
     appearanceSubBackgroundColorStyle,
-    isInputInValid && showErrorHint ? inputValidStyle : null,
+    showErrorHint ? inputValidStyle : null,
     rtl && GlobalStyle.textAlignRight,
   ];
   const rightDescTextStyle = [
@@ -158,14 +175,26 @@ const MultiLineTextInput: React.FC<Props> = ({
       style={textInputStyle}
       multiline={true}
       onChangeText={onChangeText}
-      placeholder={questionBrand}
+      onFocus={() => {
+        setFocus(true);
+        onFocusHandler();
+      }}
+      onBlur={() => {
+        setFocus(false);
+        onBlurHandler();
+      }}
+      placeholder={
+        otherText.length > 0
+          ? otherText
+          : questionBrand.length > 0
+          ? questionBrand
+          : i18n.t('survey:other-placeholder')
+      }
       placeholderTextColor={Colors.inputPlaceholder}
-      onEndEditing={onEndEditing}
       value={text}
       maxLength={MAX_CHARACTER}
       keyboardType={metadataTypeKeyboard(metaDataType)}
       autoCapitalize={metadataTypeAutoCapitalize(metaDataType)}
-      {...props}
     />
   );
 

@@ -196,7 +196,12 @@ const RankingQuestion = ({
   };
 
   const oniOSModal = selectedItem => {
-    const actionSheetOptions = ['Cancel', ...normalList.map((_, index) => (index + 1).toString()), 'N/A'];
+    let actionSheetOptions = ['Cancel', ...normalList.map((_, index) => (index + 1).toString())];
+
+    if (allowNAForRanking) {
+      actionSheetOptions = [...actionSheetOptions, 'N/A'];
+    }
+
     ActionSheetIOS.showActionSheetWithOptions({
       title: 'Select your rating',
       options: actionSheetOptions,
@@ -207,7 +212,7 @@ const RankingQuestion = ({
     }, buttonIndex => {
       if (buttonIndex === 0) {
         return;
-      } else if (buttonIndex === actionSheetOptions.length - 1) {
+      } else if (allowNAForRanking && buttonIndex === actionSheetOptions.length - 1) {
         onNAPressHandler(selectedItem);
       } else {
         setList(prev => {
@@ -223,6 +228,15 @@ const RankingQuestion = ({
     });
   };
 
+  const modalContainerStyle = [styles.modalContainer, {
+    backgroundColor: isDarkMode ? 'rgb(55,55,55)' : Colors.white
+  }];
+  const modalItemTitleStyle = [styles.modalItemTitle, {
+    color: isDarkMode ? Colors.white : Colors.black
+  }];
+  const modalItemStyle = [styles.modalItem, {
+    borderTopColor: isDarkMode ? 'rgba(17,17,17,0.5)' : Colors.divider
+  }];
   const rankingModal = /*#__PURE__*/React.createElement(Modal, {
     transparent: true,
     animationType: "fade",
@@ -233,15 +247,16 @@ const RankingQuestion = ({
     style: styles.modalDismissArea,
     onPress: () => setVisible(false)
   }, /*#__PURE__*/React.createElement(View, {
-    style: styles.modalContainer
+    style: modalContainerStyle
+  }, /*#__PURE__*/React.createElement(View, {
+    style: styles.modalTitleContainer
   }, /*#__PURE__*/React.createElement(Text, {
     style: styles.modalTitle
-  }, 'Select your rating'), normalList.map((_value, index) => {
+  }, 'Select your rating')), normalList.map((_value, index) => {
     return /*#__PURE__*/React.createElement(View, {
       key: index
-    }, /*#__PURE__*/React.createElement(View, {
-      style: styles.modalDivider
-    }), /*#__PURE__*/React.createElement(TouchableOpacity, {
+    }, /*#__PURE__*/React.createElement(TouchableOpacity, {
+      style: modalItemStyle,
       onPress: () => {
         if (selectedOption) {
           setList(prev => {
@@ -256,9 +271,10 @@ const RankingQuestion = ({
         }
       }
     }, /*#__PURE__*/React.createElement(Text, {
-      style: styles.modalTitle
+      style: modalItemTitleStyle
     }, `${index + 1}`)));
   }), allowNAForRanking ? /*#__PURE__*/React.createElement(TouchableOpacity, {
+    style: modalItemStyle,
     onPress: () => {
       if (selectedOption) {
         onNAPressHandler(selectedOption);
@@ -266,11 +282,14 @@ const RankingQuestion = ({
 
       setVisible(false);
     }
-  }, /*#__PURE__*/React.createElement(View, {
-    style: styles.modalDivider
-  }), /*#__PURE__*/React.createElement(Text, {
-    style: styles.modalTitle
-  }, 'N/A')) : null))));
+  }, /*#__PURE__*/React.createElement(Text, {
+    style: modalItemTitleStyle
+  }, 'N/A')) : null, /*#__PURE__*/React.createElement(TouchableOpacity, {
+    style: modalItemStyle,
+    onPress: () => setVisible(false)
+  }, /*#__PURE__*/React.createElement(Text, {
+    style: modalItemTitleStyle
+  }, 'Cancel'))))));
 
   const renderItem = ({
     item,
@@ -306,7 +325,6 @@ const RankingQuestion = ({
     style: styles.container,
     scrollEnabled: false
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
-    style: styles.mandatoryTitle,
     forgot: forgot,
     question: question
   }), /*#__PURE__*/React.createElement(ScrollView, {
@@ -319,6 +337,7 @@ const RankingQuestion = ({
     data: list,
     renderItem: renderItem,
     onDragStart: () => {},
+    onDragRelease: () => {},
     onDragEnd: onDragEndHandler
   })))), rankingModal);
 };
@@ -391,7 +410,6 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: 268,
-    backgroundColor: Colors.white,
     borderRadius: 14,
     shadowColor: 'rgba(0, 0, 0, 0.16)',
     shadowOffset: {
@@ -401,24 +419,31 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     shadowOpacity: 1
   },
-  modalTitle: {
-    height: 24,
-    marginVertical: 10,
-    textAlign: 'center',
-    fontSize: 17,
-    fontWeight: '500',
-    color: Colors.white
+  modalItem: {
+    paddingVertical: 10,
+    borderTopColor: Colors.divider,
+    borderTopWidth: 1
   },
-  modalDivider: {
-    backgroundColor: Colors.divider,
-    height: 1
+  modalTitleContainer: {
+    paddingVertical: 10,
+    minHeight: 50,
+    justifyContent: 'center'
+  },
+  modalTitle: {
+    textAlign: 'center',
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.dateGrey
+  },
+  modalItemTitle: {
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: '500',
+    color: Colors.black
   },
   scrollViewContainer: {
     width: '100%',
     justifyContent: 'center'
-  },
-  mandatoryTitle: {
-    marginHorizontal: -23
   },
   questionContainer: {
     width: '100%'

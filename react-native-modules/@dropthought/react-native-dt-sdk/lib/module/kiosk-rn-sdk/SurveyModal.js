@@ -1,24 +1,46 @@
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 import * as React from 'react';
-import { View, Modal } from 'react-native';
+import { View, Modal, Dimensions } from 'react-native';
 import { pick, omit } from 'ramda';
-import { GlobalStyle } from '@dropthought/react-native-ui';
+import { GlobalStyle, Colors } from '@dropthought/react-native-ui';
 import SDKEntry from './SDKEntry';
 const ModalProps = ['animated', 'animationType', 'transparent', 'visible', 'onRequestClose', 'onShow', 'presentationStyle', 'supportedOrientations', 'onDismiss', 'onOrientationChange', 'hardwareAccelerated'];
+const height = Dimensions.get('window').height;
+const width = Dimensions.get('window').width;
 /**
  * @param {SurveyModalProps & SDKEntryProps & ModalProps } props
  */
 
 export function SurveyModal(props) {
   const sdkProps = omit(ModalProps, props);
-  const modalProps = pick(ModalProps, props);
-  return /*#__PURE__*/React.createElement(Modal, _extends({
+  const modalProps = pick(ModalProps, props); //[DK-3764] add backgroundColor to prevent the broken ui issue
+
+  const {
+    backgroundColor,
+    appearance
+  } = props;
+  let dummyBackgroundColor = Colors.white;
+
+  if (backgroundColor) {
+    dummyBackgroundColor = backgroundColor;
+  } else if (appearance === 'dark') {
+    dummyBackgroundColor = Colors.backgroundColorDark;
+  }
+
+  const containerStyle = {
+    height,
+    width,
+    backgroundColor: dummyBackgroundColor
+  };
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(View, {
+    style: containerStyle
+  }), /*#__PURE__*/React.createElement(Modal, _extends({
     presentationStyle: "overFullScreen",
     transparent: true
   }, modalProps), /*#__PURE__*/React.createElement(View, {
     style: GlobalStyle.flex1
-  }, /*#__PURE__*/React.createElement(SDKEntry, sdkProps)));
+  }, /*#__PURE__*/React.createElement(SDKEntry, sdkProps))));
 }
 /** @type {React.Context<(param: OpenSurveyProps=) => void>} */
 

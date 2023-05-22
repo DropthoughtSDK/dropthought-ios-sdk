@@ -14,8 +14,9 @@ declare type DraggableListProps = {
     data: ReadonlyArray<TransformedOption>;
     renderItem: DraggableListRenderItem;
     onDragStart: () => void;
+    onDragRelease: () => void;
     onDragEnd: (newList: TransformedOption[]) => void;
 };
-declare function DraggableList({ data, renderItem, onDragStart, onDragEnd, }: DraggableListProps): JSX.Element;
+declare function DraggableList({ data, renderItem, onDragStart, onDragRelease, onDragEnd, }: DraggableListProps): JSX.Element;
 declare const _default: React.MemoExoticComponent<typeof DraggableList>;
 export default _default;

@@ -1,10 +1,11 @@
 declare var _default: React.MemoExoticComponent<typeof DraggableItem>;
 export default _default;
-declare function DraggableItem({ children, index, onDragStart, onDrag, onDragEnd, onLayout, forceReset, movements, draggable }: {
+declare function DraggableItem({ children, index, onDragStart, onDrag, onDragRelease, onDragEnd, onLayout, forceReset, movements, draggable }: {
     children: any;
     index: any;
     onDragStart: any;
     onDrag: any;
+    onDragRelease: any;
     onDragEnd: any;
     onLayout: any;
     forceReset: any;

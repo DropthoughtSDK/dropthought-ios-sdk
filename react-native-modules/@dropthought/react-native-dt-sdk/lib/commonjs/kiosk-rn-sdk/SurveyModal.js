@@ -25,19 +25,44 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 const ModalProps = ['animated', 'animationType', 'transparent', 'visible', 'onRequestClose', 'onShow', 'presentationStyle', 'supportedOrientations', 'onDismiss', 'onOrientationChange', 'hardwareAccelerated'];
+
+const height = _reactNative.Dimensions.get('window').height;
+
+const width = _reactNative.Dimensions.get('window').width;
 /**
  * @param {SurveyModalProps & SDKEntryProps & ModalProps } props
  */
 
+
 function SurveyModal(props) {
   const sdkProps = (0, _ramda.omit)(ModalProps, props);
-  const modalProps = (0, _ramda.pick)(ModalProps, props);
-  return /*#__PURE__*/React.createElement(_reactNative.Modal, _extends({
+  const modalProps = (0, _ramda.pick)(ModalProps, props); //[DK-3764] add backgroundColor to prevent the broken ui issue
+
+  const {
+    backgroundColor,
+    appearance
+  } = props;
+  let dummyBackgroundColor = _reactNativeUi.Colors.white;
+
+  if (backgroundColor) {
+    dummyBackgroundColor = backgroundColor;
+  } else if (appearance === 'dark') {
+    dummyBackgroundColor = _reactNativeUi.Colors.backgroundColorDark;
+  }
+
+  const containerStyle = {
+    height,
+    width,
+    backgroundColor: dummyBackgroundColor
+  };
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(_reactNative.View, {
+    style: containerStyle
+  }), /*#__PURE__*/React.createElement(_reactNative.Modal, _extends({
     presentationStyle: "overFullScreen",
     transparent: true
   }, modalProps), /*#__PURE__*/React.createElement(_reactNative.View, {
     style: _reactNativeUi.GlobalStyle.flex1
-  }, /*#__PURE__*/React.createElement(_SDKEntry.default, sdkProps)));
+  }, /*#__PURE__*/React.createElement(_SDKEntry.default, sdkProps))));
 }
 /** @type {React.Context<(param: OpenSurveyProps=) => void>} */
 

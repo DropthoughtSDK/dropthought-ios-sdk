@@ -59,6 +59,7 @@ const ClassicSurveyFooter = props => {
     color: themeColor,
     onPress: () => {
       setSubmitDisabled(true);
+      setTimeout(() => setSubmitDisabled(false), 1000);
       onNextPage();
     } // @ts-ignore
     ,

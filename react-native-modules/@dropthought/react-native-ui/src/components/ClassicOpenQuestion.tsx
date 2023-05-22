@@ -14,6 +14,7 @@ import {
 } from '../utils/data';
 import GlobalStyle, { Colors } from '../styles';
 import ClassicMandatoryTitle from './ClassicMandatoryTitle';
+import MetadataDesc from './MetadataDesc';
 import i18n from '../translation';
 import {
   DimensionWidthType,
@@ -28,10 +29,10 @@ import type {
 
 const MAX_CHARACTER = 4000;
 
-const metadataTypeKeyboard = (
+export const metadataTypeKeyboard = (
   metadataType: TypeQuestionMetaDataType | undefined
 ): KeyboardTypeOptions | undefined => {
-  switch (metadataType) {
+  switch (metadataType?.toLocaleLowerCase()) {
     case QuestionMetaDataType.Email:
       return 'email-address';
     case QuestionMetaDataType.Phone:
@@ -47,10 +48,10 @@ const metadataTypeKeyboard = (
   }
 };
 
-const metadataTypeAutoCapitalize = (
+export const metadataTypeAutoCapitalize = (
   metadataType: TypeQuestionMetaDataType | undefined
 ) => {
-  switch (metadataType) {
+  switch (metadataType?.toLocaleLowerCase()) {
     case QuestionMetaDataType.Name:
       return 'words';
     case QuestionMetaDataType.Email:
@@ -61,30 +62,6 @@ const metadataTypeAutoCapitalize = (
     default:
       return 'sentences';
   }
-};
-
-const MetadataDesc = ({
-  question,
-  rtl,
-}: {
-  question: Question;
-  rtl: boolean;
-}) => {
-  const dimensionWidthType = useDimensionWidthType();
-  const styles =
-    dimensionWidthType === DimensionWidthType.phone ? phoneStyles : phoneStyles;
-
-  if (!question.metaDataType) return null;
-
-  // if translation is not found, do not print anything
-  const desc = i18n.t(`metadata-question-desc:${question.metaDataType}`, '');
-  if (!desc) return null;
-
-  return (
-    <Text style={[styles.descText, rtl && GlobalStyle.textAlignRight]}>
-      {desc}
-    </Text>
-  );
 };
 
 type Props = {
@@ -137,7 +114,9 @@ const OpenQuestion = ({
       question.metaDataType === 'Name' ||
       question.metaDataType === 'Phone');
 
-  const maxCharacterLength = MAX_CHARACTER;
+  const maxCharacterLength = question.scale
+    ? parseInt(question.scale, 10)
+    : MAX_CHARACTER;
   const characterLeft = maxCharacterLength - text.length;
 
   const isValid = metaDataTypeQuestionValidator(question, text);
@@ -158,7 +137,8 @@ const OpenQuestion = ({
         invalidMessage={
           // show the error message after the user has done edited
           hasEdited && !isValid
-            ? i18n.t('metadata-invalid-message', question.metaDataType)
+            ? question.responseErrorText ??
+              i18n.t('metadata-invalid-message', question.metaDataType)
             : ''
         }
         question={question}
@@ -186,7 +166,10 @@ const OpenQuestion = ({
         ]}
         multiline={true}
         onChangeText={(t) => {
-          setText(t);
+          if (focus) {
+            // [DK-3756] if the text is close to the maxLength it will be rendered twice in the iOS, so we add the focus to prevent the issue.
+            setText(t);
+          }
           // onValueChange(text) // Keep it for Kiosk usage
         }}
         placeholder={question.questionBrand}

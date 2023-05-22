@@ -3,13 +3,13 @@ import { View, StyleSheet, Text, TextInput, Platform } from 'react-native';
 import { QuestionMetaDataType, metaDataTypeQuestionValidator, mandatoryQuestionValidator } from '../utils/data';
 import GlobalStyle, { Colors } from '../styles';
 import ClassicMandatoryTitle from './ClassicMandatoryTitle';
+import MetadataDesc from './MetadataDesc';
 import i18n from '../translation';
 import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 const MAX_CHARACTER = 4000;
-
-const metadataTypeKeyboard = metadataType => {
-  switch (metadataType) {
+export const metadataTypeKeyboard = metadataType => {
+  switch (metadataType === null || metadataType === void 0 ? void 0 : metadataType.toLocaleLowerCase()) {
     case QuestionMetaDataType.Email:
       return 'email-address';
 
@@ -27,9 +27,8 @@ const metadataTypeKeyboard = metadataType => {
       return 'default';
   }
 };
-
-const metadataTypeAutoCapitalize = metadataType => {
-  switch (metadataType) {
+export const metadataTypeAutoCapitalize = metadataType => {
+  switch (metadataType === null || metadataType === void 0 ? void 0 : metadataType.toLocaleLowerCase()) {
     case QuestionMetaDataType.Name:
       return 'words';
 
@@ -44,21 +43,6 @@ const metadataTypeAutoCapitalize = metadataType => {
   }
 };
 
-const MetadataDesc = ({
-  question,
-  rtl
-}) => {
-  const dimensionWidthType = useDimensionWidthType();
-  const styles = dimensionWidthType === DimensionWidthType.phone ? phoneStyles : phoneStyles;
-  if (!question.metaDataType) return null; // if translation is not found, do not print anything
-
-  const desc = i18n.t(`metadata-question-desc:${question.metaDataType}`, '');
-  if (!desc) return null;
-  return /*#__PURE__*/React.createElement(Text, {
-    style: [styles.descText, rtl && GlobalStyle.textAlignRight]
-  }, desc);
-};
-
 const OpenQuestion = ({
   anonymous,
   question,
@@ -68,6 +52,8 @@ const OpenQuestion = ({
   forgot,
   themeColor
 }) => {
+  var _question$responseErr;
+
   const {
     colorScheme,
     fontColor
@@ -95,7 +81,7 @@ const OpenQuestion = ({
 
   const rtl = i18n.dir() === 'rtl';
   const showAnonymousWarning = anonymous && question.metaDataType && (question.metaDataType === 'Email' || question.metaDataType === 'Name' || question.metaDataType === 'Phone');
-  const maxCharacterLength = MAX_CHARACTER;
+  const maxCharacterLength = question.scale ? parseInt(question.scale, 10) : MAX_CHARACTER;
   const characterLeft = maxCharacterLength - text.length;
   const isValid = metaDataTypeQuestionValidator(question, text);
   /** @type {Feedback} */
@@ -109,7 +95,7 @@ const OpenQuestion = ({
   const upperView = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ClassicMandatoryTitle, {
     forgot: hasForgot,
     invalidMessage: // show the error message after the user has done edited
-    hasEdited && !isValid ? i18n.t('metadata-invalid-message', question.metaDataType) : '',
+    hasEdited && !isValid ? (_question$responseErr = question.responseErrorText) !== null && _question$responseErr !== void 0 ? _question$responseErr : i18n.t('metadata-invalid-message', question.metaDataType) : '',
     question: question,
     style: styles.title
   }), /*#__PURE__*/React.createElement(MetadataDesc, {
@@ -126,7 +112,11 @@ const OpenQuestion = ({
     }, rtl && GlobalStyle.textAlignRight],
     multiline: true,
     onChangeText: t => {
-      setText(t); // onValueChange(text) // Keep it for Kiosk usage
+      if (focus) {
+        // [DK-3756] if the text is close to the maxLength it will be rendered twice in the iOS, so we add the focus to prevent the issue.
+        setText(t);
+      } // onValueChange(text) // Keep it for Kiosk usage
+
     },
     placeholder: question.questionBrand,
     placeholderTextColor: Colors.inputPlaceholder,

@@ -6,6 +6,7 @@
     "logout": "Log Out",
     "version": "Version",
     "yes-btn": "Yes",
+    "others": "Others",
     "exit_survey": "Exit Survey",
     "upload_failed": "We couldn't upload all feedbacks. Please try again later."
   },
@@ -35,7 +36,9 @@
     "other-option": "Other:",
     "other-placeholder": "What's on your mind?",
     "metadata-anonymous-warning": "Personal information will not be shared.",
-    "new-progress-bar": "Question"
+    "new-progress-bar": "Question",
+    "select-Your-Option": "Select Your Option",
+    "find-Option": "Find Option"
   },
   "metadata-question-desc": {
     "Name": "e.g. John Doe / Please type Name only",
@@ -51,9 +54,6 @@
     "Number": "Please respond with numbers.",
     "Date": "Please respond with date."
   },
-  "open-question-invalid-message": {
-    "characters": "Please type at least {{count}} characters"
-  },
   "end-survey": {
     "thank": "Thank you for taking our survey"
   },
@@ -64,10 +64,10 @@
     "title": "Drag up and down to rate"
   },
   "option4HintDescription": {
-    "title": "Tap to add starts & Tap on stars to remove it",
-    "subTitle": "You can add upto {{count}} stars"
+    "title": "Tap to add stars & Tap on stars to remove it",
+    "subTitle": "(You can add upto {{count}} stars)"
   },
   "option6HintDescription": {
-    "title":"Rotate the dialer to rate"
+    "title": "Rotate the dialer to rate"
   }
 }

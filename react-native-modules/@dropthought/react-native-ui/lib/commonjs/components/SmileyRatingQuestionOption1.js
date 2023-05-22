@@ -54,6 +54,8 @@ const SmileyRatingQuestionOption1 = ({
   onFeedback,
   feedback
 }) => {
+  const answered = feedback && feedback.answers && !(0, _ramda.isNil)(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
+  const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
   const {
     backgroundColor: themeBackgroundColor,
     fontColor,
@@ -65,7 +67,7 @@ const SmileyRatingQuestionOption1 = ({
     scale
   } = question;
 
-  const [selectedIndex, setSelectedIndex] = _react.default.useState(-1);
+  const [selectedIndex, setSelectedIndex] = _react.default.useState(answered ? answeredValue : -1);
 
   const [selected, setSelected] = _react.default.useState(getInitialSelectedValue(feedback, question));
 

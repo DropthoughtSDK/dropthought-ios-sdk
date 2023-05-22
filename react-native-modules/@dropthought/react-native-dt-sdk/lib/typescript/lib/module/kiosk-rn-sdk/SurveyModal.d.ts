@@ -1,7 +1,7 @@
 /**
  * @param {SurveyModalProps & SDKEntryProps & ModalProps } props
  */
-export function SurveyModal(props: SurveyModalProps & SDKEntryProps & ModalProps): React.CElement<any, React.Component<any, any, any>>;
+export function SurveyModal(props: SurveyModalProps & SDKEntryProps & ModalProps): React.FunctionComponentElement<null>;
 /** @type {React.Context<(param: OpenSurveyProps=) => void>} */
 export const SurveyModalOpenSurveyContext: React.Context<(param?: OpenSurveyProps) => void>;
 export function useOpenSurvey(): (param?: OpenSurveyProps) => void;

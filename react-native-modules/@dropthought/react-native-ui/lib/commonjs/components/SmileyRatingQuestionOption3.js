@@ -27,6 +27,8 @@ var _theme = require("../contexts/theme");
 
 var _data = require("../utils/data");
 
+var _ramda = require("ramda");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
@@ -43,8 +45,11 @@ const SmileyRatingQuestionOption3 = ({
   onClose,
   onPrevPage,
   onNextPage,
-  onFeedback
+  onFeedback,
+  feedback
 }) => {
+  const answered = feedback && feedback.answers && !(0, _ramda.isNil)(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
+  const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
   const {
     backgroundColor: themeBackgroundColor,
     fontColor,
@@ -59,9 +64,9 @@ const SmileyRatingQuestionOption3 = ({
     options
   } = question;
 
-  const [selectedIndex, setSelectedIndex] = _react.default.useState(0);
+  const [selectedIndex, setSelectedIndex] = _react.default.useState(answered ? answeredValue : 0);
 
-  const [score, setScore] = _react.default.useState(-1);
+  const [score, setScore] = _react.default.useState(answered ? answeredValue : -1);
 
   const [isLoop, setIsLoop] = _react.default.useState(true);
 
@@ -69,13 +74,15 @@ const SmileyRatingQuestionOption3 = ({
 
   const [transformLotties, setTransformLotties] = _react.default.useState([]);
 
-  const scoreContainerOpacity = _react.default.useRef(new _reactNative.Animated.Value(0)).current;
+  const scoreContainerOpacity = _react.default.useRef(new _reactNative.Animated.Value(answered ? 1 : 0)).current;
 
-  const scoreOpacity = _react.default.useRef(new _reactNative.Animated.Value(0)).current;
+  const scoreOpacity = _react.default.useRef(new _reactNative.Animated.Value(answered ? 1 : 0)).current;
 
-  const descriptionYAxis = _react.default.useRef(new _reactNative.Animated.Value(windowHeight / 2 - 246 + 37)).current; // 37 -> one text line height
+  const descriptionYAxis = _react.default.useRef(new _reactNative.Animated.Value(answered ? 1 : windowHeight / 2 - 246 + 37)).current; // 37 -> one text line height
   // 246 -> Padding Vertical 123
 
+
+  const lottieRef = _react.default.useRef();
 
   const totalScore = Number(scale);
   const renderScore = score + 1;
@@ -130,12 +137,19 @@ const SmileyRatingQuestionOption3 = ({
     const newScore = score + number;
     setScore(newScore);
 
-    if (number > 0 && !isAtCoverScreen) {
-      setIsLoop(false);
-    }
-
     if (!isAtCoverScreen) {
       setSelectedIndex(newScore);
+
+      if (number > 0) {
+        setIsLoop(false);
+      } else {
+        setIsLoop(true);
+        setTimeout(() => {
+          var _lottieRef$current;
+
+          (_lottieRef$current = lottieRef.current) === null || _lottieRef$current === void 0 ? void 0 : _lottieRef$current.play();
+        }, 100);
+      }
     } //animtaion--
 
 
@@ -176,9 +190,6 @@ const SmileyRatingQuestionOption3 = ({
   const styles = isPhone ? phoneStyles : tabletStyles;
   const animationBackgroundColor = score >= 0 ? backgroundColorList[scaledIndex] : _styles.Colors.white;
   const backgroundColor = colorScheme === _theme.COLOR_SCHEMES.dark ? themeBackgroundColor : animationBackgroundColor;
-  const lottieContainerStyle = [commonStyles.lottieContainer, {
-    opacity: scoreContainerOpacity
-  }];
   const scoreSelectedStyle = [styles.scoreSelected, {
     opacity: scoreOpacity,
     color: fontColor
@@ -190,43 +201,64 @@ const SmileyRatingQuestionOption3 = ({
     opacity: scoreContainerOpacity,
     color: fontColor
   }];
+  const slashStyle = [styles.slash, {
+    opacity: scoreContainerOpacity,
+    marginBottom: _reactNative.Platform.OS === 'ios' ? 10 : -1
+  }];
   const scoreTotalStyle = [styles.scoreTotal, {
-    opacity: scoreContainerOpacity
+    opacity: scoreContainerOpacity,
+    marginBottom: _reactNative.Platform.OS === 'ios' ? 4 : -3
   }];
   const containerStyle = [commonStyles.container, {
     backgroundColor
   }];
-  const hintContainerStyle = score >= 0 ? [commonStyles.hintContainer, commonStyles.flexEnd] : [commonStyles.hintContainer];
+  const hintContainerStyle = score >= 0 ? commonStyles.hintContainer : commonStyles.initHintContainer;
   const hintTextStyle = [commonStyles.hintText, {
     color: fontColor
   }];
+  (0, _react.useEffect)(() => {
+    if (isLoop) {
+      setTimeout(() => {
+        var _lottieRef$current2;
 
-  const lottieContainer = /*#__PURE__*/_react.default.createElement(_reactNative.Animated.View, {
-    style: lottieContainerStyle
-  }, /*#__PURE__*/_react.default.createElement(_lottieReactNative.default, {
-    source: isLoop ? loopLotties[selectedIndex] : transformLotties[selectedIndex],
+        (_lottieRef$current2 = lottieRef.current) === null || _lottieRef$current2 === void 0 ? void 0 : _lottieRef$current2.play();
+      }, 100);
+    }
+  }, [isLoop]);
+  const lottieContainer = isLoop ? /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+    style: commonStyles.lottieContainer
+  }, /*#__PURE__*/_react.default.createElement(_lottieReactNative.default // @ts-ignore
+  , {
+    ref: lottieRef,
+    source: loopLotties[selectedIndex],
     autoPlay: true,
     style: commonStyles.lottieContent,
-    loop: isLoop,
-    onAnimationFinish: isCancel => {
-      if (!isCancel) setIsLoop(true);
-    },
+    loop: true,
+    speed: 0.5
+  })) : /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+    style: commonStyles.lottieContainer
+  }, /*#__PURE__*/_react.default.createElement(_lottieReactNative.default, {
+    source: transformLotties[selectedIndex],
+    autoPlay: true,
+    style: commonStyles.lottieContent,
+    loop: false,
+    onAnimationFinish: () => setIsLoop(true),
     speed: 0.5
   }));
 
   const scoreContainer = /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: commonStyles.scoreContainer
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
-    style: commonStyles.scoreContainer
-  }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: commonStyles.scoreText
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Animated.Text, {
     style: scoreSelectedStyle
   }, renderScore), /*#__PURE__*/_react.default.createElement(_reactNative.Animated.Text, {
+    style: slashStyle
+  }, '/'), /*#__PURE__*/_react.default.createElement(_reactNative.Animated.Text, {
     style: scoreTotalStyle
-  }, '/' + totalScore)), /*#__PURE__*/_react.default.createElement(_reactNative.Animated.Text, {
+  }, totalScore)), /*#__PURE__*/_react.default.createElement(_reactNative.Animated.Text, {
     style: descStyle
-  }, options[selectedIndex])));
+  }, options[selectedIndex]));
 
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_SurveyHeader.default, {
     survey: survey,
@@ -275,23 +307,23 @@ const commonStyles = _reactNative.StyleSheet.create({
     alignItems: 'center'
   },
   hintContainer: {
-    flex: 1,
-    justifyContent: 'center'
+    width: '100%'
   },
-  flexEnd: {
-    justifyContent: 'flex-end'
+  initHintContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    width: '100%'
   },
   hintText: {
     fontSize: 16,
     fontWeight: '500',
-    textAlign: 'center',
-    marginBottom: 6
+    textAlign: 'center'
   },
   lottieContainer: {
-    flex: 3,
     width: '100%',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginTop: 42
   },
   lottieContent: {
     width: '60%'
@@ -299,14 +331,15 @@ const commonStyles = _reactNative.StyleSheet.create({
   scoreContainer: {
     flex: 1,
     width: '100%',
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%'
   },
   scoreText: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'baseline'
+    alignItems: 'flex-end',
+    height: 61,
+    marginBottom: 10
   }
 });
 
@@ -317,12 +350,16 @@ const phoneStyles = _reactNative.StyleSheet.create({
     textAlign: 'center'
   },
   scoreSelected: {
-    fontSize: 74,
+    fontSize: 50,
     textAlign: 'center',
     alignItems: 'baseline'
   },
   scoreTotal: {
-    fontSize: 55,
+    fontSize: 37,
+    color: _styles.Colors.smileyRatingScoreGray
+  },
+  slash: {
+    fontSize: 37,
     color: _styles.Colors.smileyRatingScoreGray
   }
 });
@@ -340,6 +377,10 @@ const tabletStyles = _reactNative.StyleSheet.create({
   },
   scoreTotal: {
     fontSize: 55,
+    color: _styles.Colors.smileyRatingScoreGray
+  },
+  slash: {
+    fontSize: 37,
     color: _styles.Colors.smileyRatingScoreGray
   }
 });

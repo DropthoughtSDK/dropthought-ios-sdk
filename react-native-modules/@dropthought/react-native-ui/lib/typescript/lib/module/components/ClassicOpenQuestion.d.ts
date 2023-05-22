@@ -1,3 +1,5 @@
+export function metadataTypeKeyboard(metadataType: any): string;
+export function metadataTypeAutoCapitalize(metadataType: any): "none" | "words" | "sentences";
 export default OpenQuestion;
 declare function OpenQuestion({ anonymous, question, onFeedback, feedback, forgot, themeColor }: {
     anonymous: any;

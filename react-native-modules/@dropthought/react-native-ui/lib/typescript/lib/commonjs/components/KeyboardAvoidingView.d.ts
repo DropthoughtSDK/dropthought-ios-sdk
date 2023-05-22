@@ -1,7 +1,7 @@
 export var __esModule: boolean;
 export default _default;
 export type KeyboardAvoidingProps = {
-    contentContainerStyle: ViewStyle;
+    contentContainerStyle?: ViewStyle | undefined;
     style: ViewStyle;
     /**
      * - optional, the default behavior of this keyboard avoiding is to avoid the whole input box, but if you wish to have extra space to avoid

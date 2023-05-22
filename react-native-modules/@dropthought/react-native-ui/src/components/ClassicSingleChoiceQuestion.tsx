@@ -123,6 +123,7 @@ class ClassicSingleChoiceQuestion extends PureComponent<Props, State> {
             checkedColor={this.props.themeColor}
             onChangeValue={this.onChangeValueHandler}
             textValue={this.state.otherText}
+            question={this.props.question}
           />
         );
       }

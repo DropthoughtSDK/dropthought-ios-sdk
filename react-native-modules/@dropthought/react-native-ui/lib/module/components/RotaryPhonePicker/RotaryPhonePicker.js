@@ -20,9 +20,9 @@ const RotaryPhonePicker = ({
     height: 0,
     width: 0
   });
-  let renderAnim = useRef(new Animated.Value(0)).current;
-  const renderAnimValue = useRef(0);
-  let tempAnim = useRef(0).current;
+  let renderAnim = useRef(new Animated.Value(selectedIndex * -45)).current;
+  const renderAnimValue = useRef(selectedIndex * -45);
+  let tempAnim = useRef(selectedIndex * -45).current;
 
   const offset = () => Math.trunc(container.width / 2) - radiusOfOrbiting;
 
@@ -113,7 +113,7 @@ const RotaryPhonePicker = ({
     return /*#__PURE__*/React.createElement(View, {
       style: [styles.item, itemStyle(index)],
       key: index
-    }, index <= numberScale ? /*#__PURE__*/React.createElement(LottieView, {
+    }, value !== '' && index <= numberScale ? /*#__PURE__*/React.createElement(LottieView, {
       source: value,
       autoPlay: true
     }) : null);

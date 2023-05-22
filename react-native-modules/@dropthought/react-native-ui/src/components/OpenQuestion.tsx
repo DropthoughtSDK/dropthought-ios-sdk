@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import {
   metaDataTypeQuestionValidator,
   mandatoryQuestionValidator,
@@ -9,6 +9,7 @@ import i18n from '../translation';
 import { useTheme } from '../contexts/theme';
 import type { Question, Feedback } from '../data';
 import MultiLineTextInput from './MultiLineTextInput';
+import MetadataDesc from './MetadataDesc';
 
 type Props = {
   anonymous: boolean;
@@ -28,8 +29,12 @@ const OpenQuestion = ({
   forgot,
   themeColor,
 }: Props) => {
+  const rtl = i18n.dir() === 'rtl';
   const { backgroundColor } = useTheme();
   const [text, setText] = React.useState<string>(
+    feedback?.answers[0] ? `${feedback?.answers[0]}` : ''
+  );
+  const textRef = React.useRef<string>(
     feedback?.answers[0] ? `${feedback?.answers[0]}` : ''
   );
   const [hasEdited, setHasEdited] = React.useState(false);
@@ -56,28 +61,31 @@ const OpenQuestion = ({
     setHasEdited(true);
     onFeedback({
       questionId: question.questionId,
-      answers: [text],
+      answers: [textRef.current],
       type: 'open',
     });
   };
 
   const onChangeTextHandler = (t: string) => {
     setText(t);
+    textRef.current = t;
   };
 
   const upperView = (
-    <>
+    <View style={styles.upperView}>
       <MandatoryTitle
         forgot={hasForgot}
         invalidMessage={
           // show the error message after the user has done edited
           hasEdited && !isValid
-            ? i18n.t(`metadata-invalid-message:${question.metaDataType}`)
+            ? question.responseErrorText ??
+              i18n.t('metadata-invalid-message', question.metaDataType)
             : ''
         }
         question={question}
       />
-    </>
+      <MetadataDesc question={question} rtl={rtl} />
+    </View>
   );
 
   return (
@@ -90,6 +98,7 @@ const OpenQuestion = ({
         feedback={feedback}
         question={question}
         anonymous={anonymous}
+        showErrorHint={hasForgot || (hasEdited && !isValid)}
       />
     </ScrollView>
   );
@@ -101,5 +110,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 42,
+  },
+  upperView: {
+    marginBottom: 5,
   },
 });

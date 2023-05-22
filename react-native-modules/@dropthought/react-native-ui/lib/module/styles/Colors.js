@@ -1,5 +1,6 @@
 export const Colors = {
   purple: '#4c3794',
+  secondary: '#ECEFF4',
   borderColor: '#c2c2c2',
   borderColorDark: '#5454548F',
   borderFocusedColor: '#4c3794',
@@ -9,6 +10,7 @@ export const Colors = {
   dateGrey: '#8b8b8b',
   buttonGrey: '#dcdcdc',
   black: '#000000',
+  backdropBG: '#rgba(0,0,0,0.24)',
   dividerGrey: '#d1d1d1',
   errorHintColor: '#a30000',
   statusBarDivider: '#CCC',
@@ -51,7 +53,8 @@ export const Colors = {
   divider: 'rgba(60, 60, 67, 0.36)',
   rankingCheckBoxBorder: '#a8a8a8',
   sliderLabel: '#848a93',
-  sliderTrack: '#4b3694'
+  sliderTrack: '#4b3694',
+  contentBackground: '#F3F5F8'
 };
 export const addOpacityToColor = (hexColor, opacity) => {
   const o = Math.max(0, Math.min(1, opacity)); // bound opacity from 0 to 1

@@ -255,11 +255,13 @@ const RankingQuestion = ({
   };
 
   const oniOSModal = (selectedItem: TransformedOption) => {
-    const actionSheetOptions = [
+    let actionSheetOptions = [
       'Cancel',
       ...normalList.map((_, index) => (index + 1).toString()),
-      'N/A',
     ];
+    if (allowNAForRanking) {
+      actionSheetOptions = [...actionSheetOptions, 'N/A'];
+    }
     ActionSheetIOS.showActionSheetWithOptions(
       {
         title: 'Select your rating',
@@ -272,7 +274,10 @@ const RankingQuestion = ({
       (buttonIndex) => {
         if (buttonIndex === 0) {
           return;
-        } else if (buttonIndex === actionSheetOptions.length - 1) {
+        } else if (
+          allowNAForRanking &&
+          buttonIndex === actionSheetOptions.length - 1
+        ) {
           onNAPressHandler(selectedItem);
         } else {
           setList((prev) => {
@@ -289,6 +294,19 @@ const RankingQuestion = ({
     );
   };
 
+  const modalContainerStyle = [
+    styles.modalContainer,
+    { backgroundColor: isDarkMode ? 'rgb(55,55,55)' : Colors.white },
+  ];
+  const modalItemTitleStyle = [
+    styles.modalItemTitle,
+    { color: isDarkMode ? Colors.white : Colors.black },
+  ];
+  const modalItemStyle = [
+    styles.modalItem,
+    { borderTopColor: isDarkMode ? 'rgba(17,17,17,0.5)' : Colors.divider },
+  ];
+
   const rankingModal = (
     <Modal transparent animationType="fade" visible={visible}>
       <View style={styles.modalBG}>
@@ -296,13 +314,15 @@ const RankingQuestion = ({
           style={styles.modalDismissArea}
           onPress={() => setVisible(false)}
         >
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>{'Select your rating'}</Text>
+          <View style={modalContainerStyle}>
+            <View style={styles.modalTitleContainer}>
+              <Text style={styles.modalTitle}>{'Select your rating'}</Text>
+            </View>
             {normalList.map((_value, index) => {
               return (
                 <View key={index}>
-                  <View style={styles.modalDivider} />
                   <TouchableOpacity
+                    style={modalItemStyle}
                     onPress={() => {
                       if (selectedOption) {
                         setList((prev) => {
@@ -321,13 +341,14 @@ const RankingQuestion = ({
                       }
                     }}
                   >
-                    <Text style={styles.modalTitle}>{`${index + 1}`}</Text>
+                    <Text style={modalItemTitleStyle}>{`${index + 1}`}</Text>
                   </TouchableOpacity>
                 </View>
               );
             })}
             {allowNAForRanking ? (
               <TouchableOpacity
+                style={modalItemStyle}
                 onPress={() => {
                   if (selectedOption) {
                     onNAPressHandler(selectedOption);
@@ -335,10 +356,15 @@ const RankingQuestion = ({
                   setVisible(false);
                 }}
               >
-                <View style={styles.modalDivider} />
-                <Text style={styles.modalTitle}>{'N/A'}</Text>
+                <Text style={modalItemTitleStyle}>{'N/A'}</Text>
               </TouchableOpacity>
             ) : null}
+            <TouchableOpacity
+              style={modalItemStyle}
+              onPress={() => setVisible(false)}
+            >
+              <Text style={modalItemTitleStyle}>{'Cancel'}</Text>
+            </TouchableOpacity>
           </View>
         </TouchableOpacity>
       </View>
@@ -376,11 +402,7 @@ const RankingQuestion = ({
   return (
     <>
       <ScrollView style={styles.container} scrollEnabled={false}>
-        <MandatoryTitle
-          style={styles.mandatoryTitle}
-          forgot={forgot}
-          question={question}
-        />
+        <MandatoryTitle forgot={forgot} question={question} />
         {/* keep the ScrollView below to prevent error => "VirtualizedLists 
             should never be nested inside plain ScrollViews with the same 
             orientation because it can break windowing and other functionality
@@ -395,6 +417,7 @@ const RankingQuestion = ({
               data={list}
               renderItem={renderItem}
               onDragStart={() => {}}
+              onDragRelease={() => {}}
               onDragEnd={onDragEndHandler}
             />
           </View>
@@ -477,7 +500,6 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: 268,
-    backgroundColor: Colors.white,
     borderRadius: 14,
     shadowColor: 'rgba(0, 0, 0, 0.16)',
     shadowOffset: {
@@ -487,24 +509,31 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     shadowOpacity: 1,
   },
-  modalTitle: {
-    height: 24,
-    marginVertical: 10,
-    textAlign: 'center',
-    fontSize: 17,
-    fontWeight: '500',
-    color: Colors.white,
+  modalItem: {
+    paddingVertical: 10,
+    borderTopColor: Colors.divider,
+    borderTopWidth: 1,
   },
-  modalDivider: {
-    backgroundColor: Colors.divider,
-    height: 1,
+  modalTitleContainer: {
+    paddingVertical: 10,
+    minHeight: 50,
+    justifyContent: 'center',
+  },
+  modalTitle: {
+    textAlign: 'center',
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.dateGrey,
+  },
+  modalItemTitle: {
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: '500',
+    color: Colors.black,
   },
   scrollViewContainer: {
     width: '100%',
     justifyContent: 'center',
-  },
-  mandatoryTitle: {
-    marginHorizontal: -23,
   },
   questionContainer: {
     width: '100%',

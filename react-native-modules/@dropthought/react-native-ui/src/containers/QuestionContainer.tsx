@@ -19,6 +19,7 @@ import SliderRatingQuestion from '../components/SliderRatingQuestion';
 import OpenQuestion from '../components/OpenQuestion';
 import IconRatingQuestion from '../components/IconRatingQuestion';
 import SliderDragRatingQuestion from '../components/SliderDragRatingQuestion';
+import DropdownQuestion from '../components/DropdownQuestion';
 import MandatoryTitle from '../components/MandatoryTitle';
 import GlobalStyle from '../styles';
 
@@ -133,6 +134,10 @@ const QuestionContainer = (props: Props) => {
     case 'ratingSlider':
       // @ts-ignore
       QuestionComponent = SliderDragRatingQuestion;
+      break;
+    case 'dropdown':
+      // @ts-ignore
+      QuestionComponent = DropdownQuestion;
       break;
     default:
       QuestionComponent = TempComponent;

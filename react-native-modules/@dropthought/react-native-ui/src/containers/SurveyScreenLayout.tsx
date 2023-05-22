@@ -44,7 +44,12 @@ const firstInvalidQuestionId = (
   let invalidQuestionId;
   for (const question of page.questions) {
     const feedback = feedbackState.feedbacksMap[question.questionId];
-    if (!questionFeedbackValidator(question, feedback)) {
+    if (question.mandatory && feedback === undefined) {
+      invalidQuestionId = question.questionId;
+      break;
+    }
+
+    if (feedback && !questionFeedbackValidator(question, feedback)) {
       invalidQuestionId = question.questionId;
       break;
     }
@@ -91,24 +96,6 @@ const SurveyScreenLayout = (props: Props) => {
   } = props;
   const scrollViewRef = React.useRef<RNScrollView>(null);
   const [scrollEnabled, setScrollEnabled] = React.useState(true);
-
-  const questions = survey.pages[pageIndex].questions.map((question) => {
-    return (
-      <ClassicQuestionContainer
-        key={question.questionId}
-        anonymous={survey.anonymous}
-        question={question}
-        validationStarted={validationStarted}
-        themeColor={survey.surveyProperty.hexCode}
-        onDragStart={() => {
-          setScrollEnabled(false);
-        }}
-        onDragEnd={() => {
-          setScrollEnabled(true);
-        }}
-      />
-    );
-  });
 
   const surveyProgressBar = (
     <SurveyProgressBar
@@ -204,6 +191,24 @@ const SurveyScreenLayout = (props: Props) => {
     surveyId,
   ]);
 
+  const classicQuestions = survey.pages[pageIndex].questions.map((question) => {
+    return (
+      <ClassicQuestionContainer
+        key={question.questionId}
+        anonymous={survey.anonymous}
+        question={question}
+        validationStarted={validationStarted}
+        themeColor={survey.surveyProperty.hexCode}
+        onDragStart={() => {
+          setScrollEnabled(false);
+        }}
+        onDragEnd={() => {
+          setScrollEnabled(true);
+        }}
+      />
+    );
+  });
+
   const classicLayout = (
     <>
       <SurveyPageIndicator
@@ -221,7 +226,7 @@ const SurveyScreenLayout = (props: Props) => {
         scrollEnabled={scrollEnabled}
       >
         <View style={styles.bodyContent}>
-          {questions}
+          {classicQuestions}
           <ClassicSurveyFooter
             survey={survey}
             pageIndex={pageIndex}

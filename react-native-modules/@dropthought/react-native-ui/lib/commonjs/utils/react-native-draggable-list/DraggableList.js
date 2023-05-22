@@ -32,6 +32,7 @@ function DraggableList({
   data,
   renderItem,
   onDragStart,
+  onDragRelease,
   onDragEnd
 }) {
   const backupListRef = (0, _react.useRef)([...data]);
@@ -208,6 +209,12 @@ function DraggableList({
           heightLevelRef.current = undefined;
         }, 0);
       });
+    } else {
+      setForceReset(true);
+      setTimeout(() => {
+        setForceReset(false);
+        heightLevelRef.current = undefined;
+      }, 0);
     }
   }, [calculateReleaseDragMovements, onDragEnd]);
 
@@ -233,6 +240,7 @@ function DraggableList({
       index: index,
       onDragStart: () => onDragStartHandler(index),
       onDrag: (pan, y) => onDragHandler(pan, y, index),
+      onDragRelease: onDragRelease,
       onDragEnd: pan => onDragEndHandler(pan, index),
       onLayout: event => onLayoutHandler(event, index),
       forceReset: forceReset,

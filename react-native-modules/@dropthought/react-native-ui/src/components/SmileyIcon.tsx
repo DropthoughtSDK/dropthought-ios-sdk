@@ -74,6 +74,7 @@ const phoneStyles = StyleSheet.create({
     marginLeft: 20,
     fontSize: 17,
     marginRight: 20,
+    flex: 1,
   },
   labelSelected: {
     fontWeight: '500',

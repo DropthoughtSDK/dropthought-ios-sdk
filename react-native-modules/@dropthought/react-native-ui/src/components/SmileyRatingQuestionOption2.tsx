@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, Platform } from 'react-native';
 import { Option1BackgroundColor, Option1BackgroundColorDark } from '../styles';
 import i18n from '../translation';
 import {
@@ -18,6 +18,7 @@ import SurveyHeader from '../containers/SurveyHeader';
 import LottieView from 'lottie-react-native';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import MandatoryTitle from './MandatoryTitle';
+import { isNil } from 'ramda';
 
 const lotties = [
   require('../assets/animations/smiley_option1/option1_1.json'),
@@ -67,13 +68,24 @@ const SmileyRatingQuestionOption2 = ({
   onFeedback,
   feedback,
 }: Props) => {
+  const answered =
+    feedback &&
+    feedback.answers &&
+    !isNil(feedback.answers[0]) &&
+    typeof feedback.answers[0] === 'number';
+  const answeredValue: number = answered
+    ? parseInt(feedback.answers[0], 10)
+    : 0;
+
   const {
     backgroundColor: themeBackgroundColor,
     fontColor,
     colorScheme,
   } = useTheme();
   const { questionId, options, scale } = question;
-  const [selectedIndex, setSelectedIndex] = React.useState<number>(-1);
+  const [selectedIndex, setSelectedIndex] = React.useState<number>(
+    answered ? answeredValue : -1
+  );
   const hasSelected = selectedIndex > -1;
 
   const scaleLogicList = scaleLogic[scale];
@@ -130,46 +142,49 @@ const SmileyRatingQuestionOption2 = ({
         {feedback && hasSelected ? (
           <View style={commonStyles.infoContainer}>
             <MandatoryTitle question={question} forgot={forgot} />
-            <View style={commonStyles.lottieContainer}>
+            <View style={commonStyles.centerContainer}>
               <LottieView
                 source={lotties[lottieSelectedIndex]}
                 autoPlay
-                style={commonStyles.lottieContent}
                 speed={0.5}
+              />
+            </View>
+            <View style={commonStyles.wheelContainer}>
+              <WheelPicker
+                selectedIndex={selectedIndex}
+                options={descriptions}
+                onChange={(index) => {
+                  if (index > -1) handleSelected(index);
+                }}
+                itemTextStyle={itemTextStyle}
+                selectedIndicatorStyle={commonStyles.selectedIndicatorStyle}
+                key={'WheelPicker-descriptions'}
+                itemHeight={Platform.OS === 'android' ? 60 : undefined}
               />
             </View>
           </View>
         ) : (
-          <View style={commonStyles.initInfoContainer}>
+          <View style={commonStyles.infoContainer}>
             <MandatoryTitle question={question} forgot={forgot} />
-            <Text style={hintTextStyle}>
-              {i18n.t('option1HintDescription:title')}
-            </Text>
-            <View />
+            <View style={commonStyles.centerContainer}>
+              <Text style={hintTextStyle}>
+                {i18n.t('option1HintDescription:title')}
+              </Text>
+            </View>
+            <View style={commonStyles.wheelContainer}>
+              <WheelPicker
+                selectedIndex={0}
+                options={dummyDescroptions}
+                onChange={(index) => {
+                  handleSelected(index - 1);
+                }}
+                itemTextStyle={itemTextStyle}
+                selectedIndicatorStyle={commonStyles.selectedIndicatorStyle}
+                key={'WheelPicker-dummyDescroptions'}
+                itemHeight={Platform.OS === 'android' ? 60 : undefined}
+              />
+            </View>
           </View>
-        )}
-        {hasSelected ? (
-          <WheelPicker
-            selectedIndex={selectedIndex}
-            options={descriptions}
-            onChange={(index) => {
-              if (index > -1) handleSelected(index);
-            }}
-            itemTextStyle={itemTextStyle}
-            selectedIndicatorStyle={commonStyles.selectedIndicatorStyle}
-            key={'WheelPicker-descriptions'}
-          />
-        ) : (
-          <WheelPicker
-            selectedIndex={0}
-            options={dummyDescroptions}
-            onChange={(index) => {
-              handleSelected(index - 1);
-            }}
-            itemTextStyle={itemTextStyle}
-            selectedIndicatorStyle={commonStyles.selectedIndicatorStyle}
-            key={'WheelPicker-dummyDescroptions'}
-          />
         )}
       </View>
       <SurveyFooter
@@ -189,29 +204,21 @@ export default React.memo(SmileyRatingQuestionOption2);
 const commonStyles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 42,
-    justifyContent: 'space-between',
+    paddingHorizontal: 32,
+    height: '100%',
   },
   infoContainer: {
-    flex: 1,
     height: '100%',
-    alignItems: 'center',
-    justifyContent: 'space-around',
   },
-  initInfoContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  lottieContainer: {
+  centerContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100%',
-  },
-  lottieContent: {
+    marginBottom: 12,
     width: '100%',
+  },
+  wheelContainer: {
+    flex: 1,
   },
   selectedIndicatorStyle: {
     opacity: 0,
@@ -219,6 +226,8 @@ const commonStyles = StyleSheet.create({
   itemTextStyle: {
     fontSize: 24,
     paddingVertical: 9,
+    width: '100%',
+    textAlign: 'center',
   },
 });
 

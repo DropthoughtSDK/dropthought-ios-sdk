@@ -144,6 +144,7 @@ class ClassicMultiChoiceQuestion extends PureComponent<Props, State> {
             type="checkbox"
             onPress={this.onOptionPressHandler}
             onChangeValue={this.onChangeValueHandler}
+            question={this.props.question}
           />
         );
       }

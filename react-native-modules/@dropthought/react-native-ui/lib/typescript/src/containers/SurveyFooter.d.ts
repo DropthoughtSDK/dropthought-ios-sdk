@@ -16,5 +16,5 @@ declare type Props = {
     onNextPage: () => void;
     backgroundColor?: string;
 };
-declare const _default: React.MemoExoticComponent<(props: Props) => JSX.Element>;
+declare const _default: React.MemoExoticComponent<(props: Props) => JSX.Element | null>;
 export default _default;

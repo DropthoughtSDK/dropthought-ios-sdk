@@ -60,7 +60,8 @@ const phoneStyles = _reactNative.StyleSheet.create({
   label: {
     marginLeft: 20,
     fontSize: 17,
-    marginRight: 20
+    marginRight: 20,
+    flex: 1
   },
   labelSelected: {
     fontWeight: '500'

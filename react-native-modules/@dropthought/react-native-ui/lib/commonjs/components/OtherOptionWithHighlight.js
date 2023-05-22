@@ -50,8 +50,13 @@ function OtherOptionWithHighlightProps(props) {
     checked,
     textValue,
     onChangeValue,
-    checkedColor
+    checkedColor,
+    question
   } = props;
+  const {
+    otherText = '',
+    questionBrand = ''
+  } = question;
   const {
     fontColor
   } = (0, _theme.useTheme)();
@@ -99,6 +104,17 @@ function OtherOptionWithHighlightProps(props) {
   });
 
   const rtl = _translation.default.dir() === 'rtl';
+  React.useEffect(() => {
+    const hideSubscription = _reactNative.Keyboard.addListener('keyboardDidHide', () => {
+      var _inputRef$current;
+
+      (_inputRef$current = inputRef.current) === null || _inputRef$current === void 0 ? void 0 : _inputRef$current.blur();
+    });
+
+    return () => {
+      hideSubscription.remove();
+    }; // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const textInput = /*#__PURE__*/React.createElement(_reactNative.View, {
     style: [styles.textInputContainer, rtl && _styles.default.flexRowReverse]
   }, /*#__PURE__*/React.createElement(_reactNative.Text, {
@@ -112,7 +128,7 @@ function OtherOptionWithHighlightProps(props) {
     }, rtl && _styles.default.textAlignRight, isFocused ? {
       borderBottomColor: checkedColor
     } : {}, _styles.QuestionContentTextSize[dimensionWidthType]],
-    placeholder: _translation.default.t('survey:other-placeholder'),
+    placeholder: otherText.length > 0 ? otherText : questionBrand.length > 0 ? questionBrand : _translation.default.t('survey:other-placeholder'),
     placeholderTextColor: _styles.Colors.inputPlaceholder,
     onChangeText: onChangeTextHandler,
     underlineColorAndroid: _styles.Colors.transparent,

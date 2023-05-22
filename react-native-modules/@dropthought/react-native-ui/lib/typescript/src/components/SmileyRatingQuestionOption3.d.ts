@@ -21,5 +21,5 @@ declare type Props = {
     }) => void;
     feedback: Feedback;
 };
-declare const SmileyRatingQuestionOption3: ({ survey, pageIndex, question, forgot, onClose, onPrevPage, onNextPage, onFeedback, }: Props) => JSX.Element;
+declare const SmileyRatingQuestionOption3: ({ survey, pageIndex, question, forgot, onClose, onPrevPage, onNextPage, onFeedback, feedback, }: Props) => JSX.Element;
 export default SmileyRatingQuestionOption3;

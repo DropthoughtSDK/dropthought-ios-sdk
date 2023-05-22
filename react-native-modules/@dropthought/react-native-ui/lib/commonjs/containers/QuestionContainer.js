@@ -37,6 +37,8 @@ var _IconRatingQuestion = _interopRequireDefault(require("../components/IconRati
 
 var _SliderDragRatingQuestion = _interopRequireDefault(require("../components/SliderDragRatingQuestion"));
 
+var _DropdownQuestion = _interopRequireDefault(require("../components/DropdownQuestion"));
+
 var _MandatoryTitle = _interopRequireDefault(require("../components/MandatoryTitle"));
 
 var _styles = _interopRequireDefault(require("../styles"));
@@ -150,6 +152,11 @@ const QuestionContainer = props => {
     case 'ratingSlider':
       // @ts-ignore
       QuestionComponent = _SliderDragRatingQuestion.default;
+      break;
+
+    case 'dropdown':
+      // @ts-ignore
+      QuestionComponent = _DropdownQuestion.default;
       break;
 
     default:

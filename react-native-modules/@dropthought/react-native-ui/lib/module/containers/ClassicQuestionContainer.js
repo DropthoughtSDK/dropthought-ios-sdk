@@ -12,6 +12,7 @@ import ClassicSliderDragRatingQuestion from '../components/ClassicSliderDragRati
 import ClassicIconRatingQuestion from '../components/ClassicIconRatingQuestion';
 import ClassicRankingQuestion from '../components/ClassicRankingQuestion';
 import ClassicOpenQuestion from '../components/ClassicOpenQuestion';
+import ClassicDropdownQuestion from '../components/ClassicDropdownQuestion';
 import ClassicMandatoryTitle from '../components/ClassicMandatoryTitle';
 import GlobalStyle from '../styles';
 
@@ -90,6 +91,11 @@ const ClassicQuestionContainer = props => {
     case 'ratingSlider':
       // @ts-ignore
       QuestionComponent = ClassicSliderDragRatingQuestion;
+      break;
+
+    case 'dropdown':
+      // @ts-ignore
+      QuestionComponent = ClassicDropdownQuestion;
       break;
 
     default:

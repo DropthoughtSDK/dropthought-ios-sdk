@@ -60,7 +60,12 @@ const firstInvalidQuestionId = (page, feedbackState) => {
   for (const question of page.questions) {
     const feedback = feedbackState.feedbacksMap[question.questionId];
 
-    if (!(0, _data.questionFeedbackValidator)(question, feedback)) {
+    if (question.mandatory && feedback === undefined) {
+      invalidQuestionId = question.questionId;
+      break;
+    }
+
+    if (feedback && !(0, _data.questionFeedbackValidator)(question, feedback)) {
       invalidQuestionId = question.questionId;
       break;
     }
@@ -95,21 +100,6 @@ const SurveyScreenLayout = props => {
   } = props;
   const scrollViewRef = React.useRef(null);
   const [scrollEnabled, setScrollEnabled] = React.useState(true);
-  const questions = survey.pages[pageIndex].questions.map(question => {
-    return /*#__PURE__*/React.createElement(_ClassicQuestionContainer.default, {
-      key: question.questionId,
-      anonymous: survey.anonymous,
-      question: question,
-      validationStarted: validationStarted,
-      themeColor: survey.surveyProperty.hexCode,
-      onDragStart: () => {
-        setScrollEnabled(false);
-      },
-      onDragEnd: () => {
-        setScrollEnabled(true);
-      }
-    });
-  });
   const surveyProgressBar = /*#__PURE__*/React.createElement(SurveyProgressBar, {
     survey: survey,
     pageIndex: pageIndex,
@@ -170,6 +160,21 @@ const SurveyScreenLayout = props => {
       }
     }
   }, [validatePageFeedbacks, pageIndex, currentPage.pageId, feedbackState, survey, onSubmit, onNextPage, surveyId]);
+  const classicQuestions = survey.pages[pageIndex].questions.map(question => {
+    return /*#__PURE__*/React.createElement(_ClassicQuestionContainer.default, {
+      key: question.questionId,
+      anonymous: survey.anonymous,
+      question: question,
+      validationStarted: validationStarted,
+      themeColor: survey.surveyProperty.hexCode,
+      onDragStart: () => {
+        setScrollEnabled(false);
+      },
+      onDragEnd: () => {
+        setScrollEnabled(true);
+      }
+    });
+  });
   const classicLayout = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SurveyPageIndicator, {
     pageIndex: pageIndex,
     survey: survey,
@@ -185,7 +190,7 @@ const SurveyScreenLayout = props => {
     scrollEnabled: scrollEnabled
   }, /*#__PURE__*/React.createElement(_reactNative.View, {
     style: styles.bodyContent
-  }, questions, /*#__PURE__*/React.createElement(_ClassicSurveyFooter.default, {
+  }, classicQuestions, /*#__PURE__*/React.createElement(_ClassicSurveyFooter.default, {
     survey: survey,
     pageIndex: pageIndex,
     onPrevPage: onPrevPageHandler,

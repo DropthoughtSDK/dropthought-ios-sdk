@@ -1,4 +1,7 @@
-import type { Question, Feedback } from '../data';
+import { KeyboardTypeOptions } from 'react-native';
+import type { QuestionMetaDataType as TypeQuestionMetaDataType, Question, Feedback } from '../data';
+export declare const metadataTypeKeyboard: (metadataType: TypeQuestionMetaDataType | undefined) => KeyboardTypeOptions | undefined;
+export declare const metadataTypeAutoCapitalize: (metadataType: TypeQuestionMetaDataType | undefined) => "none" | "words" | "sentences";
 declare type Props = {
     anonymous: boolean;
     question: Question;

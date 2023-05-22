@@ -8,4 +8,7 @@ RCT_EXPORT_MODULE()
   return @{ @"timeZone": [[NSTimeZone localTimeZone] name] };
 }
 
++ (BOOL)requiresMainQueueSetup {
+  return YES;
+}
 @end

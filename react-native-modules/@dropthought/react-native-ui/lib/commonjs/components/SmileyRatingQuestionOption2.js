@@ -29,6 +29,8 @@ var _theme = require("../contexts/theme");
 
 var _MandatoryTitle = _interopRequireDefault(require("./MandatoryTitle"));
 
+var _ramda = require("ramda");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const lotties = [require('../assets/animations/smiley_option1/option1_1.json'), require('../assets/animations/smiley_option1/option1_2.json'), require('../assets/animations/smiley_option1/option1_3.json'), require('../assets/animations/smiley_option1/option1_4.json'), require('../assets/animations/smiley_option1/option1_5.json')];
@@ -44,6 +46,8 @@ const SmileyRatingQuestionOption2 = ({
   onFeedback,
   feedback
 }) => {
+  const answered = feedback && feedback.answers && !(0, _ramda.isNil)(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
+  const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
   const {
     backgroundColor: themeBackgroundColor,
     fontColor,
@@ -55,7 +59,7 @@ const SmileyRatingQuestionOption2 = ({
     scale
   } = question;
 
-  const [selectedIndex, setSelectedIndex] = _react.default.useState(-1);
+  const [selectedIndex, setSelectedIndex] = _react.default.useState(answered ? answeredValue : -1);
 
   const hasSelected = selectedIndex > -1;
   const scaleLogicList = _data.scaleLogic[scale];
@@ -104,20 +108,14 @@ const SmileyRatingQuestionOption2 = ({
     question: question,
     forgot: forgot
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
-    style: commonStyles.lottieContainer
+    style: commonStyles.centerContainer
   }, /*#__PURE__*/_react.default.createElement(_lottieReactNative.default, {
     source: lotties[lottieSelectedIndex],
     autoPlay: true,
-    style: commonStyles.lottieContent,
     speed: 0.5
-  }))) : /*#__PURE__*/_react.default.createElement(_reactNative.View, {
-    style: commonStyles.initInfoContainer
-  }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
-    question: question,
-    forgot: forgot
-  }), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-    style: hintTextStyle
-  }, _translation.default.t('option1HintDescription:title')), /*#__PURE__*/_react.default.createElement(_reactNative.View, null)), hasSelected ? /*#__PURE__*/_react.default.createElement(_WheelPicker.default, {
+  })), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+    style: commonStyles.wheelContainer
+  }, /*#__PURE__*/_react.default.createElement(_WheelPicker.default, {
     selectedIndex: selectedIndex,
     options: descriptions,
     onChange: index => {
@@ -125,8 +123,20 @@ const SmileyRatingQuestionOption2 = ({
     },
     itemTextStyle: itemTextStyle,
     selectedIndicatorStyle: commonStyles.selectedIndicatorStyle,
-    key: 'WheelPicker-descriptions'
-  }) : /*#__PURE__*/_react.default.createElement(_WheelPicker.default, {
+    key: 'WheelPicker-descriptions',
+    itemHeight: _reactNative.Platform.OS === 'android' ? 60 : undefined
+  }))) : /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+    style: commonStyles.infoContainer
+  }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
+    question: question,
+    forgot: forgot
+  }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+    style: commonStyles.centerContainer
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    style: hintTextStyle
+  }, _translation.default.t('option1HintDescription:title'))), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+    style: commonStyles.wheelContainer
+  }, /*#__PURE__*/_react.default.createElement(_WheelPicker.default, {
     selectedIndex: 0,
     options: dummyDescroptions,
     onChange: index => {
@@ -134,8 +144,9 @@ const SmileyRatingQuestionOption2 = ({
     },
     itemTextStyle: itemTextStyle,
     selectedIndicatorStyle: commonStyles.selectedIndicatorStyle,
-    key: 'WheelPicker-dummyDescroptions'
-  })), /*#__PURE__*/_react.default.createElement(_SurveyFooter.default, {
+    key: 'WheelPicker-dummyDescroptions',
+    itemHeight: _reactNative.Platform.OS === 'android' ? 60 : undefined
+  })))), /*#__PURE__*/_react.default.createElement(_SurveyFooter.default, {
     surveyColor: survey.surveyProperty.hexCode,
     isFirstPage: pageIndex === 0,
     isLastPage: pageIndex === survey.pageOrder.length - 1,
@@ -152,36 +163,30 @@ exports.default = _default;
 const commonStyles = _reactNative.StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 42,
-    justifyContent: 'space-between'
+    paddingHorizontal: 32,
+    height: '100%'
   },
   infoContainer: {
-    flex: 1,
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'space-around'
+    height: '100%'
   },
-  initInfoContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-  lottieContainer: {
+  centerContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100%'
-  },
-  lottieContent: {
+    marginBottom: 12,
     width: '100%'
+  },
+  wheelContainer: {
+    flex: 1
   },
   selectedIndicatorStyle: {
     opacity: 0
   },
   itemTextStyle: {
     fontSize: 24,
-    paddingVertical: 9
+    paddingVertical: 9,
+    width: '100%',
+    textAlign: 'center'
   }
 });
 

@@ -1,7 +1,7 @@
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Text, Animated, Dimensions, PanResponder } from 'react-native';
+import { View, StyleSheet, Text, Animated, Dimensions, PanResponder, Platform } from 'react-native';
 import { Colors } from '../styles';
 import i18n from '../translation';
 import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
@@ -11,6 +11,7 @@ import SurveyHeader from '../containers/SurveyHeader';
 import MandatoryTitle from './MandatoryTitle';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import { scaleLogic, option3LoopFaceTable as loopFaceTable, option3TransformTable as transformTable } from '../utils/data';
+import { isNil } from 'ramda';
 
 const SmileyRatingQuestionOption3 = ({
   survey,
@@ -20,8 +21,11 @@ const SmileyRatingQuestionOption3 = ({
   onClose,
   onPrevPage,
   onNextPage,
-  onFeedback
+  onFeedback,
+  feedback
 }) => {
+  const answered = feedback && feedback.answers && !isNil(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
+  const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
   const {
     backgroundColor: themeBackgroundColor,
     fontColor,
@@ -33,16 +37,17 @@ const SmileyRatingQuestionOption3 = ({
     scale,
     options
   } = question;
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
-  const [score, setScore] = React.useState(-1);
+  const [selectedIndex, setSelectedIndex] = React.useState(answered ? answeredValue : 0);
+  const [score, setScore] = React.useState(answered ? answeredValue : -1);
   const [isLoop, setIsLoop] = React.useState(true);
   const [loopLotties, setLoopLotties] = React.useState([]);
   const [transformLotties, setTransformLotties] = React.useState([]);
-  const scoreContainerOpacity = React.useRef(new Animated.Value(0)).current;
-  const scoreOpacity = React.useRef(new Animated.Value(0)).current;
-  const descriptionYAxis = React.useRef(new Animated.Value(windowHeight / 2 - 246 + 37)).current; // 37 -> one text line height
+  const scoreContainerOpacity = React.useRef(new Animated.Value(answered ? 1 : 0)).current;
+  const scoreOpacity = React.useRef(new Animated.Value(answered ? 1 : 0)).current;
+  const descriptionYAxis = React.useRef(new Animated.Value(answered ? 1 : windowHeight / 2 - 246 + 37)).current; // 37 -> one text line height
   // 246 -> Padding Vertical 123
 
+  const lottieRef = React.useRef();
   const totalScore = Number(scale);
   const renderScore = score + 1;
   const backgroundColorList = ['#fef6f6', //red
@@ -93,12 +98,19 @@ const SmileyRatingQuestionOption3 = ({
     const newScore = score + number;
     setScore(newScore);
 
-    if (number > 0 && !isAtCoverScreen) {
-      setIsLoop(false);
-    }
-
     if (!isAtCoverScreen) {
       setSelectedIndex(newScore);
+
+      if (number > 0) {
+        setIsLoop(false);
+      } else {
+        setIsLoop(true);
+        setTimeout(() => {
+          var _lottieRef$current;
+
+          (_lottieRef$current = lottieRef.current) === null || _lottieRef$current === void 0 ? void 0 : _lottieRef$current.play();
+        }, 100);
+      }
     } //animtaion--
 
 
@@ -138,9 +150,6 @@ const SmileyRatingQuestionOption3 = ({
   const styles = isPhone ? phoneStyles : tabletStyles;
   const animationBackgroundColor = score >= 0 ? backgroundColorList[scaledIndex] : Colors.white;
   const backgroundColor = colorScheme === COLOR_SCHEMES.dark ? themeBackgroundColor : animationBackgroundColor;
-  const lottieContainerStyle = [commonStyles.lottieContainer, {
-    opacity: scoreContainerOpacity
-  }];
   const scoreSelectedStyle = [styles.scoreSelected, {
     opacity: scoreOpacity,
     color: fontColor
@@ -152,41 +161,63 @@ const SmileyRatingQuestionOption3 = ({
     opacity: scoreContainerOpacity,
     color: fontColor
   }];
+  const slashStyle = [styles.slash, {
+    opacity: scoreContainerOpacity,
+    marginBottom: Platform.OS === 'ios' ? 10 : -1
+  }];
   const scoreTotalStyle = [styles.scoreTotal, {
-    opacity: scoreContainerOpacity
+    opacity: scoreContainerOpacity,
+    marginBottom: Platform.OS === 'ios' ? 4 : -3
   }];
   const containerStyle = [commonStyles.container, {
     backgroundColor
   }];
-  const hintContainerStyle = score >= 0 ? [commonStyles.hintContainer, commonStyles.flexEnd] : [commonStyles.hintContainer];
+  const hintContainerStyle = score >= 0 ? commonStyles.hintContainer : commonStyles.initHintContainer;
   const hintTextStyle = [commonStyles.hintText, {
     color: fontColor
   }];
-  const lottieContainer = /*#__PURE__*/React.createElement(Animated.View, {
-    style: lottieContainerStyle
-  }, /*#__PURE__*/React.createElement(LottieView, {
-    source: isLoop ? loopLotties[selectedIndex] : transformLotties[selectedIndex],
+  useEffect(() => {
+    if (isLoop) {
+      setTimeout(() => {
+        var _lottieRef$current2;
+
+        (_lottieRef$current2 = lottieRef.current) === null || _lottieRef$current2 === void 0 ? void 0 : _lottieRef$current2.play();
+      }, 100);
+    }
+  }, [isLoop]);
+  const lottieContainer = isLoop ? /*#__PURE__*/React.createElement(View, {
+    style: commonStyles.lottieContainer
+  }, /*#__PURE__*/React.createElement(LottieView // @ts-ignore
+  , {
+    ref: lottieRef,
+    source: loopLotties[selectedIndex],
     autoPlay: true,
     style: commonStyles.lottieContent,
-    loop: isLoop,
-    onAnimationFinish: isCancel => {
-      if (!isCancel) setIsLoop(true);
-    },
+    loop: true,
+    speed: 0.5
+  })) : /*#__PURE__*/React.createElement(View, {
+    style: commonStyles.lottieContainer
+  }, /*#__PURE__*/React.createElement(LottieView, {
+    source: transformLotties[selectedIndex],
+    autoPlay: true,
+    style: commonStyles.lottieContent,
+    loop: false,
+    onAnimationFinish: () => setIsLoop(true),
     speed: 0.5
   }));
   const scoreContainer = /*#__PURE__*/React.createElement(View, {
-    style: commonStyles.scoreContainer
-  }, /*#__PURE__*/React.createElement(View, {
     style: commonStyles.scoreContainer
   }, /*#__PURE__*/React.createElement(View, {
     style: commonStyles.scoreText
   }, /*#__PURE__*/React.createElement(Animated.Text, {
     style: scoreSelectedStyle
   }, renderScore), /*#__PURE__*/React.createElement(Animated.Text, {
+    style: slashStyle
+  }, '/'), /*#__PURE__*/React.createElement(Animated.Text, {
     style: scoreTotalStyle
-  }, '/' + totalScore)), /*#__PURE__*/React.createElement(Animated.Text, {
+  }, totalScore)), /*#__PURE__*/React.createElement(Animated.Text, {
     style: descStyle
-  }, options[selectedIndex])));
+  }, options[selectedIndex]));
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SurveyHeader, {
     survey: survey,
     pageIndex: pageIndex,
@@ -232,23 +263,23 @@ const commonStyles = StyleSheet.create({
     alignItems: 'center'
   },
   hintContainer: {
-    flex: 1,
-    justifyContent: 'center'
+    width: '100%'
   },
-  flexEnd: {
-    justifyContent: 'flex-end'
+  initHintContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    width: '100%'
   },
   hintText: {
     fontSize: 16,
     fontWeight: '500',
-    textAlign: 'center',
-    marginBottom: 6
+    textAlign: 'center'
   },
   lottieContainer: {
-    flex: 3,
     width: '100%',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginTop: 42
   },
   lottieContent: {
     width: '60%'
@@ -256,14 +287,15 @@ const commonStyles = StyleSheet.create({
   scoreContainer: {
     flex: 1,
     width: '100%',
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%'
   },
   scoreText: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'baseline'
+    alignItems: 'flex-end',
+    height: 61,
+    marginBottom: 10
   }
 });
 const phoneStyles = StyleSheet.create({
@@ -273,12 +305,16 @@ const phoneStyles = StyleSheet.create({
     textAlign: 'center'
   },
   scoreSelected: {
-    fontSize: 74,
+    fontSize: 50,
     textAlign: 'center',
     alignItems: 'baseline'
   },
   scoreTotal: {
-    fontSize: 55,
+    fontSize: 37,
+    color: Colors.smileyRatingScoreGray
+  },
+  slash: {
+    fontSize: 37,
     color: Colors.smileyRatingScoreGray
   }
 });
@@ -295,6 +331,10 @@ const tabletStyles = StyleSheet.create({
   },
   scoreTotal: {
     fontSize: 55,
+    color: Colors.smileyRatingScoreGray
+  },
+  slash: {
+    fontSize: 37,
     color: Colors.smileyRatingScoreGray
   }
 });

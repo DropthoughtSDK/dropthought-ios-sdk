@@ -111,7 +111,8 @@ const WheelPickerItem = ({
       }]
     }]
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-    style: textStyle
+    style: textStyle,
+    numberOfLines: 1
   }, option));
 };
 
