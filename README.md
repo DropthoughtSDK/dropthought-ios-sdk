@@ -6,7 +6,7 @@ This repository contains all Dropthought iOS SDK sources.
 
 First, You need to enable to SDK Control Center on Dropthought Enterprise App.
 
-Second, create an application and a visibility. You can assign a program or change style for this visibility. 
+Second, create an application and a visibility. You can assign a program or change style for this visibility.
 
 Third, copy the visibility ID for SDK integration.
 
@@ -14,7 +14,7 @@ Now you can start to integrate Dropthought SDK
 
 ## Latest Version
 
--   4.2.0
+-   5.0.0
 
 ## iOS SDK Resources
 
@@ -67,14 +67,14 @@ And execute **pod install**
 ```ruby
   /** add this line at the begining */
   require_relative './dropthought_sdk_pods.rb'
-  
+
   platform :ios, '12.0'
   use_frameworks!
 
   target 'YourTargetName' do
     /** add this line to install dropthought sdk */
     use_dropthought_sdk
-    
+
     /** other pods scripts */
   end
 ```
