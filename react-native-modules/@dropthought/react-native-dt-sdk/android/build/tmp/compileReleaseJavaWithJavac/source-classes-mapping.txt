@@ -1,6 +1,0 @@
-com/reactnativedtsdk/BuildConfig.java
- com.reactnativedtsdk.BuildConfig
-com/reactnativedtsdk/DtSdkModule.java
- com.reactnativedtsdk.DtSdkModule
-com/reactnativedtsdk/DtSdkPackage.java
- com.reactnativedtsdk.DtSdkPackage

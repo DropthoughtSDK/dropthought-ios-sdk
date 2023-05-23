@@ -73,7 +73,7 @@ const SliderRatingQuestion = ({
     onFeedback({
       questionId,
       answers: [index],
-      type: 'nps'
+      type: 'rating'
     });
     setValue(index);
   };

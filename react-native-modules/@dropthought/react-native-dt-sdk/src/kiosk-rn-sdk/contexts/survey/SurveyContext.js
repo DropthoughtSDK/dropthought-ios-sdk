@@ -5,7 +5,13 @@
  * therefore, the children would always be sure to have "survey" in context
  */
 import * as React from 'react';
-import { View, ActivityIndicator, Image, Alert } from 'react-native';
+import {
+  View,
+  ActivityIndicator,
+  Image,
+  Alert,
+  Appearance,
+} from 'react-native';
 
 import { evolve, merge, isNil } from 'ramda';
 import { useAsync } from 'react-async';
@@ -248,7 +254,7 @@ export const SurveyContextProvider = ({
   }
   const themeDataFromSDKEntry = {
     themeOption,
-    appearance,
+    appearance: Appearance.getColorScheme() === 'dark' ? 'dark' : appearance,
     fontColor,
     backgroundColor,
   };

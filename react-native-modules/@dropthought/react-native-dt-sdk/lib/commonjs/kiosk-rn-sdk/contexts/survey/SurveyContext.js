@@ -283,7 +283,7 @@ const SurveyContextProvider = ({
 
   const themeDataFromSDKEntry = {
     themeOption,
-    appearance,
+    appearance: _reactNative.Appearance.getColorScheme() === 'dark' ? 'dark' : appearance,
     fontColor,
     backgroundColor
   };
