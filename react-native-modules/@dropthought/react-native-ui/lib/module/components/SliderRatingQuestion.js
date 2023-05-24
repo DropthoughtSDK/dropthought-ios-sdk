@@ -46,7 +46,8 @@ const SliderRatingQuestion = ({
 }) => {
   const {
     questionId,
-    scale
+    scale,
+    type
   } = question;
   const dimensionWidthType = useDimensionWidthType();
   const isPhone = dimensionWidthType === DimensionWidthType.phone;
@@ -73,7 +74,7 @@ const SliderRatingQuestion = ({
     onFeedback({
       questionId,
       answers: [index],
-      type: 'rating'
+      type: type
     });
     setValue(index);
   };
