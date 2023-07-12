@@ -1,25 +1,10 @@
-# Dropthought iOS SDK
+# Dropthought iOS Sdk
 
 This repository contains all Dropthought iOS SDK sources.
 
 ## Latest Version
 
 -   5.1.0
-
-There are two main repositories:
-
--   **Dropthought**
-
--   **react-native-modules**
-
-The repository **Dropthought** contains the interfaces and functions for using Dropthought iOS SDK.
-
-The repository **react-native-modules** contains the related react-native modules for Dropthought.
-
--   [Requirement](#Requirement)
--   [Installation](#Installation)
--   [Usage for Swift](#Usage-for-Swift)
--   [Usage for Objective-C](#Usage-for-Objective-C)
 
 ## Requirement
 
@@ -45,6 +30,23 @@ Move/Copy these two repositories **Dropthought** and **react-native-modules** in
 Note: Same path/level as the **Podfile**
 
 <img src="https://github.com/DropthoughtSDK/dropthought-ios-sdk/raw/master/imgs/repository.png" width="40%" height="40%">
+
+</br>
+
+**There are two main repositories:**
+
+-   **Dropthought**
+
+-   **react-native-modules**
+
+The repository **Dropthought** contains the interfaces and functions for using Dropthought iOS SDK.
+
+The repository **react-native-modules** contains the related react-native modules for Dropthought.
+
+-   [Requirement](#Requirement)
+-   [Installation](#Installation)
+-   [Usage for Swift](#Usage-for-Swift)
+-   [Usage for Objective-C](#Usage-for-Objective-C)
 
 </br>
 
@@ -125,16 +127,19 @@ Note: You can find and copy your visibility ID here in Enterprise app
 <img src="https://github.com/DropthoughtSDK/dropthought-ios-sdk/raw/master/imgs/image_visibility.jpeg">
 
 </br>
+</br>
 
-### Set Survey Metadata
+## Additional features
 
-Note: If you want to append metadata to each feedback. You can call this function before you open the survey
+### - Set Survey Metadata
+
+If you want to append metadata to each feedback. You can call this function before you open the survey
 
 ```swift
 Dropthought.instance().setSurveyMetadata(metadata)
 ```
 
-e.g.
+For example
 
 ```swift
 Dropthought.instance().setSurveyMetadata(["name": "Barney", "age": "36"])
@@ -142,16 +147,20 @@ Dropthought.instance().setSurveyMetadata(["name": "Barney", "age": "36"])
 
 </br>
 
-### Upload offline feedbacks
+### - Upload offline feedbacks
 
 Dropthought SDK will cache user's feedbacks if there has no network connection.
 You can call this function and we will check if there's any cached feedbacks and submit them again.
+
+When user finishes a survey under no network or a bad network, the survey feedback is saved offline. Dropthought SDK will try to upload the offline feedbacks(if any) when app start.
+
+Or, you could call
 
 ```swift
 Dropthought.instance().uploadOfflineFeedbacks()
 ```
 
-_Note: We will also upload offline feedbacks when the App is open._
+manually to try to upload the saved results once if your app has network status monitor.
 </br>
 </br>
 
@@ -208,7 +217,7 @@ Note: You can find and copy your visibility ID here in Enterprise app
 
 </br>
 
-### Set Survey Metadata
+### - Set Survey Metadata
 
 Note: If you want to append metadata to each feedback. You can call this function before you open the survey
 
@@ -225,13 +234,17 @@ NSDictionary *metadata = @{ @"name": @"Barney", @"age": @"36" };
 
 </br>
 
-### Upload offline feedbacks
+### - Upload offline feedbacks
 
 Dropthought SDK will cache user's feedbacks if there has no network connection.
 You can call this function and we will check if there's any cached feedbacks and submit them again.
+
+When user finishes a survey under no network or a bad network, the survey feedback is saved offline. Dropthought SDK will try to upload the offline feedbacks(if any) when app start.
+
+Or, you could call
 
 ```objc
 [[Dropthought instance] uploadOfflineFeedbacks];
 ```
 
-_Note: We will also upload offline feedbacks when the App is open._
+manually to try to upload the saved results once if your app has network status monitor.
