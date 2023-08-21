@@ -1,0 +1,37 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml:2:1-3:12
+INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml:2:1-3:12
+INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml:2:1-3:12
+INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml:2:1-3:12
+INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml:2:1-3:12
+INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml:2:1-3:12
+INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml:2:1-3:12
+	package
+		ADDED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml:2:70-95
+		INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
+		INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
+		ADDED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml:2:1-3:12
+		INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
+		ADDED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml:2:1-3:12
+		INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml:2:11-69
+uses-sdk
+INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
+INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
+INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
+INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
+		ADDED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
+		INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
+		ADDED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
+		INJECTED from /Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-aes-crypto/android/src/main/AndroidManifest.xml
