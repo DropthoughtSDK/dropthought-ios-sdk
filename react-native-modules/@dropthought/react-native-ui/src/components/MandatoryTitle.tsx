@@ -28,7 +28,8 @@ const MandatoryTitle = ({
   const rtl = i18n.dir() === 'rtl';
   const dimensionWidthType = useDimensionWidthType();
   const { fontColor, themeOption, customFontColor } = useTheme();
-  const { questionId, questionTitle, mandatory, type, subType } = question;
+  const { questionId, questionTitle, mandatory, type, subType, optional } =
+    question;
 
   const ref = React.useRef<View>(null);
   const addMandatoryRef = useAddMandatoryRef();
@@ -66,7 +67,10 @@ const MandatoryTitle = ({
         ]}
       >
         {questionTitle}
-        {mandatory && <Text style={styles.hint}>*</Text>}
+        {
+          //optional was been used on matrix question
+          (mandatory || optional) && <Text style={styles.hint}>*</Text>
+        }
       </Text>
       <QuestionWarningMessage
         // forgot message has higher priority than custom invalid message

@@ -30,7 +30,7 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 const metadataTypeKeyboard = metadataType => {
   switch (metadataType === null || metadataType === void 0 ? void 0 : metadataType.toLocaleLowerCase()) {
     case _data.QuestionMetaDataType.Email:
-      return 'email-address';
+      return 'default';
 
     case _data.QuestionMetaDataType.Phone:
       return 'phone-pad';
@@ -129,7 +129,7 @@ const MultiLineTextInput = ({
 
   if (showAnonymousWarning) {
     bottomText = _translation.default.t('survey:metadata-anonymous-warning');
-    bottomTextColor = (0, _styles.addOpacityToColor)(_styles.Colors.black, 0.6);
+    bottomTextColor = _styles.Colors.openQuestionSubTitle;
   }
 
   const appearanceSubBackgroundColorStyle = {

@@ -244,7 +244,7 @@ export const SurveyContextProvider = ({
   defaultLanguage = 'en',
   onClose = defaultOnCloseHandler,
   themeOption,
-  appearance,
+  appearance = 'system',
   fontColor,
   backgroundColor,
   timezone,
@@ -254,7 +254,7 @@ export const SurveyContextProvider = ({
   }
   const themeDataFromSDKEntry = {
     themeOption,
-    appearance: Appearance.getColorScheme() === 'dark' ? 'dark' : appearance,
+    appearance,
     fontColor,
     backgroundColor,
   };

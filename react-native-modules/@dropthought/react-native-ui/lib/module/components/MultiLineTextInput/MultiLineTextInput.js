@@ -9,7 +9,7 @@ import { COLOR_SCHEMES } from '../../contexts/theme/theme.const';
 export const metadataTypeKeyboard = metadataType => {
   switch (metadataType === null || metadataType === void 0 ? void 0 : metadataType.toLocaleLowerCase()) {
     case QuestionMetaDataType.Email:
-      return 'email-address';
+      return 'default';
 
     case QuestionMetaDataType.Phone:
       return 'phone-pad';
@@ -99,7 +99,7 @@ const MultiLineTextInput = ({
 
   if (showAnonymousWarning) {
     bottomText = i18n.t('survey:metadata-anonymous-warning');
-    bottomTextColor = addOpacityToColor(Colors.black, 0.6);
+    bottomTextColor = Colors.openQuestionSubTitle;
   }
 
   const appearanceSubBackgroundColorStyle = {

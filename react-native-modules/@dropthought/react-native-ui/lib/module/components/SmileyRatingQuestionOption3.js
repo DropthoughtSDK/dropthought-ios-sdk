@@ -10,7 +10,7 @@ import SurveyFooter from '../containers/SurveyFooter';
 import SurveyHeader from '../containers/SurveyHeader';
 import MandatoryTitle from './MandatoryTitle';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
-import { scaleLogic, option3LoopFaceTable as loopFaceTable, option3TransformTable as transformTable } from '../utils/data';
+import { scaleLogic, option3LoopFaceTable as loopFaceTable } from '../utils/data';
 import { isNil } from 'ramda';
 
 const SmileyRatingQuestionOption3 = ({
@@ -39,9 +39,7 @@ const SmileyRatingQuestionOption3 = ({
   } = question;
   const [selectedIndex, setSelectedIndex] = React.useState(answered ? answeredValue : 0);
   const [score, setScore] = React.useState(answered ? answeredValue : -1);
-  const [isLoop, setIsLoop] = React.useState(true);
   const [loopLotties, setLoopLotties] = React.useState([]);
-  const [transformLotties, setTransformLotties] = React.useState([]);
   const scoreContainerOpacity = React.useRef(new Animated.Value(answered ? 1 : 0)).current;
   const scoreOpacity = React.useRef(new Animated.Value(answered ? 1 : 0)).current;
   const descriptionYAxis = React.useRef(new Animated.Value(answered ? 1 : windowHeight / 2 - 246 + 37)).current; // 37 -> one text line height
@@ -66,8 +64,7 @@ const SmileyRatingQuestionOption3 = ({
       const isActionActive = Math.abs(dy) > 100;
 
       if (isActionActive) {
-        // Add isLoop to avoid when animation transform and user tap the LottieView.
-        if (direction === 1 && score > 0 && isLoop) {
+        if (direction === 1 && score > 0) {
           updateScore(-1);
         } else if (direction !== 1 && renderScore < totalScore) {
           updateScore(1);
@@ -83,15 +80,7 @@ const SmileyRatingQuestionOption3 = ({
       const scaleKey = String(value + 1);
       return loopFaceTable.get(scaleKey);
     });
-    const transformList = scaleLogicList.map((value, index, array) => {
-      if (index === 0) return '';
-      const fromScale = String(array[index - 1] + 1);
-      const toScale = String(value + 1);
-      const key = `${fromScale}-${toScale}`;
-      return transformTable.get(key);
-    });
     setLoopLotties(loopList);
-    setTransformLotties(transformList);
   }, [scaleLogicList]);
   const updateScore = React.useCallback(number => {
     const isAtCoverScreen = score === -1;
@@ -100,17 +89,6 @@ const SmileyRatingQuestionOption3 = ({
 
     if (!isAtCoverScreen) {
       setSelectedIndex(newScore);
-
-      if (number > 0) {
-        setIsLoop(false);
-      } else {
-        setIsLoop(true);
-        setTimeout(() => {
-          var _lottieRef$current;
-
-          (_lottieRef$current = lottieRef.current) === null || _lottieRef$current === void 0 ? void 0 : _lottieRef$current.play();
-        }, 100);
-      }
     } //animtaion--
 
 
@@ -176,16 +154,7 @@ const SmileyRatingQuestionOption3 = ({
   const hintTextStyle = [commonStyles.hintText, {
     color: fontColor
   }];
-  useEffect(() => {
-    if (isLoop) {
-      setTimeout(() => {
-        var _lottieRef$current2;
-
-        (_lottieRef$current2 = lottieRef.current) === null || _lottieRef$current2 === void 0 ? void 0 : _lottieRef$current2.play();
-      }, 100);
-    }
-  }, [isLoop]);
-  const lottieContainer = isLoop ? /*#__PURE__*/React.createElement(View, {
+  const lottieContainer = /*#__PURE__*/React.createElement(View, {
     style: commonStyles.lottieContainer
   }, /*#__PURE__*/React.createElement(LottieView // @ts-ignore
   , {
@@ -194,15 +163,6 @@ const SmileyRatingQuestionOption3 = ({
     autoPlay: true,
     style: commonStyles.lottieContent,
     loop: true,
-    speed: 0.5
-  })) : /*#__PURE__*/React.createElement(View, {
-    style: commonStyles.lottieContainer
-  }, /*#__PURE__*/React.createElement(LottieView, {
-    source: transformLotties[selectedIndex],
-    autoPlay: true,
-    style: commonStyles.lottieContent,
-    loop: false,
-    onAnimationFinish: () => setIsLoop(true),
     speed: 0.5
   }));
   const scoreContainer = /*#__PURE__*/React.createElement(View, {

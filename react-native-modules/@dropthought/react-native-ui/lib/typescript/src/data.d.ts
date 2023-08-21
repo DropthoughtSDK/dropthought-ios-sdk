@@ -1,28 +1,38 @@
 export type { IColorSchemesType, IAppearanceType, FontColor, BackgroundColor, IThemeOptionType, } from './contexts/theme';
 import type { RatingIconType } from './constants/RatingQuestionConstants';
-export declare type QuestionType = 'rating' | 'open' | 'multiChoice' | 'singleChoice' | 'nps' | 'ranking' | 'ratingSlider' | 'dropdown';
+export declare type QuestionType = 'rating' | 'open' | 'multiChoice' | 'singleChoice' | 'nps' | 'ranking' | 'ratingSlider' | 'dropdown' | 'matrixRating' | 'multipleOpenEnded';
 export declare type QuestionSubType = 'smiley' | 'slider' | RatingIconType;
 export declare type QuestionBrandType = 'other';
 export declare type QuestionMetaDataType = 'Name' | 'Email' | 'Phone' | 'Number' | 'Date' | 'String';
 export declare type ProgramStateType = 'expired' | 'drafts' | 'active' | 'scheduled';
 export declare type EventAPISourceType = 'api' | 'kiosk' | 'qr' | 'email' | 'sms';
+export declare type RequiredType = 'all' | 'one' | 'none';
 export interface Option {
     isOther: boolean;
     title: string;
 }
 export interface Question {
     questionId: string;
+    questionIds?: string[];
     questionTitle: string;
     questionBrand?: QuestionBrandType;
     metaDataType?: QuestionMetaDataType;
+    metaDataTypeList?: QuestionMetaDataType[];
     mandatory: boolean;
     options?: string[];
     responseErrorText: string;
+    responseErrorTextList?: string[];
     type: QuestionType;
     subType?: QuestionSubType;
     scale?: string;
     otherText: string;
     exampleMetadataText?: string;
+    exampleMetadataTextList?: string[];
+    questionTitles: string[];
+    optionsForMatrix: string[][];
+    optional: boolean;
+    phiData: boolean;
+    phiDataList: boolean[];
 }
 export interface Page {
     pageId: string;

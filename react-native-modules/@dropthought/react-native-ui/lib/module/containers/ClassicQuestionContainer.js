@@ -13,6 +13,8 @@ import ClassicIconRatingQuestion from '../components/ClassicIconRatingQuestion';
 import ClassicRankingQuestion from '../components/ClassicRankingQuestion';
 import ClassicOpenQuestion from '../components/ClassicOpenQuestion';
 import ClassicDropdownQuestion from '../components/ClassicDropdownQuestion';
+import ClassicMatrixRatingQuestion from '../components/ClassicMatrixRatingQuestion';
+import ClassicMultipleOpenEndedQuestion from '../components/ClassicMultipleOpenEndedQuestion';
 import ClassicMandatoryTitle from '../components/ClassicMandatoryTitle';
 import GlobalStyle from '../styles';
 
@@ -96,6 +98,16 @@ const ClassicQuestionContainer = props => {
     case 'dropdown':
       // @ts-ignore
       QuestionComponent = ClassicDropdownQuestion;
+      break;
+
+    case 'matrixRating':
+      // @ts-ignore
+      QuestionComponent = ClassicMatrixRatingQuestion;
+      break;
+
+    case 'multipleOpenEnded':
+      // @ts-ignore
+      QuestionComponent = ClassicMultipleOpenEndedQuestion;
       break;
 
     default:

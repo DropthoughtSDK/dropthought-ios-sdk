@@ -68,11 +68,7 @@ const SmileyRatingQuestionOption3 = ({
 
   const [score, setScore] = _react.default.useState(answered ? answeredValue : -1);
 
-  const [isLoop, setIsLoop] = _react.default.useState(true);
-
   const [loopLotties, setLoopLotties] = _react.default.useState([]);
-
-  const [transformLotties, setTransformLotties] = _react.default.useState([]);
 
   const scoreContainerOpacity = _react.default.useRef(new _reactNative.Animated.Value(answered ? 1 : 0)).current;
 
@@ -103,8 +99,7 @@ const SmileyRatingQuestionOption3 = ({
       const isActionActive = Math.abs(dy) > 100;
 
       if (isActionActive) {
-        // Add isLoop to avoid when animation transform and user tap the LottieView.
-        if (direction === 1 && score > 0 && isLoop) {
+        if (direction === 1 && score > 0) {
           updateScore(-1);
         } else if (direction !== 1 && renderScore < totalScore) {
           updateScore(1);
@@ -121,15 +116,7 @@ const SmileyRatingQuestionOption3 = ({
       const scaleKey = String(value + 1);
       return _data.option3LoopFaceTable.get(scaleKey);
     });
-    const transformList = scaleLogicList.map((value, index, array) => {
-      if (index === 0) return '';
-      const fromScale = String(array[index - 1] + 1);
-      const toScale = String(value + 1);
-      const key = `${fromScale}-${toScale}`;
-      return _data.option3TransformTable.get(key);
-    });
     setLoopLotties(loopList);
-    setTransformLotties(transformList);
   }, [scaleLogicList]);
 
   const updateScore = _react.default.useCallback(number => {
@@ -139,17 +126,6 @@ const SmileyRatingQuestionOption3 = ({
 
     if (!isAtCoverScreen) {
       setSelectedIndex(newScore);
-
-      if (number > 0) {
-        setIsLoop(false);
-      } else {
-        setIsLoop(true);
-        setTimeout(() => {
-          var _lottieRef$current;
-
-          (_lottieRef$current = lottieRef.current) === null || _lottieRef$current === void 0 ? void 0 : _lottieRef$current.play();
-        }, 100);
-      }
     } //animtaion--
 
 
@@ -216,16 +192,8 @@ const SmileyRatingQuestionOption3 = ({
   const hintTextStyle = [commonStyles.hintText, {
     color: fontColor
   }];
-  (0, _react.useEffect)(() => {
-    if (isLoop) {
-      setTimeout(() => {
-        var _lottieRef$current2;
 
-        (_lottieRef$current2 = lottieRef.current) === null || _lottieRef$current2 === void 0 ? void 0 : _lottieRef$current2.play();
-      }, 100);
-    }
-  }, [isLoop]);
-  const lottieContainer = isLoop ? /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+  const lottieContainer = /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: commonStyles.lottieContainer
   }, /*#__PURE__*/_react.default.createElement(_lottieReactNative.default // @ts-ignore
   , {
@@ -234,15 +202,6 @@ const SmileyRatingQuestionOption3 = ({
     autoPlay: true,
     style: commonStyles.lottieContent,
     loop: true,
-    speed: 0.5
-  })) : /*#__PURE__*/_react.default.createElement(_reactNative.View, {
-    style: commonStyles.lottieContainer
-  }, /*#__PURE__*/_react.default.createElement(_lottieReactNative.default, {
-    source: transformLotties[selectedIndex],
-    autoPlay: true,
-    style: commonStyles.lottieContent,
-    loop: false,
-    onAnimationFinish: () => setIsLoop(true),
     speed: 0.5
   }));
 

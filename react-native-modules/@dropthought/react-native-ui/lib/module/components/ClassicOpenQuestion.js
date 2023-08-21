@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Text, TextInput, Platform } from 'react-native';
-import { QuestionMetaDataType, metaDataTypeQuestionValidator, mandatoryQuestionValidator } from '../utils/data';
+import { QuestionMetaDataType, metaDataFormatValidator, mandatoryQuestionValidator } from '../utils/data';
 import GlobalStyle, { Colors } from '../styles';
 import ClassicMandatoryTitle from './ClassicMandatoryTitle';
 import MetadataDesc from './MetadataDesc';
@@ -11,7 +11,7 @@ const MAX_CHARACTER = 4000;
 export const metadataTypeKeyboard = metadataType => {
   switch (metadataType === null || metadataType === void 0 ? void 0 : metadataType.toLocaleLowerCase()) {
     case QuestionMetaDataType.Email:
-      return 'email-address';
+      return 'default';
 
     case QuestionMetaDataType.Phone:
       return 'phone-pad';
@@ -83,7 +83,7 @@ const OpenQuestion = ({
   const showAnonymousWarning = anonymous && question.metaDataType && (question.metaDataType === 'Email' || question.metaDataType === 'Name' || question.metaDataType === 'Phone');
   const maxCharacterLength = question.scale ? parseInt(question.scale, 10) : MAX_CHARACTER;
   const characterLeft = maxCharacterLength - text.length;
-  const isValid = metaDataTypeQuestionValidator(question, text);
+  const isValid = metaDataFormatValidator(text, question.metaDataType);
   /** @type {Feedback} */
 
   const tempFeedback = {

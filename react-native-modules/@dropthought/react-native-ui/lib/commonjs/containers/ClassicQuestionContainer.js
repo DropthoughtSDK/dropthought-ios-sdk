@@ -31,6 +31,10 @@ var _ClassicOpenQuestion = _interopRequireDefault(require("../components/Classic
 
 var _ClassicDropdownQuestion = _interopRequireDefault(require("../components/ClassicDropdownQuestion"));
 
+var _ClassicMatrixRatingQuestion = _interopRequireDefault(require("../components/ClassicMatrixRatingQuestion"));
+
+var _ClassicMultipleOpenEndedQuestion = _interopRequireDefault(require("../components/ClassicMultipleOpenEndedQuestion"));
+
 var _ClassicMandatoryTitle = _interopRequireDefault(require("../components/ClassicMandatoryTitle"));
 
 var _styles = _interopRequireDefault(require("../styles"));
@@ -123,6 +127,16 @@ const ClassicQuestionContainer = props => {
     case 'dropdown':
       // @ts-ignore
       QuestionComponent = _ClassicDropdownQuestion.default;
+      break;
+
+    case 'matrixRating':
+      // @ts-ignore
+      QuestionComponent = _ClassicMatrixRatingQuestion.default;
+      break;
+
+    case 'multipleOpenEnded':
+      // @ts-ignore
+      QuestionComponent = _ClassicMultipleOpenEndedQuestion.default;
       break;
 
     default:

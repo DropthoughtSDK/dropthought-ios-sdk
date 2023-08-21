@@ -13,9 +13,10 @@ export namespace QuestionMetaDataType {
     const String: string;
 }
 export function getOptionsFromQuestion(question: any): any;
-export function metaDataTypeQuestionValidator(question: any, value: any): boolean;
-export function mandatoryQuestionValidator(question: any, feedback?: {}): boolean;
-export function questionFeedbackValidator(question?: {}, feedback?: {}): boolean;
+export function metaDataFormatValidator(value: any, metaDataType: any): boolean;
+export function mandatoryQuestionValidator(question: any, feedback?: {}): any;
+export function getRequiredType(question: any): "none" | "all" | "one";
+export function questionFeedbackValidator(question: any, feedback: any): any;
 /**
  * return -1 if not existed
  * @type {(pageId: string, survey: Survey) => number}
@@ -60,6 +61,7 @@ export const option3LoopFaceTable: Map<string, {
             r: {
                 a: number;
                 k: number;
+                /** @enum {'other'} */
                 ix: number;
             };
             p: {
@@ -114,820 +116,6 @@ export const option3LoopFaceTable: Map<string, {
                         i?: undefined;
                         o?: undefined;
                     })[];
-                    ix: number;
-                };
-                nm: string;
-                mn: string;
-                hd: boolean;
-                c?: undefined;
-                o?: undefined;
-                w?: undefined;
-                lc?: undefined;
-                lj?: undefined;
-                ml?: undefined;
-                bm?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                r?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                c: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number[];
-                            y: number[];
-                        };
-                        o: {
-                            x: number[];
-                            y: number[];
-                        };
-                        t: number;
-                        s: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                    })[];
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                w: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                lc: number;
-                lj: number;
-                ml: number;
-                bm: number;
-                nm: string;
-                mn: string;
-                hd: boolean; /**
-                 * validate if value match metaDataType question' rule
-                 */
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                r?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                p: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number;
-                            y: number;
-                        };
-                        o: {
-                            x: number;
-                            y: number;
-                        };
-                        t: number;
-                        s: number[];
-                        to: number[];
-                        ti: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                        to?: undefined;
-                        ti?: undefined;
-                    })[];
-                    ix: number;
-                };
-                a: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                s: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number[];
-                            y: number[];
-                        };
-                        o: {
-                            x: number[];
-                            y: number[];
-                        };
-                        t: number;
-                        s: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                    })[];
-                    ix: number;
-                };
-                r: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sk: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sa: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                nm: string;
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                mn?: undefined;
-                hd?: undefined;
-                c?: undefined;
-                w?: undefined;
-                lc?: undefined;
-                lj?: undefined;
-                ml?: undefined;
-                bm?: undefined;
-            })[];
-            nm: string;
-            np: number;
-            cix: number;
-            bm: number;
-            ix: number;
-            mn: string;
-            hd: boolean;
-        } | {
-            ty: string;
-            it: ({
-                ty: string;
-                it: ({
-                    ind: number;
-                    ty: string;
-                    ix: number;
-                    ks: {
-                        a: number;
-                        k: {
-                            i: number[][];
-                            o: number[][];
-                            v: number[][];
-                            c: boolean;
-                        };
-                        ix: number;
-                    };
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    c?: undefined;
-                    o?: undefined;
-                    r?: undefined;
-                    bm?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    c: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number[];
-                                y: number[];
-                            };
-                            o: {
-                                x: number[];
-                                y: number[];
-                            };
-                            t: number;
-                            s: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    r: number;
-                    bm: number;
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                    c?: undefined;
-                    bm?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                r?: undefined;
-                o?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                p: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number;
-                            y: number;
-                        };
-                        o: {
-                            x: number;
-                            y: number;
-                        };
-                        t: number;
-                        s: number[];
-                        to: number[];
-                        ti: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                        to?: undefined;
-                        ti?: undefined;
-                    })[];
-                    ix: number;
-                };
-                a: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                s: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number[];
-                            y: number[];
-                        };
-                        o: {
-                            x: number[];
-                            y: number[];
-                        };
-                        t: number;
-                        s: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                    })[];
-                    ix: number;
-                };
-                r: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sk: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sa: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                nm: string;
-                it?: undefined;
-                np?: undefined;
-                cix?: undefined;
-                bm?: undefined;
-                ix?: undefined;
-                mn?: undefined;
-                hd?: undefined;
-            })[];
-            nm: string;
-            np: number;
-            cix: number;
-            bm: number;
-            ix: number;
-            mn: string;
-            hd: boolean;
-        } | {
-            ty: string;
-            it: ({
-                ty: string;
-                it: ({
-                    ind: number;
-                    ty: string;
-                    ix: number;
-                    ks: {
-                        a: number;
-                        k: {
-                            i: number[][];
-                            o: number[][];
-                            v: number[][];
-                            c: boolean;
-                        };
-                        ix: number;
-                    };
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    c?: undefined;
-                    o?: undefined;
-                    w?: undefined;
-                    lc?: undefined;
-                    lj?: undefined;
-                    ml?: undefined;
-                    bm?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    r?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    c: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number[];
-                                y: number[];
-                            };
-                            o: {
-                                x: number[];
-                                y: number[];
-                            };
-                            t: number;
-                            s: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    w: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    lc: number;
-                    lj: number;
-                    ml: number;
-                    bm: number;
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    r?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                    c?: undefined;
-                    w?: undefined;
-                    lc?: undefined;
-                    lj?: undefined;
-                    ml?: undefined;
-                    bm?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                r?: undefined;
-                o?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                p: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number;
-                            y: number;
-                        };
-                        o: {
-                            x: number;
-                            y: number;
-                        };
-                        t: number;
-                        s: number[];
-                        to: number[];
-                        ti: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                        to?: undefined;
-                        ti?: undefined;
-                    })[];
-                    ix: number;
-                };
-                a: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                s: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number[];
-                            y: number[];
-                        };
-                        o: {
-                            x: number[];
-                            y: number[];
-                        };
-                        t: number;
-                        s: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                    })[];
-                    ix: number;
-                };
-                r: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sk: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sa: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                nm: string;
-                it?: undefined;
-                np?: undefined;
-                cix?: undefined;
-                bm?: undefined;
-                ix?: undefined;
-                mn?: undefined;
-                hd?: undefined;
-            })[];
-            nm: string;
-            np: number;
-            cix: number;
-            bm: number;
-            ix: number;
-            mn: string;
-            hd: boolean;
-        } | {
-            ty: string;
-            it: ({
-                ind: number;
-                ty: string;
-                ix: number;
-                ks: {
-                    a: number;
-                    k: {
-                        i: number[][];
-                        o: number[][];
-                        v: number[][];
-                        c: boolean;
-                    };
-                    ix: number;
-                };
-                nm: string;
-                mn: string;
-                hd: boolean;
-                mm?: undefined;
-                c?: undefined;
-                o?: undefined;
-                r?: undefined;
-                bm?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                mm: number;
-                nm: string;
-                mn: string;
-                hd: boolean;
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                c?: undefined;
-                o?: undefined;
-                r?: undefined;
-                bm?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                c: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number[];
-                            y: number[];
-                        };
-                        o: {
-                            x: number[];
-                            y: number[];
-                        };
-                        t: number;
-                        s: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                    })[];
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                r: number;
-                bm: number;
-                nm: string;
-                mn: string;
-                hd: boolean;
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                mm?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                p: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                a: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                s: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                r: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sk: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sa: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                nm: string;
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                mn?: undefined;
-                hd?: undefined;
-                mm?: undefined;
-                c?: undefined;
-                bm?: undefined;
-            })[];
-            nm: string;
-            np: number;
-            cix: number;
-            bm: number;
-            ix: number;
-            mn: string;
-            hd: boolean;
-        })[];
-        ip: number;
-        op: number;
-        st: number;
-        bm: number;
-    } | {
-        ddd: number;
-        ind: number;
-        ty: number;
-        nm: string;
-        sr: number;
-        ks: {
-            o: {
-                a: number;
-                k: number;
-                ix: number;
-            };
-            r: {
-                a: number;
-                k: number;
-                ix: number;
-            };
-            p: {
-                a: number;
-                k: number[];
-                ix: number;
-            };
-            a: {
-                a: number;
-                k: number[];
-                ix: number;
-            };
-            s: {
-                a: number;
-                k: number[];
-                ix: number;
-            };
-        };
-        ao: number;
-        shapes: ({
-            ty: string;
-            it: ({
-                ind: number;
-                ty: string;
-                ix: number;
-                ks: {
-                    a: number;
-                    k: {
-                        i: number[][];
-                        o: number[][];
-                        v: number[][];
-                        c: boolean;
-                    };
                     ix: number;
                 };
                 nm: string;
@@ -1356,6 +544,7 @@ export const option3LoopFaceTable: Map<string, {
                                 y: number[];
                             };
                             t: number;
+                            /** @type {IQAData[]} */
                             s: number[];
                         } | {
                             t: number;
@@ -1683,1732 +872,7 @@ export const option3LoopFaceTable: Map<string, {
             nm: string;
             np: number;
             cix: number;
-            bm: number;
-            ix: number;
-            mn: string;
-            hd: boolean;
-        })[];
-        ip: number;
-        op: number;
-        st: number;
-        bm: number;
-    } | {
-        ddd: number;
-        ind: number;
-        ty: number;
-        nm: string;
-        sr: number;
-        ks: {
-            o: {
-                a: number;
-                k: number;
-                ix: number;
-            };
-            r: {
-                a: number;
-                k: number;
-                ix: number;
-            };
-            p: {
-                a: number;
-                k: number[];
-                ix: number;
-            };
-            a: {
-                a: number;
-                k: number[];
-                ix: number;
-            };
-            s: {
-                a: number;
-                k: number[];
-                ix: number;
-            };
-        };
-        ao: number;
-        shapes: ({
-            ty: string;
-            it: ({
-                ind: number;
-                ty: string;
-                ix: number;
-                ks: {
-                    a: number;
-                    k: {
-                        i: number[][];
-                        o: number[][];
-                        v: number[][];
-                        c: boolean;
-                    };
-                    ix: number;
-                };
-                nm: string;
-                mn: string;
-                hd: boolean;
-                c?: undefined;
-                o?: undefined;
-                w?: undefined;
-                lc?: undefined;
-                lj?: undefined;
-                ml?: undefined;
-                bm?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                r?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                c: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                w: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                lc: number;
-                lj: number;
-                ml: number;
-                bm: number;
-                nm: string;
-                mn: string;
-                hd: boolean;
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                r?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                p: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number;
-                            y: number;
-                        };
-                        o: {
-                            x: number;
-                            y: number;
-                        };
-                        t: number;
-                        s: number[];
-                        to: number[];
-                        ti: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                        to?: undefined;
-                        ti?: undefined;
-                    })[];
-                    ix: number;
-                };
-                a: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                s: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number[];
-                            y: number[];
-                        };
-                        o: {
-                            x: number[];
-                            y: number[];
-                        };
-                        t: number;
-                        s: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                    })[];
-                    ix: number;
-                };
-                r: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sk: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sa: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                nm: string;
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                mn?: undefined;
-                hd?: undefined;
-                c?: undefined;
-                w?: undefined;
-                lc?: undefined;
-                lj?: undefined;
-                ml?: undefined;
-                bm?: undefined;
-            })[];
-            nm: string;
-            np: number;
-            cix: number;
-            bm: number;
-            ix: number;
-            mn: string;
-            hd: boolean;
-        } | {
-            ty: string;
-            it: ({
-                ty: string;
-                it: ({
-                    ind: number;
-                    ty: string;
-                    ix: number;
-                    ks: {
-                        a: number;
-                        k: {
-                            i: number[][];
-                            o: number[][];
-                            v: number[][];
-                            c: boolean;
-                        };
-                        ix: number;
-                    };
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    c?: undefined;
-                    o?: undefined;
-                    r?: undefined;
-                    bm?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    c: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    r: number;
-                    bm: number;
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                    c?: undefined;
-                    bm?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                r?: undefined;
-                o?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                p: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number;
-                            y: number;
-                        };
-                        o: {
-                            x: number;
-                            y: number;
-                        };
-                        t: number;
-                        s: number[];
-                        to: number[];
-                        ti: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                        to?: undefined;
-                        ti?: undefined;
-                    })[];
-                    ix: number;
-                };
-                a: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                s: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number[];
-                            y: number[];
-                        };
-                        o: {
-                            x: number[];
-                            y: number[];
-                        };
-                        t: number;
-                        s: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                    })[];
-                    ix: number;
-                };
-                r: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sk: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sa: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                nm: string;
-                it?: undefined;
-                np?: undefined;
-                cix?: undefined;
-                bm?: undefined;
-                ix?: undefined;
-                mn?: undefined;
-                hd?: undefined;
-            })[];
-            nm: string;
-            np: number;
-            cix: number;
-            bm: number;
-            ix: number;
-            mn: string;
-            hd: boolean;
-        } | {
-            ty: string;
-            it: ({
-                ty: string;
-                it: ({
-                    ind: number;
-                    ty: string;
-                    ix: number;
-                    ks: {
-                        a: number;
-                        k: {
-                            i: number[][];
-                            o: number[][];
-                            v: number[][];
-                            c: boolean;
-                        };
-                        ix: number;
-                    };
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    c?: undefined;
-                    o?: undefined;
-                    w?: undefined;
-                    lc?: undefined;
-                    lj?: undefined;
-                    ml?: undefined;
-                    bm?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    r?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    c: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    w: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    lc: number;
-                    lj: number;
-                    ml: number;
-                    bm: number;
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    r?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                    c?: undefined;
-                    w?: undefined;
-                    lc?: undefined;
-                    lj?: undefined;
-                    ml?: undefined;
-                    bm?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                r?: undefined;
-                o?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                p: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number;
-                            y: number;
-                        };
-                        o: {
-                            x: number;
-                            y: number;
-                        };
-                        t: number;
-                        s: number[];
-                        to: number[];
-                        ti: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                        to?: undefined;
-                        ti?: undefined;
-                    })[];
-                    ix: number;
-                };
-                a: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                s: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number[];
-                            y: number[];
-                        };
-                        o: {
-                            x: number[];
-                            y: number[];
-                        };
-                        t: number;
-                        s: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                    })[];
-                    ix: number;
-                };
-                r: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sk: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sa: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                nm: string;
-                it?: undefined;
-                np?: undefined;
-                cix?: undefined;
-                bm?: undefined;
-                ix?: undefined;
-                mn?: undefined;
-                hd?: undefined;
-            })[];
-            nm: string;
-            np: number;
-            cix: number;
-            bm: number;
-            ix: number;
-            mn: string;
-            hd: boolean;
-        } | {
-            ty: string;
-            it: ({
-                ind: number;
-                ty: string;
-                ix: number;
-                ks: {
-                    a: number;
-                    k: {
-                        i: number[][];
-                        o: number[][];
-                        v: number[][];
-                        c: boolean;
-                    };
-                    ix: number;
-                };
-                nm: string;
-                mn: string;
-                hd: boolean;
-                mm?: undefined;
-                c?: undefined;
-                o?: undefined;
-                r?: undefined;
-                bm?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                mm: number;
-                nm: string;
-                mn: string;
-                hd: boolean;
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                c?: undefined;
-                o?: undefined;
-                r?: undefined;
-                bm?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                c: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                r: number;
-                bm: number;
-                nm: string;
-                mn: string;
-                hd: boolean;
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                mm?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                p: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                a: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                s: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                r: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sk: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sa: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                nm: string;
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                mn?: undefined;
-                hd?: undefined;
-                mm?: undefined;
-                c?: undefined;
-                bm?: undefined;
-            })[];
-            nm: string;
-            np: number;
-            cix: number;
-            bm: number;
-            ix: number;
-            mn: string;
-            hd: boolean;
-        } | {
-            ty: string;
-            it: ({
-                ind: number;
-                ty: string;
-                ix: number;
-                ks: {
-                    a: number;
-                    k: {
-                        i: number[][];
-                        o: number[][];
-                        v: number[][];
-                        c: boolean;
-                    };
-                    ix: number;
-                };
-                nm: string;
-                mn: string;
-                hd: boolean;
-                c?: undefined;
-                o?: undefined;
-                r?: undefined;
-                bm?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                c: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number[];
-                            y: number[];
-                        };
-                        o: {
-                            x: number[];
-                            y: number[];
-                        };
-                        t: number;
-                        s: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                    })[];
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                r: number;
-                bm: number;
-                nm: string;
-                mn: string;
-                hd: boolean;
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                p: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                a: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                s: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                r: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sk: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sa: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                nm: string;
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                mn?: undefined;
-                hd?: undefined;
-                c?: undefined;
-                bm?: undefined;
-            })[];
-            nm: string;
-            np: number;
-            cix: number;
-            bm: number;
-            ix: number;
-            mn: string;
-            hd: boolean;
-        })[];
-        ip: number;
-        op: number;
-        st: number;
-        bm: number;
-    })[];
-    markers: never[];
-}>;
-export const option3TransformTable: Map<string, {
-    v: string;
-    meta: {
-        g: string;
-        a: string;
-        k: string;
-        d: string;
-        tc: string;
-    };
-    fr: number;
-    ip: number;
-    op: number;
-    w: number;
-    h: number;
-    nm: string;
-    ddd: number;
-    assets: never[];
-    layers: ({
-        ddd: number;
-        ind: number;
-        ty: number;
-        nm: string;
-        sr: number;
-        ks: {
-            o: {
-                a: number;
-                k: number;
-                ix: number;
-            };
-            r: {
-                a: number;
-                k: number;
-                ix: number;
-            };
-            p: {
-                a: number;
-                k: number[];
-                ix: number;
-            };
-            a: {
-                a: number;
-                k: number[];
-                ix: number;
-            };
-            s: {
-                a: number;
-                k: number[];
-                ix: number;
-            };
-        };
-        ao: number;
-        shapes: ({
-            ty: string;
-            it: ({
-                ind: number;
-                ty: string;
-                ix: number;
-                ks: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number;
-                            y: number;
-                        };
-                        o: {
-                            x: number;
-                            y: number;
-                        };
-                        t: number;
-                        s: {
-                            i: number[][];
-                            o: number[][];
-                            v: number[][];
-                            c: boolean;
-                        }[];
-                    } | {
-                        t: number;
-                        s: {
-                            i: number[][];
-                            o: number[][];
-                            v: number[][];
-                            c: boolean;
-                        }[];
-                        i?: undefined;
-                        o?: undefined;
-                    })[];
-                    ix: number;
-                };
-                nm: string;
-                mn: string;
-                hd: boolean;
-                c?: undefined;
-                o?: undefined;
-                w?: undefined;
-                lc?: undefined;
-                lj?: undefined;
-                ml?: undefined;
-                bm?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                r?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                c: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number[];
-                            y: number[];
-                        };
-                        o: {
-                            x: number[];
-                            y: number[];
-                        };
-                        t: number;
-                        s: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                    })[];
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                w: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                lc: number;
-                lj: number;
-                ml: number;
-                bm: number;
-                nm: string;
-                mn: string;
-                hd: boolean; /**
-                 * validate if value match metaDataType question' rule
-                 */
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                r?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                p: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number;
-                            y: number;
-                        };
-                        o: {
-                            x: number;
-                            y: number;
-                        };
-                        t: number;
-                        s: number[];
-                        to: number[];
-                        ti: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                        to?: undefined;
-                        ti?: undefined;
-                    })[];
-                    ix: number;
-                };
-                a: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                s: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number[];
-                            y: number[];
-                        };
-                        o: {
-                            x: number[];
-                            y: number[];
-                        };
-                        t: number;
-                        s: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                    })[];
-                    ix: number;
-                };
-                r: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sk: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sa: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                nm: string;
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                mn?: undefined;
-                hd?: undefined;
-                c?: undefined;
-                w?: undefined;
-                lc?: undefined;
-                lj?: undefined;
-                ml?: undefined;
-                bm?: undefined;
-            })[];
-            nm: string;
-            np: number;
-            cix: number;
-            bm: number;
-            ix: number;
-            mn: string;
-            hd: boolean;
-        } | {
-            ty: string;
-            it: ({
-                ty: string;
-                it: ({
-                    ind: number;
-                    ty: string;
-                    ix: number;
-                    ks: {
-                        a: number;
-                        k: {
-                            i: number[][];
-                            o: number[][];
-                            v: number[][];
-                            c: boolean;
-                        };
-                        ix: number;
-                    };
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    c?: undefined;
-                    o?: undefined;
-                    r?: undefined;
-                    bm?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    c: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number[];
-                                y: number[];
-                            };
-                            o: {
-                                x: number[];
-                                y: number[];
-                            };
-                            t: number;
-                            s: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    r: number;
-                    bm: number;
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                    c?: undefined;
-                    bm?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                r?: undefined;
-                o?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                p: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number;
-                            y: number;
-                        };
-                        o: {
-                            x: number;
-                            y: number;
-                        };
-                        t: number;
-                        s: number[];
-                        to: number[];
-                        ti: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                        to?: undefined;
-                        ti?: undefined;
-                    })[];
-                    ix: number;
-                };
-                a: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                s: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number[];
-                            y: number[];
-                        };
-                        o: {
-                            x: number[];
-                            y: number[];
-                        };
-                        t: number;
-                        s: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                    })[];
-                    ix: number;
-                };
-                r: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sk: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sa: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                nm: string;
-                it?: undefined;
-                np?: undefined;
-                cix?: undefined;
-                bm?: undefined;
-                ix?: undefined;
-                mn?: undefined;
-                hd?: undefined;
-            })[];
-            nm: string;
-            np: number;
-            cix: number;
-            bm: number;
-            ix: number;
-            mn: string;
-            hd: boolean;
-        } | {
-            ty: string;
-            it: ({
-                ty: string;
-                it: ({
-                    ind: number;
-                    ty: string;
-                    ix: number;
-                    ks: {
-                        a: number;
-                        k: {
-                            i: number[][];
-                            o: number[][];
-                            v: number[][];
-                            c: boolean;
-                        };
-                        ix: number;
-                    };
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    c?: undefined;
-                    o?: undefined;
-                    w?: undefined;
-                    lc?: undefined;
-                    lj?: undefined;
-                    ml?: undefined;
-                    bm?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    r?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    c: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number[];
-                                y: number[];
-                            };
-                            o: {
-                                x: number[];
-                                y: number[];
-                            };
-                            t: number;
-                            s: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    w: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    lc: number;
-                    lj: number;
-                    ml: number;
-                    bm: number;
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    r?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                    c?: undefined;
-                    w?: undefined;
-                    lc?: undefined;
-                    lj?: undefined;
-                    ml?: undefined;
-                    bm?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                r?: undefined;
-                o?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                p: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number;
-                            y: number;
-                        };
-                        o: {
-                            x: number;
-                            y: number;
-                        };
-                        t: number;
-                        s: number[];
-                        to: number[];
-                        ti: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                        to?: undefined;
-                        ti?: undefined;
-                    })[];
-                    ix: number;
-                };
-                a: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                s: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number[];
-                            y: number[];
-                        };
-                        o: {
-                            x: number[];
-                            y: number[];
-                        };
-                        t: number;
-                        s: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                    })[];
-                    ix: number;
-                };
-                r: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sk: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sa: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                nm: string;
-                it?: undefined;
-                np?: undefined;
-                cix?: undefined;
-                bm?: undefined;
-                ix?: undefined;
-                mn?: undefined;
-                hd?: undefined;
-            })[];
-            nm: string;
-            np: number;
-            cix: number;
-            bm: number;
-            ix: number;
-            mn: string;
-            hd: boolean;
-        } | {
-            ty: string;
-            it: ({
-                ind: number;
-                ty: string;
-                ix: number;
-                ks: {
-                    a: number;
-                    k: {
-                        i: number[][];
-                        o: number[][];
-                        v: number[][];
-                        c: boolean;
-                    };
-                    ix: number;
-                };
-                nm: string;
-                mn: string;
-                hd: boolean;
-                mm?: undefined;
-                c?: undefined;
-                o?: undefined;
-                r?: undefined;
-                bm?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                mm: number;
-                nm: string;
-                mn: string;
-                hd: boolean;
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                c?: undefined;
-                o?: undefined;
-                r?: undefined;
-                bm?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                c: {
-                    a: number;
-                    k: ({
-                        i: {
-                            x: number[];
-                            y: number[];
-                        };
-                        o: {
-                            x: number[];
-                            y: number[];
-                        };
-                        t: number;
-                        s: number[];
-                    } | {
-                        t: number;
-                        s: number[];
-                        i?: undefined;
-                        o?: undefined;
-                    })[];
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                r: number;
-                bm: number;
-                nm: string;
-                mn: string;
-                hd: boolean;
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                mm?: undefined;
-                p?: undefined;
-                a?: undefined;
-                s?: undefined;
-                sk?: undefined;
-                sa?: undefined;
-            } | {
-                ty: string;
-                p: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                a: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                s: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                r: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sk: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                sa: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                nm: string;
-                ind?: undefined;
-                ix?: undefined;
-                ks?: undefined;
-                mn?: undefined;
-                hd?: undefined;
-                mm?: undefined;
-                c?: undefined;
-                bm?: undefined;
-            })[];
-            nm: string;
-            np: number;
-            cix: number;
-            bm: number;
+            bm: number; /** @typedef {import('./dt-common-lib/IfcRule').IQAData} IQAData */
             ix: number;
             mn: string;
             hd: boolean;
@@ -5136,6 +2600,7 @@ export const option4LoopFaceTable: Map<string, {
                 k: number;
                 ix: number;
             };
+            /** @enum {'other'} */
             p: {
                 a: number;
                 k: number[];
@@ -5268,6 +2733,9 @@ export const option4LoopFaceTable: Map<string, {
                     a: number;
                     k: ({
                         i: {
+                            /**
+                             * validate if value match metaDataType question' rule
+                             */
                             x: number[];
                             y: number[];
                         };
@@ -5549,7 +3017,6 @@ export const option4LoopFaceTable: Map<string, {
                 sk?: undefined;
                 sa?: undefined;
             } | {
-                /** @type {IQAData[]} */
                 ty: string;
                 p: {
                     a: number;
@@ -5626,6 +3093,13 @@ export const option4LoopFaceTable: Map<string, {
                         i?: undefined;
                         o?: undefined;
                     })[];
+                    /**
+                     * only keep the feedbacks that belongs to a certain page
+                     * if a question is not answered => textOrIndexArr: ['']
+                     * also convert the answers to 0-based
+                     * transform it to IQAData type
+                     * @type {(pageIndex: number, survey: Survey, feedbacksMap: {[questionId: string]: Feedback} ) => [IQAData]}
+                     */
                     ix: number;
                 };
                 sk: {
@@ -6156,1753 +3630,12 @@ export const option4TransformTable: Map<string, {
     h: number;
     nm: string;
     ddd: number;
-    assets: ({
-        id: string;
-        layers: {
-            ddd: number;
-            ind: number;
-            ty: number;
-            nm: string;
-            sr: number;
-            ks: {
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                r: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                p: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                a: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                s: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-            };
-            ao: number;
-            shapes: ({
-                ty: string;
-                /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
-                it: ({
-                    ind: number;
-                    ty: string;
-                    ix: number;
-                    ks: {
-                        a: number;
-                        k: {
-                            i: number[][];
-                            o: number[][];
-                            v: number[][];
-                            c: boolean;
-                        };
-                        ix: number;
-                    };
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    c?: undefined;
-                    o?: undefined;
-                    r?: undefined;
-                    bm?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    c: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    r: number;
-                    bm: number;
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number;
-                                y: number;
-                            };
-                            o: {
-                                x: number;
-                                y: number;
-                            };
-                            t: number;
-                            s: number[];
-                            to: number[];
-                            ti: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                            to?: undefined;
-                            ti?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number[];
-                                y: number[];
-                            };
-                            o: {
-                                x: number[];
-                                y: number[];
-                            };
-                            t: number;
-                            s: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number[];
-                                y: number[];
-                            };
-                            o: {
-                                x: number[];
-                                y: number[];
-                            };
-                            t: number;
-                            s: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                    c?: undefined;
-                    bm?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-            } | {
-                ty: string;
-                it: ({
-                    ind: number;
-                    ty: string;
-                    ix: number;
-                    ks: {
-                        a: number;
-                        k: {
-                            i: number[][];
-                            o: number[][];
-                            v: number[][];
-                            c: boolean;
-                        };
-                        ix: number;
-                    };
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    c?: undefined;
-                    o?: undefined;
-                    r?: undefined;
-                    bm?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    c: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    r: number;
-                    bm: number;
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number[];
-                                y: number[];
-                            };
-                            o: {
-                                x: number[];
-                                y: number[];
-                            };
-                            t: number;
-                            s: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number; /**
-                         * if mandatory question has feedback
-                         */
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                    c?: undefined;
-                    bm?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-            } | {
-                ty: string;
-                it: ({
-                    ty: string;
-                    it: ({
-                        ind: number;
-                        ty: string;
-                        ix: number;
-                        ks: {
-                            a: number;
-                            k: {
-                                i: number[][];
-                                o: number[][];
-                                v: number[][];
-                                c: boolean;
-                            };
-                            ix: number;
-                        };
-                        nm: string;
-                        mn: string;
-                        hd: boolean;
-                        c?: undefined;
-                        o?: undefined;
-                        r?: undefined;
-                        bm?: undefined;
-                        p?: undefined;
-                        a?: undefined;
-                        s?: undefined;
-                        sk?: undefined;
-                        sa?: undefined;
-                    } | {
-                        ty: string;
-                        c: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        o: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        r: number;
-                        bm: number;
-                        nm: string;
-                        mn: string;
-                        hd: boolean;
-                        ind?: undefined;
-                        ix?: undefined;
-                        ks?: undefined;
-                        p?: undefined;
-                        a?: undefined;
-                        s?: undefined;
-                        sk?: undefined;
-                        sa?: undefined;
-                    } | {
-                        ty: string;
-                        p: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        a: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        s: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        r: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        o: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        sk: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        sa: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        nm: string;
-                        ind?: undefined;
-                        ix?: undefined;
-                        ks?: undefined;
-                        mn?: undefined;
-                        hd?: undefined;
-                        c?: undefined;
-                        bm?: undefined;
-                    })[];
-                    nm: string;
-                    np: number;
-                    cix: number;
-                    bm: number;
-                    ix: number;
-                    mn: string;
-                    hd: boolean;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    r?: undefined;
-                    o?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number;
-                                y: number;
-                            };
-                            o: {
-                                x: number;
-                                y: number;
-                            };
-                            t: number;
-                            s: number[];
-                            to: number[];
-                            ti: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                            to?: undefined;
-                            ti?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number[];
-                                y: number[];
-                            };
-                            o: {
-                                x: number[];
-                                y: number[];
-                            };
-                            t: number;
-                            s: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number[];
-                                y: number[];
-                            };
-                            o: {
-                                x: number[];
-                                y: number[];
-                            };
-                            t: number;
-                            s: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    it?: undefined;
-                    np?: undefined;
-                    cix?: undefined;
-                    bm?: undefined;
-                    ix?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-            } | {
-                ty: string;
-                it: ({
-                    ty: string;
-                    it: ({
-                        ind: number;
-                        ty: string;
-                        ix: number;
-                        ks: {
-                            a: number;
-                            k: {
-                                i: number[][];
-                                o: number[][];
-                                v: number[][];
-                                c: boolean;
-                            };
-                            ix: number;
-                        };
-                        nm: string;
-                        mn: string;
-                        hd: boolean;
-                        c?: undefined;
-                        o?: undefined;
-                        r?: undefined;
-                        bm?: undefined;
-                        p?: undefined;
-                        a?: undefined;
-                        s?: undefined;
-                        sk?: undefined;
-                        sa?: undefined;
-                    } | {
-                        ty: string;
-                        c: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        o: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        r: number;
-                        bm: number;
-                        nm: string;
-                        mn: string;
-                        hd: boolean;
-                        ind?: undefined;
-                        ix?: undefined;
-                        ks?: undefined;
-                        p?: undefined;
-                        a?: undefined;
-                        s?: undefined;
-                        sk?: undefined;
-                        sa?: undefined;
-                    } | {
-                        ty: string;
-                        p: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        a: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        s: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        r: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        o: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        sk: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        sa: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        nm: string;
-                        ind?: undefined;
-                        ix?: undefined;
-                        ks?: undefined;
-                        mn?: undefined;
-                        hd?: undefined;
-                        c?: undefined;
-                        bm?: undefined;
-                    })[];
-                    nm: string;
-                    np: number;
-                    cix: number;
-                    bm: number;
-                    ix: number;
-                    mn: string;
-                    hd: boolean;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    r?: undefined;
-                    o?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number;
-                                y: number;
-                            };
-                            o: {
-                                x: number;
-                                y: number;
-                            };
-                            t: number;
-                            s: number[];
-                            to: number[];
-                            ti: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                            to?: undefined;
-                            ti?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number[];
-                                y: number[];
-                            };
-                            o: {
-                                x: number[];
-                                y: number[];
-                            };
-                            t: number;
-                            s: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    it?: undefined;
-                    np?: undefined;
-                    cix?: undefined;
-                    bm?: undefined;
-                    ix?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-            } | {
-                ty: string;
-                it: ({
-                    ty: string;
-                    it: ({
-                        ind: number;
-                        ty: string;
-                        ix: number;
-                        ks: {
-                            a: number;
-                            k: {
-                                i: number[][];
-                                o: number[][];
-                                v: number[][];
-                                c: boolean;
-                            };
-                            ix: number;
-                        };
-                        nm: string;
-                        mn: string;
-                        hd: boolean;
-                        c?: undefined;
-                        o?: undefined;
-                        r?: undefined;
-                        bm?: undefined;
-                        p?: undefined;
-                        a?: undefined;
-                        s?: undefined;
-                        sk?: undefined;
-                        sa?: undefined;
-                    } | {
-                        ty: string;
-                        c: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        o: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        r: number;
-                        bm: number;
-                        nm: string;
-                        mn: string;
-                        hd: boolean;
-                        ind?: undefined;
-                        ix?: undefined;
-                        ks?: undefined;
-                        p?: undefined;
-                        a?: undefined;
-                        s?: undefined;
-                        sk?: undefined;
-                        sa?: undefined;
-                    } | {
-                        ty: string;
-                        p: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        a: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        s: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        r: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        o: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        sk: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        sa: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        nm: string;
-                        ind?: undefined;
-                        ix?: undefined;
-                        ks?: undefined;
-                        mn?: undefined;
-                        hd?: undefined;
-                        c?: undefined;
-                        bm?: undefined;
-                    })[];
-                    nm: string;
-                    np: number;
-                    cix: number;
-                    bm: number;
-                    ix: number;
-                    mn: string;
-                    hd: boolean;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    r?: undefined;
-                    o?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    it?: undefined;
-                    np?: undefined;
-                    cix?: undefined;
-                    bm?: undefined;
-                    ix?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-            } | {
-                ty: string;
-                it: ({
-                    ind: number;
-                    ty: string;
-                    ix: number;
-                    ks: {
-                        a: number;
-                        k: {
-                            i: number[][];
-                            o: number[][];
-                            v: number[][];
-                            c: boolean;
-                        };
-                        ix: number;
-                    };
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    c?: undefined;
-                    o?: undefined;
-                    r?: undefined;
-                    bm?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    c: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    r: number;
-                    bm: number;
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                    c?: undefined;
-                    bm?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-            })[];
-            ip: number;
-            op: number;
-            st: number;
-            bm: number;
-        }[];
-    } | {
-        id: string;
-        layers: {
-            ddd: number;
-            ind: number;
-            ty: number;
-            nm: string;
-            sr: number;
-            ks: {
-                o: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                r: {
-                    a: number;
-                    k: number;
-                    ix: number;
-                };
-                p: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                a: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-                s: {
-                    a: number;
-                    k: number[];
-                    ix: number;
-                };
-            };
-            ao: number;
-            shapes: ({
-                ty: string;
-                it: ({
-                    ty: string;
-                    it: ({
-                        ind: number;
-                        ty: string;
-                        ix: number;
-                        ks: {
-                            a: number;
-                            k: {
-                                i: number[][];
-                                o: number[][];
-                                v: number[][];
-                                c: boolean;
-                            };
-                            ix: number;
-                        };
-                        nm: string;
-                        mn: string;
-                        hd: boolean;
-                        c?: undefined;
-                        o?: undefined;
-                        r?: undefined;
-                        bm?: undefined;
-                        p?: undefined;
-                        a?: undefined;
-                        s?: undefined;
-                        sk?: undefined;
-                        sa?: undefined;
-                    } | {
-                        ty: string;
-                        c: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        o: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        r: number;
-                        bm: number;
-                        nm: string;
-                        mn: string;
-                        hd: boolean;
-                        ind?: undefined;
-                        ix?: undefined;
-                        ks?: undefined;
-                        p?: undefined;
-                        a?: undefined;
-                        s?: undefined;
-                        sk?: undefined;
-                        sa?: undefined;
-                    } | {
-                        ty: string;
-                        p: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        a: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        s: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        r: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        o: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        sk: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        sa: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        nm: string;
-                        ind?: undefined;
-                        ix?: undefined;
-                        ks?: undefined;
-                        mn?: undefined;
-                        hd?: undefined;
-                        c?: undefined;
-                        bm?: undefined;
-                    })[];
-                    nm: string;
-                    np: number;
-                    cix: number;
-                    bm: number;
-                    ix: number;
-                    mn: string;
-                    hd: boolean;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    r?: undefined;
-                    o?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number;
-                                y: number;
-                            };
-                            o: {
-                                x: number;
-                                y: number;
-                            };
-                            t: number;
-                            s: number[];
-                            to: number[];
-                            ti: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                            to?: undefined;
-                            ti?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number[];
-                                y: number[];
-                            };
-                            o: {
-                                x: number[];
-                                y: number[];
-                            };
-                            t: number;
-                            s: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    it?: undefined;
-                    np?: undefined;
-                    cix?: undefined;
-                    bm?: undefined;
-                    ix?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-            } | {
-                ty: string;
-                it: ({
-                    ind: number;
-                    ty: string;
-                    ix: number;
-                    ks: {
-                        a: number;
-                        k: {
-                            i: number[][];
-                            o: number[][];
-                            v: number[][];
-                            c: boolean;
-                        };
-                        ix: number;
-                    };
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    c?: undefined;
-                    o?: undefined;
-                    r?: undefined;
-                    bm?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    c: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    r: number;
-                    bm: number;
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number;
-                                y: number;
-                            };
-                            o: {
-                                x: number;
-                                y: number;
-                            };
-                            t: number;
-                            s: number[];
-                            to: number[];
-                            ti: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                            to?: undefined;
-                            ti?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number[];
-                                y: number[];
-                            };
-                            o: {
-                                x: number[];
-                                y: number[];
-                            };
-                            t: number;
-                            s: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                    c?: undefined;
-                    bm?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-            } | {
-                ty: string;
-                it: ({
-                    ty: string;
-                    it: ({
-                        ind: number;
-                        ty: string;
-                        ix: number;
-                        ks: {
-                            a: number;
-                            k: {
-                                i: number[][];
-                                o: number[][];
-                                v: number[][];
-                                c: boolean;
-                            };
-                            ix: number;
-                        };
-                        nm: string;
-                        mn: string;
-                        hd: boolean;
-                        c?: undefined;
-                        o?: undefined;
-                        r?: undefined;
-                        bm?: undefined;
-                        p?: undefined;
-                        a?: undefined;
-                        s?: undefined;
-                        sk?: undefined;
-                        sa?: undefined;
-                    } | {
-                        ty: string;
-                        c: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        o: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        r: number;
-                        bm: number;
-                        nm: string;
-                        mn: string;
-                        hd: boolean;
-                        ind?: undefined;
-                        ix?: undefined;
-                        ks?: undefined;
-                        p?: undefined;
-                        a?: undefined;
-                        s?: undefined;
-                        sk?: undefined;
-                        sa?: undefined;
-                    } | {
-                        ty: string;
-                        p: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        a: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        s: {
-                            a: number;
-                            k: number[];
-                            ix: number;
-                        };
-                        r: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        o: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        sk: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        sa: {
-                            a: number;
-                            k: number;
-                            ix: number;
-                        };
-                        nm: string;
-                        ind?: undefined;
-                        ix?: undefined;
-                        ks?: undefined;
-                        mn?: undefined;
-                        hd?: undefined;
-                        c?: undefined;
-                        bm?: undefined;
-                    })[];
-                    nm: string;
-                    np: number;
-                    cix: number;
-                    bm: number;
-                    ix: number;
-                    mn: string;
-                    hd: boolean;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    r?: undefined;
-                    o?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number;
-                                y: number;
-                            };
-                            o: {
-                                x: number;
-                                y: number;
-                            };
-                            t: number;
-                            s: number[];
-                            to: number[];
-                            ti: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                            to?: undefined;
-                            ti?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number[];
-                                y: number[];
-                            };
-                            o: {
-                                x: number[];
-                                y: number[];
-                            };
-                            t: number;
-                            s: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: ({
-                            i: {
-                                x: number[];
-                                y: number[];
-                            };
-                            o: {
-                                x: number[];
-                                y: number[];
-                            };
-                            t: number;
-                            s: number[];
-                        } | {
-                            t: number;
-                            s: number[];
-                            i?: undefined;
-                            o?: undefined;
-                        })[];
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    it?: undefined;
-                    np?: undefined;
-                    cix?: undefined;
-                    bm?: undefined;
-                    ix?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-            } | {
-                ty: string;
-                it: ({
-                    ind: number;
-                    ty: string;
-                    ix: number;
-                    ks: {
-                        a: number;
-                        k: {
-                            i: number[][];
-                            o: number[][];
-                            v: number[][];
-                            c: boolean;
-                        };
-                        ix: number;
-                    };
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    c?: undefined;
-                    o?: undefined;
-                    r?: undefined;
-                    bm?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    c: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    r: number;
-                    bm: number;
-                    nm: string;
-                    mn: string;
-                    hd: boolean;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    p?: undefined;
-                    a?: undefined;
-                    s?: undefined;
-                    sk?: undefined;
-                    sa?: undefined;
-                } | {
-                    ty: string;
-                    p: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    a: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    s: {
-                        a: number;
-                        k: number[];
-                        ix: number;
-                    };
-                    r: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    o: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sk: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    sa: {
-                        a: number;
-                        k: number;
-                        ix: number;
-                    };
-                    nm: string;
-                    ind?: undefined;
-                    ix?: undefined;
-                    ks?: undefined;
-                    mn?: undefined;
-                    hd?: undefined;
-                    c?: undefined;
-                    bm?: undefined;
-                })[];
-                nm: string;
-                np: number;
-                cix: number;
-                bm: number;
-                ix: number;
-                mn: string;
-                hd: boolean;
-            })[];
-            ip: number;
-            op: number;
-            st: number;
-            bm: number;
-        }[];
-    })[];
+    assets: never[];
     layers: ({
         ddd: number;
         ind: number;
         ty: number;
         nm: string;
-        refId: string;
         sr: number;
         ks: {
             o: {
@@ -7924,6 +3657,779 @@ export const option4TransformTable: Map<string, {
                     i?: undefined;
                     o?: undefined;
                 })[];
+                ix: number;
+            };
+            r: {
+                a: number;
+                k: number;
+                ix: number;
+            };
+            p: {
+                a: number;
+                k: number[];
+                ix: number;
+            };
+            a: {
+                a: number;
+                k: number[];
+                ix: number;
+            };
+            s: {
+                a: number;
+                k: number[];
+                ix: number;
+            };
+        };
+        ao: number;
+        shapes: ({
+            ty: string;
+            it: ({
+                ind: number;
+                ty: string;
+                ix: number;
+                ks: {
+                    a: number;
+                    k: {
+                        i: number[][];
+                        o: number[][];
+                        v: number[][];
+                        c: boolean;
+                    };
+                    ix: number;
+                };
+                nm: string;
+                mn: string;
+                hd: boolean;
+                c?: undefined;
+                o?: undefined;
+                r?: undefined;
+                bm?: undefined;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                c: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                r: number;
+                bm: number;
+                nm: string;
+                mn: string;
+                hd: boolean;
+                ind?: undefined;
+                ix?: undefined;
+                ks?: undefined;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                p: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number;
+                            y: number;
+                        };
+                        o: {
+                            x: number;
+                            y: number;
+                        };
+                        t: number;
+                        s: number[];
+                        to: number[];
+                        ti: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                        to?: undefined;
+                        ti?: undefined;
+                    })[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number[];
+                            y: number[];
+                        };
+                        o: {
+                            x: number[];
+                            y: number[];
+                        };
+                        t: number;
+                        s: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                    })[];
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sk: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sa: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                nm: string;
+                ind?: undefined;
+                ix?: undefined;
+                ks?: undefined;
+                mn?: undefined;
+                hd?: undefined;
+                c?: undefined;
+                bm?: undefined;
+            })[];
+            nm: string;
+            np: number;
+            cix: number;
+            bm: number;
+            ix: number;
+            mn: string;
+            hd: boolean;
+        } | {
+            ty: string;
+            it: ({
+                ty: string;
+                it: ({
+                    ty: string;
+                    it: ({
+                        ind: number;
+                        ty: string;
+                        ix: number;
+                        ks: {
+                            a: number;
+                            k: {
+                                i: number[][];
+                                o: number[][];
+                                v: number[][];
+                                c: boolean;
+                            };
+                            ix: number;
+                        };
+                        nm: string;
+                        mn: string;
+                        hd: boolean;
+                        c?: undefined;
+                        o?: undefined;
+                        r?: undefined;
+                        bm?: undefined;
+                        p?: undefined;
+                        a?: undefined;
+                        s?: undefined;
+                        sk?: undefined;
+                        sa?: undefined;
+                    } | {
+                        ty: string;
+                        c: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        o: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        r: number;
+                        bm: number;
+                        nm: string;
+                        mn: string;
+                        hd: boolean;
+                        ind?: undefined;
+                        ix?: undefined;
+                        ks?: undefined;
+                        p?: undefined;
+                        a?: undefined;
+                        s?: undefined;
+                        sk?: undefined;
+                        sa?: undefined;
+                    } | {
+                        ty: string;
+                        p: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        a: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        s: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        r: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        o: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        sk: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        sa: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        nm: string;
+                        ind?: undefined;
+                        ix?: undefined;
+                        ks?: undefined;
+                        mn?: undefined;
+                        hd?: undefined;
+                        c?: undefined;
+                        bm?: undefined;
+                    })[];
+                    nm: string;
+                    np: number;
+                    cix: number;
+                    bm: number;
+                    ix: number;
+                    mn: string;
+                    hd: boolean;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    r?: undefined;
+                    o?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    it?: undefined;
+                    np?: undefined;
+                    cix?: undefined;
+                    bm?: undefined;
+                    ix?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
+                ix: number;
+                mn: string;
+                hd: boolean;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                r?: undefined;
+                o?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                p: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number;
+                            y: number;
+                        };
+                        o: {
+                            x: number;
+                            y: number;
+                        };
+                        t: number;
+                        s: number[];
+                        to: number[];
+                        ti: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                        to?: undefined;
+                        ti?: undefined;
+                    })[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number[];
+                            y: number[];
+                        };
+                        o: {
+                            x: number[];
+                            y: number[];
+                        };
+                        t: number;
+                        s: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                    })[];
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sk: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sa: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                nm: string;
+                it?: undefined;
+                np?: undefined;
+                cix?: undefined;
+                bm?: undefined;
+                ix?: undefined;
+                mn?: undefined;
+                hd?: undefined;
+            })[];
+            nm: string;
+            np: number;
+            cix: number;
+            bm: number;
+            ix: number;
+            mn: string;
+            hd: boolean;
+        } | {
+            ty: string;
+            it: ({
+                ty: string;
+                it: ({
+                    ind: number;
+                    ty: string;
+                    ix: number;
+                    ks: {
+                        a: number;
+                        k: {
+                            i: number[][];
+                            o: number[][];
+                            v: number[][];
+                            c: boolean;
+                        };
+                        ix: number;
+                    };
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    c?: undefined;
+                    o?: undefined;
+                    r?: undefined;
+                    bm?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    c: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    r: number;
+                    bm: number;
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                    c?: undefined;
+                    bm?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
+                ix: number;
+                mn: string;
+                hd: boolean;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                r?: undefined;
+                o?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                p: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number;
+                            y: number;
+                        };
+                        o: {
+                            x: number;
+                            y: number;
+                        };
+                        t: number;
+                        s: number[];
+                        to: number[];
+                        ti: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                        to?: undefined;
+                        ti?: undefined;
+                    })[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number[];
+                            y: number[];
+                        };
+                        o: {
+                            x: number[];
+                            y: number[];
+                        };
+                        t: number;
+                        s: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                    })[];
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number[];
+                            y: number[];
+                        };
+                        o: {
+                            x: number[];
+                            y: number[];
+                        };
+                        t: number;
+                        s: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                    })[];
+                    ix: number;
+                };
+                sk: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sa: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                nm: string;
+                it?: undefined;
+                np?: undefined;
+                cix?: undefined;
+                bm?: undefined;
+                ix?: undefined;
+                mn?: undefined;
+                hd?: undefined;
+            })[];
+            nm: string;
+            np: number;
+            cix: number;
+            bm: number;
+            ix: number;
+            mn: string;
+            hd: boolean;
+        } | {
+            ty: string;
+            it: ({
+                ind: number;
+                ty: string;
+                ix: number;
+                ks: {
+                    a: number;
+                    k: {
+                        i: number[][];
+                        o: number[][];
+                        v: number[][];
+                        c: boolean;
+                    };
+                    ix: number;
+                };
+                nm: string;
+                mn: string;
+                hd: boolean;
+                c?: undefined;
+                o?: undefined;
+                r?: undefined;
+                bm?: undefined;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                c: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                r: number;
+                bm: number;
+                nm: string;
+                mn: string;
+                hd: boolean;
+                ind?: undefined;
+                ix?: undefined;
+                ks?: undefined;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                p: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sk: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sa: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                nm: string;
+                ind?: undefined;
+                ix?: undefined;
+                ks?: undefined;
+                mn?: undefined;
+                hd?: undefined;
+                c?: undefined;
+                bm?: undefined;
+            })[];
+            nm: string;
+            np: number;
+            cix: number;
+            bm: number;
+            ix: number;
+            mn: string;
+            hd: boolean;
+        })[];
+        ip: number;
+        op: number;
+        st: number;
+        bm: number;
+    } | {
+        ddd: number;
+        ind: number;
+        ty: number;
+        nm: string;
+        sr: number;
+        ks: {
+            o: {
+                a: number;
+                k: number;
                 ix: number;
             };
             r: {
@@ -7968,65 +4474,741 @@ export const option4TransformTable: Map<string, {
             };
         };
         ao: number;
-        w: number;
-        h: number;
-        ip: number;
-        op: number;
-        st: number;
-        bm: number;
-    } | {
-        ddd: number;
-        ind: number;
-        ty: number;
-        nm: string;
-        refId: string;
-        sr: number;
-        ks: {
-            o: {
-                a: number;
-                k: ({
-                    i: {
-                        x: number[];
-                        y: number[];
+        shapes: ({
+            ty: string;
+            it: ({
+                ind: number;
+                ty: string;
+                ix: number;
+                ks: {
+                    a: number;
+                    k: {
+                        i: number[][];
+                        o: number[][];
+                        v: number[][];
+                        c: boolean;
+                    };
+                    ix: number;
+                };
+                nm: string;
+                mn: string;
+                hd: boolean;
+                c?: undefined;
+                o?: undefined;
+                r?: undefined;
+                bm?: undefined;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                c: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                r: number;
+                bm: number;
+                nm: string;
+                mn: string;
+                hd: boolean;
+                ind?: undefined;
+                ix?: undefined;
+                ks?: undefined;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                p: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number;
+                            y: number;
+                        };
+                        o: {
+                            x: number;
+                            y: number;
+                        };
+                        t: number;
+                        s: number[];
+                        to: number[];
+                        ti: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                        to?: undefined;
+                        ti?: undefined;
+                    })[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number[];
+                            y: number[];
+                        };
+                        o: {
+                            x: number[];
+                            y: number[];
+                        };
+                        t: number;
+                        s: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                    })[];
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sk: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sa: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                nm: string;
+                ind?: undefined;
+                ix?: undefined;
+                ks?: undefined;
+                mn?: undefined;
+                hd?: undefined;
+                c?: undefined;
+                bm?: undefined;
+            })[];
+            nm: string;
+            np: number;
+            cix: number;
+            bm: number;
+            ix: number;
+            mn: string;
+            hd: boolean;
+        } | {
+            ty: string;
+            it: ({
+                ty: string;
+                it: ({
+                    ty: string;
+                    it: ({
+                        ind: number;
+                        ty: string;
+                        ix: number;
+                        ks: {
+                            a: number;
+                            k: {
+                                i: number[][];
+                                o: number[][];
+                                v: number[][];
+                                c: boolean;
+                            };
+                            ix: number;
+                        };
+                        nm: string;
+                        mn: string;
+                        hd: boolean;
+                        c?: undefined;
+                        o?: undefined;
+                        r?: undefined;
+                        bm?: undefined;
+                        p?: undefined;
+                        a?: undefined;
+                        s?: undefined;
+                        sk?: undefined;
+                        sa?: undefined;
+                    } | {
+                        ty: string;
+                        c: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        o: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        r: number;
+                        bm: number;
+                        nm: string;
+                        mn: string;
+                        hd: boolean;
+                        ind?: undefined;
+                        ix?: undefined;
+                        ks?: undefined;
+                        p?: undefined;
+                        a?: undefined;
+                        s?: undefined;
+                        sk?: undefined;
+                        sa?: undefined;
+                    } | {
+                        ty: string;
+                        p: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        a: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        s: {
+                            a: number;
+                            k: number[];
+                            ix: number;
+                        };
+                        r: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        o: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        sk: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        sa: {
+                            a: number;
+                            k: number;
+                            ix: number;
+                        };
+                        nm: string;
+                        ind?: undefined;
+                        ix?: undefined;
+                        ks?: undefined;
+                        mn?: undefined;
+                        hd?: undefined;
+                        c?: undefined;
+                        bm?: undefined;
+                    })[];
+                    nm: string;
+                    np: number;
+                    cix: number;
+                    bm: number;
+                    ix: number;
+                    mn: string;
+                    hd: boolean;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    r?: undefined;
+                    o?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
                     };
                     o: {
-                        x: number[];
-                        y: number[];
+                        a: number;
+                        k: number;
+                        ix: number;
                     };
-                    t: number;
-                    s: number[];
-                } | {
-                    t: number;
-                    s: number[];
-                    i?: undefined;
-                    o?: undefined;
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    it?: undefined;
+                    np?: undefined;
+                    cix?: undefined;
+                    bm?: undefined;
+                    ix?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
                 })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
                 ix: number;
-            };
-            r: {
-                a: number;
-                k: number;
+                mn: string;
+                hd: boolean;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                r?: undefined;
+                o?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                p: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number;
+                            y: number;
+                        };
+                        o: {
+                            x: number;
+                            y: number;
+                        };
+                        t: number;
+                        s: number[];
+                        to: number[];
+                        ti: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                        to?: undefined;
+                        ti?: undefined;
+                    })[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number[];
+                            y: number[];
+                        };
+                        o: {
+                            x: number[];
+                            y: number[];
+                        };
+                        t: number;
+                        s: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                    })[];
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sk: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sa: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                nm: string;
+                it?: undefined;
+                np?: undefined;
+                cix?: undefined;
+                bm?: undefined;
+                ix?: undefined;
+                mn?: undefined;
+                hd?: undefined;
+            })[];
+            nm: string;
+            np: number;
+            cix: number;
+            bm: number;
+            ix: number;
+            mn: string;
+            hd: boolean;
+        } | {
+            ty: string;
+            it: ({
+                ty: string;
+                it: ({
+                    ind: number;
+                    ty: string;
+                    ix: number;
+                    ks: {
+                        a: number;
+                        k: {
+                            i: number[][];
+                            o: number[][];
+                            v: number[][];
+                            c: boolean;
+                        };
+                        ix: number;
+                    };
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    c?: undefined;
+                    o?: undefined;
+                    r?: undefined;
+                    bm?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    c: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    r: number;
+                    bm: number;
+                    nm: string;
+                    mn: string;
+                    hd: boolean;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    p?: undefined;
+                    a?: undefined;
+                    s?: undefined;
+                    sk?: undefined;
+                    sa?: undefined;
+                } | {
+                    ty: string;
+                    p: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    a: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    s: {
+                        a: number;
+                        k: number[];
+                        ix: number;
+                    };
+                    r: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    o: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sk: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    sa: {
+                        a: number;
+                        k: number;
+                        ix: number;
+                    };
+                    nm: string;
+                    ind?: undefined;
+                    ix?: undefined;
+                    ks?: undefined;
+                    mn?: undefined;
+                    hd?: undefined;
+                    c?: undefined;
+                    bm?: undefined;
+                })[];
+                nm: string;
+                np: number;
+                cix: number;
+                bm: number;
                 ix: number;
-            };
-            p: {
-                a: number;
-                k: number[];
+                mn: string;
+                hd: boolean;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                r?: undefined;
+                o?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                p: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number;
+                            y: number;
+                        };
+                        o: {
+                            x: number;
+                            y: number;
+                        };
+                        t: number;
+                        s: number[];
+                        to: number[];
+                        ti: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                        to?: undefined;
+                        ti?: undefined;
+                    })[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number[];
+                            y: number[];
+                        };
+                        o: {
+                            x: number[];
+                            y: number[];
+                        };
+                        t: number;
+                        s: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                    })[];
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: ({
+                        i: {
+                            x: number[];
+                            y: number[];
+                        };
+                        o: {
+                            x: number[];
+                            y: number[];
+                        };
+                        t: number;
+                        s: number[];
+                    } | {
+                        t: number;
+                        s: number[];
+                        i?: undefined;
+                        o?: undefined;
+                    })[];
+                    ix: number;
+                };
+                sk: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sa: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                nm: string;
+                it?: undefined;
+                np?: undefined;
+                cix?: undefined;
+                bm?: undefined;
+                ix?: undefined;
+                mn?: undefined;
+                hd?: undefined;
+            })[];
+            nm: string;
+            np: number;
+            cix: number;
+            bm: number;
+            ix: number;
+            mn: string;
+            hd: boolean;
+        } | {
+            ty: string;
+            it: ({
+                ind: number;
+                ty: string;
                 ix: number;
-            };
-            a: {
-                a: number;
-                k: number[];
-                ix: number;
-            };
-            s: {
-                a: number;
-                k: number[];
-                ix: number;
-            };
-        };
-        ao: number;
-        w: number;
-        h: number;
+                ks: {
+                    a: number;
+                    k: {
+                        i: number[][];
+                        o: number[][];
+                        v: number[][];
+                        c: boolean;
+                    };
+                    ix: number;
+                };
+                nm: string;
+                mn: string;
+                hd: boolean;
+                c?: undefined;
+                o?: undefined;
+                r?: undefined;
+                bm?: undefined;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                c: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                r: number;
+                bm: number;
+                nm: string;
+                mn: string;
+                hd: boolean;
+                ind?: undefined;
+                ix?: undefined;
+                ks?: undefined;
+                p?: undefined;
+                a?: undefined;
+                s?: undefined;
+                sk?: undefined;
+                sa?: undefined;
+            } | {
+                ty: string;
+                p: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                a: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                s: {
+                    a: number;
+                    k: number[];
+                    ix: number;
+                };
+                r: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                o: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sk: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                sa: {
+                    a: number;
+                    k: number;
+                    ix: number;
+                };
+                nm: string;
+                ind?: undefined;
+                ix?: undefined;
+                ks?: undefined;
+                mn?: undefined;
+                hd?: undefined;
+                c?: undefined;
+                bm?: undefined;
+            })[];
+            nm: string;
+            np: number;
+            cix: number;
+            bm: number;
+            ix: number;
+            mn: string;
+            hd: boolean;
+        })[];
         ip: number;
         op: number;
         st: number;

@@ -1,3 +1,5 @@
+import { scaleLogic } from '../utils/data';
+
 const smileyPoor = require('../assets/btn_very_dislike.png');
 const smileyFair = require('../assets/btn_dislike.png');
 const smileyNeutral = require('../assets/btn_not_sure.png');
@@ -96,6 +98,14 @@ const thumbIconsSelected = [
 ];
 
 /**
+ * @param {number} length
+ * @param {*} icons
+ */
+const getIconList = (length, icons) => {
+  return scaleLogic[length].map((value) => icons[value]);
+};
+
+/**
  * @param {QuestionSubType} type
  * @param {number} optionLength
  * @returns {string[]}
@@ -119,11 +129,11 @@ export const getIcons = (type, optionLength) => {
 
   switch (optionLength) {
     case 2:
-      return [icons[0], icons[4]];
+      return getIconList(2, icons);
     case 3:
-      return [icons[1], icons[2], icons[4]];
+      return getIconList(3, icons);
     case 4:
-      return [icons[0], icons[1], icons[3], icons[4]];
+      return getIconList(4, icons);
     default:
       return icons;
   }
@@ -153,11 +163,11 @@ export const getSelectedIcons = (type, optionLength) => {
 
   switch (optionLength) {
     case 2:
-      return [icons[0], icons[4]];
+      return getIconList(2, icons);
     case 3:
-      return [icons[1], icons[2], icons[4]];
+      return getIconList(3, icons);
     case 4:
-      return [icons[0], icons[1], icons[3], icons[4]];
+      return getIconList(4, icons);
     default:
       return icons;
   }

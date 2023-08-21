@@ -39,6 +39,10 @@ var _SliderDragRatingQuestion = _interopRequireDefault(require("../components/Sl
 
 var _DropdownQuestion = _interopRequireDefault(require("../components/DropdownQuestion"));
 
+var _MatrixRatingQuestion = _interopRequireDefault(require("../components/MatrixRatingQuestion"));
+
+var _MultipleOpenEndedQuestion = _interopRequireDefault(require("../components/MultipleOpenEndedQuestion"));
+
 var _MandatoryTitle = _interopRequireDefault(require("../components/MandatoryTitle"));
 
 var _styles = _interopRequireDefault(require("../styles"));
@@ -157,6 +161,16 @@ const QuestionContainer = props => {
     case 'dropdown':
       // @ts-ignore
       QuestionComponent = _DropdownQuestion.default;
+      break;
+
+    case 'matrixRating':
+      // @ts-ignore
+      QuestionComponent = _MatrixRatingQuestion.default;
+      break;
+
+    case 'multipleOpenEnded':
+      // @ts-ignore
+      QuestionComponent = _MultipleOpenEndedQuestion.default;
       break;
 
     default:

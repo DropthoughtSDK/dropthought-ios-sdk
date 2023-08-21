@@ -55,7 +55,12 @@ const ClassicMandatoryTitle = ({
           {text + ' '}
         </Text>
       ))}
-      {question.mandatory && <Text style={styles.hint}>*</Text>}
+      {
+        //optional was been used on matrix question
+        (question.mandatory || question.optional) && (
+          <Text style={styles.hint}>*</Text>
+        )
+      }
       <ClassicQuestionWarningMessage
         // forgot message has higher priority than custom invalid message
         message={forgot ? i18n.t('survey:mandatory') : invalidMessage}

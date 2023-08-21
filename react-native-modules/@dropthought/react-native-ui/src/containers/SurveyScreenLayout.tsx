@@ -44,7 +44,10 @@ const firstInvalidQuestionId = (
   let invalidQuestionId;
   for (const question of page.questions) {
     const feedback = feedbackState.feedbacksMap[question.questionId];
-    if (question.mandatory && feedback === undefined) {
+    if (
+      (question.mandatory && feedback === undefined) ||
+      (question.optional && feedback === undefined)
+    ) {
       invalidQuestionId = question.questionId;
       break;
     }

@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.getSelectedIcons = exports.getIcons = exports.defaultIcon = exports.RatingIconType = void 0;
 
+var _data = require("../utils/data");
+
 const smileyPoor = require('../assets/btn_very_dislike.png');
 
 const smileyFair = require('../assets/btn_dislike.png');
@@ -102,10 +104,19 @@ const heartIcons = [heartPoor, heartFair, heartNeutral, heartGood, heartExcellen
 const thumbIcons = [thumbPoor, thumbFair, thumbNeutral, thumbGood, thumbExcellent];
 const thumbIconsSelected = [thumbPoorSelected, thumbFairSelected, thumbNeutralSelected, thumbGoodSelected, thumbExcellentSelected];
 /**
+ * @param {number} length
+ * @param {*} icons
+ */
+
+const getIconList = (length, icons) => {
+  return _data.scaleLogic[length].map(value => icons[value]);
+};
+/**
  * @param {QuestionSubType} type
  * @param {number} optionLength
  * @returns {string[]}
  */
+
 
 const getIcons = (type, optionLength) => {
   let icons;
@@ -130,13 +141,13 @@ const getIcons = (type, optionLength) => {
 
   switch (optionLength) {
     case 2:
-      return [icons[0], icons[4]];
+      return getIconList(2, icons);
 
     case 3:
-      return [icons[1], icons[2], icons[4]];
+      return getIconList(3, icons);
 
     case 4:
-      return [icons[0], icons[1], icons[3], icons[4]];
+      return getIconList(4, icons);
 
     default:
       return icons;
@@ -176,13 +187,13 @@ const getSelectedIcons = (type, optionLength) => {
 
   switch (optionLength) {
     case 2:
-      return [icons[0], icons[4]];
+      return getIconList(2, icons);
 
     case 3:
-      return [icons[1], icons[2], icons[4]];
+      return getIconList(3, icons);
 
     case 4:
-      return [icons[0], icons[1], icons[3], icons[4]];
+      return getIconList(4, icons);
 
     default:
       return icons;

@@ -1,5 +1,6 @@
 export const Colors = {
   purple: '#4c3794',
+  border: '#9b9b9b',
   secondary: '#ECEFF4',
   borderColor: '#c2c2c2',
   borderColorDark: '#5454548F',

@@ -340,7 +340,6 @@ const ClassicRankingQuestion = ({
     data: list,
     renderItem: renderItem,
     onDragStart: () => {
-      console.log('start');
       onDragStart && onDragStart();
     },
     onDragRelease: onDragEnd,

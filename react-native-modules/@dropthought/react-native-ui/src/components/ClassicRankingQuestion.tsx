@@ -413,8 +413,8 @@ const ClassicRankingQuestion = ({
           forgot={forgot}
           question={question}
         />
-        {/* keep the ScrollView below to prevent error => "VirtualizedLists 
-            should never be nested inside plain ScrollViews with the same 
+        {/* keep the ScrollView below to prevent error => "VirtualizedLists
+            should never be nested inside plain ScrollViews with the same
             orientation because it can break windowing and other functionality
             - use another VirtualizedList-backed container instead" */}
         <ScrollView
@@ -427,8 +427,6 @@ const ClassicRankingQuestion = ({
               data={list}
               renderItem={renderItem}
               onDragStart={() => {
-                console.log('start');
-
                 onDragStart && onDragStart();
               }}
               onDragRelease={onDragEnd}

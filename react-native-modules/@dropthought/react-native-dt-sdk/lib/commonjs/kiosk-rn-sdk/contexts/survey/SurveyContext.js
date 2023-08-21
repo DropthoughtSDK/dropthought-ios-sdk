@@ -269,7 +269,7 @@ const SurveyContextProvider = ({
   defaultLanguage = 'en',
   onClose = defaultOnCloseHandler,
   themeOption,
-  appearance,
+  appearance = 'system',
   fontColor,
   backgroundColor,
   timezone
@@ -283,7 +283,7 @@ const SurveyContextProvider = ({
 
   const themeDataFromSDKEntry = {
     themeOption,
-    appearance: _reactNative.Appearance.getColorScheme() === 'dark' ? 'dark' : appearance,
+    appearance,
     fontColor,
     backgroundColor
   };

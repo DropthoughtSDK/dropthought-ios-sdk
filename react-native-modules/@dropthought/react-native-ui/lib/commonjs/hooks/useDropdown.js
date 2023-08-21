@@ -38,7 +38,7 @@ const useDropdown = (question, feedback, onFeedback) => {
   const [searchText, setSearchText] = (0, _react.useState)('');
   const [otherText, setOtherText] = (0, _react.useState)('');
   const [hasEdited, setHasEdited] = (0, _react.useState)(feedback !== null && feedback !== void 0 && feedback.answers[0] && typeof feedback.answers[0] === 'string' ? feedback.answers[0].length > 0 : false);
-  const isValid = (0, _data.metaDataTypeQuestionValidator)(question, otherText);
+  const isValid = (0, _data.metaDataFormatValidator)(otherText, question.metaDataType);
   (0, _react.useEffect)(() => {
     const searchedList = options.filter(({
       title

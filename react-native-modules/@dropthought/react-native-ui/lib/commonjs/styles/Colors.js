@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.opacity60 = exports.opacity30 = exports.opacity15 = exports.opacity10 = exports.addOpacityToColor = exports.Option1BackgroundColorDark = exports.Option1BackgroundColor = exports.Colors = void 0;
 const Colors = {
   purple: '#4c3794',
+  border: '#9b9b9b',
   secondary: '#ECEFF4',
   borderColor: '#c2c2c2',
   borderColorDark: '#5454548F',

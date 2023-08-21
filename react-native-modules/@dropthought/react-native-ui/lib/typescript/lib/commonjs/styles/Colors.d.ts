@@ -1,6 +1,7 @@
 export var __esModule: boolean;
 export namespace Colors {
     const purple: string;
+    const border: string;
     const secondary: string;
     const borderColor: string;
     const borderColorDark: string;

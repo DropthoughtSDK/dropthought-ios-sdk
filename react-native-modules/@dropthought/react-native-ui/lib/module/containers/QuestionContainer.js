@@ -17,6 +17,8 @@ import OpenQuestion from '../components/OpenQuestion';
 import IconRatingQuestion from '../components/IconRatingQuestion';
 import SliderDragRatingQuestion from '../components/SliderDragRatingQuestion';
 import DropdownQuestion from '../components/DropdownQuestion';
+import MatrixRatingQuestion from '../components/MatrixRatingQuestion';
+import MultipleOpenEndedQuestion from '../components/MultipleOpenEndedQuestion';
 import MandatoryTitle from '../components/MandatoryTitle';
 import GlobalStyle from '../styles';
 
@@ -126,6 +128,16 @@ const QuestionContainer = props => {
     case 'dropdown':
       // @ts-ignore
       QuestionComponent = DropdownQuestion;
+      break;
+
+    case 'matrixRating':
+      // @ts-ignore
+      QuestionComponent = MatrixRatingQuestion;
+      break;
+
+    case 'multipleOpenEnded':
+      // @ts-ignore
+      QuestionComponent = MultipleOpenEndedQuestion;
       break;
 
     default:

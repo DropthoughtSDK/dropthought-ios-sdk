@@ -46,7 +46,7 @@ const OpenQuestion = ({
   const [hasEdited, setHasEdited] = _react.default.useState(false); // It will be used in valid title
 
 
-  const isValid = (0, _data.metaDataTypeQuestionValidator)(question, text);
+  const isValid = (0, _data.metaDataFormatValidator)(text, question.metaDataType);
   const appearanceBackgroundColorStyle = {
     backgroundColor: backgroundColor
   };

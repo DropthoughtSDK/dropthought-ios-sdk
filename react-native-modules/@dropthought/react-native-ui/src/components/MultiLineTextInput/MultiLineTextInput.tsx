@@ -24,7 +24,7 @@ export const metadataTypeKeyboard = (
 ): KeyboardTypeOptions | undefined => {
   switch (metadataType?.toLocaleLowerCase()) {
     case QuestionMetaDataType.Email:
-      return 'email-address';
+      return 'default';
     case QuestionMetaDataType.Phone:
       return 'phone-pad';
     case QuestionMetaDataType.Number:
@@ -133,7 +133,7 @@ const MultiLineTextInput: React.FC<Props> = ({
   let bottomTextColor = Colors.warningRed;
   if (showAnonymousWarning) {
     bottomText = i18n.t('survey:metadata-anonymous-warning');
-    bottomTextColor = addOpacityToColor(Colors.black, 0.6);
+    bottomTextColor = Colors.openQuestionSubTitle;
   }
 
   const appearanceSubBackgroundColorStyle = {

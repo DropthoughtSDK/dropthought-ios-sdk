@@ -94,6 +94,9 @@ export const GlobalStyle = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  flexShrink1: {
+    flexShrink: 1,
+  },
   loadingMask: {
     flex: 1,
     alignItems: 'center',

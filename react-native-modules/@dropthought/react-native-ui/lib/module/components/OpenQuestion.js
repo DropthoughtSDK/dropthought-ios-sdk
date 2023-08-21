@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { metaDataTypeQuestionValidator, mandatoryQuestionValidator } from '../utils/data';
+import { metaDataFormatValidator, mandatoryQuestionValidator } from '../utils/data';
 import MandatoryTitle from './MandatoryTitle';
 import i18n from '../translation';
 import { useTheme } from '../contexts/theme';
@@ -26,7 +26,7 @@ const OpenQuestion = ({
   const textRef = React.useRef(feedback !== null && feedback !== void 0 && feedback.answers[0] ? `${feedback === null || feedback === void 0 ? void 0 : feedback.answers[0]}` : '');
   const [hasEdited, setHasEdited] = React.useState(false); // It will be used in valid title
 
-  const isValid = metaDataTypeQuestionValidator(question, text);
+  const isValid = metaDataFormatValidator(text, question.metaDataType);
   const appearanceBackgroundColorStyle = {
     backgroundColor: backgroundColor
   };

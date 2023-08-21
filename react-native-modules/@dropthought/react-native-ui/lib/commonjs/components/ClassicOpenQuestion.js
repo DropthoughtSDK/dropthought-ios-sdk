@@ -34,7 +34,7 @@ const MAX_CHARACTER = 4000;
 const metadataTypeKeyboard = metadataType => {
   switch (metadataType === null || metadataType === void 0 ? void 0 : metadataType.toLocaleLowerCase()) {
     case _data.QuestionMetaDataType.Email:
-      return 'email-address';
+      return 'default';
 
     case _data.QuestionMetaDataType.Phone:
       return 'phone-pad';
@@ -115,7 +115,7 @@ const OpenQuestion = ({
   const showAnonymousWarning = anonymous && question.metaDataType && (question.metaDataType === 'Email' || question.metaDataType === 'Name' || question.metaDataType === 'Phone');
   const maxCharacterLength = question.scale ? parseInt(question.scale, 10) : MAX_CHARACTER;
   const characterLeft = maxCharacterLength - text.length;
-  const isValid = (0, _data.metaDataTypeQuestionValidator)(question, text);
+  const isValid = (0, _data.metaDataFormatValidator)(text, question.metaDataType);
   /** @type {Feedback} */
 
   const tempFeedback = {

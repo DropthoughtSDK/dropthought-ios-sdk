@@ -80,6 +80,9 @@ declare var _default: {
         alignItems: "center";
         justifyContent: "center";
     };
+    flexShrink1: {
+        flexShrink: number;
+    };
     loadingMask: {
         flex: number;
         alignItems: "center";

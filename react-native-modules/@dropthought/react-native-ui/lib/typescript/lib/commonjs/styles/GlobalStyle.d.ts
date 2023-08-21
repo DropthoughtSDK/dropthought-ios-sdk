@@ -112,6 +112,9 @@ export namespace GlobalStyle {
         const justifyContent_3: "center";
         export { justifyContent_3 as justifyContent };
     }
+    export namespace flexShrink1 {
+        const flexShrink: number;
+    }
     export namespace loadingMask {
         const flex_3: number;
         export { flex_3 as flex };

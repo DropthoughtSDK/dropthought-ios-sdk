@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {
   QuestionMetaDataType,
-  metaDataTypeQuestionValidator,
+  metaDataFormatValidator,
   mandatoryQuestionValidator,
 } from '../utils/data';
 import GlobalStyle, { Colors } from '../styles';
@@ -34,7 +34,7 @@ export const metadataTypeKeyboard = (
 ): KeyboardTypeOptions | undefined => {
   switch (metadataType?.toLocaleLowerCase()) {
     case QuestionMetaDataType.Email:
-      return 'email-address';
+      return 'default';
     case QuestionMetaDataType.Phone:
       return 'phone-pad';
     case QuestionMetaDataType.Number:
@@ -119,7 +119,7 @@ const OpenQuestion = ({
     : MAX_CHARACTER;
   const characterLeft = maxCharacterLength - text.length;
 
-  const isValid = metaDataTypeQuestionValidator(question, text);
+  const isValid = metaDataFormatValidator(text, question.metaDataType);
 
   /** @type {Feedback} */
   const tempFeedback = {

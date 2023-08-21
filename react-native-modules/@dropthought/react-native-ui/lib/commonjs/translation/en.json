@@ -38,7 +38,11 @@
     "metadata-anonymous-warning": "Personal information will not be shared.",
     "new-progress-bar": "Question",
     "select-Your-Option": "Select Your Option",
-    "find-Option": "Find Option"
+    "find-Option": "Find Option",
+    "error-hint-required-all": "Please answer all of these labels",
+    "error-hint-least-one": "Please answer at least one of these labels",
+    "multiple-placeholder": "Type your {{type}} here",
+    "hippa-hint": "The information you share will be safe and protected under HIPAA. Only authorized people will have access to it, so your privacy is ensured."
   },
   "metadata-question-desc": {
     "Name": "e.g. John Doe / Please type Name only",

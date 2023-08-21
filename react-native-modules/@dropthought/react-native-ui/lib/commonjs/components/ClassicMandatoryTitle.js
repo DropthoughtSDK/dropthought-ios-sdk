@@ -53,7 +53,8 @@ const ClassicMandatoryTitle = ({
     style: [styles.questionTitle, questionTitleSize[dimensionWidthType], {
       color: fontColor
     }]
-  }, text + ' ')), question.mandatory && /*#__PURE__*/React.createElement(_reactNative.Text, {
+  }, text + ' ')), //optional was been used on matrix question
+  (question.mandatory || question.optional) && /*#__PURE__*/React.createElement(_reactNative.Text, {
     style: styles.hint
   }, "*"), /*#__PURE__*/React.createElement(_ClassicQuestionWarningMessage.default // forgot message has higher priority than custom invalid message
   , {

@@ -1,5 +1,6 @@
 export declare const Colors: {
     purple: string;
+    border: string;
     secondary: string;
     borderColor: string;
     borderColorDark: string;

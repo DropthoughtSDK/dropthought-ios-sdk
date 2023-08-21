@@ -14,4 +14,4 @@ export function defaultIcon(type: any, colorScheme: any): any;
  * @returns {string[]}
  */
 export function getIcons(type: any, optionLength: number): string[];
-export function getSelectedIcons(type: any, optionLength: any): any[] | undefined;
+export function getSelectedIcons(type: any, optionLength: any): any;

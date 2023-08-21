@@ -45,7 +45,8 @@ const MandatoryTitle = ({
     questionTitle,
     mandatory,
     type,
-    subType
+    subType,
+    optional
   } = question;
   const ref = React.useRef(null);
   const addMandatoryRef = (0, _surveyPage.useAddMandatoryRef)();
@@ -68,7 +69,8 @@ const MandatoryTitle = ({
     style: [styles.questionTitle, questionTitleSize[dimensionWidthType], {
       color
     }]
-  }, questionTitle, mandatory && /*#__PURE__*/React.createElement(_reactNative.Text, {
+  }, questionTitle, //optional was been used on matrix question
+  (mandatory || optional) && /*#__PURE__*/React.createElement(_reactNative.Text, {
     style: styles.hint
   }, "*")), /*#__PURE__*/React.createElement(_QuestionWarningMessage.default // forgot message has higher priority than custom invalid message
   , {

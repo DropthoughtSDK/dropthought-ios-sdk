@@ -15,7 +15,9 @@ export type QuestionType =
   | 'nps'
   | 'ranking'
   | 'ratingSlider'
-  | 'dropdown';
+  | 'dropdown'
+  | 'matrixRating'
+  | 'multipleOpenEnded';
 
 export type QuestionSubType = 'smiley' | 'slider' | RatingIconType;
 
@@ -33,6 +35,8 @@ export type ProgramStateType = 'expired' | 'drafts' | 'active' | 'scheduled';
 
 export type EventAPISourceType = 'api' | 'kiosk' | 'qr' | 'email' | 'sms';
 
+export type RequiredType = 'all' | 'one' | 'none';
+
 export interface Option {
   isOther: boolean;
   title: string;
@@ -40,17 +44,26 @@ export interface Option {
 
 export interface Question {
   questionId: string;
+  questionIds?: string[];
   questionTitle: string;
   questionBrand?: QuestionBrandType;
   metaDataType?: QuestionMetaDataType;
+  metaDataTypeList?: QuestionMetaDataType[];
   mandatory: boolean;
   options?: string[];
   responseErrorText: string;
+  responseErrorTextList?: string[];
   type: QuestionType;
   subType?: QuestionSubType;
   scale?: string;
   otherText: string;
   exampleMetadataText?: string;
+  exampleMetadataTextList?: string[];
+  questionTitles: string[];
+  optionsForMatrix: string[][];
+  optional: boolean;
+  phiData: boolean;
+  phiDataList: boolean[];
 }
 
 export interface Page {

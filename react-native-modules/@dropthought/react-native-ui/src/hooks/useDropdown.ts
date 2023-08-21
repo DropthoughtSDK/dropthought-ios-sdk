@@ -1,8 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import {
-  metaDataTypeQuestionValidator,
-  getOptionsFromQuestion,
-} from '../utils/data';
+import { metaDataFormatValidator, getOptionsFromQuestion } from '../utils/data';
 import i18n from '../translation';
 import type { Question, Feedback } from '../data';
 import { isNil } from 'ramda';
@@ -40,7 +37,7 @@ const useDropdown = (
       ? feedback.answers[0].length > 0
       : false
   );
-  const isValid = metaDataTypeQuestionValidator(question, otherText);
+  const isValid = metaDataFormatValidator(otherText, question.metaDataType);
 
   useEffect(() => {
     const searchedList = options.filter(({ title }) => {

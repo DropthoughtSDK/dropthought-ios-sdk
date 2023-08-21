@@ -10,7 +10,15 @@ import {
   isNil,
 } from 'ramda';
 import { EvaluateRuleSet } from './dt-common-lib';
-import type { Feedback, Question, Survey } from '../data';
+import type {
+  Feedback,
+  Question,
+  Survey,
+  RequiredType,
+  QuestionMetaDataType as DataQuestionMetaDataType,
+} from '../data';
+import { matrixRatingValidator } from '../hooks/useMatrixRating';
+import { multipleOpenEndedValidator } from '../hooks/useMultipleOpenEnded';
 
 /** @enum {'other'} */
 export const QuestionBrandType = {
@@ -67,19 +75,16 @@ export const getOptionsFromQuestion = (
 /**
  * validate if value match metaDataType question' rule
  */
-export const metaDataTypeQuestionValidator = (
-  question: Question,
-  value: string
+export const metaDataFormatValidator = (
+  value: string,
+  metaDataType?: DataQuestionMetaDataType
 ): boolean => {
-  // if it is not a open ended or dropdown question no need to check, return valid
-  if (question.type !== 'open' && question.type !== 'dropdown') return true;
-
   // no need to check the value when no value or no type
-  if (!value || !question.metaDataType) return true;
+  if (!value || !metaDataType) return true;
 
   let reg = null;
 
-  switch (question.metaDataType.toLocaleLowerCase()) {
+  switch (metaDataType.toLocaleLowerCase()) {
     case QuestionMetaDataType.Number:
       reg = /^\d+$/; // if need negative integer someday, reg = /^-?\d+$/
       return reg.test(value);
@@ -109,6 +114,13 @@ export const mandatoryQuestionValidator = (
 ): boolean => {
   // @ts-ignore
   const { answers, otherFlag } = feedback;
+  if (question.type === 'matrixRating') {
+    // @ts-ignore
+    return matrixRatingValidator(question, feedback);
+  } else if (question.type === 'multipleOpenEnded') {
+    // @ts-ignore
+    return multipleOpenEndedValidator(question, feedback);
+  }
   if (!question.mandatory) {
     if (
       otherFlag &&
@@ -130,17 +142,44 @@ export const mandatoryQuestionValidator = (
   return isAnswered;
 };
 
+export const getRequiredType = (question: Question): RequiredType => {
+  const { mandatory, optional } = question;
+  switch (true) {
+    case mandatory && !optional:
+      return 'all';
+    case !mandatory && optional:
+      return 'one';
+    case !mandatory && !optional:
+      return 'none';
+    default:
+      return 'none';
+  }
+};
+
 /**
  * validate if question's feedback is valid:
  * metadata type value check, mandatory check
  */
 export const questionFeedbackValidator = (
-  question: Question | {} = {},
-  feedback: Feedback | {} = {}
+  question: Question,
+  feedback: Feedback
 ): boolean => {
+  let isValid = false;
+  if (question.type === 'multipleOpenEnded' && question.metaDataTypeList) {
+    isValid = question.metaDataTypeList?.every((type, index) =>
+      // @ts-ignore
+      metaDataFormatValidator(feedback.answers?.[index], type)
+    );
+  } else {
+    isValid = metaDataFormatValidator(
+      // @ts-ignore
+      feedback.answers?.[0],
+      question.metaDataType
+    );
+  }
   return (
     // @ts-ignore
-    metaDataTypeQuestionValidator(question, feedback.answers?.[0]) &&
+    isValid &&
     // @ts-ignore
     mandatoryQuestionValidator(question, feedback)
   );
@@ -191,6 +230,7 @@ const transformFeedbacks = (
         // @ts-ignore
         textOrIndexArr: feedback.answers.map((s) => s.toString()),
         otherFlag: feedback.otherFlag,
+        type: feedback.type,
       };
     }
     return defaultIQAData;
@@ -227,8 +267,8 @@ export const scaleLogic: {
   [name in string]: number[];
 } = {
   '2': [0, 4],
-  '3': [0, 2, 4],
-  '4': [0, 2, 3, 4],
+  '3': [1, 2, 3],
+  '4': [0, 1, 3, 4],
   '5': [0, 1, 2, 3, 4],
 };
 
@@ -257,39 +297,9 @@ export const option3LoopFaceTable = new Map([
   ],
 ]);
 
-export const option3TransformTable = new Map([
-  [
-    '1-2',
-    require('../assets/animations/smiley_option3/option3_smile_1-2_transform.json'),
-  ],
-  [
-    '2-3',
-    require('../assets/animations/smiley_option3/option3_smile_2-3_transform.json'),
-  ],
-  [
-    '3-4',
-    require('../assets/animations/smiley_option3/option3_smile_3-4_transform.json'),
-  ],
-  [
-    '4-5',
-    require('../assets/animations/smiley_option3/option3_smile_4-5_transform.json'),
-  ],
-  [
-    '1-3',
-    require('../assets/animations/smiley_option3/option3_smile_1-3_transform.json'),
-  ],
-  [
-    '1-5',
-    require('../assets/animations/smiley_option3/option3_smile_1-5_transform.json'),
-  ],
-  [
-    '3-5',
-    require('../assets/animations/smiley_option3/option3_smile_3-5_transform.json'),
-  ],
-]);
-
 export const option4LoopFaceTable = new Map([
   ['1A', require('../assets/animations/smiley_option4/1A.json')],
+  ['1B', require('../assets/animations/smiley_option4/1B.json')],
   ['2B', require('../assets/animations/smiley_option4/2B.json')],
   ['2C', require('../assets/animations/smiley_option4/2C.json')],
   ['2E', require('../assets/animations/smiley_option4/2E.json')],
@@ -302,7 +312,9 @@ export const option4LoopFaceTable = new Map([
 ]);
 export const option4TransformTable = new Map([
   ['1A-2B', require('../assets/animations/smiley_option4/1A-2B.json')],
+  ['1B-2C', require('../assets/animations/smiley_option4/1B-2C.json')],
   ['2B-3C', require('../assets/animations/smiley_option4/2B-3C.json')],
+  ['2B-3D', require('../assets/animations/smiley_option4/2B-3D.json')],
   ['3C-4D', require('../assets/animations/smiley_option4/3C-4D.json')],
   ['4D-5E', require('../assets/animations/smiley_option4/4D-5E.json')],
   ['1A-2E', require('../assets/animations/smiley_option4/1A-2E.json')],
