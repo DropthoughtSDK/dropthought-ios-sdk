@@ -215,7 +215,7 @@ const MatrixRatingQuestion = ({
       />
       <FlatList
         data={questionTitles}
-        style={GlobalStyle.flex1}
+        style={styles.content}
         renderItem={({ item, index }) => (
           <MatrixRow
             title={item}
@@ -238,12 +238,16 @@ export default React.memo(MatrixRatingQuestion);
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 30,
     ...GlobalStyle.questionContainer,
     ...GlobalStyle.flex1,
   },
   title: {
     marginBottom: 16,
+    paddingHorizontal: 30,
+  },
+  content: {
+    ...GlobalStyle.flex1,
+    paddingHorizontal: 30,
   },
   rowContainer: {
     marginBottom: 8,

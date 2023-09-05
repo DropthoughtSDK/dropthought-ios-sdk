@@ -175,7 +175,7 @@ const MatrixRatingQuestion = ({
     invalidMessage: handleMatrixRatingErrorHint(forgot)
   }), /*#__PURE__*/_react.default.createElement(_reactNative.FlatList, {
     data: questionTitles,
-    style: _styles.default.flex1,
+    style: styles.content,
     renderItem: ({
       item,
       index
@@ -198,13 +198,15 @@ var _default = /*#__PURE__*/_react.default.memo(MatrixRatingQuestion);
 exports.default = _default;
 
 const styles = _reactNative.StyleSheet.create({
-  container: {
-    paddingHorizontal: 30,
-    ..._styles.default.questionContainer,
+  container: { ..._styles.default.questionContainer,
     ..._styles.default.flex1
   },
   title: {
-    marginBottom: 16
+    marginBottom: 16,
+    paddingHorizontal: 30
+  },
+  content: { ..._styles.default.flex1,
+    paddingHorizontal: 30
   },
   rowContainer: {
     marginBottom: 8,

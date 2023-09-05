@@ -398,30 +398,30 @@ const RankingQuestion = ({
       return result;
     });
   };
+  const [scrollEnabled, setScrollEnabled] = useState(true);
 
   return (
     <>
-      <ScrollView style={styles.container} scrollEnabled={false}>
-        <MandatoryTitle forgot={forgot} question={question} />
-        {/* keep the ScrollView below to prevent error => "VirtualizedLists 
-            should never be nested inside plain ScrollViews with the same 
-            orientation because it can break windowing and other functionality
-            - use another VirtualizedList-backed container instead" */}
-        <ScrollView
-          horizontal
-          scrollEnabled={false}
-          contentContainerStyle={styles.scrollViewContainer}
-        >
-          <View style={styles.questionContainer}>
-            <DraggableList
-              data={list}
-              renderItem={renderItem}
-              onDragStart={() => {}}
-              onDragRelease={() => {}}
-              onDragEnd={onDragEndHandler}
-            />
-          </View>
-        </ScrollView>
+      <ScrollView style={styles.container} scrollEnabled={scrollEnabled}>
+        <MandatoryTitle
+          style={styles.title}
+          forgot={forgot}
+          question={question}
+        />
+        <View style={styles.questionContainer}>
+          <DraggableList
+            data={list}
+            renderItem={renderItem}
+            onDragStart={() => {}}
+            onDragGrant={() => {
+              setScrollEnabled(false);
+            }}
+            onDragRelease={() => {
+              setScrollEnabled(true);
+            }}
+            onDragEnd={onDragEndHandler}
+          />
+        </View>
       </ScrollView>
       {rankingModal}
     </>
@@ -433,14 +433,9 @@ export default React.memo(RankingQuestion);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 43,
   },
   title: {
-    fontSize: 26,
-    fontWeight: '600',
-    lineHeight: 32,
-    textAlign: 'center',
-    marginBottom: 54,
+    marginHorizontal: 16,
   },
   renderItem: {
     ...GlobalStyle.row,
@@ -537,6 +532,7 @@ const styles = StyleSheet.create({
   },
   questionContainer: {
     width: '100%',
+    paddingHorizontal: 43,
   },
   modalDismissArea: {
     width: '100%',

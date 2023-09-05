@@ -1,5 +1,4 @@
-/// <reference types="ts-toolbelt" />
-import type { Feedback, Question, Survey, RequiredType, QuestionMetaDataType as DataQuestionMetaDataType } from '../data';
+import type { Feedback, Question, RequiredType, QuestionMetaDataType as DataQuestionMetaDataType } from '../data';
 /** @enum {'other'} */
 export declare const QuestionBrandType: {
     Other: string;
@@ -38,14 +37,6 @@ export declare const getRequiredType: (question: Question) => RequiredType;
  * metadata type value check, mandatory check
  */
 export declare const questionFeedbackValidator: (question: Question, feedback: Feedback) => boolean;
-/**
- * return -1 if not existed
- * @type {(pageId: string, survey: Survey) => number}
- */
-export declare const getPageIndexFromPageId: import("Function/Curry").Curry<(pageId: string, survey: Survey) => number>;
-export declare function nextPage(pageIndex: number, pageId: string, feedbacksMap: {
-    [questionId: string]: Feedback;
-}, survey: Survey): number;
 export declare const scaleLogic: {
     [name in string]: number[];
 };
@@ -53,4 +44,3 @@ export declare const option4FaceTable: string[];
 export declare const option3LoopFaceTable: Map<string, any>;
 export declare const option4LoopFaceTable: Map<string, any>;
 export declare const option4TransformTable: Map<string, any>;
-/** @typedef {import('./dt-common-lib/IfcRule').IQAData} IQAData */

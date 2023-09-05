@@ -14,6 +14,7 @@ import ClassicRankingQuestion from '../components/ClassicRankingQuestion';
 import ClassicOpenQuestion from '../components/ClassicOpenQuestion';
 import ClassicDropdownQuestion from '../components/ClassicDropdownQuestion';
 import ClassicMatrixRatingQuestion from '../components/ClassicMatrixRatingQuestion';
+import ClassicMatrixChoiceQuestion from '../components/ClassicMatrixChoiceQuestion';
 import ClassicMultipleOpenEndedQuestion from '../components/ClassicMultipleOpenEndedQuestion';
 import ClassicMandatoryTitle from '../components/ClassicMandatoryTitle';
 import GlobalStyle from '../styles';
@@ -35,7 +36,7 @@ const ClassicQuestionContainer = props => {
     question,
     onFeedback: propsOnFeedback,
     validationStarted,
-    onDragStart,
+    onDragGrant,
     onDragEnd
   } = props;
   let QuestionComponent = TempComponent; // get/update feedback to context
@@ -105,6 +106,11 @@ const ClassicQuestionContainer = props => {
       QuestionComponent = ClassicMatrixRatingQuestion;
       break;
 
+    case 'matrixChoice':
+      // @ts-ignore
+      QuestionComponent = ClassicMatrixChoiceQuestion;
+      break;
+
     case 'multipleOpenEnded':
       // @ts-ignore
       QuestionComponent = ClassicMultipleOpenEndedQuestion;
@@ -119,7 +125,7 @@ const ClassicQuestionContainer = props => {
     feedback: feedback,
     onFeedback: onFeedbackHandler,
     forgot: forgot,
-    onDragStart: onDragStart,
+    onDragGrant: onDragGrant,
     onDragEnd: onDragEnd
   }));
 };

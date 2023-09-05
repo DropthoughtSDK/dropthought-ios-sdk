@@ -35,6 +35,7 @@ type DraggableListProps = {
   data: ReadonlyArray<TransformedOption>;
   renderItem: DraggableListRenderItem;
   onDragStart: () => void;
+  onDragGrant: () => void;
   onDragRelease: () => void;
   onDragEnd: (newList: TransformedOption[]) => void;
 };
@@ -43,6 +44,7 @@ function DraggableList({
   data,
   renderItem,
   onDragStart,
+  onDragGrant,
   onDragRelease,
   onDragEnd,
 }: DraggableListProps) {
@@ -198,6 +200,10 @@ function DraggableList({
     }
   };
 
+  const onDragGrantHandler = () => {
+    onDragGrant && onDragGrant();
+  };
+
   const onDragHandler = useCallback(
     (pan: Animated.ValueXY, y: number, listIndex: number) => {
       if (y > minRef.current && y < maxRef.current) {
@@ -269,6 +275,7 @@ function DraggableList({
           <DraggableItem
             index={index}
             onDragStart={() => onDragStartHandler(index)}
+            onDragGrant={() => onDragGrantHandler()}
             onDrag={(pan, y) => onDragHandler(pan, y, index)}
             onDragRelease={onDragRelease}
             onDragEnd={(pan) => onDragEndHandler(pan, index)}

@@ -1,8 +1,5 @@
-/// <reference types="ts-toolbelt" />
 export var __esModule: boolean;
 export type QuestionBrandType = 'Date' | 'Name' | 'Email' | 'Phone' | 'Number' | 'String';
-export type IQAData = import('./dt-common-lib/IfcRule').IQAData;
-export function nextPage(pageIndex: any, pageId: any, feedbacksMap: any, survey: any): any;
 export type QuestionBrandType = 'other';
 export namespace QuestionBrandType {
     const Other: string;
@@ -24,7 +21,6 @@ export function metaDataFormatValidator(value: any, metaDataType: any): boolean;
 export function mandatoryQuestionValidator(question: any, feedback?: {}): any;
 export function getRequiredType(question: any): "none" | "all" | "one";
 export function questionFeedbackValidator(question: any, feedback: any): any;
-export const getPageIndexFromPageId: import("Function/Curry").Curry<(pageId: any, survey: any) => number>;
 export const scaleLogic: {
     '2': number[];
     '3': number[];
@@ -108,10 +104,11 @@ export const option3LoopFaceTable: Map<string, {
                             c: boolean;
                         }[];
                     } | {
+                        /** @enum {'other'} */
                         t: number;
                         s: {
                             i: number[][];
-                            o: number[][];
+                            o: number[][]; /** @enum {'Date'|'Name'|'Email'|'Phone'|'Number'|'String'} */
                             v: number[][];
                             c: boolean;
                         }[];
@@ -161,10 +158,7 @@ export const option3LoopFaceTable: Map<string, {
                 };
                 o: {
                     a: number;
-                    k: number; /**
-                     * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                     * if the type is boolean at the last, it means it is an "other" option
-                     */
+                    k: number;
                     ix: number;
                 };
                 w: {
@@ -2677,7 +2671,6 @@ export const option4LoopFaceTable: Map<string, {
             } | {
                 ty: string;
                 p: {
-                    /** @enum {'Date'|'Name'|'Email'|'Phone'|'Number'|'String'} */
                     a: number;
                     k: ({
                         i: {
@@ -2711,10 +2704,6 @@ export const option4LoopFaceTable: Map<string, {
                     a: number;
                     k: ({
                         i: {
-                            /**
-                             * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                             * if the type is boolean at the last, it means it is an "other" option
-                             */
                             x: number[];
                             y: number[];
                         };
@@ -3058,7 +3047,10 @@ export const option4LoopFaceTable: Map<string, {
                     k: ({
                         i: {
                             x: number[];
-                            y: number[];
+                            y: number[]; /**
+                             * validate if question's feedback is valid:
+                             * metadata type value check, mandatory check
+                             */
                         };
                         o: {
                             x: number[];
@@ -4100,9 +4092,7 @@ export const option4TransformTable: Map<string, {
                         k: {
                             i: number[][];
                             o: number[][];
-                            /** @type {IQAData[]} */
                             v: number[][];
-                            /** @type {IQAData[]} */
                             c: boolean;
                         };
                         ix: number;

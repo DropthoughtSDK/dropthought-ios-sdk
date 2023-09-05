@@ -12,5 +12,6 @@ import { KioskProvider } from "./KioskProvider";
 import ActivityIndicatorMask from "./components/ActivityIndicatorMask";
 import i18n from "./translation";
 import { SurveyProgressBarPosition } from "./containers/SurveyScreenLayout";
-export { ClassicQuestionContainer, QuestionContainer, SurveyScreenLayout, EndScreenLayout, StartScreenLayout, PlaceholderScreen, KioskProvider, KioskProviderProps, ActivityIndicatorMask, i18n, SurveyProgressBarPosition };
+import { KeyboardAvoidingScrollView } from "./components/KeyboardAvoidingView";
+export { ClassicQuestionContainer, QuestionContainer, SurveyScreenLayout, EndScreenLayout, StartScreenLayout, PlaceholderScreen, KioskProvider, KioskProviderProps, ActivityIndicatorMask, i18n, SurveyProgressBarPosition, KeyboardAvoidingScrollView };
 export { Colors, GlobalStyle } from "./styles";

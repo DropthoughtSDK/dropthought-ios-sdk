@@ -15,8 +15,8 @@ declare type Props = {
     forgot: boolean;
     feedback: Feedback;
     themeColor: string;
-    onDragStart: () => void;
+    onDragGrant: () => void;
     onDragEnd: () => void;
 };
-declare const _default: React.MemoExoticComponent<({ question, onFeedback, forgot, feedback, themeColor, onDragStart, onDragEnd, }: Props) => JSX.Element>;
+declare const _default: React.MemoExoticComponent<({ question, onFeedback, forgot, feedback, themeColor, onDragGrant, onDragEnd, }: Props) => JSX.Element>;
 export default _default;

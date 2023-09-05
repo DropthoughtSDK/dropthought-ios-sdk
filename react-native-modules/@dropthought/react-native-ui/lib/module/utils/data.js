@@ -1,7 +1,7 @@
-import { isEmpty, prop, pipe, findIndex, equals, curry, nth, map, isNil } from 'ramda';
-import { EvaluateRuleSet } from './dt-common-lib';
+import { isEmpty, isNil } from 'ramda';
 import { matrixRatingValidator } from '../hooks/useMatrixRating';
 import { multipleOpenEndedValidator } from '../hooks/useMultipleOpenEnded';
+import { matrixChoiceValidator } from '../hooks/useMatrixChoice';
 /** @enum {'other'} */
 
 export const QuestionBrandType = {
@@ -95,6 +95,9 @@ export const mandatoryQuestionValidator = (question, feedback = {}) => {
   } else if (question.type === 'multipleOpenEnded') {
     // @ts-ignore
     return multipleOpenEndedValidator(question, feedback);
+  } else if (question.type === 'matrixChoice') {
+    // @ts-ignore
+    return matrixChoiceValidator(question, feedback);
   }
 
   if (!question.mandatory) {
@@ -159,71 +162,6 @@ export const questionFeedbackValidator = (question, feedback) => {
     mandatoryQuestionValidator(question, feedback)
   );
 };
-/**
- * return -1 if not existed
- * @type {(pageId: string, survey: Survey) => number}
- */
-
-export const getPageIndexFromPageId = curry((pageId, survey) => // @ts-ignore
-pipe(prop('pageOrder'), findIndex(equals(pageId)))(survey));
-/**
- * only keep the feedbacks that belongs to a certain page
- * if a question is not answered => textOrIndexArr: ['']
- * also convert the answers to 0-based
- * transform it to IQAData type
- * @type {(pageIndex: number, survey: Survey, feedbacksMap: {[questionId: string]: Feedback} ) => [IQAData]}
- */
-
-const transformFeedbacks = (pageIndex, survey, feedbacksMap) => {
-  // get the default page IQAData
-
-  /** @type {IQAData[]} */
-  const defaultPageIQAData = pipe(prop('pages'), // @ts-ignore
-  nth(pageIndex), prop('questions'), map(question => ({
-    // @ts-ignore
-    questionId: question.questionId,
-    textOrIndexArr: ['']
-  })) // @ts-ignore
-  )(survey); // if feedback has answers, use it to replace the default
-
-  return defaultPageIQAData.map(defaultIQAData => {
-    const feedback = feedbacksMap[defaultIQAData.questionId];
-
-    if (feedback && !isEmpty(feedback.answers)) {
-      return {
-        questionId: defaultIQAData.questionId,
-        // @ts-ignore
-        textOrIndexArr: feedback.answers.map(s => s.toString()),
-        otherFlag: feedback.otherFlag,
-        type: feedback.type
-      };
-    }
-
-    return defaultIQAData;
-  });
-};
-
-export function nextPage(pageIndex, pageId, feedbacksMap, survey) {
-  const defaultNextPage = () => pageIndex >= survey.pageOrder.length - 1 ? -1 : pageIndex + 1; // if there's no rule, go to default next page
-
-
-  const pageRuleSet = survey.rules[pageId];
-
-  if (!pageRuleSet || isEmpty(pageRuleSet)) {
-    return defaultNextPage();
-  } // apply the rule
-
-
-  const iQADataArr = transformFeedbacks(pageIndex, survey, feedbacksMap);
-  const nextPageId = EvaluateRuleSet(pageRuleSet, iQADataArr);
-
-  if (!nextPageId) {
-    return defaultNextPage();
-  } // next page index
-
-
-  return getPageIndexFromPageId(nextPageId, survey);
-}
 export const scaleLogic = {
   '2': [0, 4],
   '3': [1, 2, 3],
@@ -234,5 +172,4 @@ export const option4FaceTable = ['A', 'B', 'C', 'D', 'E'];
 export const option3LoopFaceTable = new Map([['1', require('../assets/animations/smiley_option3/option3_smile_1_loop.json')], ['2', require('../assets/animations/smiley_option3/option3_smile_2_loop.json')], ['3', require('../assets/animations/smiley_option3/option3_smile_3_loop.json')], ['4', require('../assets/animations/smiley_option3/option3_smile_4_loop.json')], ['5', require('../assets/animations/smiley_option3/option3_smile_5_loop.json')]]);
 export const option4LoopFaceTable = new Map([['1A', require('../assets/animations/smiley_option4/1A.json')], ['1B', require('../assets/animations/smiley_option4/1B.json')], ['2B', require('../assets/animations/smiley_option4/2B.json')], ['2C', require('../assets/animations/smiley_option4/2C.json')], ['2E', require('../assets/animations/smiley_option4/2E.json')], ['3C', require('../assets/animations/smiley_option4/3C.json')], ['3D', require('../assets/animations/smiley_option4/3D.json')], ['3E', require('../assets/animations/smiley_option4/3E.json')], ['4D', require('../assets/animations/smiley_option4/4D.json')], ['4E', require('../assets/animations/smiley_option4/4E.json')], ['5E', require('../assets/animations/smiley_option4/5E.json')]]);
 export const option4TransformTable = new Map([['1A-2B', require('../assets/animations/smiley_option4/1A-2B.json')], ['1B-2C', require('../assets/animations/smiley_option4/1B-2C.json')], ['2B-3C', require('../assets/animations/smiley_option4/2B-3C.json')], ['2B-3D', require('../assets/animations/smiley_option4/2B-3D.json')], ['3C-4D', require('../assets/animations/smiley_option4/3C-4D.json')], ['4D-5E', require('../assets/animations/smiley_option4/4D-5E.json')], ['1A-2E', require('../assets/animations/smiley_option4/1A-2E.json')], ['1A-2C', require('../assets/animations/smiley_option4/1A-2C.json')], ['2C-3E', require('../assets/animations/smiley_option4/2C-3E.json')], ['2C-3D', require('../assets/animations/smiley_option4/2C-3D.json')], ['3D-4E', require('../assets/animations/smiley_option4/3D-4E.json')]]);
-/** @typedef {import('./dt-common-lib/IfcRule').IQAData} IQAData */
 //# sourceMappingURL=data.js.map

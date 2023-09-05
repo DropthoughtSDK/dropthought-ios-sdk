@@ -188,7 +188,7 @@ const MultiLineTextInput: React.FC<Props> = ({
           ? otherText
           : questionBrand.length > 0
           ? questionBrand
-          : i18n.t('survey:other-placeholder')
+          : ''
       }
       placeholderTextColor={Colors.inputPlaceholder}
       value={text}

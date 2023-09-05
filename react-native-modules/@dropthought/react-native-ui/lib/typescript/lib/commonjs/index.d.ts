@@ -4,6 +4,7 @@ export var ClassicQuestionContainer: any;
 export var Colors: any;
 export var EndScreenLayout: any;
 export var GlobalStyle: any;
+export var KeyboardAvoidingScrollView: React.FunctionComponent<_KeyboardAvoidingView.KeyboardAvoidingProps & import("react-native").ScrollViewProps>;
 export var KioskProvider: ({ children, themeOption, appearance, fontColor, backgroundColor }: {
     children: any;
     themeOption: any;
@@ -18,3 +19,4 @@ export var StartScreenLayout: any;
 export var SurveyProgressBarPosition: any;
 export var SurveyScreenLayout: any;
 export var i18n: any;
+import _KeyboardAvoidingView = require("./components/KeyboardAvoidingView");

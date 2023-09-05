@@ -5,7 +5,7 @@ declare type Props = {
     validationStarted: boolean;
     themeColor: string;
     onFeedback?: (feedback: Feedback) => void;
-    onDragStart: () => void;
+    onDragGrant: () => void;
     onDragEnd: () => void;
 };
 declare const ClassicQuestionContainer: (props: Props) => JSX.Element;

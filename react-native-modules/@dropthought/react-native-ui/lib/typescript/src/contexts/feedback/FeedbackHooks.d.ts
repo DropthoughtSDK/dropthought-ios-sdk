@@ -7,7 +7,7 @@ export declare const useFeedbackState: () => import("./FeedbackReducer").Feedbac
  * @param {string} questionId
  * @returns {Feedback|undefined}
  */
-export declare const useFeedbackByQid: (questionId: string) => import("../..").Feedback;
+export declare const useFeedbackByQid: (questionId: string) => import("@dropthought/dt-common/lib/types/data").Feedback;
 /**
  * @returns {FeedbackDispatchContext}
  */

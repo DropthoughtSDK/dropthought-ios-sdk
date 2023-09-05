@@ -5,6 +5,7 @@ type DraggableItemProps = {
   children: React.ReactNode;
   index: number;
   onDragStart: () => void;
+  onDragGrant: () => void;
   onDrag: (pan: Animated.ValueXY, y: number) => void;
   onDragRelease: () => void;
   onDragEnd: (pan: Animated.ValueXY) => void;
@@ -18,6 +19,7 @@ function DraggableItem({
   children,
   index,
   onDragStart,
+  onDragGrant,
   onDrag,
   onDragRelease,
   onDragEnd,
@@ -27,21 +29,36 @@ function DraggableItem({
   draggable,
 }: DraggableItemProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
   const isDraggingRef = useRef(false);
 
   const longPressTimeout = useRef<NodeJS.Timeout>();
 
   const pan = useState(new Animated.ValueXY())[0];
+  const onClear = () => {
+    setIsPressed(false);
+    if (longPressTimeout.current) {
+      clearTimeout(longPressTimeout.current);
+      onDragRelease && onDragRelease();
+    }
+    if (isDraggingRef.current) {
+      setIsDragging(false);
+      isDraggingRef.current = false;
+      onDragEnd && onDragEnd(pan);
+    }
+  };
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => {
         return draggable;
       },
       onPanResponderStart: (_e, _gestureState) => {
+        setIsPressed(true);
         onDragStart();
       },
       onPanResponderGrant: (_e, _gesture) => {
         longPressTimeout.current = setTimeout(() => {
+          onDragGrant && onDragGrant();
           setIsDragging(true);
           isDraggingRef.current = true;
           //@ts-ignore
@@ -55,21 +72,10 @@ function DraggableItem({
         }
       },
       onPanResponderRelease: (_e, _gesture) => {
-        onDragRelease && onDragRelease();
-        if (longPressTimeout.current) {
-          clearTimeout(longPressTimeout.current);
-        }
-        if (isDraggingRef.current) {
-          setIsDragging(false);
-          isDraggingRef.current = false;
-          onDragEnd && onDragEnd(pan);
-        }
+        onClear();
       },
       onPanResponderTerminate(_e, _gestureState) {
-        onDragRelease && onDragRelease();
-        if (longPressTimeout.current) {
-          clearTimeout(longPressTimeout.current);
-        }
+        onClear();
       },
     })
   );
@@ -104,16 +110,18 @@ function DraggableItem({
 
   const draggingStyle = {
     zIndex: isDragging ? 2 : 0,
-    opacity: isDragging ? 0.3 : 1,
+    opacity: isPressed ? 0.3 : 1,
+    transform: [
+      ...pan.getTranslateTransform(),
+      {
+        scale: isDragging ? 1.1 : 1,
+      },
+    ],
   };
   return (
     <Animated.View
       {...panResponder.current.panHandlers}
-      style={[
-        panStyle,
-        draggingStyle,
-        { transform: pan.getTranslateTransform() },
-      ]}
+      style={[panStyle, draggingStyle]}
       onLayout={onLayout}
     >
       {children}

@@ -11,6 +11,7 @@ export { Colors, GlobalStyle } from './styles';
 export * from './hooks/useWindowDimensions';
 export * from './contexts/theme';
 import ActivityIndicatorMask from './components/ActivityIndicatorMask';
-export { ClassicQuestionContainer, QuestionContainer, SurveyScreenLayout, EndScreenLayout, StartScreenLayout, PlaceholderScreen, KioskProvider, KioskProviderProps, ActivityIndicatorMask, i18n, SurveyProgressBarPosition };
+import { KeyboardAvoidingScrollView } from './components/KeyboardAvoidingView';
+export { ClassicQuestionContainer, QuestionContainer, SurveyScreenLayout, EndScreenLayout, StartScreenLayout, PlaceholderScreen, KioskProvider, KioskProviderProps, ActivityIndicatorMask, i18n, SurveyProgressBarPosition, KeyboardAvoidingScrollView };
 export * from './data';
 //# sourceMappingURL=index.js.map

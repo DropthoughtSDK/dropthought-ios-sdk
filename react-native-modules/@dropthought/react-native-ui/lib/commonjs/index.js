@@ -16,7 +16,8 @@ var _exportNames = {
   i18n: true,
   Colors: true,
   GlobalStyle: true,
-  ActivityIndicatorMask: true
+  ActivityIndicatorMask: true,
+  KeyboardAvoidingScrollView: true
 };
 Object.defineProperty(exports, "ActivityIndicatorMask", {
   enumerable: true,
@@ -46,6 +47,12 @@ Object.defineProperty(exports, "GlobalStyle", {
   enumerable: true,
   get: function () {
     return _styles.GlobalStyle;
+  }
+});
+Object.defineProperty(exports, "KeyboardAvoidingScrollView", {
+  enumerable: true,
+  get: function () {
+    return _KeyboardAvoidingView.KeyboardAvoidingScrollView;
   }
 });
 Object.defineProperty(exports, "KioskProvider", {
@@ -156,6 +163,8 @@ Object.keys(_theme).forEach(function (key) {
 });
 
 var _ActivityIndicatorMask = _interopRequireDefault(require("./components/ActivityIndicatorMask"));
+
+var _KeyboardAvoidingView = require("./components/KeyboardAvoidingView");
 
 var _data = require("./data");
 

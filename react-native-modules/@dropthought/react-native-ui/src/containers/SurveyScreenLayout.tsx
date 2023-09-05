@@ -19,7 +19,8 @@ import GlobalStyle from '../styles';
 import i18n from '../translation';
 import { THEME_OPTION, useTheme } from '../contexts/theme';
 import type { Survey, SurveyFeedback, Page, Feedback } from 'src/data';
-import { questionFeedbackValidator, nextPage } from '../utils/data';
+import { questionFeedbackValidator } from '../utils/data';
+import { nextPage } from '@dropthought/dt-common';
 import { useFeedbackState } from '../contexts/feedback';
 import { useSurveyPageContext } from '../contexts/survey-page';
 import SurveyHeader from './SurveyHeader';
@@ -170,8 +171,7 @@ const SurveyScreenLayout = (props: Props) => {
     if (isValid) {
       const nextPageIndex = nextPage(
         pageIndex,
-        currentPage.pageId,
-        feedbackState.feedbacksMap,
+        getFeedbacks(feedbackState),
         survey
       );
       if (nextPageIndex === -1) {
@@ -186,7 +186,6 @@ const SurveyScreenLayout = (props: Props) => {
   }, [
     validatePageFeedbacks,
     pageIndex,
-    currentPage.pageId,
     feedbackState,
     survey,
     onSubmit,
@@ -202,7 +201,7 @@ const SurveyScreenLayout = (props: Props) => {
         question={question}
         validationStarted={validationStarted}
         themeColor={survey.surveyProperty.hexCode}
-        onDragStart={() => {
+        onDragGrant={() => {
           setScrollEnabled(false);
         }}
         onDragEnd={() => {

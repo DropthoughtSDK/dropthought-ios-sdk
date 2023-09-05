@@ -3,17 +3,15 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.metaDataFormatValidator = exports.mandatoryQuestionValidator = exports.getRequiredType = exports.getPageIndexFromPageId = exports.getOptionsFromQuestion = exports.QuestionMetaDataType = exports.QuestionBrandType = void 0;
-exports.nextPage = nextPage;
-exports.scaleLogic = exports.questionFeedbackValidator = exports.option4TransformTable = exports.option4LoopFaceTable = exports.option4FaceTable = exports.option3LoopFaceTable = void 0;
+exports.scaleLogic = exports.questionFeedbackValidator = exports.option4TransformTable = exports.option4LoopFaceTable = exports.option4FaceTable = exports.option3LoopFaceTable = exports.metaDataFormatValidator = exports.mandatoryQuestionValidator = exports.getRequiredType = exports.getOptionsFromQuestion = exports.QuestionMetaDataType = exports.QuestionBrandType = void 0;
 
 var _ramda = require("ramda");
-
-var _dtCommonLib = require("./dt-common-lib");
 
 var _useMatrixRating = require("../hooks/useMatrixRating");
 
 var _useMultipleOpenEnded = require("../hooks/useMultipleOpenEnded");
+
+var _useMatrixChoice = require("../hooks/useMatrixChoice");
 
 /** @enum {'other'} */
 const QuestionBrandType = {
@@ -115,6 +113,9 @@ const mandatoryQuestionValidator = (question, feedback = {}) => {
   } else if (question.type === 'multipleOpenEnded') {
     // @ts-ignore
     return (0, _useMultipleOpenEnded.multipleOpenEndedValidator)(question, feedback);
+  } else if (question.type === 'matrixChoice') {
+    // @ts-ignore
+    return (0, _useMatrixChoice.matrixChoiceValidator)(question, feedback);
   }
 
   if (!question.mandatory) {
@@ -185,76 +186,8 @@ const questionFeedbackValidator = (question, feedback) => {
     mandatoryQuestionValidator(question, feedback)
   );
 };
-/**
- * return -1 if not existed
- * @type {(pageId: string, survey: Survey) => number}
- */
-
 
 exports.questionFeedbackValidator = questionFeedbackValidator;
-const getPageIndexFromPageId = (0, _ramda.curry)((pageId, survey) => // @ts-ignore
-(0, _ramda.pipe)((0, _ramda.prop)('pageOrder'), (0, _ramda.findIndex)((0, _ramda.equals)(pageId)))(survey));
-/**
- * only keep the feedbacks that belongs to a certain page
- * if a question is not answered => textOrIndexArr: ['']
- * also convert the answers to 0-based
- * transform it to IQAData type
- * @type {(pageIndex: number, survey: Survey, feedbacksMap: {[questionId: string]: Feedback} ) => [IQAData]}
- */
-
-exports.getPageIndexFromPageId = getPageIndexFromPageId;
-
-const transformFeedbacks = (pageIndex, survey, feedbacksMap) => {
-  // get the default page IQAData
-
-  /** @type {IQAData[]} */
-  const defaultPageIQAData = (0, _ramda.pipe)((0, _ramda.prop)('pages'), // @ts-ignore
-  (0, _ramda.nth)(pageIndex), (0, _ramda.prop)('questions'), (0, _ramda.map)(question => ({
-    // @ts-ignore
-    questionId: question.questionId,
-    textOrIndexArr: ['']
-  })) // @ts-ignore
-  )(survey); // if feedback has answers, use it to replace the default
-
-  return defaultPageIQAData.map(defaultIQAData => {
-    const feedback = feedbacksMap[defaultIQAData.questionId];
-
-    if (feedback && !(0, _ramda.isEmpty)(feedback.answers)) {
-      return {
-        questionId: defaultIQAData.questionId,
-        // @ts-ignore
-        textOrIndexArr: feedback.answers.map(s => s.toString()),
-        otherFlag: feedback.otherFlag,
-        type: feedback.type
-      };
-    }
-
-    return defaultIQAData;
-  });
-};
-
-function nextPage(pageIndex, pageId, feedbacksMap, survey) {
-  const defaultNextPage = () => pageIndex >= survey.pageOrder.length - 1 ? -1 : pageIndex + 1; // if there's no rule, go to default next page
-
-
-  const pageRuleSet = survey.rules[pageId];
-
-  if (!pageRuleSet || (0, _ramda.isEmpty)(pageRuleSet)) {
-    return defaultNextPage();
-  } // apply the rule
-
-
-  const iQADataArr = transformFeedbacks(pageIndex, survey, feedbacksMap);
-  const nextPageId = (0, _dtCommonLib.EvaluateRuleSet)(pageRuleSet, iQADataArr);
-
-  if (!nextPageId) {
-    return defaultNextPage();
-  } // next page index
-
-
-  return getPageIndexFromPageId(nextPageId, survey);
-}
-
 const scaleLogic = {
   '2': [0, 4],
   '3': [1, 2, 3],
@@ -269,7 +202,5 @@ exports.option3LoopFaceTable = option3LoopFaceTable;
 const option4LoopFaceTable = new Map([['1A', require('../assets/animations/smiley_option4/1A.json')], ['1B', require('../assets/animations/smiley_option4/1B.json')], ['2B', require('../assets/animations/smiley_option4/2B.json')], ['2C', require('../assets/animations/smiley_option4/2C.json')], ['2E', require('../assets/animations/smiley_option4/2E.json')], ['3C', require('../assets/animations/smiley_option4/3C.json')], ['3D', require('../assets/animations/smiley_option4/3D.json')], ['3E', require('../assets/animations/smiley_option4/3E.json')], ['4D', require('../assets/animations/smiley_option4/4D.json')], ['4E', require('../assets/animations/smiley_option4/4E.json')], ['5E', require('../assets/animations/smiley_option4/5E.json')]]);
 exports.option4LoopFaceTable = option4LoopFaceTable;
 const option4TransformTable = new Map([['1A-2B', require('../assets/animations/smiley_option4/1A-2B.json')], ['1B-2C', require('../assets/animations/smiley_option4/1B-2C.json')], ['2B-3C', require('../assets/animations/smiley_option4/2B-3C.json')], ['2B-3D', require('../assets/animations/smiley_option4/2B-3D.json')], ['3C-4D', require('../assets/animations/smiley_option4/3C-4D.json')], ['4D-5E', require('../assets/animations/smiley_option4/4D-5E.json')], ['1A-2E', require('../assets/animations/smiley_option4/1A-2E.json')], ['1A-2C', require('../assets/animations/smiley_option4/1A-2C.json')], ['2C-3E', require('../assets/animations/smiley_option4/2C-3E.json')], ['2C-3D', require('../assets/animations/smiley_option4/2C-3D.json')], ['3D-4E', require('../assets/animations/smiley_option4/3D-4E.json')]]);
-/** @typedef {import('./dt-common-lib/IfcRule').IQAData} IQAData */
-
 exports.option4TransformTable = option4TransformTable;
 //# sourceMappingURL=data.js.map

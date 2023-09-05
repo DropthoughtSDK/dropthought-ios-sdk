@@ -32,6 +32,7 @@ function DraggableList({
   data,
   renderItem,
   onDragStart,
+  onDragGrant,
   onDragRelease,
   onDragEnd
 }) {
@@ -178,6 +179,10 @@ function DraggableList({
     }
   };
 
+  const onDragGrantHandler = () => {
+    onDragGrant && onDragGrant();
+  };
+
   const onDragHandler = (0, _react.useCallback)((pan, y, listIndex) => {
     if (y > minRef.current && y < maxRef.current) {
       pan.y.setValue(y);
@@ -239,6 +244,7 @@ function DraggableList({
     return /*#__PURE__*/_react.default.createElement(_DraggableItem.default, {
       index: index,
       onDragStart: () => onDragStartHandler(index),
+      onDragGrant: () => onDragGrantHandler(),
       onDrag: (pan, y) => onDragHandler(pan, y, index),
       onDragRelease: onDragRelease,
       onDragEnd: pan => onDragEndHandler(pan, index),

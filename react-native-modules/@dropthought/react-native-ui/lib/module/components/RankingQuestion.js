@@ -321,39 +321,37 @@ const RankingQuestion = ({
     });
   };
 
+  const [scrollEnabled, setScrollEnabled] = useState(true);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ScrollView, {
     style: styles.container,
-    scrollEnabled: false
+    scrollEnabled: scrollEnabled
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
+    style: styles.title,
     forgot: forgot,
     question: question
-  }), /*#__PURE__*/React.createElement(ScrollView, {
-    horizontal: true,
-    scrollEnabled: false,
-    contentContainerStyle: styles.scrollViewContainer
-  }, /*#__PURE__*/React.createElement(View, {
+  }), /*#__PURE__*/React.createElement(View, {
     style: styles.questionContainer
   }, /*#__PURE__*/React.createElement(DraggableList, {
     data: list,
     renderItem: renderItem,
     onDragStart: () => {},
-    onDragRelease: () => {},
+    onDragGrant: () => {
+      setScrollEnabled(false);
+    },
+    onDragRelease: () => {
+      setScrollEnabled(true);
+    },
     onDragEnd: onDragEndHandler
-  })))), rankingModal);
+  }))), rankingModal);
 };
 
 export default /*#__PURE__*/React.memo(RankingQuestion);
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    paddingHorizontal: 43
+    flex: 1
   },
   title: {
-    fontSize: 26,
-    fontWeight: '600',
-    lineHeight: 32,
-    textAlign: 'center',
-    marginBottom: 54
+    marginHorizontal: 16
   },
   renderItem: { ...GlobalStyle.row,
     minHeight: 50,
@@ -446,7 +444,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   questionContainer: {
-    width: '100%'
+    width: '100%',
+    paddingHorizontal: 43
   },
   modalDismissArea: {
     width: '100%',

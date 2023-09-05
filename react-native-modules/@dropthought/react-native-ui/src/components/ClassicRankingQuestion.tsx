@@ -164,7 +164,7 @@ type Props = {
   forgot: boolean;
   feedback: Feedback;
   themeColor: string;
-  onDragStart: () => void;
+  onDragGrant: () => void;
   onDragEnd: () => void;
 };
 
@@ -174,7 +174,7 @@ const ClassicRankingQuestion = ({
   forgot,
   feedback,
   themeColor,
-  onDragStart,
+  onDragGrant,
   onDragEnd,
 }: Props) => {
   const { colorScheme } = useTheme();
@@ -413,27 +413,18 @@ const ClassicRankingQuestion = ({
           forgot={forgot}
           question={question}
         />
-        {/* keep the ScrollView below to prevent error => "VirtualizedLists
-            should never be nested inside plain ScrollViews with the same
-            orientation because it can break windowing and other functionality
-            - use another VirtualizedList-backed container instead" */}
-        <ScrollView
-          horizontal
-          scrollEnabled={false}
-          contentContainerStyle={styles.scrollViewContainer}
-        >
-          <View style={styles.questionContainer}>
-            <DraggableList
-              data={list}
-              renderItem={renderItem}
-              onDragStart={() => {
-                onDragStart && onDragStart();
-              }}
-              onDragRelease={onDragEnd}
-              onDragEnd={onDragEndHandler}
-            />
-          </View>
-        </ScrollView>
+        <View style={styles.questionContainer}>
+          <DraggableList
+            data={list}
+            renderItem={renderItem}
+            onDragStart={() => {}}
+            onDragGrant={() => {
+              onDragGrant && onDragGrant();
+            }}
+            onDragRelease={onDragEnd}
+            onDragEnd={onDragEndHandler}
+          />
+        </View>
       </ScrollView>
       {rankingModal}
     </>

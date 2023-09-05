@@ -157,7 +157,7 @@ const MatrixRatingQuestion = ({
     invalidMessage: handleMatrixRatingErrorHint(forgot)
   }), /*#__PURE__*/React.createElement(FlatList, {
     data: questionTitles,
-    style: GlobalStyle.flex1,
+    style: styles.content,
     renderItem: ({
       item,
       index
@@ -177,13 +177,15 @@ const MatrixRatingQuestion = ({
 
 export default /*#__PURE__*/React.memo(MatrixRatingQuestion);
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 30,
-    ...GlobalStyle.questionContainer,
+  container: { ...GlobalStyle.questionContainer,
     ...GlobalStyle.flex1
   },
   title: {
-    marginBottom: 16
+    marginBottom: 16,
+    paddingHorizontal: 30
+  },
+  content: { ...GlobalStyle.flex1,
+    paddingHorizontal: 30
   },
   rowContainer: {
     marginBottom: 8,

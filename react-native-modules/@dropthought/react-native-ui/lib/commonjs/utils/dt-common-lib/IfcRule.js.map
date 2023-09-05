@@ -1,1 +1,0 @@
-{"version":3,"sources":["IfcRule.js"],"names":["Object","defineProperty","exports","value"],"mappings":"AAAA;;AACAA,MAAM,CAACC,cAAP,CAAsBC,OAAtB,EAA+B,YAA/B,EAA6C;AAAEC,EAAAA,KAAK,EAAE;AAAT,CAA7C,E,CACA","sourcesContent":["'use strict';\nObject.defineProperty(exports, '__esModule', { value: true });\n// export default IRule;\n"]}

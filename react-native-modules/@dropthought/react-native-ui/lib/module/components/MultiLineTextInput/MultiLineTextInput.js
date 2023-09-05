@@ -129,7 +129,7 @@ const MultiLineTextInput = ({
       setFocus(false);
       onBlurHandler();
     },
-    placeholder: otherText.length > 0 ? otherText : questionBrand.length > 0 ? questionBrand : i18n.t('survey:other-placeholder'),
+    placeholder: otherText.length > 0 ? otherText : questionBrand.length > 0 ? questionBrand : '',
     placeholderTextColor: Colors.inputPlaceholder,
     value: text,
     maxLength: MAX_CHARACTER,

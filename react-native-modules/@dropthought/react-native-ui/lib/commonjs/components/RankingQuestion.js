@@ -341,25 +341,28 @@ const RankingQuestion = ({
     });
   };
 
+  const [scrollEnabled, setScrollEnabled] = (0, _react.useState)(true);
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_reactNative.ScrollView, {
     style: styles.container,
-    scrollEnabled: false
+    scrollEnabled: scrollEnabled
   }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
+    style: styles.title,
     forgot: forgot,
     question: question
-  }), /*#__PURE__*/_react.default.createElement(_reactNative.ScrollView, {
-    horizontal: true,
-    scrollEnabled: false,
-    contentContainerStyle: styles.scrollViewContainer
-  }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+  }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.questionContainer
   }, /*#__PURE__*/_react.default.createElement(_DraggableList.default, {
     data: list,
     renderItem: renderItem,
     onDragStart: () => {},
-    onDragRelease: () => {},
+    onDragGrant: () => {
+      setScrollEnabled(false);
+    },
+    onDragRelease: () => {
+      setScrollEnabled(true);
+    },
     onDragEnd: onDragEndHandler
-  })))), rankingModal);
+  }))), rankingModal);
 };
 
 var _default = /*#__PURE__*/_react.default.memo(RankingQuestion);
@@ -368,15 +371,10 @@ exports.default = _default;
 
 const styles = _reactNative.StyleSheet.create({
   container: {
-    flex: 1,
-    paddingHorizontal: 43
+    flex: 1
   },
   title: {
-    fontSize: 26,
-    fontWeight: '600',
-    lineHeight: 32,
-    textAlign: 'center',
-    marginBottom: 54
+    marginHorizontal: 16
   },
   renderItem: { ..._styles.default.row,
     minHeight: 50,
@@ -469,7 +467,8 @@ const styles = _reactNative.StyleSheet.create({
     justifyContent: 'center'
   },
   questionContainer: {
-    width: '100%'
+    width: '100%',
+    paddingHorizontal: 43
   },
   modalDismissArea: {
     width: '100%',

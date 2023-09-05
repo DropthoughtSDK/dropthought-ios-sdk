@@ -123,7 +123,7 @@ const ClassicRankingQuestion = ({
   forgot,
   feedback,
   themeColor,
-  onDragStart,
+  onDragGrant,
   onDragEnd
 }) => {
   const {
@@ -350,21 +350,18 @@ const ClassicRankingQuestion = ({
     style: styles.mandatoryTitle,
     forgot: forgot,
     question: question
-  }), /*#__PURE__*/_react.default.createElement(_reactNative.ScrollView, {
-    horizontal: true,
-    scrollEnabled: false,
-    contentContainerStyle: styles.scrollViewContainer
-  }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+  }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.questionContainer
   }, /*#__PURE__*/_react.default.createElement(_DraggableList.default, {
     data: list,
     renderItem: renderItem,
-    onDragStart: () => {
-      onDragStart && onDragStart();
+    onDragStart: () => {},
+    onDragGrant: () => {
+      onDragGrant && onDragGrant();
     },
     onDragRelease: onDragEnd,
     onDragEnd: onDragEndHandler
-  })))), rankingModal);
+  }))), rankingModal);
 };
 
 var _default = /*#__PURE__*/_react.default.memo(ClassicRankingQuestion);

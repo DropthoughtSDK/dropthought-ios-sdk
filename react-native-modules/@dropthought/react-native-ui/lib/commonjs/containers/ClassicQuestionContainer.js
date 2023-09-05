@@ -33,6 +33,8 @@ var _ClassicDropdownQuestion = _interopRequireDefault(require("../components/Cla
 
 var _ClassicMatrixRatingQuestion = _interopRequireDefault(require("../components/ClassicMatrixRatingQuestion"));
 
+var _ClassicMatrixChoiceQuestion = _interopRequireDefault(require("../components/ClassicMatrixChoiceQuestion"));
+
 var _ClassicMultipleOpenEndedQuestion = _interopRequireDefault(require("../components/ClassicMultipleOpenEndedQuestion"));
 
 var _ClassicMandatoryTitle = _interopRequireDefault(require("../components/ClassicMandatoryTitle"));
@@ -64,7 +66,7 @@ const ClassicQuestionContainer = props => {
     question,
     onFeedback: propsOnFeedback,
     validationStarted,
-    onDragStart,
+    onDragGrant,
     onDragEnd
   } = props;
   let QuestionComponent = TempComponent; // get/update feedback to context
@@ -134,6 +136,11 @@ const ClassicQuestionContainer = props => {
       QuestionComponent = _ClassicMatrixRatingQuestion.default;
       break;
 
+    case 'matrixChoice':
+      // @ts-ignore
+      QuestionComponent = _ClassicMatrixChoiceQuestion.default;
+      break;
+
     case 'multipleOpenEnded':
       // @ts-ignore
       QuestionComponent = _ClassicMultipleOpenEndedQuestion.default;
@@ -148,7 +155,7 @@ const ClassicQuestionContainer = props => {
     feedback: feedback,
     onFeedback: onFeedbackHandler,
     forgot: forgot,
-    onDragStart: onDragStart,
+    onDragGrant: onDragGrant,
     onDragEnd: onDragEnd
   }));
 };

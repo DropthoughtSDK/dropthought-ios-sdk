@@ -19,6 +19,7 @@ function DraggableItem({
   children,
   index,
   onDragStart,
+  onDragGrant,
   onDrag,
   onDragRelease,
   onDragEnd,
@@ -28,18 +29,37 @@ function DraggableItem({
   draggable
 }) {
   const [isDragging, setIsDragging] = (0, _react.useState)(false);
+  const [isPressed, setIsPressed] = (0, _react.useState)(false);
   const isDraggingRef = (0, _react.useRef)(false);
   const longPressTimeout = (0, _react.useRef)();
   const pan = (0, _react.useState)(new _reactNative.Animated.ValueXY())[0];
+
+  const onClear = () => {
+    setIsPressed(false);
+
+    if (longPressTimeout.current) {
+      clearTimeout(longPressTimeout.current);
+      onDragRelease && onDragRelease();
+    }
+
+    if (isDraggingRef.current) {
+      setIsDragging(false);
+      isDraggingRef.current = false;
+      onDragEnd && onDragEnd(pan);
+    }
+  };
+
   const panResponder = (0, _react.useRef)(_reactNative.PanResponder.create({
     onStartShouldSetPanResponder: () => {
       return draggable;
     },
     onPanResponderStart: (_e, _gestureState) => {
+      setIsPressed(true);
       onDragStart();
     },
     onPanResponderGrant: (_e, _gesture) => {
       longPressTimeout.current = setTimeout(() => {
+        onDragGrant && onDragGrant();
         setIsDragging(true);
         isDraggingRef.current = true; //@ts-ignore
 
@@ -59,25 +79,11 @@ function DraggableItem({
       }
     },
     onPanResponderRelease: (_e, _gesture) => {
-      onDragRelease && onDragRelease();
-
-      if (longPressTimeout.current) {
-        clearTimeout(longPressTimeout.current);
-      }
-
-      if (isDraggingRef.current) {
-        setIsDragging(false);
-        isDraggingRef.current = false;
-        onDragEnd && onDragEnd(pan);
-      }
+      onClear();
     },
 
     onPanResponderTerminate(_e, _gestureState) {
-      onDragRelease && onDragRelease();
-
-      if (longPressTimeout.current) {
-        clearTimeout(longPressTimeout.current);
-      }
+      onClear();
     }
 
   }));
@@ -119,12 +125,13 @@ function DraggableItem({
   };
   const draggingStyle = {
     zIndex: isDragging ? 2 : 0,
-    opacity: isDragging ? 0.3 : 1
+    opacity: isPressed ? 0.3 : 1,
+    transform: [...pan.getTranslateTransform(), {
+      scale: isDragging ? 1.1 : 1
+    }]
   };
   return /*#__PURE__*/_react.default.createElement(_reactNative.Animated.View, _extends({}, panResponder.current.panHandlers, {
-    style: [panStyle, draggingStyle, {
-      transform: pan.getTranslateTransform()
-    }],
+    style: [panStyle, draggingStyle],
     onLayout: onLayout
   }), children);
 }

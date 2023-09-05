@@ -17,6 +17,7 @@ import ClassicRankingQuestion from '../components/ClassicRankingQuestion';
 import ClassicOpenQuestion from '../components/ClassicOpenQuestion';
 import ClassicDropdownQuestion from '../components/ClassicDropdownQuestion';
 import ClassicMatrixRatingQuestion from '../components/ClassicMatrixRatingQuestion';
+import ClassicMatrixChoiceQuestion from '../components/ClassicMatrixChoiceQuestion';
 import ClassicMultipleOpenEndedQuestion from '../components/ClassicMultipleOpenEndedQuestion';
 import ClassicMandatoryTitle from '../components/ClassicMandatoryTitle';
 import GlobalStyle from '../styles';
@@ -42,7 +43,7 @@ type Props = {
   validationStarted: boolean;
   themeColor: string;
   onFeedback?: (feedback: Feedback) => void;
-  onDragStart: () => void;
+  onDragGrant: () => void;
   onDragEnd: () => void;
 };
 
@@ -51,7 +52,7 @@ const ClassicQuestionContainer = (props: Props) => {
     question,
     onFeedback: propsOnFeedback,
     validationStarted,
-    onDragStart,
+    onDragGrant,
     onDragEnd,
   } = props;
 
@@ -118,6 +119,10 @@ const ClassicQuestionContainer = (props: Props) => {
       // @ts-ignore
       QuestionComponent = ClassicMatrixRatingQuestion;
       break;
+    case 'matrixChoice':
+      // @ts-ignore
+      QuestionComponent = ClassicMatrixChoiceQuestion;
+      break;
     case 'multipleOpenEnded':
       // @ts-ignore
       QuestionComponent = ClassicMultipleOpenEndedQuestion;
@@ -133,7 +138,7 @@ const ClassicQuestionContainer = (props: Props) => {
       feedback={feedback}
       onFeedback={onFeedbackHandler}
       forgot={forgot}
-      onDragStart={onDragStart}
+      onDragGrant={onDragGrant}
       onDragEnd={onDragEnd}
     />
   );

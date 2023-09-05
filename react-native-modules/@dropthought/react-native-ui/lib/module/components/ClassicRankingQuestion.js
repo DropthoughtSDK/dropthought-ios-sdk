@@ -104,7 +104,7 @@ const ClassicRankingQuestion = ({
   forgot,
   feedback,
   themeColor,
-  onDragStart,
+  onDragGrant,
   onDragEnd
 }) => {
   const {
@@ -330,21 +330,18 @@ const ClassicRankingQuestion = ({
     style: styles.mandatoryTitle,
     forgot: forgot,
     question: question
-  }), /*#__PURE__*/React.createElement(ScrollView, {
-    horizontal: true,
-    scrollEnabled: false,
-    contentContainerStyle: styles.scrollViewContainer
-  }, /*#__PURE__*/React.createElement(View, {
+  }), /*#__PURE__*/React.createElement(View, {
     style: styles.questionContainer
   }, /*#__PURE__*/React.createElement(DraggableList, {
     data: list,
     renderItem: renderItem,
-    onDragStart: () => {
-      onDragStart && onDragStart();
+    onDragStart: () => {},
+    onDragGrant: () => {
+      onDragGrant && onDragGrant();
     },
     onDragRelease: onDragEnd,
     onDragEnd: onDragEndHandler
-  })))), rankingModal);
+  }))), rankingModal);
 };
 
 export default /*#__PURE__*/React.memo(ClassicRankingQuestion);

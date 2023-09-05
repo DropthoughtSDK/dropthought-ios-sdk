@@ -1,10 +1,10 @@
-declare var _default: React.MemoExoticComponent<({ question, onFeedback, forgot, feedback, themeColor, onDragStart, onDragEnd }: {
+declare var _default: React.MemoExoticComponent<({ question, onFeedback, forgot, feedback, themeColor, onDragGrant, onDragEnd }: {
     question: any;
     onFeedback: any;
     forgot: any;
     feedback: any;
     themeColor: any;
-    onDragStart: any;
+    onDragGrant: any;
     onDragEnd: any;
 }) => React.FunctionComponentElement<{}>>;
 export default _default;

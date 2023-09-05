@@ -6,6 +6,7 @@
  *
  */
 export declare const valid: {
+    'build.gradle': any;
     src: {
         'AndroidManifest.xml': any;
         main: {
@@ -21,6 +22,7 @@ export declare const valid: {
     };
 };
 export declare const validKotlin: {
+    'build.gradle': any;
     src: {
         'AndroidManifest.xml': any;
         main: {
@@ -33,6 +35,15 @@ export declare const validKotlin: {
                 };
             };
         };
+    };
+};
+export declare const validApp: {
+    'build.gradle': any;
+    app: {
+        'build.gradle': any;
+    };
+    src: {
+        'AndroidManifest.xml': any;
     };
 };
 export declare const userConfigManifest: {

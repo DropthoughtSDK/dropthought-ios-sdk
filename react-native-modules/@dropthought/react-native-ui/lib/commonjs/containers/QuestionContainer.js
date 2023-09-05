@@ -41,6 +41,8 @@ var _DropdownQuestion = _interopRequireDefault(require("../components/DropdownQu
 
 var _MatrixRatingQuestion = _interopRequireDefault(require("../components/MatrixRatingQuestion"));
 
+var _MatrixChoiceQuestion = _interopRequireDefault(require("../components/MatrixChoiceQuestion"));
+
 var _MultipleOpenEndedQuestion = _interopRequireDefault(require("../components/MultipleOpenEndedQuestion"));
 
 var _MandatoryTitle = _interopRequireDefault(require("../components/MandatoryTitle"));
@@ -166,6 +168,11 @@ const QuestionContainer = props => {
     case 'matrixRating':
       // @ts-ignore
       QuestionComponent = _MatrixRatingQuestion.default;
+      break;
+
+    case 'matrixChoice':
+      // @ts-ignore
+      QuestionComponent = _MatrixChoiceQuestion.default;
       break;
 
     case 'multipleOpenEnded':

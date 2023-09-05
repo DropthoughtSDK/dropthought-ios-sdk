@@ -11,7 +11,8 @@ import { KeyboardAvoidingScrollView } from '../components/KeyboardAvoidingView';
 import GlobalStyle from '../styles';
 import i18n from '../translation';
 import { THEME_OPTION, useTheme } from '../contexts/theme';
-import { questionFeedbackValidator, nextPage } from '../utils/data';
+import { questionFeedbackValidator } from '../utils/data';
+import { nextPage } from '@dropthought/dt-common';
 import { useFeedbackState } from '../contexts/feedback';
 import { useSurveyPageContext } from '../contexts/survey-page';
 import SurveyHeader from './SurveyHeader';
@@ -119,7 +120,7 @@ const SurveyScreenLayout = props => {
     const isValid = validatePageFeedbacks();
 
     if (isValid) {
-      const nextPageIndex = nextPage(pageIndex, currentPage.pageId, feedbackState.feedbacksMap, survey);
+      const nextPageIndex = nextPage(pageIndex, getFeedbacks(feedbackState), survey);
 
       if (nextPageIndex === -1) {
         onSubmit({
@@ -130,7 +131,7 @@ const SurveyScreenLayout = props => {
         onNextPage(nextPageIndex);
       }
     }
-  }, [validatePageFeedbacks, pageIndex, currentPage.pageId, feedbackState, survey, onSubmit, onNextPage, surveyId]);
+  }, [validatePageFeedbacks, pageIndex, feedbackState, survey, onSubmit, onNextPage, surveyId]);
   const classicQuestions = survey.pages[pageIndex].questions.map(question => {
     return /*#__PURE__*/React.createElement(ClassicQuestionContainer, {
       key: question.questionId,
@@ -138,7 +139,7 @@ const SurveyScreenLayout = props => {
       question: question,
       validationStarted: validationStarted,
       themeColor: survey.surveyProperty.hexCode,
-      onDragStart: () => {
+      onDragGrant: () => {
         setScrollEnabled(false);
       },
       onDragEnd: () => {

@@ -33,6 +33,8 @@ var _theme = require("../contexts/theme");
 
 var _data = require("../utils/data");
 
+var _dtCommon = require("@dropthought/dt-common");
+
 var _feedback = require("../contexts/feedback");
 
 var _SurveyHeader = _interopRequireDefault(require("./SurveyHeader"));
@@ -148,7 +150,7 @@ const SurveyScreenLayout = props => {
     const isValid = validatePageFeedbacks();
 
     if (isValid) {
-      const nextPageIndex = (0, _data.nextPage)(pageIndex, currentPage.pageId, feedbackState.feedbacksMap, survey);
+      const nextPageIndex = (0, _dtCommon.nextPage)(pageIndex, getFeedbacks(feedbackState), survey);
 
       if (nextPageIndex === -1) {
         onSubmit({
@@ -159,7 +161,7 @@ const SurveyScreenLayout = props => {
         onNextPage(nextPageIndex);
       }
     }
-  }, [validatePageFeedbacks, pageIndex, currentPage.pageId, feedbackState, survey, onSubmit, onNextPage, surveyId]);
+  }, [validatePageFeedbacks, pageIndex, feedbackState, survey, onSubmit, onNextPage, surveyId]);
   const classicQuestions = survey.pages[pageIndex].questions.map(question => {
     return /*#__PURE__*/React.createElement(_ClassicQuestionContainer.default, {
       key: question.questionId,
@@ -167,7 +169,7 @@ const SurveyScreenLayout = props => {
       question: question,
       validationStarted: validationStarted,
       themeColor: survey.surveyProperty.hexCode,
-      onDragStart: () => {
+      onDragGrant: () => {
         setScrollEnabled(false);
       },
       onDragEnd: () => {

@@ -4,6 +4,7 @@ declare type DraggableItemProps = {
     children: React.ReactNode;
     index: number;
     onDragStart: () => void;
+    onDragGrant: () => void;
     onDrag: (pan: Animated.ValueXY, y: number) => void;
     onDragRelease: () => void;
     onDragEnd: (pan: Animated.ValueXY) => void;
@@ -12,6 +13,6 @@ declare type DraggableItemProps = {
     movements: number;
     draggable: boolean;
 };
-declare function DraggableItem({ children, index, onDragStart, onDrag, onDragRelease, onDragEnd, onLayout, forceReset, movements, draggable, }: DraggableItemProps): JSX.Element;
+declare function DraggableItem({ children, index, onDragStart, onDragGrant, onDrag, onDragRelease, onDragEnd, onLayout, forceReset, movements, draggable, }: DraggableItemProps): JSX.Element;
 declare const _default: React.MemoExoticComponent<typeof DraggableItem>;
 export default _default;

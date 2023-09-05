@@ -14,6 +14,7 @@ export * from './hooks/useWindowDimensions';
 export * from './contexts/theme';
 
 import ActivityIndicatorMask from './components/ActivityIndicatorMask';
+import { KeyboardAvoidingScrollView } from './components/KeyboardAvoidingView';
 
 export {
   ClassicQuestionContainer,
@@ -27,6 +28,7 @@ export {
   ActivityIndicatorMask,
   i18n,
   SurveyProgressBarPosition,
+  KeyboardAvoidingScrollView,
 };
 
 export * from './data';

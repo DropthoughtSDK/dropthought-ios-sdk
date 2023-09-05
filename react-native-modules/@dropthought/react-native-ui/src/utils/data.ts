@@ -1,24 +1,13 @@
-import {
-  isEmpty,
-  prop,
-  pipe,
-  findIndex,
-  equals,
-  curry,
-  nth,
-  map,
-  isNil,
-} from 'ramda';
-import { EvaluateRuleSet } from './dt-common-lib';
+import { isEmpty, isNil } from 'ramda';
 import type {
   Feedback,
   Question,
-  Survey,
   RequiredType,
   QuestionMetaDataType as DataQuestionMetaDataType,
 } from '../data';
 import { matrixRatingValidator } from '../hooks/useMatrixRating';
 import { multipleOpenEndedValidator } from '../hooks/useMultipleOpenEnded';
+import { matrixChoiceValidator } from '../hooks/useMatrixChoice';
 
 /** @enum {'other'} */
 export const QuestionBrandType = {
@@ -120,6 +109,9 @@ export const mandatoryQuestionValidator = (
   } else if (question.type === 'multipleOpenEnded') {
     // @ts-ignore
     return multipleOpenEndedValidator(question, feedback);
+  } else if (question.type === 'matrixChoice') {
+    // @ts-ignore
+    return matrixChoiceValidator(question, feedback);
   }
   if (!question.mandatory) {
     if (
@@ -185,84 +177,6 @@ export const questionFeedbackValidator = (
   );
 };
 
-/**
- * return -1 if not existed
- * @type {(pageId: string, survey: Survey) => number}
- */
-export const getPageIndexFromPageId = curry((pageId: string, survey: Survey) =>
-  // @ts-ignore
-  pipe(prop('pageOrder'), findIndex(equals(pageId)))(survey)
-);
-
-/**
- * only keep the feedbacks that belongs to a certain page
- * if a question is not answered => textOrIndexArr: ['']
- * also convert the answers to 0-based
- * transform it to IQAData type
- * @type {(pageIndex: number, survey: Survey, feedbacksMap: {[questionId: string]: Feedback} ) => [IQAData]}
- */
-const transformFeedbacks = (
-  pageIndex: number,
-  survey: Survey,
-  feedbacksMap: { [questionId: string]: Feedback }
-) => {
-  // get the default page IQAData
-  /** @type {IQAData[]} */
-  const defaultPageIQAData = pipe(
-    prop('pages'),
-    // @ts-ignore
-    nth(pageIndex),
-    prop('questions'),
-    map((question) => ({
-      // @ts-ignore
-      questionId: question.questionId,
-      textOrIndexArr: [''],
-    }))
-    // @ts-ignore
-  )(survey);
-
-  // if feedback has answers, use it to replace the default
-  return defaultPageIQAData.map((defaultIQAData) => {
-    const feedback = feedbacksMap[defaultIQAData.questionId];
-    if (feedback && !isEmpty(feedback.answers)) {
-      return {
-        questionId: defaultIQAData.questionId,
-        // @ts-ignore
-        textOrIndexArr: feedback.answers.map((s) => s.toString()),
-        otherFlag: feedback.otherFlag,
-        type: feedback.type,
-      };
-    }
-    return defaultIQAData;
-  });
-};
-
-export function nextPage(
-  pageIndex: number,
-  pageId: string,
-  feedbacksMap: { [questionId: string]: Feedback },
-  survey: Survey
-): number {
-  const defaultNextPage = () =>
-    pageIndex >= survey.pageOrder.length - 1 ? -1 : pageIndex + 1;
-
-  // if there's no rule, go to default next page
-  const pageRuleSet = survey.rules[pageId];
-  if (!pageRuleSet || isEmpty(pageRuleSet)) {
-    return defaultNextPage();
-  }
-
-  // apply the rule
-  const iQADataArr = transformFeedbacks(pageIndex, survey, feedbacksMap);
-  const nextPageId = EvaluateRuleSet(pageRuleSet, iQADataArr);
-  if (!nextPageId) {
-    return defaultNextPage();
-  }
-
-  // next page index
-  return getPageIndexFromPageId(nextPageId, survey);
-}
-
 export const scaleLogic: {
   [name in string]: number[];
 } = {
@@ -323,5 +237,3 @@ export const option4TransformTable = new Map([
   ['2C-3D', require('../assets/animations/smiley_option4/2C-3D.json')],
   ['3D-4E', require('../assets/animations/smiley_option4/3D-4E.json')],
 ]);
-
-/** @typedef {import('./dt-common-lib/IfcRule').IQAData} IQAData */
