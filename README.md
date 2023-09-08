@@ -4,10 +4,11 @@ This repository contains all Dropthought iOS SDK sources.
 
 ## Latest Version
 
--   5.2.0
+-   5.3.0
 
 ## Features
 
+-   Matrix choice
 -   Multiple open question
 -   Matrix rating
 -   Dropdown

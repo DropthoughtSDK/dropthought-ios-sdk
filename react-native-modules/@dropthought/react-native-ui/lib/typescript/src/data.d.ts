@@ -1,4 +1,4 @@
-import type { QuestionType, QuestionSubType, QuestionBrandType, QuestionMetaDataType, Question, Feedback, Survey, Page, Rule, SurveyProperty } from '@dropthought/dt-common/lib/types/data';
+import type { QuestionType, QuestionSubType, QuestionBrandType, QuestionMetaDataType, Question, Feedback, Survey, Page, Rule, SurveyProperty } from './dt-common/types/data';
 export type { QuestionType, QuestionSubType, QuestionBrandType, QuestionMetaDataType, Question, Feedback, Survey, Page, Rule, SurveyProperty, };
 export type { IColorSchemesType, IAppearanceType, FontColor, BackgroundColor, IThemeOptionType, } from './contexts/theme';
 export declare type EventAPISourceType = 'api' | 'kiosk' | 'qr' | 'email' | 'sms';

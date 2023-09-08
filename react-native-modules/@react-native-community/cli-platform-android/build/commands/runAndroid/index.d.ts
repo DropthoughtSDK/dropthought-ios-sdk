@@ -1,14 +1,18 @@
 import { Config } from '@react-native-community/cli-types';
-import { BuildFlags } from '../buildAndroid';
-export interface Flags extends BuildFlags {
+export interface Flags {
+    tasks?: Array<string>;
+    root: string;
+    variant: string;
+    appFolder: string;
     appId: string;
     appIdSuffix: string;
     mainActivity: string;
     deviceId?: string;
-    listDevices?: boolean;
-    binaryPath?: string;
+    packager: boolean;
+    port: number;
+    terminal: string;
+    jetifier: boolean;
 }
-export declare type AndroidProject = NonNullable<Config['project']['android']>;
 /**
  * Starts the app on a connected Android emulator or device.
  */
@@ -37,11 +41,6 @@ declare const _default: {
         description: string;
         parse: (val: string) => string[];
         default?: undefined;
-    } | {
-        name: string;
-        description: string;
-        default: boolean;
-        parse?: undefined;
     })[];
 };
 export default _default;

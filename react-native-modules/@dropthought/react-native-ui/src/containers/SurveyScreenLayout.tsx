@@ -20,7 +20,7 @@ import i18n from '../translation';
 import { THEME_OPTION, useTheme } from '../contexts/theme';
 import type { Survey, SurveyFeedback, Page, Feedback } from 'src/data';
 import { questionFeedbackValidator } from '../utils/data';
-import { nextPage } from '@dropthought/dt-common';
+import { nextPage } from '../dt-common';
 import { useFeedbackState } from '../contexts/feedback';
 import { useSurveyPageContext } from '../contexts/survey-page';
 import SurveyHeader from './SurveyHeader';

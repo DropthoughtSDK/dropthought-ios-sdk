@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import { AndroidProjectParams, AndroidProjectConfig, AndroidDependencyParams, AndroidDependencyConfig } from '@react-native-community/cli-types';
+import { AndroidProjectParams, AndroidDependencyParams, AndroidProjectConfig } from '@react-native-community/cli-types';
 /**
  * Gets android project config by analyzing given folder and taking some
  * defaults specified by user into consideration
@@ -15,5 +15,11 @@ export declare function projectConfig(root: string, userConfig?: AndroidProjectP
  * Same as projectConfigAndroid except it returns
  * different config that applies to packages only
  */
-export declare function dependencyConfig(root: string, userConfig?: AndroidDependencyParams | null): AndroidDependencyConfig | null;
+export declare function dependencyConfig(root: string, userConfig?: AndroidDependencyParams): {
+    sourceDir: string;
+    folder: string;
+    packageImportPath: string;
+    packageInstance: string;
+    buildTypes: string[];
+} | null;
 //# sourceMappingURL=index.d.ts.map

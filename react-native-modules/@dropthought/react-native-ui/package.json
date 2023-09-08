@@ -1,6 +1,6 @@
 {
   "name": "@dropthought/react-native-ui",
-  "version": "5.3.0-beta.4",
+  "version": "5.3.0",
   "description": "UI element for Dropthought React Native SDK",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -155,7 +155,6 @@
     ]
   },
   "dependencies": {
-    "@dropthought/dt-common": "^1.1.0-beta.1",
     "@react-native-community/hooks": "^2.6.0",
     "i18next": "^21.3.0",
     "lodash": "^4.17.11",

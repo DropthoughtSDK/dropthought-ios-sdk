@@ -4,14 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-function _path() {
-  const data = _interopRequireDefault(require("path"));
-  _path = function () {
-    return data;
-  };
-  return data;
-}
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -19,10 +12,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * LICENSE file in the root directory of this source tree.
  *
  */
-
 function getAdbPath() {
-  return process.env.ANDROID_HOME ? _path().default.join(process.env.ANDROID_HOME, 'platform-tools', 'adb') : 'adb';
+  return process.env.ANDROID_HOME ? `${process.env.ANDROID_HOME}/platform-tools/adb` : 'adb';
 }
+
 var _default = getAdbPath;
 exports.default = _default;
 

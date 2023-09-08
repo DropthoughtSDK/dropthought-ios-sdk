@@ -26,11 +26,6 @@ declare const _default: ({
         description: string;
         parse: (val: string) => string[];
         default?: undefined;
-    } | {
-        name: string;
-        description: string;
-        default: boolean;
-        parse?: undefined;
     })[];
 })[];
 export default _default;

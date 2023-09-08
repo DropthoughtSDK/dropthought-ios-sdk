@@ -9,7 +9,7 @@ import type {
   Page,
   Rule,
   SurveyProperty,
-} from '@dropthought/dt-common/lib/types/data';
+} from './dt-common/types/data';
 
 export type {
   QuestionType,

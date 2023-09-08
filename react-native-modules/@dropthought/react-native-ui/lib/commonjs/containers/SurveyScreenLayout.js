@@ -33,7 +33,7 @@ var _theme = require("../contexts/theme");
 
 var _data = require("../utils/data");
 
-var _dtCommon = require("@dropthought/dt-common");
+var _dtCommon = require("../dt-common");
 
 var _feedback = require("../contexts/feedback");
 
