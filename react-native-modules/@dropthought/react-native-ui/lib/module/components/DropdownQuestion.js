@@ -15,7 +15,7 @@ const radioIconSource = {
   ic_radio_unselected: require('../assets/radio-off.png')
 };
 
-const ClassicDropdownQuestion = ({
+const DropdownQuestion = ({
   question,
   onFeedback,
   feedback,
@@ -165,7 +165,7 @@ const ClassicDropdownQuestion = ({
   }));
 };
 
-export default /*#__PURE__*/React.memo(ClassicDropdownQuestion);
+export default /*#__PURE__*/React.memo(DropdownQuestion);
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 30,

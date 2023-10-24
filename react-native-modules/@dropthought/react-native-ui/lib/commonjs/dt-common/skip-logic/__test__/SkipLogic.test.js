@@ -837,6 +837,25 @@ const mockSkipLogicList = [{
     textOrIndexArr: ['-1', '-1', '-1'],
     type: 'matrixChoice'
   }]
+}, {
+  conditionArr: ['ce9ff81e-5913-4166-8d93-c09642bd5e6a', 'answ', '0,3,-2'],
+  filteredFeedback: [{
+    questionId: 'ce9ff81e-5913-4166-8d93-c09642bd5e6a',
+    textOrIndexArr: ['4', '5', '3', {
+      image: 'https://dt-program-banner.s3.us-west-1.amazonaws.com/8a2d5239-0099-4894-8d2a-04c72395eea9_uploaded_2074995423495942380DSC_0005.JPG',
+      value: 'other option picture'
+    }],
+    type: 'pictureChoice',
+    otherFlag: true
+  }]
+}, {
+  conditionArr: ['ce9ff81e-5913-4166-8d93-c09642bd5e6a', 'nasw', '0,3,-2'],
+  filteredFeedback: [{
+    questionId: 'ce9ff81e-5913-4166-8d93-c09642bd5e6a',
+    textOrIndexArr: ['5', '1'],
+    type: 'pictureChoice',
+    otherFlag: false
+  }]
 }];
 describe('evaluateCondition skiplogic', () => {
   mockSkipLogicList.forEach((item, index) => {

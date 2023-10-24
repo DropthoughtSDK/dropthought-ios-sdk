@@ -1,3 +1,4 @@
+export function addOpacityToHex(hexColor: any, opacity: any): string;
 export namespace Colors {
     const purple: string;
     const border: string;
@@ -56,6 +57,7 @@ export namespace Colors {
     const sliderLabel: string;
     const sliderTrack: string;
     const contentBackground: string;
+    const nonSelectCircle: string;
 }
 export function addOpacityToColor(hexColor: any, opacity: any): string;
 export function opacity10(color: any): string;

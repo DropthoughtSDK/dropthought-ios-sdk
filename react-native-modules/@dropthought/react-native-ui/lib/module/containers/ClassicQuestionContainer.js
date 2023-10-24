@@ -16,6 +16,7 @@ import ClassicDropdownQuestion from '../components/ClassicDropdownQuestion';
 import ClassicMatrixRatingQuestion from '../components/ClassicMatrixRatingQuestion';
 import ClassicMatrixChoiceQuestion from '../components/ClassicMatrixChoiceQuestion';
 import ClassicMultipleOpenEndedQuestion from '../components/ClassicMultipleOpenEndedQuestion';
+import ClassicPictureChoiceQuestion from '../components/ClassicPictureChoiceQuestion';
 import ClassicMandatoryTitle from '../components/ClassicMandatoryTitle';
 import GlobalStyle from '../styles';
 
@@ -114,6 +115,11 @@ const ClassicQuestionContainer = props => {
     case 'multipleOpenEnded':
       // @ts-ignore
       QuestionComponent = ClassicMultipleOpenEndedQuestion;
+      break;
+
+    case 'pictureChoice':
+      // @ts-ignore
+      QuestionComponent = ClassicPictureChoiceQuestion;
       break;
 
     default:

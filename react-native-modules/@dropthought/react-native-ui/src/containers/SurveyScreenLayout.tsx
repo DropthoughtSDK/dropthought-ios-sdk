@@ -18,7 +18,13 @@ import { KeyboardAvoidingScrollView } from '../components/KeyboardAvoidingView';
 import GlobalStyle from '../styles';
 import i18n from '../translation';
 import { THEME_OPTION, useTheme } from '../contexts/theme';
-import type { Survey, SurveyFeedback, Page, Feedback } from 'src/data';
+import type {
+  Survey,
+  SurveyFeedback,
+  Page,
+  Feedback,
+  ImageFileProps,
+} from '../data';
 import { questionFeedbackValidator } from '../utils/data';
 import { nextPage } from '../dt-common';
 import { useFeedbackState } from '../contexts/feedback';
@@ -80,6 +86,8 @@ type Props = {
   onPageEnter?: () => void;
   onPageLeave?: () => void;
   onFeedback?: () => void;
+  onUpload?: (file: ImageFileProps) => Promise<string | undefined>;
+  isUploading?: boolean;
   SurveyProgressBar?: any;
   surveyProgressBarPosition?: number;
   SurveyPageIndicator?: any;
@@ -94,6 +102,8 @@ const SurveyScreenLayout = (props: Props) => {
     onPrevPage,
     onNextPage,
     onSubmit,
+    onUpload,
+    isUploading,
     SurveyPageIndicator = DefaultSurveyPageIndicator,
     SurveyProgressBar = DefaultSurveyProgressBar,
     surveyProgressBarPosition = SurveyProgressBarPosition.FixedBottom,
@@ -201,12 +211,10 @@ const SurveyScreenLayout = (props: Props) => {
         question={question}
         validationStarted={validationStarted}
         themeColor={survey.surveyProperty.hexCode}
-        onDragGrant={() => {
-          setScrollEnabled(false);
-        }}
-        onDragEnd={() => {
-          setScrollEnabled(true);
-        }}
+        onDragGrant={() => setScrollEnabled(false)}
+        onDragEnd={() => setScrollEnabled(true)}
+        onUpload={onUpload}
+        isUploading={isUploading}
       />
     );
   });
@@ -269,6 +277,8 @@ const SurveyScreenLayout = (props: Props) => {
         onClose={onCloseHandler}
         onPrevPage={onPrevPageHandler}
         onNextPage={onNextPageHandler}
+        onUpload={onUpload}
+        isUploading={isUploading}
         survey={survey}
         pageIndex={pageIndex}
         themeOption={themeOption}

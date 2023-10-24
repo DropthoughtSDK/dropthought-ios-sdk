@@ -4,7 +4,9 @@ export declare type QuestionSubType =
   | 'slider'
   | 'short'
   | 'long'
+  | 'multiChoice'
   | RatingIconType;
+
 export declare type QuestionBrandType = 'other';
 export declare type QuestionMetaDataType =
   | 'Name'
@@ -25,7 +27,9 @@ export declare type QuestionType =
   | 'ratingSlider'
   | 'dropdown'
   | 'matrixRating'
-  | 'matrixChoice';
+  | 'matrixChoice'
+  | 'pictureChoice';
+
 export type ProgramStateType = 'expired' | 'drafts' | 'active' | 'scheduled';
 
 export interface Question {
@@ -52,6 +56,7 @@ export interface Question {
   optional: boolean;
   phiData: boolean;
   phiDataList: boolean[];
+  optionImages: string[];
 }
 
 export interface Page {
@@ -109,6 +114,7 @@ export interface Survey {
   startDate: string;
   thankYouText?: string;
   welcomeText?: string;
+  welcomeTextPlain?: string;
   backPage?: string;
   nextPage?: string;
   submitSurvey?: string;
@@ -133,10 +139,15 @@ export interface TransformedOption {
   isNA: boolean;
 }
 
+export interface PictureChoiceOtherAnswer {
+  image: string;
+  value: string;
+}
 export interface Feedback {
   questionId: string;
-  answers: (string | number | undefined)[];
+  answers: (string | number | PictureChoiceOtherAnswer | undefined)[];
   type: string;
+  subType?: string;
   otherFlag?: boolean;
   listForRankingQuestion?: TransformedOption[];
 }

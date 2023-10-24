@@ -449,8 +449,18 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
                 result = conditionValueArr.every(condition => !multiChoiceFeedbackArr.includes(condition));
                 break;
 
+              case 'pictureChoice':
+                const pictureChoiceFeedbackArr = feedback.textOrIndexArr.map(text => parseInt(text, 10));
+                result = conditionValueArr.every(condition => !pictureChoiceFeedbackArr.includes(condition));
+                break;
+
               default:
-                result = conditionValueArr.every(feedback => !feedbackArr.includes(feedback));
+                if (conditionValueArr.includes(-2) && feedback.otherFlag) {
+                  result = false;
+                } else {
+                  result = conditionValueArr.every(feedback => !feedbackArr.includes(feedback));
+                }
+
                 break;
             }
 

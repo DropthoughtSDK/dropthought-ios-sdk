@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, StyleSheet, Text, TextInput, Platform, ScrollView as RNScrollView } from 'react-native';
 import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import GlobalStyle, { Colors, addOpacityToColor } from '../styles';
@@ -43,12 +43,13 @@ const RowComponent = ({
   } = useOpenEnded(feedback, index);
   const {
     colorScheme,
-    fontColor
+    fontColor,
+    backgroundColor
   } = useTheme();
   const opacityThemeColor = addOpacityToColor(themeColor, 0.1);
   const isDark = colorScheme === COLOR_SCHEMES.dark;
   const isValid = metaDataFormatValidator(text, question === null || question === void 0 ? void 0 : (_question$metaDataTyp = question.metaDataTypeList) === null || _question$metaDataTyp === void 0 ? void 0 : _question$metaDataTyp[index]);
-  const isFoucsAndInValid = isFocus || !isValid && hasEdited;
+  const isFoucsAndInValid = useMemo(() => isFocus || !isValid && hasEdited, [hasEdited, isFocus, isValid]);
 
   const onChangeText = textInput => {
     onChangeTextHandler(textInput);
@@ -60,36 +61,34 @@ const RowComponent = ({
   };
 
   const rowContainerStyle = [styles.rowContainer, {
-    backgroundColor: isFocus ? isDark ? Colors.rankingContainerBgDark : addOpacityToColor(themeColor || Colors.white, 0.1) : undefined
+    backgroundColor: isFocus ? isDark ? Colors.rankingContainerBgDark : addOpacityToColor(themeColor || Colors.white, 0.1) : backgroundColor
   }];
   const rowTitleTextStyle = [styles.rowTitleText, {
     color: fontColor
   }];
   const hippaText = i18n.t('survey:hippa-hint');
-  let inputBorderColor;
-  let bottomTextComponent;
-
-  if (!isValid && hasEdited) {
-    inputBorderColor = Colors.warningRed;
-    const errorTextStyle = [styles.responseText, {
-      color: Colors.warningRed
-    }];
-    bottomTextComponent = /*#__PURE__*/React.createElement(Text, {
-      style: errorTextStyle
-    }, responseErrorText);
-  } else if (isFocus) {
-    inputBorderColor = themeColor;
-    const descTextStyle = [styles.responseText, {
-      color: Colors.openQuestionSubTitle
-    }];
-    bottomTextComponent = /*#__PURE__*/React.createElement(Text, {
-      style: descTextStyle
-    }, phiData ? hippaText : '');
-  } else {
-    inputBorderColor = isDark ? Colors.rankingBorderDark : Colors.white;
-    bottomTextComponent = null;
-  }
-
+  const inputBorderColor = useMemo(() => {
+    if (!isValid && hasEdited) {
+      return Colors.warningRed;
+    } else if (isFocus) {
+      return themeColor;
+    } else {
+      return isDark ? Colors.rankingBorderDark : Colors.white;
+    }
+  }, [hasEdited, isDark, isFocus, isValid, themeColor]);
+  const bottomTextComponent = useMemo(() => {
+    if (!isValid && hasEdited) {
+      return /*#__PURE__*/React.createElement(Text, {
+        style: styles.responseTextWarning
+      }, responseErrorText);
+    } else if (isFocus) {
+      return /*#__PURE__*/React.createElement(Text, {
+        style: styles.responseText
+      }, phiData ? hippaText : '');
+    } else {
+      return null;
+    }
+  }, [hasEdited, hippaText, isFocus, isValid, phiData, responseErrorText]);
   const inputStyle = [styles.input, {
     backgroundColor: isDark ? Colors.rankingBorderDark : opacityThemeColor,
     borderColor: inputBorderColor,
@@ -97,9 +96,9 @@ const RowComponent = ({
   }];
   return /*#__PURE__*/React.createElement(View, {
     style: rowContainerStyle
-  }, /*#__PURE__*/React.createElement(View, null, /*#__PURE__*/React.createElement(Text, {
+  }, /*#__PURE__*/React.createElement(Text, {
     style: rowTitleTextStyle
-  }, questionTitle)), /*#__PURE__*/React.createElement(View, {
+  }, questionTitle), /*#__PURE__*/React.createElement(View, {
     style: styles.rowContent
   }, exampleMetadataText && isFoucsAndInValid ? /*#__PURE__*/React.createElement(Text, {
     style: styles.rowSubTitleText
@@ -160,17 +159,16 @@ export default /*#__PURE__*/React.memo(MultipleOpenEndedQuestion);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 30
+    paddingHorizontal: 19
   },
   title: {
-    marginBottom: 16
+    marginBottom: 16,
+    marginHorizontal: 11
   },
   rowContainer: {
-    flexDirection: 'column',
     flex: 1,
     paddingVertical: 16,
-    paddingHorizontal: 20,
-    marginHorizontal: -20,
+    paddingHorizontal: 24,
     borderRadius: 4
   },
   rowTitleText: {
@@ -204,11 +202,18 @@ const styles = StyleSheet.create({
   inputLengthText: {
     fontSize: 12,
     fontWeight: '500',
-    color: Colors.openQuestionSubTitle
+    color: Colors.openQuestionSubTitle,
+    marginLeft: 16
   },
   responseText: {
     fontSize: 12,
-    fontWeight: '500'
+    fontWeight: '500',
+    color: Colors.openQuestionSubTitle
+  },
+  responseTextWarning: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: Colors.warningRed
   }
 });
 //# sourceMappingURL=MultipleOpenEndedQuestion.js.map

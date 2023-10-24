@@ -1,8 +1,8 @@
 export declare type RatingIconType = 'smiley' | 'star' | 'heart' | 'thumb';
-export declare type QuestionSubType = 'smiley' | 'slider' | 'short' | 'long' | RatingIconType;
+export declare type QuestionSubType = 'smiley' | 'slider' | 'short' | 'long' | 'multiChoice' | RatingIconType;
 export declare type QuestionBrandType = 'other';
 export declare type QuestionMetaDataType = 'Name' | 'Email' | 'Phone' | 'Number' | 'Date' | 'String';
-export declare type QuestionType = 'nps' | 'rating' | 'multiChoice' | 'singleChoice' | 'open' | 'multipleOpenEnded' | 'ranking' | 'ratingSlider' | 'dropdown' | 'matrixRating' | 'matrixChoice';
+export declare type QuestionType = 'nps' | 'rating' | 'multiChoice' | 'singleChoice' | 'open' | 'multipleOpenEnded' | 'ranking' | 'ratingSlider' | 'dropdown' | 'matrixRating' | 'matrixChoice' | 'pictureChoice';
 export declare type ProgramStateType = 'expired' | 'drafts' | 'active' | 'scheduled';
 export interface Question {
     category: string;
@@ -28,6 +28,7 @@ export interface Question {
     optional: boolean;
     phiData: boolean;
     phiDataList: boolean[];
+    optionImages: string[];
 }
 export interface Page {
     pageId: string;
@@ -74,6 +75,7 @@ export interface Survey {
     startDate: string;
     thankYouText?: string;
     welcomeText?: string;
+    welcomeTextPlain?: string;
     backPage?: string;
     nextPage?: string;
     submitSurvey?: string;
@@ -96,10 +98,15 @@ export interface TransformedOption {
     index: number;
     isNA: boolean;
 }
+export interface PictureChoiceOtherAnswer {
+    image: string;
+    value: string;
+}
 export interface Feedback {
     questionId: string;
-    answers: (string | number | undefined)[];
+    answers: (string | number | PictureChoiceOtherAnswer | undefined)[];
     type: string;
+    subType?: string;
     otherFlag?: boolean;
     listForRankingQuestion?: TransformedOption[];
 }

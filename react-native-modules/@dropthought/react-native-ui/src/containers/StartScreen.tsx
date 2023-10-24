@@ -39,7 +39,7 @@ const StartScreen = ({ onLanguageSelect, onClose, onStart, survey }: Props) => {
   const dimensionWidthType = useDimensionWidthType();
   const { fontColor, backgroundColor } = useTheme();
 
-  const { surveyProperty, surveyName, welcomeText } = survey;
+  const { surveyProperty, surveyName, welcomeTextPlain } = survey;
   const {
     image,
     hexCode,
@@ -116,9 +116,9 @@ const StartScreen = ({ onLanguageSelect, onClose, onStart, survey }: Props) => {
       <View style={styles.main}>
         {iconView}
         <Text style={[styles.title, { color: fontColor }]}>{surveyName}</Text>
-        {!!welcomeText && (
+        {!!welcomeTextPlain && (
           <Text style={[styles.subtitle, { color: fontColor }]}>
-            {welcomeText}
+            {welcomeTextPlain}
           </Text>
         )}
         <TouchableOpacity style={buttonStyle} onPress={onStart}>

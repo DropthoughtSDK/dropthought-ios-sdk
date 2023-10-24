@@ -38,7 +38,7 @@ const ClassicStartScreen = ({ onLanguageSelect, onStart, survey }: Props) => {
   const isPhone = dimensionWidthType === DimensionWidthType.phone;
   const styles = isPhone ? phoneStyles : tabletStyles;
 
-  const { surveyProperty, surveyName, welcomeText } = survey;
+  const { surveyProperty, surveyName, welcomeTextPlain } = survey;
   const {
     image,
     hexCode,
@@ -93,9 +93,9 @@ const ClassicStartScreen = ({ onLanguageSelect, onStart, survey }: Props) => {
       <View style={styles.main}>
         {iconView}
         <Text style={[styles.title, { color: fontColor }]}>{surveyName}</Text>
-        {!!welcomeText && (
+        {!!welcomeTextPlain && (
           <Text style={[styles.subtitle, { color: fontColor }]}>
-            {welcomeText}
+            {welcomeTextPlain}
           </Text>
         )}
         <View style={styles.divider} />

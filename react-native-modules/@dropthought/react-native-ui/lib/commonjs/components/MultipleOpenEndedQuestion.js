@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _react = _interopRequireDefault(require("react"));
+var _react = _interopRequireWildcard(require("react"));
 
 var _reactNative = require("react-native");
 
@@ -25,11 +25,11 @@ var _translation = _interopRequireDefault(require("../translation"));
 
 var _theme = require("../contexts/theme");
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const ScrollView = _reactNative.Platform.OS === 'ios' ? _KeyboardAvoidingView.KeyboardAvoidingScrollView : _reactNative.ScrollView;
 
@@ -66,12 +66,13 @@ const RowComponent = ({
   } = (0, _useOpenEnded.default)(feedback, index);
   const {
     colorScheme,
-    fontColor
+    fontColor,
+    backgroundColor
   } = (0, _theme.useTheme)();
   const opacityThemeColor = (0, _styles.addOpacityToColor)(themeColor, 0.1);
   const isDark = colorScheme === _theme.COLOR_SCHEMES.dark;
   const isValid = (0, _data.metaDataFormatValidator)(text, question === null || question === void 0 ? void 0 : (_question$metaDataTyp = question.metaDataTypeList) === null || _question$metaDataTyp === void 0 ? void 0 : _question$metaDataTyp[index]);
-  const isFoucsAndInValid = isFocus || !isValid && hasEdited;
+  const isFoucsAndInValid = (0, _react.useMemo)(() => isFocus || !isValid && hasEdited, [hasEdited, isFocus, isValid]);
 
   const onChangeText = textInput => {
     onChangeTextHandler(textInput);
@@ -83,7 +84,7 @@ const RowComponent = ({
   };
 
   const rowContainerStyle = [styles.rowContainer, {
-    backgroundColor: isFocus ? isDark ? _styles.Colors.rankingContainerBgDark : (0, _styles.addOpacityToColor)(themeColor || _styles.Colors.white, 0.1) : undefined
+    backgroundColor: isFocus ? isDark ? _styles.Colors.rankingContainerBgDark : (0, _styles.addOpacityToColor)(themeColor || _styles.Colors.white, 0.1) : backgroundColor
   }];
   const rowTitleTextStyle = [styles.rowTitleText, {
     color: fontColor
@@ -91,30 +92,28 @@ const RowComponent = ({
 
   const hippaText = _translation.default.t('survey:hippa-hint');
 
-  let inputBorderColor;
-  let bottomTextComponent;
-
-  if (!isValid && hasEdited) {
-    inputBorderColor = _styles.Colors.warningRed;
-    const errorTextStyle = [styles.responseText, {
-      color: _styles.Colors.warningRed
-    }];
-    bottomTextComponent = /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-      style: errorTextStyle
-    }, responseErrorText);
-  } else if (isFocus) {
-    inputBorderColor = themeColor;
-    const descTextStyle = [styles.responseText, {
-      color: _styles.Colors.openQuestionSubTitle
-    }];
-    bottomTextComponent = /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-      style: descTextStyle
-    }, phiData ? hippaText : '');
-  } else {
-    inputBorderColor = isDark ? _styles.Colors.rankingBorderDark : _styles.Colors.white;
-    bottomTextComponent = null;
-  }
-
+  const inputBorderColor = (0, _react.useMemo)(() => {
+    if (!isValid && hasEdited) {
+      return _styles.Colors.warningRed;
+    } else if (isFocus) {
+      return themeColor;
+    } else {
+      return isDark ? _styles.Colors.rankingBorderDark : _styles.Colors.white;
+    }
+  }, [hasEdited, isDark, isFocus, isValid, themeColor]);
+  const bottomTextComponent = (0, _react.useMemo)(() => {
+    if (!isValid && hasEdited) {
+      return /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+        style: styles.responseTextWarning
+      }, responseErrorText);
+    } else if (isFocus) {
+      return /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+        style: styles.responseText
+      }, phiData ? hippaText : '');
+    } else {
+      return null;
+    }
+  }, [hasEdited, hippaText, isFocus, isValid, phiData, responseErrorText]);
   const inputStyle = [styles.input, {
     backgroundColor: isDark ? _styles.Colors.rankingBorderDark : opacityThemeColor,
     borderColor: inputBorderColor,
@@ -122,9 +121,9 @@ const RowComponent = ({
   }];
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: rowContainerStyle
-  }, /*#__PURE__*/_react.default.createElement(_reactNative.View, null, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: rowTitleTextStyle
-  }, questionTitle)), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+  }, questionTitle), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.rowContent
   }, exampleMetadataText && isFoucsAndInValid ? /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: styles.rowSubTitleText
@@ -188,17 +187,16 @@ exports.default = _default;
 const styles = _reactNative.StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 30
+    paddingHorizontal: 19
   },
   title: {
-    marginBottom: 16
+    marginBottom: 16,
+    marginHorizontal: 11
   },
   rowContainer: {
-    flexDirection: 'column',
     flex: 1,
     paddingVertical: 16,
-    paddingHorizontal: 20,
-    marginHorizontal: -20,
+    paddingHorizontal: 24,
     borderRadius: 4
   },
   rowTitleText: {
@@ -232,11 +230,18 @@ const styles = _reactNative.StyleSheet.create({
   inputLengthText: {
     fontSize: 12,
     fontWeight: '500',
-    color: _styles.Colors.openQuestionSubTitle
+    color: _styles.Colors.openQuestionSubTitle,
+    marginLeft: 16
   },
   responseText: {
     fontSize: 12,
-    fontWeight: '500'
+    fontWeight: '500',
+    color: _styles.Colors.openQuestionSubTitle
+  },
+  responseTextWarning: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: _styles.Colors.warningRed
   }
 });
 //# sourceMappingURL=MultipleOpenEndedQuestion.js.map

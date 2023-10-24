@@ -38,7 +38,7 @@ const radioIconSource = {
   ic_radio_unselected: require('../assets/radio-off.png')
 };
 
-const ClassicDropdownQuestion = ({
+const DropdownQuestion = ({
   question,
   onFeedback,
   feedback,
@@ -188,7 +188,7 @@ const ClassicDropdownQuestion = ({
   }));
 };
 
-var _default = /*#__PURE__*/_react.default.memo(ClassicDropdownQuestion);
+var _default = /*#__PURE__*/_react.default.memo(DropdownQuestion);
 
 exports.default = _default;
 

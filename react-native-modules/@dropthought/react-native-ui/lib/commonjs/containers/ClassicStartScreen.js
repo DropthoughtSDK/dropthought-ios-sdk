@@ -47,7 +47,7 @@ const ClassicStartScreen = ({
   const {
     surveyProperty,
     surveyName,
-    welcomeText
+    welcomeTextPlain
   } = survey;
   const {
     image,
@@ -102,11 +102,11 @@ const ClassicStartScreen = ({
     style: [styles.title, {
       color: fontColor
     }]
-  }, surveyName), !!welcomeText && /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+  }, surveyName), !!welcomeTextPlain && /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: [styles.subtitle, {
       color: fontColor
     }]
-  }, welcomeText), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+  }, welcomeTextPlain), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.divider
   }), /*#__PURE__*/_react.default.createElement(_Button.default, {
     width: buttonWidth,

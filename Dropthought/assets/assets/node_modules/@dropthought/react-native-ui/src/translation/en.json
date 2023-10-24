@@ -73,5 +73,19 @@
   },
   "option6HintDescription": {
     "title": "Rotate the dialer to rate"
+  },
+  "picture-choice": {
+    "clickTo": "Click to ",
+    "chooseImage": "choose image",
+    "optional": "(optional)",
+    "other": "Other:",
+    "overSizeHint": "Please upload image less than 5 MB",
+    "chooseImageTitle": "How would you like to choose your image?",
+    "camera": "Camera",
+    "photoLibrary": "Photo Library",
+    "cancel": "Cancel",
+    "invalidTypeHint": "Please upload only PNG, JPG, JPEG formats",
+    "reload": "Tap to reload image",
+    "uploadFailed": "Image upload failed. Please try again"
   }
 }

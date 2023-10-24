@@ -87,7 +87,7 @@ const RowComponent = ({
         ? isDark
           ? Colors.rankingContainerBgDark
           : addOpacityToColor(themeColor || Colors.white, 0.1)
-        : undefined,
+        : backgroundColor,
     },
   ];
   const rowTitleTextStyle = [styles.rowTitleText, { color: fontColor }];
@@ -186,7 +186,7 @@ const ClassicMultipleOpenEndedQuestion = ({
   ));
 
   return (
-    <View style={GlobalStyle.questionContainer}>
+    <View style={styles.questionContainer}>
       <ClassicMandatoryTitle
         forgot={false}
         question={question}
@@ -201,6 +201,10 @@ const ClassicMultipleOpenEndedQuestion = ({
 export default React.memo(ClassicMultipleOpenEndedQuestion);
 
 const styles = StyleSheet.create({
+  questionContainer: {
+    marginTop: 45,
+    marginHorizontal: 16,
+  },
   title: {
     marginBottom: 16,
   },

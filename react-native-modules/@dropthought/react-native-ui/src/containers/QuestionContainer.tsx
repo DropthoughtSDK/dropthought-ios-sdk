@@ -23,10 +23,11 @@ import DropdownQuestion from '../components/DropdownQuestion';
 import MatrixRatingQuestion from '../components/MatrixRatingQuestion';
 import MatrixChoiceQuestion from '../components/MatrixChoiceQuestion';
 import MultipleOpenEndedQuestion from '../components/MultipleOpenEndedQuestion';
+import PictureChoiceQuestion from '../components/PictureChoiceQuestion';
 import MandatoryTitle from '../components/MandatoryTitle';
 import GlobalStyle from '../styles';
 
-import type { Question, Feedback, Survey } from '../data';
+import type { Question, Feedback, Survey, ImageFileProps } from '../data';
 import type { THEME_OPTION } from '../contexts/theme';
 
 const TempComponent = ({
@@ -52,6 +53,8 @@ type Props = {
   onPrevPage: () => void;
   onNextPage: () => void;
   onFeedback?: (feedback: Feedback) => void;
+  onUpload?: (file: ImageFileProps) => void;
+  isUploading?: boolean;
   survey: Survey;
   pageIndex: number;
   themeOption: THEME_OPTION;
@@ -153,6 +156,10 @@ const QuestionContainer = (props: Props) => {
     case 'multipleOpenEnded':
       // @ts-ignore
       QuestionComponent = MultipleOpenEndedQuestion;
+      break;
+    case 'pictureChoice':
+      // @ts-ignore
+      QuestionComponent = PictureChoiceQuestion;
       break;
     default:
       QuestionComponent = TempComponent;

@@ -49,7 +49,7 @@ const StartScreen = ({
   const {
     surveyProperty,
     surveyName,
-    welcomeText
+    welcomeTextPlain
   } = survey;
   const {
     image,
@@ -129,11 +129,11 @@ const StartScreen = ({
     style: [styles.title, {
       color: fontColor
     }]
-  }, surveyName), !!welcomeText && /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+  }, surveyName), !!welcomeTextPlain && /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: [styles.subtitle, {
       color: fontColor
     }]
-  }, welcomeText), /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+  }, welcomeTextPlain), /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
     style: buttonStyle,
     onPress: onStart
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {

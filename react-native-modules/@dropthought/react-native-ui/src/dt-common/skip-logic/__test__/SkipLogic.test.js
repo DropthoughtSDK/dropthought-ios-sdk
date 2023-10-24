@@ -1,5 +1,5 @@
-import {nextPage} from '..';
-import {evaluateCondition} from '../index';
+import { nextPage } from '..';
+import { evaluateCondition } from '../index';
 
 const surveyWithRules = {
   pageOrder: [
@@ -12,30 +12,30 @@ const surveyWithRules = {
     {
       pageId: '38923572-2924-45af-bf3f-b2b43b2b3929',
       questions: [
-        {questionId: 'cf82e9de-7140-40d2-b59f-8b43e0dec209'},
-        {questionId: '86e3cd04-f81e-4254-a59a-a61641eb9c26'},
-        {questionId: '64cbf808-95d0-470f-8748-0b9111cdbca5'},
+        { questionId: 'cf82e9de-7140-40d2-b59f-8b43e0dec209' },
+        { questionId: '86e3cd04-f81e-4254-a59a-a61641eb9c26' },
+        { questionId: '64cbf808-95d0-470f-8748-0b9111cdbca5' },
       ],
     },
     {
       pageId: '366065b9-a495-430e-927a-f4ddc02dc85a',
       questions: [
-        {questionId: '43c8f71b-4613-4b77-bd99-90cdfacb7f00'},
-        {questionId: 'c0ad0634-af48-4903-98c7-01322d323643'},
-        {questionId: '6ab17499-9316-49cf-9d70-20827aa20fe3'},
+        { questionId: '43c8f71b-4613-4b77-bd99-90cdfacb7f00' },
+        { questionId: 'c0ad0634-af48-4903-98c7-01322d323643' },
+        { questionId: '6ab17499-9316-49cf-9d70-20827aa20fe3' },
       ],
     },
     {
       pageId: '86a829b1-e2ee-4201-a006-ca43d2958e55',
       questions: [
-        {questionId: '91e635aa-8887-4ded-96f2-5b4fa96715be'},
-        {questionId: 'a02a4a16-110d-48c8-8fdb-f87dff9c6c19'},
-        {questionId: '8d215d01-a8ae-430d-8a44-8a5a4f142b9d'},
+        { questionId: '91e635aa-8887-4ded-96f2-5b4fa96715be' },
+        { questionId: 'a02a4a16-110d-48c8-8fdb-f87dff9c6c19' },
+        { questionId: '8d215d01-a8ae-430d-8a44-8a5a4f142b9d' },
       ],
     },
     {
       pageId: '6a6d5dca-bc10-4f7a-9d55-4e8ccfc2fbf1',
-      questions: [{questionId: '5ec1ffd1-bcf2-454f-9707-4f0880db0bfc'}],
+      questions: [{ questionId: '5ec1ffd1-bcf2-454f-9707-4f0880db0bfc' }],
     },
   ],
   rules: {
@@ -84,13 +84,13 @@ describe('rule set for page 1, conditions with &&', () => {
   test('should jump to 3rd page (index 2) when match with conditions', () => {
     const testPageIndex = 0;
     const feedbacks = [
-      {answers: [4], questionId: 'cf82e9de-7140-40d2-b59f-8b43e0dec209'},
+      { answers: [4], questionId: 'cf82e9de-7140-40d2-b59f-8b43e0dec209' },
       {
         answers: ['12345'],
         questionId: '86e3cd04-f81e-4254-a59a-a61641eb9c26',
       },
-      {answers: [0], questionId: '64cbf808-95d0-470f-8748-0b9111cdbca5'},
-      {answers: [0], questionId: '43c8f71b-4613-4b77-bd99-90cdfacb7f00'},
+      { answers: [0], questionId: '64cbf808-95d0-470f-8748-0b9111cdbca5' },
+      { answers: [0], questionId: '43c8f71b-4613-4b77-bd99-90cdfacb7f00' },
     ];
 
     const nextPageIndex = nextPage(testPageIndex, feedbacks, surveyWithRules);
@@ -100,10 +100,10 @@ describe('rule set for page 1, conditions with &&', () => {
   test('should jump to next when not match with conditions', () => {
     const testPageIndex = 0;
     const feedbacks = [
-      {answers: [3], questionId: 'cf82e9de-7140-40d2-b59f-8b43e0dec209'},
-      {answers: [''], questionId: '86e3cd04-f81e-4254-a59a-a61641eb9c26'},
-      {answers: [0], questionId: '64cbf808-95d0-470f-8748-0b9111cdbca5'},
-      {answers: [0], questionId: '43c8f71b-4613-4b77-bd99-90cdfacb7f00'},
+      { answers: [3], questionId: 'cf82e9de-7140-40d2-b59f-8b43e0dec209' },
+      { answers: [''], questionId: '86e3cd04-f81e-4254-a59a-a61641eb9c26' },
+      { answers: [0], questionId: '64cbf808-95d0-470f-8748-0b9111cdbca5' },
+      { answers: [0], questionId: '43c8f71b-4613-4b77-bd99-90cdfacb7f00' },
     ];
 
     const nextPageIndex = nextPage(testPageIndex, feedbacks, surveyWithRules);
@@ -293,12 +293,12 @@ describe('rule set for page answered and not answered, ', () => {
   test('answered question', () => {
     const testPageIndex = 0;
     const feedbacks = [
-      {answers: [4], questionId: 'cf82e9de-7140-40d2-b59f-8b43e0dec209'},
+      { answers: [4], questionId: 'cf82e9de-7140-40d2-b59f-8b43e0dec209' },
       {
         answers: [2],
         questionId: '86e3cd04-f81e-4254-a59a-a61641eb9c26',
       },
-      {answers: [0], questionId: '64cbf808-95d0-470f-8748-0b9111cdbca5'},
+      { answers: [0], questionId: '64cbf808-95d0-470f-8748-0b9111cdbca5' },
     ];
 
     const nextPageIndex = nextPage(testPageIndex, feedbacks, surveyWithRules);
@@ -308,7 +308,7 @@ describe('rule set for page answered and not answered, ', () => {
   test('not answered question', () => {
     const testPageIndex = 0;
     const feedbacks = [
-      {answers: [2], questionId: 'cf82e9de-7140-40d2-b59f-8b43e0dec209'},
+      { answers: [2], questionId: 'cf82e9de-7140-40d2-b59f-8b43e0dec209' },
     ];
 
     const nextPageIndex = nextPage(testPageIndex, feedbacks, surveyWithRules);
@@ -1153,10 +1153,41 @@ const mockSkipLogicList = [
       },
     ],
   },
+  {
+    conditionArr: ['ce9ff81e-5913-4166-8d93-c09642bd5e6a', 'answ', '0,3,-2'],
+    filteredFeedback: [
+      {
+        questionId: 'ce9ff81e-5913-4166-8d93-c09642bd5e6a',
+        textOrIndexArr: [
+          '4',
+          '5',
+          '3',
+          {
+            image:
+              'https://dt-program-banner.s3.us-west-1.amazonaws.com/8a2d5239-0099-4894-8d2a-04c72395eea9_uploaded_2074995423495942380DSC_0005.JPG',
+            value: 'other option picture',
+          },
+        ],
+        type: 'pictureChoice',
+        otherFlag: true,
+      },
+    ],
+  },
+  {
+    conditionArr: ['ce9ff81e-5913-4166-8d93-c09642bd5e6a', 'nasw', '0,3,-2'],
+    filteredFeedback: [
+      {
+        questionId: 'ce9ff81e-5913-4166-8d93-c09642bd5e6a',
+        textOrIndexArr: ['5', '1'],
+        type: 'pictureChoice',
+        otherFlag: false,
+      },
+    ],
+  },
 ];
 describe('evaluateCondition skiplogic', () => {
   mockSkipLogicList.forEach((item, index) => {
-    const {conditionArr, filteredFeedback} = item;
+    const { conditionArr, filteredFeedback } = item;
     const skipLogicType = conditionArr[conditionArr.length === 4 ? 2 : 1];
     test(`[${index + 1}], ${
       filteredFeedback[0].questionId
@@ -1166,8 +1197,8 @@ describe('evaluateCondition skiplogic', () => {
           conditionArr,
           filteredFeedback[0].questionId,
           filteredFeedback[0].type,
-          filteredFeedback[0],
-        ),
+          filteredFeedback[0]
+        )
       ).toBe(true);
     });
   });

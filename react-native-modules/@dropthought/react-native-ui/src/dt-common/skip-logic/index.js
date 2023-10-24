@@ -1,7 +1,7 @@
 'use strict';
-Object.defineProperty(exports, '__esModule', {value: true});
+Object.defineProperty(exports, '__esModule', { value: true });
 // dummy integration test
-exports.Greeter = name => `Nĭ hăo ${name}`;
+exports.Greeter = (name) => `Nĭ hăo ${name}`;
 /**
  * This function is used to evaluate skip logic rule based on the skip authoring rules
  * and the page feedback passed to evaluate and provide the next page index on condition met
@@ -18,7 +18,7 @@ exports.EvaluateRuleSet = (ruleSet, pageFeedback) => {
       for (const andCond of andArr) {
         const filteredFeedback = filterFeedback(
           pageFeedback,
-          andCond.split('.')[0],
+          andCond.split('.')[0]
         );
         const conditionArr = handleSplit(andCond, filteredFeedback[0].type);
         if (filteredFeedback.length > 0) {
@@ -28,7 +28,7 @@ exports.EvaluateRuleSet = (ruleSet, pageFeedback) => {
               conditionArr,
               filteredFeedback[0].questionId,
               filteredFeedback[0].type,
-              filteredFeedback[0],
+              filteredFeedback[0]
             )
           ) {
             evalCond =
@@ -48,7 +48,7 @@ exports.EvaluateRuleSet = (ruleSet, pageFeedback) => {
       for (const orCond of orArr) {
         const filteredFeedback = filterFeedback(
           pageFeedback,
-          orCond.split('.')[0],
+          orCond.split('.')[0]
         );
         const conditionArr = handleSplit(orCond, filteredFeedback[0].type);
         if (filteredFeedback.length > 0) {
@@ -58,7 +58,7 @@ exports.EvaluateRuleSet = (ruleSet, pageFeedback) => {
               conditionArr,
               filteredFeedback[0].questionId,
               filteredFeedback[0].type,
-              filteredFeedback[0],
+              filteredFeedback[0]
             )
           ) {
             result = rule.toPageId;
@@ -68,11 +68,11 @@ exports.EvaluateRuleSet = (ruleSet, pageFeedback) => {
     } else {
       const filteredFeedback = filterFeedback(
         pageFeedback,
-        rule.condition.split('.')[0],
+        rule.condition.split('.')[0]
       );
       const conditionArr = handleSplit(
         rule.condition,
-        filteredFeedback[0].type,
+        filteredFeedback[0].type
       );
       if (filteredFeedback.length > 0) {
         logDetails(conditionArr, filteredFeedback);
@@ -81,7 +81,7 @@ exports.EvaluateRuleSet = (ruleSet, pageFeedback) => {
             conditionArr,
             filteredFeedback[0].questionId,
             filteredFeedback[0].type,
-            filteredFeedback[0],
+            filteredFeedback[0]
           )
         ) {
           result = rule.toPageId;
@@ -100,7 +100,7 @@ exports.EvaluateRuleSet = (ruleSet, pageFeedback) => {
  * @param {string} questionId
  */
 const filterFeedback = (pageFeedback, questionId) => {
-  return pageFeedback.filter(el => {
+  return pageFeedback.filter((el) => {
     return (
       el.questionId === questionId
       // && el.textOrIndexArr === (conditionArr.length === 3 ? [conditionArr[2]] : [''])
@@ -171,7 +171,7 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
       switch (type) {
         case 'ranking': {
           selectedAnswer = feedback.textOrIndexArr.findIndex(
-            value => value === targetOption,
+            (value) => value === targetOption
           );
           // can not find index (should be set to 'N/A')
           if (selectedAnswer === -1) return false;
@@ -195,10 +195,10 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
           const textOrIndexArr = `${feedback.textOrIndexArr[selectedIndex]}`;
           conditionMatrixArr = conditionArr[3]
             .split(',')
-            .map(condition => parseInt(condition, 10));
+            .map((condition) => parseInt(condition, 10));
           selectedMatrix = textOrIndexArr
             .split(',')
-            .map(selected => parseInt(selected, 10));
+            .map((selected) => parseInt(selected, 10));
           break;
         }
         case 'multipleOpenEnded': {
@@ -219,7 +219,7 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
           //['5e3480b2-6e4b-475c-a916-1f0bab87033b','5','mtch','amazon.com',]
           // If the answer to this question Contains the text "logic test"
           result = feedback.textOrIndexArr[conditionArr[1]].includes(
-            conditionArr[lastIndex],
+            conditionArr[lastIndex]
           );
           break;
         case 'nmtch': {
@@ -229,7 +229,7 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
             result = true;
           } else {
             result = !feedback.textOrIndexArr[conditionArr[1]].includes(
-              conditionArr[lastIndex],
+              conditionArr[lastIndex]
             );
           }
           break;
@@ -239,15 +239,15 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
           // e.g. If the answer to this question is Staff Service and is Ranked with "2,3"
           switch (type) {
             case 'matrixChoice': {
-              result = conditionMatrixArr.some(condition =>
-                selectedMatrix.includes(condition),
+              result = conditionMatrixArr.some((condition) =>
+                selectedMatrix.includes(condition)
               );
               break;
             }
             default: {
               const conditionValueArr = conditionArr[lastIndex]
                 .split(',')
-                .map(value => Number(value) - 1); //[2,3]
+                .map((value) => Number(value) - 1); //[2,3]
               result = conditionValueArr.includes(selectedAnswer);
               break;
             }
@@ -292,8 +292,8 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
           // e.g. If the answer to this question is Problem Resolution and is Not Answered with "3"
           switch (type) {
             case 'matrixChoice': {
-              const isIncluding = conditionMatrixArr.some(condition =>
-                selectedMatrix.includes(condition),
+              const isIncluding = conditionMatrixArr.some((condition) =>
+                selectedMatrix.includes(condition)
               );
               result = !isIncluding;
               break;
@@ -301,7 +301,7 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
             default: {
               const conditionValueArr = conditionArr[lastIndex]
                 .split(',')
-                .map(text => parseInt(text, 10) - 1); //[3]
+                .map((text) => parseInt(text, 10) - 1); //[3]
               const isIncluding = conditionValueArr.includes(selectedAnswer);
               result = !isIncluding;
               break;
@@ -320,7 +320,7 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
           // between is not include the first and the last
           const conditionValueArr = conditionArr[lastIndex]
             .split('-')
-            .map(value => Number(value)); //[2,5]
+            .map((value) => Number(value)); //[2,5]
           result =
             selectedAnswer > conditionValueArr[0] - 1 &&
             selectedAnswer < conditionValueArr[1] - 1;
@@ -388,9 +388,9 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
           //If the answer to this question is Answered with "False,Other"
           const conditionValueArr = conditionArr[2].split(',');
           const feedbackAnswers = feedback.textOrIndexArr.map(
-            feedback => `${feedback}`,
+            (feedback) => `${feedback}`
           );
-          conditionValueArr.forEach(condition => {
+          conditionValueArr.forEach((condition) => {
             if (!result) {
               // check "other" case
               if (condition === '-2') {
@@ -418,27 +418,39 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
           }
           const conditionValueArr = conditionArr[2]
             .split(',')
-            .map(text => parseInt(text, 10)); //[1,3]
+            .map((text) => parseInt(text, 10)); //[1,3]
           const feedbackArr = textOrIndexArr
             .split(',')
-            .map(text => parseInt(text, 10));
+            .map((text) => parseInt(text, 10));
           switch (type) {
             case 'ratingSlider':
               result = !conditionValueArr.includes(selectedAnswer);
               break;
             case 'multiChoice':
-              const multiChoiceFeedbackArr = feedback.textOrIndexArr.map(text =>
-                parseInt(text, 10),
+              const multiChoiceFeedbackArr = feedback.textOrIndexArr.map(
+                (text) => parseInt(text, 10)
               );
               result = conditionValueArr.every(
-                condition => !multiChoiceFeedbackArr.includes(condition),
+                (condition) => !multiChoiceFeedbackArr.includes(condition)
+              );
+              break;
+            case 'pictureChoice':
+              const pictureChoiceFeedbackArr = feedback.textOrIndexArr.map(
+                (text) => parseInt(text, 10)
+              );
+              result = conditionValueArr.every(
+                (condition) => !pictureChoiceFeedbackArr.includes(condition)
               );
               break;
 
             default:
-              result = conditionValueArr.every(
-                feedback => !feedbackArr.includes(feedback),
-              );
+              if (conditionValueArr.includes(-2) && feedback.otherFlag) {
+                result = false;
+              } else {
+                result = conditionValueArr.every(
+                  (feedback) => !feedbackArr.includes(feedback)
+                );
+              }
               break;
           }
           break;
@@ -451,7 +463,7 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
           // between is not include the first and the last
           const conditionValueArr = conditionArr[lastIndex]
             .split('-')
-            .map(value => Number(value)); //[3,8]
+            .map((value) => Number(value)); //[3,8]
           result =
             selectedAnswer > conditionValueArr[0] &&
             selectedAnswer < conditionValueArr[1];

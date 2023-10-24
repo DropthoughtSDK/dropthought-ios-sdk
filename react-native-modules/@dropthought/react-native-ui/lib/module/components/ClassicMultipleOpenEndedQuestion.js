@@ -58,7 +58,7 @@ const RowComponent = ({
   };
 
   const rowContainerStyle = [styles.rowContainer, {
-    backgroundColor: isFocus ? isDark ? Colors.rankingContainerBgDark : addOpacityToColor(themeColor || Colors.white, 0.1) : undefined
+    backgroundColor: isFocus ? isDark ? Colors.rankingContainerBgDark : addOpacityToColor(themeColor || Colors.white, 0.1) : backgroundColor
   }];
   const rowTitleTextStyle = [styles.rowTitleText, {
     color: fontColor
@@ -144,7 +144,7 @@ const ClassicMultipleOpenEndedQuestion = ({
     key: index.toString()
   }));
   return /*#__PURE__*/React.createElement(View, {
-    style: GlobalStyle.questionContainer
+    style: styles.questionContainer
   }, /*#__PURE__*/React.createElement(ClassicMandatoryTitle, {
     forgot: false,
     question: question,
@@ -155,6 +155,10 @@ const ClassicMultipleOpenEndedQuestion = ({
 
 export default /*#__PURE__*/React.memo(ClassicMultipleOpenEndedQuestion);
 const styles = StyleSheet.create({
+  questionContainer: {
+    marginTop: 45,
+    marginHorizontal: 16
+  },
   title: {
     marginBottom: 16
   },

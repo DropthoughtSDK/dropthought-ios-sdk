@@ -4,4 +4,4 @@ declare function SurveyStack({ preview }: {
 }): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> | React.FunctionComponentElement<{
     preview: any;
 }>;
-import * as React from "react";
+import React from "react";

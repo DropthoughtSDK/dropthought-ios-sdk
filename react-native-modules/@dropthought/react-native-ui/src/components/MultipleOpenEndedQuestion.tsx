@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -71,7 +71,7 @@ const RowComponent = ({
     onFocus,
     onBlur,
   } = useOpenEnded(feedback, index);
-  const { colorScheme, fontColor } = useTheme();
+  const { colorScheme, fontColor, backgroundColor } = useTheme();
   const opacityThemeColor = addOpacityToColor(themeColor, 0.1);
   const isDark = colorScheme === COLOR_SCHEMES.dark;
 
@@ -80,7 +80,11 @@ const RowComponent = ({
     question?.metaDataTypeList?.[index]
   );
 
-  const isFoucsAndInValid = isFocus || (!isValid && hasEdited);
+  const isFoucsAndInValid = useMemo(
+    () => isFocus || (!isValid && hasEdited),
+    [hasEdited, isFocus, isValid]
+  );
+
   const onChangeText = (textInput: string) => {
     onChangeTextHandler(textInput);
     setSelectedAnswer((previous) => {
@@ -99,41 +103,37 @@ const RowComponent = ({
         ? isDark
           ? Colors.rankingContainerBgDark
           : addOpacityToColor(themeColor || Colors.white, 0.1)
-        : undefined,
+        : backgroundColor,
     },
   ];
   const rowTitleTextStyle = [styles.rowTitleText, { color: fontColor }];
 
   const hippaText = i18n.t('survey:hippa-hint');
 
-  let inputBorderColor;
-  let bottomTextComponent;
-  if (!isValid && hasEdited) {
-    inputBorderColor = Colors.warningRed;
-    const errorTextStyle = [
-      styles.responseText,
-      {
-        color: Colors.warningRed,
-      },
-    ];
-    bottomTextComponent = (
-      <Text style={errorTextStyle}>{responseErrorText}</Text>
-    );
-  } else if (isFocus) {
-    inputBorderColor = themeColor;
-    const descTextStyle = [
-      styles.responseText,
-      {
-        color: Colors.openQuestionSubTitle,
-      },
-    ];
-    bottomTextComponent = (
-      <Text style={descTextStyle}>{phiData ? hippaText : ''}</Text>
-    );
-  } else {
-    inputBorderColor = isDark ? Colors.rankingBorderDark : Colors.white;
-    bottomTextComponent = null;
-  }
+  const inputBorderColor = useMemo(() => {
+    if (!isValid && hasEdited) {
+      return Colors.warningRed;
+    } else if (isFocus) {
+      return themeColor;
+    } else {
+      return isDark ? Colors.rankingBorderDark : Colors.white;
+    }
+  }, [hasEdited, isDark, isFocus, isValid, themeColor]);
+
+  const bottomTextComponent = useMemo(() => {
+    if (!isValid && hasEdited) {
+      return (
+        <Text style={styles.responseTextWarning}>{responseErrorText}</Text>
+      );
+    } else if (isFocus) {
+      return (
+        <Text style={styles.responseText}>{phiData ? hippaText : ''}</Text>
+      );
+    } else {
+      return null;
+    }
+  }, [hasEdited, hippaText, isFocus, isValid, phiData, responseErrorText]);
+
   const inputStyle = [
     styles.input,
     {
@@ -142,11 +142,10 @@ const RowComponent = ({
       color: fontColor,
     },
   ];
+
   return (
     <View style={rowContainerStyle}>
-      <View>
-        <Text style={rowTitleTextStyle}>{questionTitle}</Text>
-      </View>
+      <Text style={rowTitleTextStyle}>{questionTitle}</Text>
       <View style={styles.rowContent}>
         {exampleMetadataText && isFoucsAndInValid ? (
           <Text style={styles.rowSubTitleText}>{exampleMetadataText}</Text>
@@ -215,17 +214,16 @@ export default React.memo(MultipleOpenEndedQuestion);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 30,
+    paddingHorizontal: 19,
   },
   title: {
     marginBottom: 16,
+    marginHorizontal: 11,
   },
   rowContainer: {
-    flexDirection: 'column',
     flex: 1,
     paddingVertical: 16,
-    paddingHorizontal: 20,
-    marginHorizontal: -20,
+    paddingHorizontal: 24,
     borderRadius: 4,
   },
   rowTitleText: {
@@ -260,9 +258,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     color: Colors.openQuestionSubTitle,
+    marginLeft: 16,
   },
   responseText: {
     fontSize: 12,
     fontWeight: '500',
+    color: Colors.openQuestionSubTitle,
+  },
+  responseTextWarning: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: Colors.warningRed,
   },
 });

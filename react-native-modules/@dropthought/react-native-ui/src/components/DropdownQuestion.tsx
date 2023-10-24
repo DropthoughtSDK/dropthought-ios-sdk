@@ -42,7 +42,7 @@ type Props = {
   themeColor: string;
 };
 
-const ClassicDropdownQuestion = ({
+const DropdownQuestion = ({
   question,
   onFeedback,
   feedback,
@@ -224,7 +224,7 @@ const ClassicDropdownQuestion = ({
   );
 };
 
-export default React.memo(ClassicDropdownQuestion);
+export default React.memo(DropdownQuestion);
 
 const styles = StyleSheet.create({
   container: {

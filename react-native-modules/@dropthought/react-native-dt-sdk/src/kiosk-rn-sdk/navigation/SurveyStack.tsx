@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, StyleSheet, NativeModules } from 'react-native';
 import { isEmpty, isNil } from 'ramda';
 import {
@@ -18,6 +18,8 @@ import { submitFeedback } from '../../lib/Feedback';
 import ScreenWrapper from './ScreenWrapper';
 import Header from './Header';
 import { fromJSToAPIDateStr } from '../../lib/DateTimerParser';
+import { uploadPicture } from '../../lib/UploadPicture';
+import type { ImageFormData } from '../../lib/UploadFileAPI';
 
 type StackProps = {
   preview: boolean;
@@ -28,10 +30,10 @@ const noData = (a: any) => isNil(a) || isEmpty(a);
 const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
   const { survey, onClose } = useSurveyContext();
   const themeColor = survey.surveyProperty.hexCode;
-  const [visiblePageIds, setVisiblePageIds] = React.useState([]);
-  const [endScreenvisible, setEndScreenvisible] = React.useState(false);
-  const [surveyFeedback, setSurveyFeedback] = React.useState(undefined);
-  const [error, setError] = React.useState<Error | undefined>();
+  const [visiblePageIds, setVisiblePageIds] = useState([]);
+  const [endScreenvisible, setEndScreenvisible] = useState(false);
+  const [surveyFeedback, setSurveyFeedback] = useState(undefined);
+  const [error, setError] = useState<Error | undefined>();
   const metadata = useMetadata();
   const { run, isPending: loading } = useAsync({
     deferFn: submitFeedback,
@@ -44,7 +46,7 @@ const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
     },
   });
 
-  const handleNextPage = React.useCallback(
+  const handleNextPage = useCallback(
     (nextPageIndex) => {
       if (nextPageIndex < survey.pageOrder.length) {
         setVisiblePageIds((prevPageIds) => {
@@ -61,15 +63,15 @@ const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
     [survey.pageOrder]
   );
 
-  const handleStart = React.useCallback(() => {
+  const handleStart = useCallback(() => {
     handleNextPage(0);
   }, [handleNextPage]);
 
-  const handlePrevPage = React.useCallback(() => {
+  const handlePrevPage = useCallback(() => {
     setVisiblePageIds((prevPageIds) => prevPageIds.slice(0, -1));
   }, []);
 
-  const handleSubmit = React.useCallback(
+  const handleSubmit = useCallback(
     (feedback) => {
       if (preview) {
         setEndScreenvisible(true);
@@ -86,6 +88,23 @@ const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
     },
     [metadata, preview, run]
   );
+
+  const [isUploading, setIsUploading] = useState(false);
+  const handleUpload = async (file: ImageFormData) => {
+    if (file) {
+      setIsUploading(true);
+      try {
+        const { url } = await uploadPicture(file);
+        setIsUploading(false);
+        return url;
+      } catch (reason) {
+        setIsUploading(false);
+        return undefined;
+      }
+    } else {
+      return undefined;
+    }
+  };
 
   return (
     <View style={styles.flexOne}>
@@ -115,6 +134,8 @@ const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
                 onNextPage={handleNextPage}
                 onPrevPage={handlePrevPage}
                 onSubmit={handleSubmit}
+                onUpload={handleUpload}
+                isUploading={isUploading}
               />
             </ScreenWrapper>
           );

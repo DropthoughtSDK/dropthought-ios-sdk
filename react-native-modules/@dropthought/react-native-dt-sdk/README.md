@@ -39,6 +39,9 @@ yarn add @dropthought/react-native-dt-sdk
 - [react-native-safe-area-context](https://github.com/th3rdwave/react-native-safe-area-context#getting-started)
 - [react-native-secure-key-store](https://www.npmjs.com/package/react-native-secure-key-store)
 - [lottie-react-native](https://github.com/lottie-react-native/lottie-react-native)
+- [react-native-image-picker](https://github.com/react-native-image-picker/react-native-image-picker)
+- [react-native-webview](https://github.com/react-native-webview/react-native-webview)
+-
 
 ## initialize
 

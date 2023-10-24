@@ -46,3 +46,9 @@ export interface SurveyFeedback {
   feedbacks: Feedback[];
   metadata?: QuestionMetaDataType;
 }
+
+export interface ImageFileProps {
+  uri: string;
+  name: string;
+  type: string;
+}

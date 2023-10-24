@@ -45,6 +45,8 @@ var _MatrixChoiceQuestion = _interopRequireDefault(require("../components/Matrix
 
 var _MultipleOpenEndedQuestion = _interopRequireDefault(require("../components/MultipleOpenEndedQuestion"));
 
+var _PictureChoiceQuestion = _interopRequireDefault(require("../components/PictureChoiceQuestion"));
+
 var _MandatoryTitle = _interopRequireDefault(require("../components/MandatoryTitle"));
 
 var _styles = _interopRequireDefault(require("../styles"));
@@ -178,6 +180,11 @@ const QuestionContainer = props => {
     case 'multipleOpenEnded':
       // @ts-ignore
       QuestionComponent = _MultipleOpenEndedQuestion.default;
+      break;
+
+    case 'pictureChoice':
+      // @ts-ignore
+      QuestionComponent = _PictureChoiceQuestion.default;
       break;
 
     default:

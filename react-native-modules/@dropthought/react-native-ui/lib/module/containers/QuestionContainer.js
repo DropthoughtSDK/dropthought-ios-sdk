@@ -20,6 +20,7 @@ import DropdownQuestion from '../components/DropdownQuestion';
 import MatrixRatingQuestion from '../components/MatrixRatingQuestion';
 import MatrixChoiceQuestion from '../components/MatrixChoiceQuestion';
 import MultipleOpenEndedQuestion from '../components/MultipleOpenEndedQuestion';
+import PictureChoiceQuestion from '../components/PictureChoiceQuestion';
 import MandatoryTitle from '../components/MandatoryTitle';
 import GlobalStyle from '../styles';
 
@@ -144,6 +145,11 @@ const QuestionContainer = props => {
     case 'multipleOpenEnded':
       // @ts-ignore
       QuestionComponent = MultipleOpenEndedQuestion;
+      break;
+
+    case 'pictureChoice':
+      // @ts-ignore
+      QuestionComponent = PictureChoiceQuestion;
       break;
 
     default:

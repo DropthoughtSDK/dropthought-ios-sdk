@@ -19,9 +19,10 @@ import ClassicDropdownQuestion from '../components/ClassicDropdownQuestion';
 import ClassicMatrixRatingQuestion from '../components/ClassicMatrixRatingQuestion';
 import ClassicMatrixChoiceQuestion from '../components/ClassicMatrixChoiceQuestion';
 import ClassicMultipleOpenEndedQuestion from '../components/ClassicMultipleOpenEndedQuestion';
+import ClassicPictureChoiceQuestion from '../components/ClassicPictureChoiceQuestion';
 import ClassicMandatoryTitle from '../components/ClassicMandatoryTitle';
 import GlobalStyle from '../styles';
-import type { Question, Feedback } from '../data';
+import type { Question, Feedback, ImageFileProps } from '../data';
 
 const TempComponent = ({
   question,
@@ -43,6 +44,8 @@ type Props = {
   validationStarted: boolean;
   themeColor: string;
   onFeedback?: (feedback: Feedback) => void;
+  onUpload?: (file: ImageFileProps) => void;
+  isUploading?: boolean;
   onDragGrant: () => void;
   onDragEnd: () => void;
 };
@@ -126,6 +129,10 @@ const ClassicQuestionContainer = (props: Props) => {
     case 'multipleOpenEnded':
       // @ts-ignore
       QuestionComponent = ClassicMultipleOpenEndedQuestion;
+      break;
+    case 'pictureChoice':
+      // @ts-ignore
+      QuestionComponent = ClassicPictureChoiceQuestion;
       break;
     default:
       QuestionComponent = TempComponent;

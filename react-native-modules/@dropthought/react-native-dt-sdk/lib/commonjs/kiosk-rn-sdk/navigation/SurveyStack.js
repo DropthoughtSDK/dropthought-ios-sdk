@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var React = _interopRequireWildcard(require("react"));
+var _react = _interopRequireWildcard(require("react"));
 
 var _reactNative = require("react-native");
 
@@ -33,6 +33,8 @@ var _Header = _interopRequireDefault(require("./Header"));
 
 var _DateTimerParser = require("../../lib/DateTimerParser");
 
+var _UploadPicture = require("../../lib/UploadPicture");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
@@ -49,10 +51,10 @@ const Stack = ({
     onClose
   } = (0, _survey.useSurveyContext)();
   const themeColor = survey.surveyProperty.hexCode;
-  const [visiblePageIds, setVisiblePageIds] = React.useState([]);
-  const [endScreenvisible, setEndScreenvisible] = React.useState(false);
-  const [surveyFeedback, setSurveyFeedback] = React.useState(undefined);
-  const [error, setError] = React.useState();
+  const [visiblePageIds, setVisiblePageIds] = (0, _react.useState)([]);
+  const [endScreenvisible, setEndScreenvisible] = (0, _react.useState)(false);
+  const [surveyFeedback, setSurveyFeedback] = (0, _react.useState)(undefined);
+  const [error, setError] = (0, _react.useState)();
   const metadata = (0, _customProps.useMetadata)();
   const {
     run,
@@ -67,7 +69,7 @@ const Stack = ({
       setEndScreenvisible(true);
     }
   });
-  const handleNextPage = React.useCallback(nextPageIndex => {
+  const handleNextPage = (0, _react.useCallback)(nextPageIndex => {
     if (nextPageIndex < survey.pageOrder.length) {
       setVisiblePageIds(prevPageIds => {
         const nextPageId = survey.pageOrder[nextPageIndex];
@@ -75,13 +77,13 @@ const Stack = ({
       });
     }
   }, [survey.pageOrder]);
-  const handleStart = React.useCallback(() => {
+  const handleStart = (0, _react.useCallback)(() => {
     handleNextPage(0);
   }, [handleNextPage]);
-  const handlePrevPage = React.useCallback(() => {
+  const handlePrevPage = (0, _react.useCallback)(() => {
     setVisiblePageIds(prevPageIds => prevPageIds.slice(0, -1));
   }, []);
-  const handleSubmit = React.useCallback(feedback => {
+  const handleSubmit = (0, _react.useCallback)(feedback => {
     if (preview) {
       setEndScreenvisible(true);
     } else {
@@ -97,41 +99,64 @@ const Stack = ({
       });
     }
   }, [metadata, preview, run]);
-  return /*#__PURE__*/React.createElement(_reactNative.View, {
+  const [isUploading, setIsUploading] = (0, _react.useState)(false);
+
+  const handleUpload = async file => {
+    if (file) {
+      setIsUploading(true);
+
+      try {
+        const {
+          url
+        } = await (0, _UploadPicture.uploadPicture)(file);
+        setIsUploading(false);
+        return url;
+      } catch (reason) {
+        setIsUploading(false);
+        return undefined;
+      }
+    } else {
+      return undefined;
+    }
+  };
+
+  return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.flexOne
-  }, /*#__PURE__*/React.createElement(_Header.default, {
+  }, /*#__PURE__*/_react.default.createElement(_Header.default, {
     title: survey.surveyName,
     onClose: onClose,
     themeColor: themeColor
-  }), /*#__PURE__*/React.createElement(_reactNative.View, {
+  }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.flexOne
-  }, /*#__PURE__*/React.createElement(_ScreenWrapper.default, {
+  }, /*#__PURE__*/_react.default.createElement(_ScreenWrapper.default, {
     visible: true,
     isOnTop: !endScreenvisible && visiblePageIds.length === 0
-  }, /*#__PURE__*/React.createElement(_StartScreen.default, {
+  }, /*#__PURE__*/_react.default.createElement(_StartScreen.default, {
     onStart: handleStart,
     onClose: onClose
   })), survey.pageOrder.map((pageId, pageIndex) => {
-    return /*#__PURE__*/React.createElement(_ScreenWrapper.default, {
+    return /*#__PURE__*/_react.default.createElement(_ScreenWrapper.default, {
       key: pageId,
       visible: visiblePageIds.includes(pageId),
       isOnTop: visiblePageIds[visiblePageIds.length - 1] === pageId
-    }, /*#__PURE__*/React.createElement(_reactNativeUi.SurveyScreenLayout, {
+    }, /*#__PURE__*/_react.default.createElement(_reactNativeUi.SurveyScreenLayout, {
       survey: survey,
       pageIndex: pageIndex,
       onClose: onClose,
       onNextPage: handleNextPage,
       onPrevPage: handlePrevPage,
-      onSubmit: handleSubmit
+      onSubmit: handleSubmit,
+      onUpload: handleUpload,
+      isUploading: isUploading
     }));
-  }), /*#__PURE__*/React.createElement(_ScreenWrapper.default, {
+  }), /*#__PURE__*/_react.default.createElement(_ScreenWrapper.default, {
     visible: endScreenvisible,
     isOnTop: endScreenvisible
-  }, /*#__PURE__*/React.createElement(_EndScreen.default, {
+  }, /*#__PURE__*/_react.default.createElement(_EndScreen.default, {
     error: error,
     surveyFeedback: surveyFeedback,
     onClose: onClose
-  }))), /*#__PURE__*/React.createElement(_reactNativeUi.ActivityIndicatorMask, {
+  }))), /*#__PURE__*/_react.default.createElement(_reactNativeUi.ActivityIndicatorMask, {
     loading: loading
   }));
 };
@@ -146,15 +171,15 @@ const SurveyStack = ({
 
   if (noData(survey.pages) || noData(survey.surveyProperty) || noData(survey.surveyStartDate) || noData(survey.surveyEndDate)) {
     // need to render placeholder
-    return /*#__PURE__*/React.createElement(_FakeScreen.default, {
+    return /*#__PURE__*/_react.default.createElement(_FakeScreen.default, {
       onClose: onClose
-    }, /*#__PURE__*/React.createElement(_reactNativeUi.PlaceholderScreen, {
+    }, /*#__PURE__*/_react.default.createElement(_reactNativeUi.PlaceholderScreen, {
       imageType: _reactNativeUi.PlaceholderImageTypes.ProgramUnavailable,
       message: _reactNativeUi.i18n.t('start-survey:placeholder-message')
     }));
   }
 
-  return /*#__PURE__*/React.createElement(Stack, {
+  return /*#__PURE__*/_react.default.createElement(Stack, {
     preview: preview
   });
 };

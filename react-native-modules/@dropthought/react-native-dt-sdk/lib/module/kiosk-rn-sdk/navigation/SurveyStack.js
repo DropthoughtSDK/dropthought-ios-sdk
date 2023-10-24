@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, StyleSheet, NativeModules } from 'react-native';
 import { isEmpty, isNil } from 'ramda';
 import { PlaceholderImageTypes, PlaceholderScreen, i18n, SurveyScreenLayout, ActivityIndicatorMask } from '@dropthought/react-native-ui';
@@ -12,6 +12,7 @@ import { submitFeedback } from '../../lib/Feedback';
 import ScreenWrapper from './ScreenWrapper';
 import Header from './Header';
 import { fromJSToAPIDateStr } from '../../lib/DateTimerParser';
+import { uploadPicture } from '../../lib/UploadPicture';
 
 const noData = a => isNil(a) || isEmpty(a);
 
@@ -23,10 +24,10 @@ const Stack = ({
     onClose
   } = useSurveyContext();
   const themeColor = survey.surveyProperty.hexCode;
-  const [visiblePageIds, setVisiblePageIds] = React.useState([]);
-  const [endScreenvisible, setEndScreenvisible] = React.useState(false);
-  const [surveyFeedback, setSurveyFeedback] = React.useState(undefined);
-  const [error, setError] = React.useState();
+  const [visiblePageIds, setVisiblePageIds] = useState([]);
+  const [endScreenvisible, setEndScreenvisible] = useState(false);
+  const [surveyFeedback, setSurveyFeedback] = useState(undefined);
+  const [error, setError] = useState();
   const metadata = useMetadata();
   const {
     run,
@@ -41,7 +42,7 @@ const Stack = ({
       setEndScreenvisible(true);
     }
   });
-  const handleNextPage = React.useCallback(nextPageIndex => {
+  const handleNextPage = useCallback(nextPageIndex => {
     if (nextPageIndex < survey.pageOrder.length) {
       setVisiblePageIds(prevPageIds => {
         const nextPageId = survey.pageOrder[nextPageIndex];
@@ -49,13 +50,13 @@ const Stack = ({
       });
     }
   }, [survey.pageOrder]);
-  const handleStart = React.useCallback(() => {
+  const handleStart = useCallback(() => {
     handleNextPage(0);
   }, [handleNextPage]);
-  const handlePrevPage = React.useCallback(() => {
+  const handlePrevPage = useCallback(() => {
     setVisiblePageIds(prevPageIds => prevPageIds.slice(0, -1));
   }, []);
-  const handleSubmit = React.useCallback(feedback => {
+  const handleSubmit = useCallback(feedback => {
     if (preview) {
       setEndScreenvisible(true);
     } else {
@@ -70,6 +71,27 @@ const Stack = ({
       });
     }
   }, [metadata, preview, run]);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleUpload = async file => {
+    if (file) {
+      setIsUploading(true);
+
+      try {
+        const {
+          url
+        } = await uploadPicture(file);
+        setIsUploading(false);
+        return url;
+      } catch (reason) {
+        setIsUploading(false);
+        return undefined;
+      }
+    } else {
+      return undefined;
+    }
+  };
+
   return /*#__PURE__*/React.createElement(View, {
     style: styles.flexOne
   }, /*#__PURE__*/React.createElement(Header, {
@@ -95,7 +117,9 @@ const Stack = ({
       onClose: onClose,
       onNextPage: handleNextPage,
       onPrevPage: handlePrevPage,
-      onSubmit: handleSubmit
+      onSubmit: handleSubmit,
+      onUpload: handleUpload,
+      isUploading: isUploading
     }));
   }), /*#__PURE__*/React.createElement(ScreenWrapper, {
     visible: endScreenvisible,

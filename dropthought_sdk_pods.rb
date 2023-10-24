@@ -51,5 +51,6 @@ def use_dropthought_sdk
     pod 'react-native-aes', :path => "#{third_party_prefix}/react-native-aes-crypto"
     pod 'RNSecureKeyStore', :path => "#{third_party_prefix}/react-native-secure-key-store/ios"
     pod 'lottie-react-native', :path =>  "#{third_party_prefix}/lottie-react-native"
+    pod 'react-native-image-picker', :path =>  "#{third_party_prefix}/react-native-image-picker"
 
 end

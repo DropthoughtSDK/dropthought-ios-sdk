@@ -1,5 +1,5 @@
 import R from 'ramda';
-import {EvaluateRuleSet} from './index';
+import { EvaluateRuleSet } from './index';
 
 /**
  * return undefined if not existed
@@ -9,8 +9,8 @@ export const getPageIdFromPageIndex = R.curry((pageIndex, survey) =>
   R.pipe(
     //
     R.prop('pageOrder'),
-    R.nth(pageIndex),
-  )(survey),
+    R.nth(pageIndex)
+  )(survey)
 );
 
 /**
@@ -21,8 +21,8 @@ export const getPageIndexFromPageId = R.curry((pageId, survey) =>
   R.pipe(
     //
     R.prop('pageOrder'),
-    R.findIndex(R.equals(pageId)),
-  )(survey),
+    R.findIndex(R.equals(pageId))
+  )(survey)
 );
 
 /**
@@ -33,7 +33,7 @@ const getRuleSetFromPageIndex = (pageIndex, survey) =>
   R.pipe(
     // @ts-ignore
     getPageIdFromPageIndex(pageIndex),
-    R.prop(R.__, R.prop('rules', survey)),
+    R.prop(R.__, R.prop('rules', survey))
   )(survey);
 
 /**
@@ -49,22 +49,22 @@ const getPageFeedbacks = (pageIndex, survey, feedbacks) => {
     R.nth(pageIndex),
     // @ts-ignore
     R.prop('questions'),
-    R.map(question => ({
+    R.map((question) => ({
       questionId: question.questionId,
       textOrIndexArr: [''],
-    })),
+    }))
   )(survey);
 
   // if feedback has answers, use it to replace the default
-  return defaultPageFeedbacks.map(defaultFeedback => {
+  return defaultPageFeedbacks.map((defaultFeedback) => {
     const realFeedback = R.find(
-      f => f.questionId === defaultFeedback.questionId,
-      feedbacks,
+      (f) => f.questionId === defaultFeedback.questionId,
+      feedbacks
     );
     if (realFeedback && !R.isEmpty(realFeedback.answers)) {
       return {
         questionId: defaultFeedback.questionId,
-        textOrIndexArr: realFeedback.answers.map(s => s.toString()),
+        textOrIndexArr: realFeedback.answers.map((s) => s.toString()),
         otherFlag: realFeedback.otherFlag,
         type: realFeedback.type,
       };
@@ -89,7 +89,7 @@ export function nextPage(pageIndex, feedbacks, survey) {
   }
   const nextPageId = EvaluateRuleSet(
     pageRuleSet,
-    getPageFeedbacks(pageIndex, survey, feedbacks),
+    getPageFeedbacks(pageIndex, survey, feedbacks)
   );
   if (!nextPageId) {
     return defaultNextPage();

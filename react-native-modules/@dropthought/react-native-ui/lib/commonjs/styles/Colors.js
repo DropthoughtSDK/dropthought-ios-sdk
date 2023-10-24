@@ -3,7 +3,9 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.opacity60 = exports.opacity30 = exports.opacity15 = exports.opacity10 = exports.addOpacityToColor = exports.Option1BackgroundColorDark = exports.Option1BackgroundColor = exports.Colors = void 0;
+exports.addOpacityToColor = exports.Option1BackgroundColorDark = exports.Option1BackgroundColor = exports.Colors = void 0;
+exports.addOpacityToHex = addOpacityToHex;
+exports.opacity60 = exports.opacity30 = exports.opacity15 = exports.opacity10 = void 0;
 const Colors = {
   purple: '#4c3794',
   border: '#9b9b9b',
@@ -61,7 +63,8 @@ const Colors = {
   rankingCheckBoxBorder: '#a8a8a8',
   sliderLabel: '#848a93',
   sliderTrack: '#4b3694',
-  contentBackground: '#F3F5F8'
+  contentBackground: '#F3F5F8',
+  nonSelectCircle: '#aeb3be'
 };
 exports.Colors = Colors;
 
@@ -97,4 +100,14 @@ const Option1BackgroundColor = ['#ff8d8d', '#ffca8d', '#8de0ff', '#dbffb1', '#fe
 exports.Option1BackgroundColor = Option1BackgroundColor;
 const Option1BackgroundColorDark = ['#b2706d', '#b5976e', '#76a3bb', '#a4b986', '#b8af6e'];
 exports.Option1BackgroundColorDark = Option1BackgroundColorDark;
+
+function addOpacityToHex(hexColor, opacity) {
+  const o = Math.max(0, Math.min(1, opacity)); // bound opacity from 0 to 1
+
+  const intValue = Math.round(o * 255); // map percent to nearest integer (0 - 255)
+
+  const hexValue = intValue.toString(16); // get hexadecimal representation
+
+  return `${hexColor}${hexValue.padStart(2, '0').toUpperCase()}`; // format with leading 0 and upper case characters
+}
 //# sourceMappingURL=Colors.js.map

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.apiPostEvent = exports.apiGetVisibilityById = exports.apiGetProgramById = exports.sdkFetcher = void 0;
+exports.apiUploadFileEvent = exports.apiPostEvent = exports.apiGetVisibilityById = exports.apiGetProgramById = exports.sdkFetcher = void 0;
 
 var _Fetcher = require("./Fetcher");
 
@@ -12,6 +12,8 @@ var _ProgramAPI = require("./ProgramAPI");
 var _VisibilityAPI = require("./VisibilityAPI");
 
 var _EventAPI = require("./EventAPI");
+
+var _UploadFileAPI = require("./UploadFileAPI");
 
 var _APIClient = require("./APIClient");
 
@@ -46,12 +48,23 @@ exports.apiGetVisibilityById = apiGetVisibilityById;
 
 const apiPostEvent = (param, requestConfig) => (0, _EventAPI.apiPostEvent)(param, requestConfig, sdkFetcher);
 /**
- * @typedef {import('../data').APIGetProgramByIdParam} APIGetProgramByIdParam
- * @typedef {import('../data').APIPostEventParam} APIPostEventParam
- * @typedef {import('../data').RequestConfig} RequestConfig
- * @typedef {import('../data').InitializeParams} InitializeParams
+ *
+ * @param {ImageFormData} file
+ * @param {RequestConfig=} requestConfig
  */
 
 
 exports.apiPostEvent = apiPostEvent;
+
+const apiUploadFileEvent = (file, requestConfig) => (0, _UploadFileAPI.uploadFile)(file, requestConfig, sdkFetcher);
+/**
+ * @typedef {import('../data').APIGetProgramByIdParam} APIGetProgramByIdParam
+ * @typedef {import('../data').APIPostEventParam} APIPostEventParam
+ * @typedef {import('../data').RequestConfig} RequestConfig
+ * @typedef {import('../data').InitializeParams} InitializeParams
+ * @typedef {import('../lib/UploadFileAPI').ImageFormData} ImageFormData
+ */
+
+
+exports.apiUploadFileEvent = apiUploadFileEvent;
 //# sourceMappingURL=API.js.map

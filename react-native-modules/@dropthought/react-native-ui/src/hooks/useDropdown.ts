@@ -63,7 +63,7 @@ const useDropdown = (
       const answer = feedback.answers[0];
       if (typeof answer === 'number') {
         setSelectedOptionIndex(answer);
-      } else {
+      } else if (typeof answer === 'string') {
         // if the answer is not a number type,
         // it is for other label, return the last index
         setOtherText(answer);

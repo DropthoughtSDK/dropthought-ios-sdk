@@ -18,7 +18,9 @@ yarn add @dropthought/react-native-ui
 
 ### Installing dependencies
 
-[react-native-safe-area-context](https://github.com/th3rdwave/react-native-safe-area-context#getting-started)
+- [lottie-react-native](https://github.com/lottie-react-native/lottie-react-native)
+- [react-native-safe-area-context](https://github.com/th3rdwave/react-native-safe-area-context#getting-started)
+- [react-native-image-picker](https://github.com/react-native-image-picker/react-native-image-picker)
 
 ## Usage
 
@@ -122,6 +124,8 @@ Survey component.
   - `SurveyProgressBar`: ReactNode
   - `surveyProgressBarPosition`: ReactNode
   - `SurveyPageIndicator`: ReactNode
+  - `onUpload`: (file: ImageFileProps) => Promise<string | undefined>
+  - `isUploading`: boolean | undefined;
 
 ### EndScreenLayout
 

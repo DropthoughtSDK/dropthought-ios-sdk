@@ -56,6 +56,7 @@ export const Colors = {
   sliderLabel: '#848a93',
   sliderTrack: '#4b3694',
   contentBackground: '#F3F5F8',
+  nonSelectCircle: '#aeb3be',
 };
 
 export const addOpacityToColor = (hexColor: string, opacity: number) => {
@@ -86,3 +87,10 @@ export const Option1BackgroundColorDark = [
   '#a4b986',
   '#b8af6e',
 ];
+
+export function addOpacityToHex(hexColor: string, opacity: number) {
+  const o = Math.max(0, Math.min(1, opacity)); // bound opacity from 0 to 1
+  const intValue = Math.round(o * 255); // map percent to nearest integer (0 - 255)
+  const hexValue = intValue.toString(16); // get hexadecimal representation
+  return `${hexColor}${hexValue.padStart(2, '0').toUpperCase()}`; // format with leading 0 and upper case characters
+}

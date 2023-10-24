@@ -55,7 +55,8 @@ export const Colors = {
   rankingCheckBoxBorder: '#a8a8a8',
   sliderLabel: '#848a93',
   sliderTrack: '#4b3694',
-  contentBackground: '#F3F5F8'
+  contentBackground: '#F3F5F8',
+  nonSelectCircle: '#aeb3be'
 };
 export const addOpacityToColor = (hexColor, opacity) => {
   const o = Math.max(0, Math.min(1, opacity)); // bound opacity from 0 to 1
@@ -73,4 +74,13 @@ export const opacity30 = color => `${color}4d`;
 export const opacity60 = color => `${color}99`;
 export const Option1BackgroundColor = ['#ff8d8d', '#ffca8d', '#8de0ff', '#dbffb1', '#feed8d'];
 export const Option1BackgroundColorDark = ['#b2706d', '#b5976e', '#76a3bb', '#a4b986', '#b8af6e'];
+export function addOpacityToHex(hexColor, opacity) {
+  const o = Math.max(0, Math.min(1, opacity)); // bound opacity from 0 to 1
+
+  const intValue = Math.round(o * 255); // map percent to nearest integer (0 - 255)
+
+  const hexValue = intValue.toString(16); // get hexadecimal representation
+
+  return `${hexColor}${hexValue.padStart(2, '0').toUpperCase()}`; // format with leading 0 and upper case characters
+}
 //# sourceMappingURL=Colors.js.map

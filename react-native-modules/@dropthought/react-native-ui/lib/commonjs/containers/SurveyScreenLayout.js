@@ -96,6 +96,8 @@ const SurveyScreenLayout = props => {
     onPrevPage,
     onNextPage,
     onSubmit,
+    onUpload,
+    isUploading,
     SurveyPageIndicator = _SurveyPageIndicator.default,
     SurveyProgressBar = _SurveyProgressBar.default,
     surveyProgressBarPosition = SurveyProgressBarPosition.FixedBottom
@@ -169,12 +171,10 @@ const SurveyScreenLayout = props => {
       question: question,
       validationStarted: validationStarted,
       themeColor: survey.surveyProperty.hexCode,
-      onDragGrant: () => {
-        setScrollEnabled(false);
-      },
-      onDragEnd: () => {
-        setScrollEnabled(true);
-      }
+      onDragGrant: () => setScrollEnabled(false),
+      onDragEnd: () => setScrollEnabled(true),
+      onUpload: onUpload,
+      isUploading: isUploading
     });
   });
   const classicLayout = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SurveyPageIndicator, {
@@ -218,6 +218,8 @@ const SurveyScreenLayout = props => {
     onClose: onCloseHandler,
     onPrevPage: onPrevPageHandler,
     onNextPage: onNextPageHandler,
+    onUpload: onUpload,
+    isUploading: isUploading,
     survey: survey,
     pageIndex: pageIndex,
     themeOption: themeOption

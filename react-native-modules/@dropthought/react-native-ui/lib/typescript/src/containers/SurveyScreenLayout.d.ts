@@ -1,4 +1,4 @@
-import type { Survey, SurveyFeedback } from 'src/data';
+import type { Survey, SurveyFeedback, ImageFileProps } from '../data';
 export declare const SurveyProgressBarPosition: {
     FixedBottom: number;
     BelowBody: number;
@@ -13,6 +13,8 @@ declare type Props = {
     onPageEnter?: () => void;
     onPageLeave?: () => void;
     onFeedback?: () => void;
+    onUpload?: (file: ImageFileProps) => Promise<string | undefined>;
+    isUploading?: boolean;
     SurveyProgressBar?: any;
     surveyProgressBarPosition?: number;
     SurveyPageIndicator?: any;

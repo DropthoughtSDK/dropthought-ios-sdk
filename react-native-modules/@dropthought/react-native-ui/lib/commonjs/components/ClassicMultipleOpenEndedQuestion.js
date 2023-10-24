@@ -79,7 +79,7 @@ const RowComponent = ({
   };
 
   const rowContainerStyle = [styles.rowContainer, {
-    backgroundColor: isFocus ? isDark ? _styles.Colors.rankingContainerBgDark : (0, _styles.addOpacityToColor)(themeColor || _styles.Colors.white, 0.1) : undefined
+    backgroundColor: isFocus ? isDark ? _styles.Colors.rankingContainerBgDark : (0, _styles.addOpacityToColor)(themeColor || _styles.Colors.white, 0.1) : backgroundColor
   }];
   const rowTitleTextStyle = [styles.rowTitleText, {
     color: fontColor
@@ -167,7 +167,7 @@ const ClassicMultipleOpenEndedQuestion = ({
     key: index.toString()
   }));
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
-    style: _styles.default.questionContainer
+    style: styles.questionContainer
   }, /*#__PURE__*/_react.default.createElement(_ClassicMandatoryTitle.default, {
     forgot: false,
     question: question,
@@ -181,6 +181,10 @@ var _default = /*#__PURE__*/_react.default.memo(ClassicMultipleOpenEndedQuestion
 exports.default = _default;
 
 const styles = _reactNative.StyleSheet.create({
+  questionContainer: {
+    marginTop: 45,
+    marginHorizontal: 16
+  },
   title: {
     marginBottom: 16
   },
