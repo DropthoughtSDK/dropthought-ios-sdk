@@ -57,6 +57,8 @@ export const Colors = {
   sliderTrack: '#4b3694',
   contentBackground: '#F3F5F8',
   nonSelectCircle: '#aeb3be',
+  lightActionText: '#121212',
+  darkActionText: '#e1e1e1',
 };
 
 export const addOpacityToColor = (hexColor: string, opacity: number) => {

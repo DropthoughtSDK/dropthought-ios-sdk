@@ -58,6 +58,8 @@ export namespace Colors {
     const sliderTrack: string;
     const contentBackground: string;
     const nonSelectCircle: string;
+    const lightActionText: string;
+    const darkActionText: string;
 }
 export function addOpacityToColor(hexColor: any, opacity: any): string;
 export function opacity10(color: any): string;

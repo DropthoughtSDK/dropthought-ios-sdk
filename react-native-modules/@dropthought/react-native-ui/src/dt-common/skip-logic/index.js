@@ -427,20 +427,28 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
               result = !conditionValueArr.includes(selectedAnswer);
               break;
             case 'multiChoice':
-              const multiChoiceFeedbackArr = feedback.textOrIndexArr.map(
-                (text) => parseInt(text, 10)
-              );
-              result = conditionValueArr.every(
-                (condition) => !multiChoiceFeedbackArr.includes(condition)
-              );
+              if (conditionValueArr.includes(-2) && feedback.otherFlag) {
+                result = false;
+              } else {
+                const multiChoiceFeedbackArr = feedback.textOrIndexArr.map(
+                  (text) => parseInt(text, 10)
+                );
+                result = conditionValueArr.every(
+                  (condition) => !multiChoiceFeedbackArr.includes(condition)
+                );
+              }
               break;
             case 'pictureChoice':
-              const pictureChoiceFeedbackArr = feedback.textOrIndexArr.map(
-                (text) => parseInt(text, 10)
-              );
-              result = conditionValueArr.every(
-                (condition) => !pictureChoiceFeedbackArr.includes(condition)
-              );
+              if (conditionValueArr.includes(-2) && feedback.otherFlag) {
+                result = false;
+              } else {
+                const pictureChoiceFeedbackArr = feedback.textOrIndexArr.map(
+                  (text) => parseInt(text, 10)
+                );
+                result = conditionValueArr.every(
+                  (condition) => !pictureChoiceFeedbackArr.includes(condition)
+                );
+              }
               break;
 
             default:

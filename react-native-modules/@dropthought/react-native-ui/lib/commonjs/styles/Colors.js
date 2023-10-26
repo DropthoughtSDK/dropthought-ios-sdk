@@ -64,7 +64,9 @@ const Colors = {
   sliderLabel: '#848a93',
   sliderTrack: '#4b3694',
   contentBackground: '#F3F5F8',
-  nonSelectCircle: '#aeb3be'
+  nonSelectCircle: '#aeb3be',
+  lightActionText: '#121212',
+  darkActionText: '#e1e1e1'
 };
 exports.Colors = Colors;
 

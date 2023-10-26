@@ -47,6 +47,7 @@ const PictureChoiceOtherItem = ({
     fontColor,
     colorScheme
   } = (0, _theme.useTheme)();
+  const isDarkMode = true; //colorScheme === COLOR_SCHEMES.dark;
 
   const {
     width
@@ -55,6 +56,7 @@ const PictureChoiceOtherItem = ({
   const questionMargin = 30;
   const itemWidth = (width - 2 * questionMargin - columnGap) / 2;
   const [imageLoadError, setImageLoadError] = (0, _react.useState)(false);
+  const [actionSheetVisible, setActionSheetVisible] = (0, _react.useState)(false);
   const pictureSelectedStyle = [styles.pictureSelected, {
     width: itemWidth,
     borderColor: themeColor
@@ -112,6 +114,7 @@ const PictureChoiceOtherItem = ({
   }
 
   const openPhotoLibrary = () => {
+    setActionSheetVisible(false);
     const options = {
       selectionLimit: 1,
       mediaType: 'photo'
@@ -120,6 +123,7 @@ const PictureChoiceOtherItem = ({
   };
 
   const openCamera = () => {
+    setActionSheetVisible(false);
     const options = {
       saveToPhotos: true,
       mediaType: 'photo'
@@ -134,19 +138,6 @@ const PictureChoiceOtherItem = ({
     } else {
       (0, _reactNativeImagePicker.launchCamera)(options, uploadPicture);
     }
-  };
-
-  const showChooseAlert = () => {
-    _reactNative.Alert.alert(`${_translation.default.t('picture-choice:chooseImageTitle')}`, undefined, [{
-      text: `${_translation.default.t('picture-choice:camera')}`,
-      onPress: openCamera
-    }, {
-      text: `${_translation.default.t('picture-choice:photoLibrary')}`,
-      onPress: openPhotoLibrary
-    }, {
-      text: `${_translation.default.t('picture-choice:cancel')}`,
-      style: 'cancel'
-    }]);
   };
 
   const placeholderTextStyle = colorScheme === _theme.COLOR_SCHEMES.dark ? [styles.placeholderText, {
@@ -172,13 +163,41 @@ const PictureChoiceOtherItem = ({
   const reloadStyle = [styles.pictureReloadContainer, {
     width: itemWidth
   }];
+
+  const actionSheet = /*#__PURE__*/_react.default.createElement(_reactNative.Modal, {
+    animationType: "none",
+    transparent: true,
+    visible: actionSheetVisible
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+    style: styles.actionModalContainer
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+    style: styles.actionContainer
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+    style: styles.actions
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+    style: isDarkMode ? styles.darkUpperAction : styles.upperAction,
+    onPress: openPhotoLibrary
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    style: isDarkMode ? styles.darkActionText : styles.actionText
+  }, `${_translation.default.t('picture-choice:photoLibrary')}`)), /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+    style: isDarkMode ? styles.darkBottomAction : styles.bottomAction,
+    onPress: openCamera
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    style: isDarkMode ? styles.darkActionText : styles.actionText
+  }, `${_translation.default.t('picture-choice:camera')}`))), /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+    style: isDarkMode ? styles.darkCancelAction : styles.cancelAction,
+    onPress: () => setActionSheetVisible(false)
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    style: isDarkMode ? styles.darkActionText : styles.actionCancelText
+  }, `${_translation.default.t('picture-choice:cancel')}`)))));
+
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, null, /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
     onPress: () => {
       if (imageLoadError) {
         setImageLoadError(false);
         setLoadingImage(true);
       } else {
-        showChooseAlert();
+        setActionSheetVisible(true);
       }
     }
   }, imageLoadError ? /*#__PURE__*/_react.default.createElement(_reactNative.View, {
@@ -222,7 +241,7 @@ const PictureChoiceOtherItem = ({
     style: styles.optionContainer,
     onPress: () => {
       if (!selected) {
-        showChooseAlert();
+        setActionSheetVisible(true);
       }
 
       onSelect();
@@ -244,7 +263,7 @@ const PictureChoiceOtherItem = ({
     underlineColorAndroid: _styles.Colors.transparent,
     defaultValue: otherPicture.value,
     onChangeText: onChangeText
-  }))));
+  }))), actionSheet);
 };
 
 var _default = PictureChoiceOtherItem;
@@ -312,6 +331,86 @@ const styles = _reactNative.StyleSheet.create({
   reloadText: {
     fontSize: 12,
     marginLeft: 4
+  },
+  actionModalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingBottom: 29,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)'
+  },
+  actionContainer: {
+    width: '100%',
+    height: 190
+  },
+  actionText: {
+    fontSize: 20,
+    fontWeight: '500',
+    color: _styles.Colors.lightActionText
+  },
+  actionCancelText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: _styles.Colors.defaultThemeColor
+  },
+  darkActionText: {
+    fontSize: 20,
+    fontWeight: '500',
+    color: _styles.Colors.darkActionText
+  },
+  actions: {
+    marginBottom: 16
+  },
+  upperAction: {
+    height: 58,
+    backgroundColor: _styles.Colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderTopLeftRadius: 14,
+    borderTopRightRadius: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(17, 17, 17, 0.5)'
+  },
+  bottomAction: {
+    height: 58,
+    backgroundColor: _styles.Colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomLeftRadius: 14,
+    borderBottomRightRadius: 14
+  },
+  cancelAction: {
+    height: 58,
+    backgroundColor: _styles.Colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14
+  },
+  darkUpperAction: {
+    height: 58,
+    backgroundColor: _styles.Colors.rankingContainerBgDark,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderTopLeftRadius: 14,
+    borderTopRightRadius: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(17, 17, 17, 0.5)'
+  },
+  darkBottomAction: {
+    height: 58,
+    backgroundColor: _styles.Colors.rankingContainerBgDark,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomLeftRadius: 14,
+    borderBottomRightRadius: 14
+  },
+  darkCancelAction: {
+    height: 58,
+    backgroundColor: _styles.Colors.rankingContainerBgDark,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14
   }
 });
 //# sourceMappingURL=PictureChoiceOtherItem.js.map

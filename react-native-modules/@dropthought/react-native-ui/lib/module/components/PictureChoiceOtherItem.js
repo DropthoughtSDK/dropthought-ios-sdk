@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity, TextInput, Alert, Platform, PermissionsAndroid, Text, Dimensions } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity, TextInput, Platform, PermissionsAndroid, Text, Dimensions, Modal } from 'react-native';
 import GlobalStyle, { Colors, addOpacityToHex } from '../styles';
 import i18n from '../translation';
 import ActivityIndicatorMask from './ActivityIndicatorMask';
@@ -26,12 +26,15 @@ const PictureChoiceOtherItem = ({
     fontColor,
     colorScheme
   } = useTheme();
+  const isDarkMode = true; //colorScheme === COLOR_SCHEMES.dark;
+
   const {
     width
   } = Dimensions.get('window');
   const questionMargin = 30;
   const itemWidth = (width - 2 * questionMargin - columnGap) / 2;
   const [imageLoadError, setImageLoadError] = useState(false);
+  const [actionSheetVisible, setActionSheetVisible] = useState(false);
   const pictureSelectedStyle = [styles.pictureSelected, {
     width: itemWidth,
     borderColor: themeColor
@@ -89,6 +92,7 @@ const PictureChoiceOtherItem = ({
   }
 
   const openPhotoLibrary = () => {
+    setActionSheetVisible(false);
     const options = {
       selectionLimit: 1,
       mediaType: 'photo'
@@ -97,6 +101,7 @@ const PictureChoiceOtherItem = ({
   };
 
   const openCamera = () => {
+    setActionSheetVisible(false);
     const options = {
       saveToPhotos: true,
       mediaType: 'photo'
@@ -111,19 +116,6 @@ const PictureChoiceOtherItem = ({
     } else {
       launchCamera(options, uploadPicture);
     }
-  };
-
-  const showChooseAlert = () => {
-    Alert.alert(`${i18n.t('picture-choice:chooseImageTitle')}`, undefined, [{
-      text: `${i18n.t('picture-choice:camera')}`,
-      onPress: openCamera
-    }, {
-      text: `${i18n.t('picture-choice:photoLibrary')}`,
-      onPress: openPhotoLibrary
-    }, {
-      text: `${i18n.t('picture-choice:cancel')}`,
-      style: 'cancel'
-    }]);
   };
 
   const placeholderTextStyle = colorScheme === COLOR_SCHEMES.dark ? [styles.placeholderText, {
@@ -149,13 +141,39 @@ const PictureChoiceOtherItem = ({
   const reloadStyle = [styles.pictureReloadContainer, {
     width: itemWidth
   }];
+  const actionSheet = /*#__PURE__*/React.createElement(Modal, {
+    animationType: "none",
+    transparent: true,
+    visible: actionSheetVisible
+  }, /*#__PURE__*/React.createElement(View, {
+    style: styles.actionModalContainer
+  }, /*#__PURE__*/React.createElement(View, {
+    style: styles.actionContainer
+  }, /*#__PURE__*/React.createElement(View, {
+    style: styles.actions
+  }, /*#__PURE__*/React.createElement(TouchableOpacity, {
+    style: isDarkMode ? styles.darkUpperAction : styles.upperAction,
+    onPress: openPhotoLibrary
+  }, /*#__PURE__*/React.createElement(Text, {
+    style: isDarkMode ? styles.darkActionText : styles.actionText
+  }, `${i18n.t('picture-choice:photoLibrary')}`)), /*#__PURE__*/React.createElement(TouchableOpacity, {
+    style: isDarkMode ? styles.darkBottomAction : styles.bottomAction,
+    onPress: openCamera
+  }, /*#__PURE__*/React.createElement(Text, {
+    style: isDarkMode ? styles.darkActionText : styles.actionText
+  }, `${i18n.t('picture-choice:camera')}`))), /*#__PURE__*/React.createElement(TouchableOpacity, {
+    style: isDarkMode ? styles.darkCancelAction : styles.cancelAction,
+    onPress: () => setActionSheetVisible(false)
+  }, /*#__PURE__*/React.createElement(Text, {
+    style: isDarkMode ? styles.darkActionText : styles.actionCancelText
+  }, `${i18n.t('picture-choice:cancel')}`)))));
   return /*#__PURE__*/React.createElement(View, null, /*#__PURE__*/React.createElement(TouchableOpacity, {
     onPress: () => {
       if (imageLoadError) {
         setImageLoadError(false);
         setLoadingImage(true);
       } else {
-        showChooseAlert();
+        setActionSheetVisible(true);
       }
     }
   }, imageLoadError ? /*#__PURE__*/React.createElement(View, {
@@ -199,7 +217,7 @@ const PictureChoiceOtherItem = ({
     style: styles.optionContainer,
     onPress: () => {
       if (!selected) {
-        showChooseAlert();
+        setActionSheetVisible(true);
       }
 
       onSelect();
@@ -221,7 +239,7 @@ const PictureChoiceOtherItem = ({
     underlineColorAndroid: Colors.transparent,
     defaultValue: otherPicture.value,
     onChangeText: onChangeText
-  }))));
+  }))), actionSheet);
 };
 
 export default PictureChoiceOtherItem;
@@ -287,6 +305,86 @@ const styles = StyleSheet.create({
   reloadText: {
     fontSize: 12,
     marginLeft: 4
+  },
+  actionModalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingBottom: 29,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)'
+  },
+  actionContainer: {
+    width: '100%',
+    height: 190
+  },
+  actionText: {
+    fontSize: 20,
+    fontWeight: '500',
+    color: Colors.lightActionText
+  },
+  actionCancelText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: Colors.defaultThemeColor
+  },
+  darkActionText: {
+    fontSize: 20,
+    fontWeight: '500',
+    color: Colors.darkActionText
+  },
+  actions: {
+    marginBottom: 16
+  },
+  upperAction: {
+    height: 58,
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderTopLeftRadius: 14,
+    borderTopRightRadius: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(17, 17, 17, 0.5)'
+  },
+  bottomAction: {
+    height: 58,
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomLeftRadius: 14,
+    borderBottomRightRadius: 14
+  },
+  cancelAction: {
+    height: 58,
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14
+  },
+  darkUpperAction: {
+    height: 58,
+    backgroundColor: Colors.rankingContainerBgDark,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderTopLeftRadius: 14,
+    borderTopRightRadius: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(17, 17, 17, 0.5)'
+  },
+  darkBottomAction: {
+    height: 58,
+    backgroundColor: Colors.rankingContainerBgDark,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomLeftRadius: 14,
+    borderBottomRightRadius: 14
+  },
+  darkCancelAction: {
+    height: 58,
+    backgroundColor: Colors.rankingContainerBgDark,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14
   }
 });
 //# sourceMappingURL=PictureChoiceOtherItem.js.map
