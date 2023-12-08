@@ -30,6 +30,7 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 const MandatoryTitle = ({
   forgot,
   invalidMessage = '',
+  mandatoryErrorMessage,
   question,
   style
 }) => {
@@ -74,7 +75,7 @@ const MandatoryTitle = ({
     style: styles.hint
   }, "*")), /*#__PURE__*/React.createElement(_QuestionWarningMessage.default // forgot message has higher priority than custom invalid message
   , {
-    message: forgot ? _translation.default.t('survey:mandatory') : invalidMessage
+    message: forgot ? mandatoryErrorMessage : invalidMessage
   }));
 };
 

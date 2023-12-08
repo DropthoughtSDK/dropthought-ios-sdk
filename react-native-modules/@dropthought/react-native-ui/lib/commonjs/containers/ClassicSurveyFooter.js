@@ -17,6 +17,8 @@ var _styles = require("../styles");
 
 var _translation = _interopRequireDefault(require("../translation"));
 
+var _theme = require("../contexts/theme");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
@@ -41,6 +43,9 @@ const DummyButton = ({
 });
 
 const ClassicSurveyFooter = props => {
+  const {
+    hexCode
+  } = (0, _theme.useTheme)();
   const dimensionWidthType = (0, _useWindowDimensions.useDimensionWidthType)();
   const rtl = _translation.default.dir() === 'rtl';
   const {
@@ -58,14 +63,14 @@ const ClassicSurveyFooter = props => {
     LeftButtonComponent = DummyButton;
   }
 
-  const themeColor = props.survey.surveyProperty.hexCode;
+  const themeColor = hexCode;
   const btnWidth = dimensionWidthType === _useWindowDimensions.DimensionWidthType.phone ? 76 : 100;
   const [submitDisabled, setSubmitDisabled] = React.useState(false);
   return /*#__PURE__*/React.createElement(_reactNative.View, {
     style: [styles.container, rtl && _styles.GlobalStyle.flexRowReverse]
   }, /*#__PURE__*/React.createElement(LeftButtonComponent, {
     width: btnWidth,
-    title: _translation.default.t('survey:survey-back'),
+    title: survey.backPage,
     color: themeColor,
     onPress: onPrevPage // @ts-ignore
     ,
@@ -73,7 +78,7 @@ const ClassicSurveyFooter = props => {
   }), lastPage ? /*#__PURE__*/React.createElement(_Button.default, {
     disabled: submitDisabled,
     width: btnWidth,
-    title: _translation.default.t('survey:survey-submit'),
+    title: survey.submitSurvey,
     color: themeColor,
     onPress: () => {
       setSubmitDisabled(true);
@@ -84,7 +89,7 @@ const ClassicSurveyFooter = props => {
     containerStyle: styles.rightBtnContainer
   }) : /*#__PURE__*/React.createElement(_Button.default, {
     width: btnWidth,
-    title: _translation.default.t('survey:survey-next'),
+    title: survey.nextPage,
     color: themeColor,
     onPress: onNextPage // @ts-ignore
     ,

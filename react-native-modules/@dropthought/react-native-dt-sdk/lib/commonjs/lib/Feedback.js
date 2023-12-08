@@ -3,12 +3,9 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.saveFeedback = exports.submitFeedback = void 0;
-
+exports.submitFeedback = exports.saveFeedback = void 0;
 var _API = require("./API");
-
 var _FeedbacksUploader = require("./FeedbacksUploader");
-
 /**
  * the format is to fit in the react-async deferFn
  * @param {[SurveyFeedback]} surveyFeedback
@@ -30,20 +27,16 @@ const submitFeedback = async ([surveyFeedback]) => {
     throw error;
   });
 };
+
 /**
  * @param {SurveyFeedback} surveyFeedback
  */
-
-
 exports.submitFeedback = submitFeedback;
-
 const saveFeedback = async surveyFeedback => {
   return _FeedbacksUploader.FeedbacksQueue.enqueue(surveyFeedback);
 };
+
 /**@typedef {import('../data').Feedback} Feedback */
-
 /**@typedef {import('../data').SurveyFeedback} SurveyFeedback */
-
-
 exports.saveFeedback = saveFeedback;
 //# sourceMappingURL=Feedback.js.map

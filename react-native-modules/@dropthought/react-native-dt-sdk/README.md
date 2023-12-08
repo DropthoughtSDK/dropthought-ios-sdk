@@ -4,10 +4,11 @@ This repository contains all the sources of dropthought SDK for react-native
 
 ## Latest version
 
-- 5.3.0
+- 5.5.0
 
 ## Features
 
+- Picture Choice
 - Matrix choice
 - Multiple open question
 - Matrix rating
@@ -35,13 +36,15 @@ yarn add @dropthought/react-native-dt-sdk
 
 ### Installing dependencies
 
+```sh
+yarn add react-native-aes-crypto react-native-secure-key-store react-native-safe-area-context@^3.0.7 lottie-react-native@5.1.6 react-native-image-picker@7.0.1
+```
+
 - [react-native-aes-crypto](https://www.npmjs.com/package/react-native-aes-crypto)
-- [react-native-safe-area-context](https://github.com/th3rdwave/react-native-safe-area-context#getting-started)
+- [react-native-safe-area-context, @^3.0.7](https://github.com/th3rdwave/react-native-safe-area-context#getting-started)
 - [react-native-secure-key-store](https://www.npmjs.com/package/react-native-secure-key-store)
-- [lottie-react-native](https://github.com/lottie-react-native/lottie-react-native)
-- [react-native-image-picker](https://github.com/react-native-image-picker/react-native-image-picker)
-- [react-native-webview](https://github.com/react-native-webview/react-native-webview)
--
+- [lottie-react-native, use 5.1.6](https://github.com/lottie-react-native/lottie-react-native)
+- [react-native-image-picker, use 7.0.1](https://github.com/react-native-image-picker/react-native-image-picker)
 
 ## initialize
 

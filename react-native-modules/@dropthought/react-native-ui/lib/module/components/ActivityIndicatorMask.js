@@ -1,12 +1,13 @@
 import React from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 import { GlobalStyle } from '../styles';
 
 const ActivityIndicatorMask = ({
-  loading = false
+  loading = false,
+  style
 }) => {
   return loading ? /*#__PURE__*/React.createElement(View, {
-    style: [GlobalStyle.loadingMask, GlobalStyle.fullCenter]
+    style: [GlobalStyle.loadingMask, GlobalStyle.fullCenter, style]
   }, /*#__PURE__*/React.createElement(ActivityIndicator, null)) : null;
 };
 

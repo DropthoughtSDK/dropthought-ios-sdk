@@ -9,26 +9,24 @@ export const fetcherInstance = new Fetcher({
   baseURL: BASE_URL,
   timeout: DEFAULT_TIMEOUT
 });
+
 /** @typedef {import('./Fetcher').InitializeParams} APIInitializeParams */
-
 /** @typedef {import('./Fetcher').RequestConfig} RequestConfig */
-
 /** @typedef {import('./Fetcher').AuthToken} AuthToken */
 
 /**
  * @param {APIInitializeParams} param
  */
-
 export function apiInitialize(param = {}) {
   fetcherInstance.init(param);
 }
+
 /**
  * @template T
  * @param {string} url
  * @param {RequestConfig} requestConfig
  * @returns {import('axios').AxiosPromise<T>}
  */
-
 export async function apiRequest(url, requestConfig) {
   return fetcherInstance.request(url, requestConfig);
 }

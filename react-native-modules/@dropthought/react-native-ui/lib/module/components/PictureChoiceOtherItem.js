@@ -3,10 +3,10 @@ import { View, StyleSheet, Image, TouchableOpacity, TextInput, Platform, Permiss
 import GlobalStyle, { Colors, addOpacityToHex } from '../styles';
 import i18n from '../translation';
 import ActivityIndicatorMask from './ActivityIndicatorMask';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 import { ChooseIcon } from './PictureChoiceItem';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
-const MAXIMUM_SIZE_KB = 5 * 1024 * 1024; // 2MB
+const MAXIMUM_SIZE_KB = 5 * 1024 * 1024; // 5MB
 
 const PictureChoiceOtherItem = ({
   otherPicture,
@@ -17,17 +17,17 @@ const PictureChoiceOtherItem = ({
   onChooseImage,
   onSelect,
   onUpload,
-  isUploading,
   onError,
   onChangeText,
-  themeColor
+  themeColor,
+  preview
 }) => {
+  const rtl = i18n.dir() === 'rtl';
   const {
     fontColor,
     colorScheme
   } = useTheme();
-  const isDarkMode = true; //colorScheme === COLOR_SCHEMES.dark;
-
+  const isDarkMode = colorScheme === COLOR_SCHEMES.dark;
   const {
     width
   } = Dimensions.get('window');
@@ -48,33 +48,35 @@ const PictureChoiceOtherItem = ({
     width: itemWidth
   }];
   const [loadingImage, setLoadingImage] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const validTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 
-  const uploadPicture = response => {
-    var _response$assets;
+  const uploadPicture = image => {
+    setActionSheetVisible(false);
+    const {
+      path: uri,
+      mime: type,
+      data: base64,
+      size
+    } = image;
+    const pieces = uri.split('/');
+    const name = pieces[pieces.length - 1];
 
-    if (response !== null && response !== void 0 && response.assets && (response === null || response === void 0 ? void 0 : (_response$assets = response.assets) === null || _response$assets === void 0 ? void 0 : _response$assets.length) > 0) {
-      const {
-        uri,
-        fileName: name,
-        type,
-        fileSize
-      } = response.assets[0];
-
-      if (type && !validTypes.includes(type)) {
-        onError(`${i18n.t('picture-choice:invalidTypeHint')}`);
-      } else if (fileSize && fileSize > MAXIMUM_SIZE_KB) {
-        onError(`${i18n.t('picture-choice:overSizeHint')}`);
-      } else {
-        if (uri && name && type) {
-          const file = {
-            uri,
-            name,
-            type
-          };
-          onUpload(file);
-          onChooseImage();
-        }
+    if (type && !validTypes.includes(type)) {
+      onError(`${i18n.t('picture-choice:invalidTypeHint')}`);
+    } else if (size && size > MAXIMUM_SIZE_KB) {
+      onError(`${i18n.t('picture-choice:overSizeHint')}`);
+    } else {
+      if (uri && name && type && base64) {
+        setIsUploading(true);
+        const file = {
+          uri,
+          name,
+          type,
+          base64
+        };
+        onUpload(file).then(() => setIsUploading(false));
+        onChooseImage();
       }
     }
   };
@@ -82,39 +84,55 @@ const PictureChoiceOtherItem = ({
   async function hasAndroidPermission() {
     const permission = PermissionsAndroid.PERMISSIONS.CAMERA;
     const hasPermission = await PermissionsAndroid.check(permission);
+    console.log('[hasAndroidPermission] hasPermission: ', hasPermission);
 
     if (hasPermission) {
       return true;
     }
 
+    console.log('[hasAndroidPermission] before request status: ');
     const status = await PermissionsAndroid.request(permission);
+    console.log('[hasAndroidPermission] status: ', status);
     return status === PermissionsAndroid.RESULTS.GRANTED;
   }
 
   const openPhotoLibrary = () => {
-    setActionSheetVisible(false);
-    const options = {
-      selectionLimit: 1,
-      mediaType: 'photo'
-    };
-    launchImageLibrary(options, uploadPicture);
+    ImagePicker.openPicker({
+      mediaType: 'photo',
+      includeBase64: true
+    }).then(image => {
+      console.log(image);
+      uploadPicture(image);
+    });
   };
 
   const openCamera = () => {
-    setActionSheetVisible(false);
-    const options = {
-      saveToPhotos: true,
-      mediaType: 'photo'
-    };
+    console.log('[openCamera] enter');
 
     if (Platform.OS === 'android') {
+      console.log('[openCamera] before hasAndroidPermission');
       hasAndroidPermission().then(result => {
+        console.log('[openCamera] hasAndroidPermission result: ', result);
+
         if (result) {
-          launchCamera(options, uploadPicture);
+          console.log('[openCamera] open');
+          ImagePicker.openCamera({
+            mediaType: 'photo',
+            includeBase64: true
+          }).then(image => {
+            console.log('[openCamera] open image: ', image);
+            uploadPicture(image);
+          });
         }
       });
     } else {
-      launchCamera(options, uploadPicture);
+      ImagePicker.openCamera({
+        mediaType: 'photo',
+        includeBase64: true
+      }).then(image => {
+        console.log(image);
+        uploadPicture(image);
+      });
     }
   };
 
@@ -139,10 +157,16 @@ const PictureChoiceOtherItem = ({
     color: fontColor
   }];
   const reloadStyle = [styles.pictureReloadContainer, {
-    width: itemWidth
+    width: itemWidth,
+    backgroundColor: addOpacityToHex(themeColor, 0.1),
+    borderColor: themeColor
+  }];
+  const reloadPlacholderStyle = [styles.reloadPlaceholderImage, iconStyle];
+  const reloadTextStyle = [styles.reloadText, {
+    color: fontColor
   }];
   const actionSheet = /*#__PURE__*/React.createElement(Modal, {
-    animationType: "none",
+    animationType: "fade",
     transparent: true,
     visible: actionSheetVisible
   }, /*#__PURE__*/React.createElement(View, {
@@ -168,6 +192,8 @@ const PictureChoiceOtherItem = ({
     style: isDarkMode ? styles.darkActionText : styles.actionCancelText
   }, `${i18n.t('picture-choice:cancel')}`)))));
   return /*#__PURE__*/React.createElement(View, null, /*#__PURE__*/React.createElement(TouchableOpacity, {
+    style: styles.buttonContainer,
+    disabled: preview,
     onPress: () => {
       if (imageLoadError) {
         setImageLoadError(false);
@@ -179,15 +205,16 @@ const PictureChoiceOtherItem = ({
   }, imageLoadError ? /*#__PURE__*/React.createElement(View, {
     style: reloadStyle
   }, /*#__PURE__*/React.createElement(Image, {
-    style: styles.reloadPlaceholderImage,
+    style: reloadPlacholderStyle,
     source: require('../assets/ic_image_placeholder.png')
   }), /*#__PURE__*/React.createElement(View, {
     style: GlobalStyle.row
   }, /*#__PURE__*/React.createElement(Image, {
+    style: iconStyle,
     source: require('../assets/ic_reload.png')
   }), /*#__PURE__*/React.createElement(Text, {
-    style: styles.reloadText
-  }, `${i18n.t('picture-choice:reload')}`))) : selected && otherPicture.image.length > 0 ? /*#__PURE__*/React.createElement(Image, {
+    style: reloadTextStyle
+  }, `${i18n.t('picture-choice:reload')}`))) : selected && otherPicture.image.length > 0 ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Image, {
     style: pictureSelectedStyle,
     source: {
       uri: otherPicture.image
@@ -198,7 +225,9 @@ const PictureChoiceOtherItem = ({
       setImageLoadError(true);
       setLoadingImage(false);
     }
-  }) : /*#__PURE__*/React.createElement(View, {
+  }), /*#__PURE__*/React.createElement(ActivityIndicatorMask, {
+    loading: loadingImage
+  })) : /*#__PURE__*/React.createElement(View, {
     style: nonSelectedOtherPictureContainerStyle
   }, /*#__PURE__*/React.createElement(View, {
     style: styles.placeholderGroup
@@ -212,9 +241,10 @@ const PictureChoiceOtherItem = ({
   }, `${i18n.t('picture-choice:chooseImage')}`)), /*#__PURE__*/React.createElement(Text, {
     style: optionalTextStyle
   }, `${i18n.t('picture-choice:optional')}`))), /*#__PURE__*/React.createElement(ActivityIndicatorMask, {
-    loading: isUploading || loadingImage
+    loading: selected && isUploading
   })), /*#__PURE__*/React.createElement(TouchableOpacity, {
-    style: styles.optionContainer,
+    style: [styles.optionContainer, rtl && GlobalStyle.flexRowReverse],
+    disabled: preview,
     onPress: () => {
       if (!selected) {
         setActionSheetVisible(true);
@@ -231,6 +261,7 @@ const PictureChoiceOtherItem = ({
   }, /*#__PURE__*/React.createElement(Text, {
     style: optionTextStyle
   }, `${i18n.t('picture-choice:other')}`), /*#__PURE__*/React.createElement(TextInput, {
+    multiline: true,
     style: inputStyle,
     maxLength: 100,
     editable: selected,
@@ -244,6 +275,10 @@ const PictureChoiceOtherItem = ({
 
 export default PictureChoiceOtherItem;
 const styles = StyleSheet.create({
+  buttonContainer: {
+    borderRadius: 12,
+    overflow: 'hidden'
+  },
   optionContainer: {
     flexDirection: 'row',
     marginTop: 16,

@@ -1,28 +1,30 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  ScrollView,
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import { Colors } from '../styles';
 import {
   DimensionWidthType,
   useDimensionWidthType,
 } from '../hooks/useWindowDimensions';
 import Button from '../components/Button';
-import i18n from '../translation';
-import { useTheme } from '../contexts/theme';
+import { THEME_OPTION, useTheme } from '../contexts/theme';
 import type { Survey as OriginSurvey } from '../data';
+import { getLanguageBy } from '../utils/LanguageUtils';
 
 type Survey = OriginSurvey & {
-  languages: ('en' | 'ar')[];
+  languages: string[];
 };
 
 const defaultIconSource = require('../assets/rating.png');
 const defaultIconSize = {
   [DimensionWidthType.phone]: 65,
   [DimensionWidthType.tablet]: 72,
-};
-
-const LANG_TITLE = {
-  en: 'English',
-  ar: 'العربي',
 };
 
 type Props = {
@@ -33,26 +35,38 @@ type Props = {
 
 const ClassicStartScreen = ({ onLanguageSelect, onStart, survey }: Props) => {
   const dimensionWidthType = useDimensionWidthType();
-  const { fontColor, backgroundColor } = useTheme();
+  const { themeOption, hexCode, fontColor, backgroundColor } = useTheme();
 
   const isPhone = dimensionWidthType === DimensionWidthType.phone;
   const styles = isPhone ? phoneStyles : tabletStyles;
 
-  const { surveyProperty, surveyName, welcomeTextPlain } = survey;
-  const {
-    image,
-    hexCode,
-    width = defaultIconSize[dimensionWidthType],
-    height = defaultIconSize[dimensionWidthType],
-  } = surveyProperty;
+  const { surveyProperty, surveyName, welcomeTextPlain, language, takeSurvey } =
+    survey;
+  const { image } = surveyProperty;
+
+  const [imageHeight, setImageHeight] = useState(65);
   const iconStyle = {
-    width,
-    height,
+    width: '100%',
+    height: imageHeight,
   };
+
+  useEffect(() => {
+    Image.getSize(
+      image,
+      (_, height) => {
+        if (height < defaultIconSize[dimensionWidthType]) {
+          setImageHeight(height);
+        }
+      },
+      (_) => {}
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const iconSource = image === undefined ? defaultIconSource : { uri: image };
 
   const iconView = (
-    <Image resizeMode="cover" style={iconStyle} source={iconSource} />
+    <Image resizeMode="contain" style={iconStyle} source={iconSource} />
   );
 
   const buttonWidth = isPhone ? 143 : 160;
@@ -63,33 +77,40 @@ const ClassicStartScreen = ({ onLanguageSelect, onStart, survey }: Props) => {
     // if there's only one language or no languages, no need to display
     if (!languages || !languages.length || languages.length <= 1) return null;
 
-    const languageView = languages.map((language: 'en' | 'ar', index) => (
+    const languageView = languages.map((lang, index) => (
       <TouchableOpacity
         key={index}
         onPress={() => {
-          onLanguageSelect && onLanguageSelect(language);
+          onLanguageSelect && onLanguageSelect(lang);
         }}
       >
         <Text
           style={[
             styles.language_label,
             {
-              color:
-                language !== survey.language
-                  ? survey.surveyProperty.hexCode
-                  : fontColor,
+              color: lang !== language ? hexCode : fontColor,
             },
           ]}
         >
-          {LANG_TITLE[language]}
+          {getLanguageBy(lang)}
         </Text>
       </TouchableOpacity>
     ));
     return <View style={styles.languages}>{languageView}</View>;
   };
 
+  const containerStyle = [
+    shareStyles.container,
+    {
+      backgroundColor:
+        themeOption === THEME_OPTION.BIJLIRIDE
+          ? Colors.bijlirideBackgroundColor
+          : backgroundColor,
+    },
+  ];
+
   return (
-    <View style={[shareStyles.container, { backgroundColor }]}>
+    <ScrollView contentContainerStyle={containerStyle}>
       <View style={styles.main}>
         {iconView}
         <Text style={[styles.title, { color: fontColor }]}>{surveyName}</Text>
@@ -101,16 +122,14 @@ const ClassicStartScreen = ({ onLanguageSelect, onStart, survey }: Props) => {
         <View style={styles.divider} />
         <Button
           width={buttonWidth}
-          title={i18n.t('start-survey:start-btn')}
+          title={takeSurvey}
           color={hexCode}
-          onPress={() => {
-            onStart();
-          }}
+          onPress={onStart}
           containerStyle={styles.takeSurveyButton}
         />
       </View>
       {languagesView()}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -120,7 +139,6 @@ const shareStyles = StyleSheet.create({
   container: {
     backgroundColor: Colors.white,
     flex: 1,
-    alignItems: 'center',
   },
 });
 
@@ -157,13 +175,15 @@ const phoneStyles = StyleSheet.create({
   },
   language_label: {
     fontSize: 13,
-    marginRight: 19,
+    paddingHorizontal: 8,
   },
   languages: {
     flexDirection: 'row',
     justifyContent: 'center',
     height: '12%',
     maxHeight: 90,
+    flexWrap: 'wrap',
+    marginHorizontal: 38,
   },
 });
 
@@ -200,7 +220,7 @@ const tabletStyles = StyleSheet.create({
   },
   language_label: {
     fontSize: 13,
-    marginRight: 19,
+    paddingHorizontal: 8,
   },
   languages: {
     flexDirection: 'row',

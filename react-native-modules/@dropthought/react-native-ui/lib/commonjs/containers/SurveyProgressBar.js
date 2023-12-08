@@ -21,6 +21,8 @@ var _feedback = require("../contexts/feedback");
 
 var _styles = require("../styles");
 
+var _theme = require("../contexts/theme");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
@@ -62,7 +64,10 @@ const SurveyProgressBar = ({
   ...props
 }) => {
   const feedbackState = (0, _feedback.useFeedbackState)();
-  const themeColor = props.survey.surveyProperty.hexCode;
+  const {
+    hexCode
+  } = (0, _theme.useTheme)();
+  const themeColor = hexCode;
   const insets = (0, _reactNativeSafeAreaContext.useSafeAreaInsets)();
   const {
     keyboardShown

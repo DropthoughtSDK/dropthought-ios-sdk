@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, Modal, Dimensions } from 'react-native';
 import { pick, omit } from 'ramda';
-import { GlobalStyle, Colors } from '@dropthought/react-native-ui';
+import { GlobalStyle, Colors } from '@dropthought/react-native-ui/src';
 import SDKEntry from './SDKEntry';
 
 const ModalProps = [

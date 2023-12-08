@@ -5,7 +5,7 @@ import ClassicStartScreen from './ClassicStartScreen';
 import type { Survey as OriginSurvey } from '../data';
 
 type Survey = OriginSurvey & {
-  languages: ('en' | 'ar')[];
+  languages: string[];
 };
 
 type Props = {
@@ -25,6 +25,7 @@ export default function StartScreenLayout({
 
   switch (themeOption) {
     case THEME_OPTION.CLASSIC:
+    case THEME_OPTION.BIJLIRIDE:
       return (
         <ClassicStartScreen
           survey={survey}

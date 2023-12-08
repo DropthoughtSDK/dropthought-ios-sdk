@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.usePictureChoice = void 0;
+exports.usePictureChoice = exports.multiplePictureChoiceValidator = void 0;
 
 var _react = require("react");
 
@@ -13,6 +13,26 @@ const DefaultPictureAnswer = {
   image: '',
   value: ''
 };
+
+const multiplePictureChoiceValidator = (question, feedback) => {
+  const {
+    answers
+  } = feedback !== null && feedback !== void 0 ? feedback : {};
+  const lastItem = answers && answers.length > 0 ? answers[answers.length - 1] : undefined;
+
+  if (answers && answers.length > 0) {
+    if (lastItem && typeof lastItem !== 'number' && typeof lastItem !== 'string') {
+      return lastItem.image.length > 0 && lastItem.value.length > 0;
+    } else {
+      return true;
+    }
+  } else {
+    // if mandatory return false
+    return !question.mandatory;
+  }
+};
+
+exports.multiplePictureChoiceValidator = multiplePictureChoiceValidator;
 
 const usePictureChoice = (question, onFeedback, feedback) => {
   const {

@@ -5,10 +5,11 @@ export var Colors: any;
 export var EndScreenLayout: any;
 export var GlobalStyle: any;
 export var KeyboardAvoidingScrollView: React.FunctionComponent<_KeyboardAvoidingView.KeyboardAvoidingProps & import("react-native").ScrollViewProps>;
-export var KioskProvider: ({ children, themeOption, appearance, fontColor, backgroundColor }: {
+export var KioskProvider: ({ children, themeOption, appearance, hexCode, fontColor, backgroundColor }: {
     children: any;
     themeOption: any;
     appearance: any;
+    hexCode: any;
     fontColor: any;
     backgroundColor: any;
 }) => any;

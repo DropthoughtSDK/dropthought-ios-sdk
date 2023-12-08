@@ -119,6 +119,7 @@ const SmileyRatingQuestionOption4 = ({
     });
   }, [score, scoreOpacity, onFeedback, questionId, descriptionYAxis, scoreContainerOpacity]);
   const {
+    hexCode,
     backgroundColor,
     fontColor,
     colorScheme
@@ -221,6 +222,7 @@ const SmileyRatingQuestionOption4 = ({
     style: containerStyle
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     question: question,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     forgot: forgot
   }), /*#__PURE__*/React.createElement(View, {
     style: commonStyles.contentContainer
@@ -235,7 +237,8 @@ const SmileyRatingQuestionOption4 = ({
   }, i18n.t('option4HintDescription:subTitle', {
     count: totalScore
   })))))), /*#__PURE__*/React.createElement(SurveyFooter, {
-    surveyColor: survey.surveyProperty.hexCode,
+    submitSurvey: survey.submitSurvey,
+    surveyColor: hexCode,
     isFirstPage: pageIndex === 0,
     isLastPage: pageIndex === survey.pageOrder.length - 1,
     onPrevPage: onPrevPage,

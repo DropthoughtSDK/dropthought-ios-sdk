@@ -146,6 +146,7 @@ const MatrixRow = ({
 };
 
 const ClassicMatrixChoiceQuestion = ({
+  mandatoryErrorMessage,
   question,
   onFeedback,
   feedback,
@@ -166,6 +167,7 @@ const ClassicMatrixChoiceQuestion = ({
     style: GlobalStyle.questionContainer
   }, /*#__PURE__*/React.createElement(ClassicMandatoryTitle, {
     forgot: false,
+    mandatoryErrorMessage: mandatoryErrorMessage,
     question: question,
     style: styles.title,
     invalidMessage: handleMatrixChoiceErrorHint(forgot)

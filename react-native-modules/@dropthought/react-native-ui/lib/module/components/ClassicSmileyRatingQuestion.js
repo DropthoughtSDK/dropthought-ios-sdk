@@ -113,6 +113,7 @@ const DislikeIcon = ({
 };
 
 const ClassicSmileyRatingQuestion = ({
+  mandatoryErrorMessage,
   question,
   onFeedback,
   feedback,
@@ -231,6 +232,7 @@ const ClassicSmileyRatingQuestion = ({
     style: GlobalStyle.questionContainer
   }, /*#__PURE__*/React.createElement(ClassicMandatoryTitle, {
     forgot: forgot,
+    mandatoryErrorMessage: mandatoryErrorMessage,
     question: question
   }), /*#__PURE__*/React.createElement(View, {
     style: [styles.smileyRowContainer, rtl && GlobalStyle.flexEnd]

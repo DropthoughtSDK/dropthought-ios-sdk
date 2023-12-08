@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, StyleSheet, Image, TouchableOpacity, Text, Dimensions } from 'react-native';
-import GlobalStyle, { Colors } from '../styles';
+import GlobalStyle, { Colors, addOpacityToHex } from '../styles';
 import ActivityIndicatorMask from './ActivityIndicatorMask';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import i18n from '../translation';
@@ -41,6 +41,18 @@ const PictureChoiceItem = ({
     fontColor,
     colorScheme
   } = useTheme();
+  const rtl = i18n.dir() === 'rtl';
+  const itemGapStyle = useMemo(() => {
+    if (rtl) {
+      return {
+        marginLeft: index % 2 === 0 ? columnGap : 0
+      };
+    } else {
+      return {
+        marginRight: index % 2 === 0 ? columnGap : 0
+      };
+    }
+  }, [columnGap, index, rtl]);
   const {
     width
   } = Dimensions.get('window');
@@ -49,27 +61,36 @@ const PictureChoiceItem = ({
   const [loadingImage, setLoadingImage] = useState(true);
   const [imageLoadError, setImageLoadError] = useState(false);
   const photo = useMemo(() => {
+    const iconStyle = {
+      tintColor: themeColor
+    };
     const photoStyle = [styles.picture, {
-      width: itemWidth,
-      marginRight: index % 2 === 0 ? columnGap : 0
+      width: itemWidth
+    }];
+    const reloadTextStyle = [styles.reloadText, {
+      color: fontColor
     }];
 
     if (imageLoadError) {
       const reloadStyle = [styles.pictureReloadContainer, {
         width: itemWidth,
-        marginRight: index % 2 === 0 ? columnGap : 0
+        backgroundColor: addOpacityToHex(themeColor, 0.1),
+        borderColor: themeColor,
+        ...itemGapStyle
       }];
+      const reloadPlacholderStyle = [styles.reloadPlaceholderImage, iconStyle];
       return /*#__PURE__*/React.createElement(View, {
         style: reloadStyle
       }, /*#__PURE__*/React.createElement(Image, {
-        style: styles.reloadPlaceholderImage,
+        style: reloadPlacholderStyle,
         source: require('../assets/ic_image_placeholder.png')
       }), /*#__PURE__*/React.createElement(View, {
         style: GlobalStyle.row
       }, /*#__PURE__*/React.createElement(Image, {
+        style: iconStyle,
         source: require('../assets/ic_reload.png')
       }), /*#__PURE__*/React.createElement(Text, {
-        style: styles.reloadText
+        style: reloadTextStyle
       }, `${i18n.t('picture-choice:reload')}`)));
     } else {
       return /*#__PURE__*/React.createElement(Image, {
@@ -85,24 +106,25 @@ const PictureChoiceItem = ({
         }
       });
     }
-  }, [columnGap, imageLoadError, index, itemWidth, uri]);
+  }, [fontColor, imageLoadError, itemGapStyle, itemWidth, themeColor, uri]);
   const border = useMemo(() => {
     const containerStyle = [styles.borderContainer, {
       borderWidth: selected ? 2 : 1,
       borderColor: selected ? themeColor : Colors.rankingBorder,
-      width: itemWidth,
-      marginRight: index % 2 === 0 ? columnGap : 0
+      width: itemWidth
     }];
+    const maskStyle = {
+      backgroundColor: addOpacityToHex(themeColor, 0.1)
+    };
     return /*#__PURE__*/React.createElement(View, {
       style: containerStyle
     }, /*#__PURE__*/React.createElement(ActivityIndicatorMask, {
-      loading: loadingImage
+      loading: loadingImage,
+      style: maskStyle
     }));
-  }, [columnGap, index, itemWidth, loadingImage, selected, themeColor]);
+  }, [itemWidth, loadingImage, selected, themeColor]);
   const selection = useMemo(() => {
-    const containerStyle = [styles.optionContainer, {
-      marginRight: index % 2 === 0 ? columnGap : 0
-    }];
+    const containerStyle = [styles.optionContainer, rtl && GlobalStyle.flexRowReverse];
     const textStyle = colorScheme === COLOR_SCHEMES.dark ? [styles.optionText, {
       color: fontColor !== null && fontColor !== void 0 ? fontColor : Colors.appearanceSubBlack
     }] : [styles.optionText, {
@@ -117,8 +139,9 @@ const PictureChoiceItem = ({
     }), /*#__PURE__*/React.createElement(Text, {
       style: textStyle
     }, title));
-  }, [colorScheme, columnGap, fontColor, index, isMultipleChoice, selected, themeColor, title]);
+  }, [colorScheme, fontColor, isMultipleChoice, rtl, selected, themeColor, title]);
   return /*#__PURE__*/React.createElement(TouchableOpacity, {
+    style: itemGapStyle,
     onPress: () => {
       if (imageLoadError) {
         setImageLoadError(false);
@@ -139,9 +162,9 @@ const styles = StyleSheet.create({
     minHeight: 20
   },
   optionText: {
-    marginLeft: 5,
     flex: 1,
-    fontSize: 16
+    fontSize: 16,
+    paddingHorizontal: 5
   },
   picture: {
     height: 138,
@@ -184,7 +207,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     height: 138,
     borderRadius: 12,
-    borderColor: 'red'
+    borderColor: 'red',
+    overflow: 'hidden'
   }
 });
 //# sourceMappingURL=PictureChoiceItem.js.map

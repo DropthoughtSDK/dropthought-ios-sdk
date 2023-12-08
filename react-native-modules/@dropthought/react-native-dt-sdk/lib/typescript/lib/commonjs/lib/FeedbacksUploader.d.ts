@@ -1,4 +1,18 @@
 export var __esModule: boolean;
+export var FeedbacksQueue: any;
+export var FailedFeedbacksQueue: any;
+export var FailedReasonsQueue: any;
+export namespace UploaderStates {
+    const Idle: string;
+    const Processing: string;
+}
+export namespace feedbackUploader {
+    export { upload };
+    export { subscribe };
+    export { cancel };
+    export { clear };
+    export { initialize };
+}
 export type FeedbackUploaderSubscription = {
     id: string;
     subscriber: FeedbackUploaderSubscriber;
@@ -18,22 +32,6 @@ export type FailedReason = {
     message: string;
     status: number | undefined;
 };
-/** @type {QueueStorage<SurveyFeedback>} */
-export const FeedbacksQueue: any;
-export const FailedFeedbacksQueue: any;
-export const FailedReasonsQueue: any;
-export type UploaderStates = 'idle' | 'processing';
-export namespace UploaderStates {
-    const Idle: string;
-    const Processing: string;
-}
-export namespace feedbackUploader {
-    export { upload };
-    export { subscribe };
-    export { cancel };
-    export { clear };
-    export { initialize };
-}
 /**
  * @public
  */
@@ -55,4 +53,11 @@ declare function clear(): Promise<void>;
  * @public
  */
 declare function initialize(): Promise<any>;
+type UploaderStates = 'idle' | 'processing';
+declare namespace UploaderStates {
+    const Idle_1: string;
+    export { Idle_1 as Idle };
+    const Processing_1: string;
+    export { Processing_1 as Processing };
+}
 export {};

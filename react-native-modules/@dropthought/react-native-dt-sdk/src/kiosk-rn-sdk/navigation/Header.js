@@ -7,7 +7,8 @@ import {
   DimensionWidthType,
   useTheme,
   THEME_OPTION,
-} from '@dropthought/react-native-ui';
+  Colors,
+} from '@dropthought/react-native-ui/src';
 import CloseButton, { ICON_SIZE } from '../components/CloseButton';
 
 /**
@@ -27,12 +28,14 @@ const Header = ({ title, themeColor, onClose }) => {
   const isRtl = i18n.dir() === 'rtl';
   const isPhone = useDimensionWidthType() === DimensionWidthType.phone;
 
+  const backgroundColor =
+    themeOption === THEME_OPTION.BIJLIRIDE
+      ? Colors.bijlirideHexCode
+      : themeColor;
+
   const classicHeader = (
     <View
-      style={[
-        styles.container,
-        { backgroundColor: themeColor, paddingTop: insets.top },
-      ]}
+      style={[styles.container, { backgroundColor, paddingTop: insets.top }]}
     >
       <View style={styles.header}>
         <Text
@@ -56,7 +59,10 @@ const Header = ({ title, themeColor, onClose }) => {
     </View>
   );
 
-  return themeOption === THEME_OPTION.CLASSIC ? classicHeader : null;
+  return themeOption === THEME_OPTION.CLASSIC ||
+    themeOption === THEME_OPTION.BIJLIRIDE
+    ? classicHeader
+    : null;
 };
 
 export default Header;

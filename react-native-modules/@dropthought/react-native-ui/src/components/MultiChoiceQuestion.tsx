@@ -2,7 +2,12 @@ import React from 'react';
 import { StyleSheet, Platform, ScrollView as RNScrollView } from 'react-native';
 import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import { last } from 'ramda';
-import type { Question as OriginQuestion, Option, Feedback } from '../data';
+import type {
+  Question as OriginQuestion,
+  Option,
+  Feedback,
+  Survey,
+} from '../data';
 import { getOptionsFromQuestion } from '../utils/data';
 import NewOptionWithHighlight from './NewOptionWithHighlight';
 import NewOtherOptionWithHighlight from './NewOtherOptionWithHighlight';
@@ -13,10 +18,10 @@ const ScrollView =
 
 type Question = OriginQuestion & {
   options: string[];
-  otherText: string;
 };
 
 type Props = {
+  survey: Survey;
   anonymous: boolean;
   question: Question;
   onFeedback: (feedback: Feedback) => void;
@@ -55,6 +60,7 @@ const getInitialSelectedValuesFromFeedbackProps = (
 };
 
 const MultiChoiceQuestion = ({
+  survey,
   anonymous,
   question,
   onFeedback,
@@ -156,7 +162,11 @@ const MultiChoiceQuestion = ({
   return (
     // @ts-ignore
     <ScrollView extraAvoidingSpace={30} style={commonStyles.container}>
-      <MandatoryTitle forgot={forgot} question={question} />
+      <MandatoryTitle
+        forgot={forgot}
+        mandatoryErrorMessage={survey.mandatoryErrorMessage}
+        question={question}
+      />
       {buttonList}
     </ScrollView>
   );

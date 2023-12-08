@@ -14,10 +14,11 @@ var _styles = require("../styles");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const ActivityIndicatorMask = ({
-  loading = false
+  loading = false,
+  style
 }) => {
   return loading ? /*#__PURE__*/_react.default.createElement(_reactNative.View, {
-    style: [_styles.GlobalStyle.loadingMask, _styles.GlobalStyle.fullCenter]
+    style: [_styles.GlobalStyle.loadingMask, _styles.GlobalStyle.fullCenter, style]
   }, /*#__PURE__*/_react.default.createElement(_reactNative.ActivityIndicator, null)) : null;
 };
 

@@ -2,19 +2,19 @@ import { isNil, isEmpty } from 'ramda';
 import { fetcherInstance } from './APIClient';
 import { throwRequestError } from './Fetcher';
 const UPLOAD_PATH = '/api/event/storage/file';
+
 /**
  * @param {ImageFormData} file
  * @param {AxiosRequestConfig} axiosConfig
  * @param {Fetcher=} fetcher
  * @returns {Promise<UploadFileResult>}
  */
-
 export async function uploadFile(file, axiosConfig = {}, fetcher = fetcherInstance) {
-  let formData = new FormData(); // @ts-ignore
-
+  let formData = new FormData();
+  // @ts-ignore
   formData.append('file', file);
-  /** @type {AxiosRequestConfig} */
 
+  /** @type {AxiosRequestConfig} */
   const params = {
     method: 'POST',
     authRequired: true,
@@ -32,10 +32,10 @@ export async function uploadFile(file, axiosConfig = {}, fetcher = fetcherInstan
       throwRequestError(response);
       return;
     }
-
     return response.data;
   });
 }
+
 /**
  * @typedef {Object} ImageFormData
  * @property {string} uri

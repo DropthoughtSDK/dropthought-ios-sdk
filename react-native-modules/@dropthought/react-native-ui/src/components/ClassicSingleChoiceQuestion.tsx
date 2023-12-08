@@ -23,6 +23,7 @@ type Question = OriginQuestion & {
 };
 
 type Props = {
+  mandatoryErrorMessage: string;
   question: Question;
   feedback: Feedback;
   onFeedback: (feedback: Feedback) => void;
@@ -146,6 +147,7 @@ class ClassicSingleChoiceQuestion extends PureComponent<Props, State> {
       <View style={GlobalStyle.questionContainer}>
         <ClassicMandatoryTitle
           forgot={this.props.forgot}
+          mandatoryErrorMessage={this.props.mandatoryErrorMessage}
           question={this.props.question}
         />
         <View style={styles.radioForm}>{this.renderRadios()}</View>

@@ -59,6 +59,8 @@ export const Colors = {
   nonSelectCircle: '#aeb3be',
   lightActionText: '#121212',
   darkActionText: '#e1e1e1',
+  bijlirideBackgroundColor: '#32cbf1',
+  bijlirideHexCode: '#407d37',
 };
 
 export const addOpacityToColor = (hexColor: string, opacity: number) => {

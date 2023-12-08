@@ -52,6 +52,7 @@ const getInitialSelectedValuesFromFeedbackProps = (options, feedback) => {
 };
 
 const MultiChoiceQuestion = ({
+  survey,
   anonymous,
   question,
   onFeedback,
@@ -144,6 +145,7 @@ const MultiChoiceQuestion = ({
       style: commonStyles.container
     }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
       forgot: forgot,
+      mandatoryErrorMessage: survey.mandatoryErrorMessage,
       question: question
     }), buttonList)
   );

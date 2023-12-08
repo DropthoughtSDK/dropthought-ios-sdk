@@ -49,8 +49,8 @@ def use_dropthought_sdk
     pod 'react-native-dt-sdk', :path => "#{third_party_prefix}/@dropthought/react-native-dt-sdk"
     pod 'RNCAsyncStorage', :path => "#{third_party_prefix}/@react-native-community/async-storage"
     pod 'react-native-aes', :path => "#{third_party_prefix}/react-native-aes-crypto"
-    pod 'RNSecureKeyStore', :path => "#{third_party_prefix}/react-native-secure-key-store/ios"
+    pod 'react-native-secure-key-store', :path => "#{third_party_prefix}/react-native-secure-key-store"
     pod 'lottie-react-native', :path =>  "#{third_party_prefix}/lottie-react-native"
-    pod 'react-native-image-picker', :path =>  "#{third_party_prefix}/react-native-image-picker"
+    pod 'RNImageCropPicker', :path =>  "#{third_party_prefix}/react-native-image-crop-picker"
 
 end

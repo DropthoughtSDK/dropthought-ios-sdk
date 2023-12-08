@@ -62,6 +62,7 @@ function getBackgroundColor(customBackgroundColor, colorScheme) {
 function useTheme({
   themeOption,
   appearance,
+  hexCode,
   fontColor: customFontColor,
   backgroundColor: customBackgroundColor
 }) {
@@ -72,25 +73,34 @@ function useTheme({
   return React.useMemo(() => {
     return {
       themeOption,
+      hexCode,
       colorScheme,
       fontColor,
       backgroundColor,
       customFontColor,
       customBackgroundColor
     };
-  }, [themeOption, colorScheme, fontColor, backgroundColor, customFontColor, customBackgroundColor]);
+  }, [themeOption, hexCode, colorScheme, fontColor, backgroundColor, customFontColor, customBackgroundColor]);
 }
 
 function ThemeProvider({
   children,
   themeOption,
   appearance,
+  hexCode,
   fontColor,
   backgroundColor
 }) {
+  let transformedHexCode = hexCode;
+
+  if (themeOption === _theme.THEME_OPTION.BIJLIRIDE) {
+    transformedHexCode = _styles.Colors.bijlirideHexCode;
+  }
+
   const themeValue = useTheme({
     themeOption,
     appearance,
+    hexCode: transformedHexCode,
     fontColor,
     backgroundColor
   });

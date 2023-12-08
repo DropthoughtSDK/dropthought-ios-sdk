@@ -28,7 +28,7 @@ const Button = ({
   const buttonStyle = [styles.button, {
     backgroundColor: color
   }, disabled ? styles.disabledButton : {}, width ? {
-    width
+    minWidth: width
   } : {}];
   return /*#__PURE__*/React.createElement(_reactNative.View, {
     style: [styles.container, containerStyle]
@@ -51,7 +51,8 @@ const styles = _reactNative.StyleSheet.create({
   button: {
     alignItems: 'center',
     borderRadius: 3,
-    flex: undefined
+    flex: undefined,
+    paddingHorizontal: 10
   },
   title: {
     color: _styles.Colors.white,

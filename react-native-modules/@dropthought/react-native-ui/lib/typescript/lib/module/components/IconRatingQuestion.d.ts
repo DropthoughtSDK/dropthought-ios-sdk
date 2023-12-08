@@ -1,4 +1,5 @@
-declare var _default: React.MemoExoticComponent<({ question, feedback, forgot, onFeedback }: {
+declare var _default: React.MemoExoticComponent<({ survey, question, feedback, forgot, onFeedback }: {
+    survey: any;
     question: any;
     feedback: any;
     forgot: any;

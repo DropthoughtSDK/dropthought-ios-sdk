@@ -14,6 +14,7 @@ declare type Props = {
     survey: Survey;
     pageIndex: number;
     themeOption: THEME_OPTION;
+    preview: boolean;
 };
 declare const QuestionContainer: (props: Props) => JSX.Element;
 export default QuestionContainer;

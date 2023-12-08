@@ -10,16 +10,17 @@ import i18n from '../translation';
 const ScrollView = Platform.OS === 'ios' ? KeyboardAvoidingScrollView : RNScrollView;
 
 const PictureChoiceQuestion = ({
+  survey,
   question,
   feedback,
   onFeedback,
   forgot,
   themeColor,
   onUpload,
-  isUploading
+  preview
 }) => {
   const {
-    otherText
+    otherText = ''
   } = question;
   const {
     images,
@@ -37,6 +38,7 @@ const PictureChoiceQuestion = ({
     invalidMessage,
     setInvalidMessage
   } = usePictureChoice(question, onFeedback, feedback);
+  const rtl = i18n.dir() === 'rtl';
   const imageItems = images.map(({
     uri,
     option
@@ -95,29 +97,32 @@ const PictureChoiceQuestion = ({
       setInvalidMessage(undefined);
       const url = await onUpload(file);
 
-      if (url) {
+      if (typeof url !== 'string') {
+        setInvalidMessage(`${i18n.t('picture-choice:uploadFailed')}`);
+      } else if (url) {
         setOtherPictureAnswerUrl(url);
       }
     },
     onError: msg => {
       setInvalidMessage(msg);
     },
-    isUploading: isUploading,
     onChangeText: text => {
       setOtherPictureAnswerText(text);
     },
-    themeColor: themeColor
+    themeColor: themeColor,
+    preview: preview
   }) : null;
   return /*#__PURE__*/React.createElement(ScrollView, {
     extraAvoidingSpace: 30,
     style: styles.container
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     forgot: forgot,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     question: question,
     style: styles.mandatoryTitle,
     invalidMessage: invalidMessage
   }), /*#__PURE__*/React.createElement(View, {
-    style: styles.pictureGridContainer
+    style: [styles.pictureGridContainer, rtl && GlobalStyle.flexRowReverse]
   }, imageItems, otherImageItem));
 };
 

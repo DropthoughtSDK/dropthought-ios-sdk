@@ -4,6 +4,7 @@ declare type Feedback = OriginFeedback & {
     answers: string[];
 };
 declare type Props = {
+    mandatoryErrorMessage: string;
     question: Question;
     onFeedback: ({ questionId, answers, type, }: {
         questionId: string;
@@ -14,5 +15,5 @@ declare type Props = {
     forgot: boolean;
     themeColor: string;
 };
-declare const _default: React.MemoExoticComponent<({ question, feedback, forgot, onFeedback, }: Props) => JSX.Element>;
+declare const _default: React.MemoExoticComponent<({ mandatoryErrorMessage, question, feedback, forgot, onFeedback, }: Props) => JSX.Element>;
 export default _default;

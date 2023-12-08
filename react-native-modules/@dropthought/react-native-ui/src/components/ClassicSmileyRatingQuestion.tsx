@@ -175,6 +175,7 @@ const DislikeIcon = ({
 };
 
 type Props = {
+  mandatoryErrorMessage: string;
   question: Question;
   onFeedback: ({
     questionId,
@@ -190,6 +191,7 @@ type Props = {
 };
 
 const ClassicSmileyRatingQuestion = ({
+  mandatoryErrorMessage,
   question,
   onFeedback,
   feedback,
@@ -332,7 +334,11 @@ const ClassicSmileyRatingQuestion = ({
 
   return (
     <View style={GlobalStyle.questionContainer}>
-      <ClassicMandatoryTitle forgot={forgot} question={question} />
+      <ClassicMandatoryTitle
+        forgot={forgot}
+        mandatoryErrorMessage={mandatoryErrorMessage}
+        question={question}
+      />
       <View style={[styles.smileyRowContainer, rtl && GlobalStyle.flexEnd]}>
         {renderSmiley()}
       </View>

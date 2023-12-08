@@ -15,7 +15,7 @@ var _translation = _interopRequireDefault(require("../translation"));
 
 var _ActivityIndicatorMask = _interopRequireDefault(require("./ActivityIndicatorMask"));
 
-var _reactNativeImagePicker = require("react-native-image-picker");
+var _reactNativeImageCropPicker = _interopRequireDefault(require("react-native-image-crop-picker"));
 
 var _PictureChoiceItem = require("./PictureChoiceItem");
 
@@ -27,7 +27,7 @@ function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "functio
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-const MAXIMUM_SIZE_KB = 5 * 1024 * 1024; // 2MB
+const MAXIMUM_SIZE_KB = 5 * 1024 * 1024; // 5MB
 
 const PictureChoiceOtherItem = ({
   otherPicture,
@@ -38,16 +38,17 @@ const PictureChoiceOtherItem = ({
   onChooseImage,
   onSelect,
   onUpload,
-  isUploading,
   onError,
   onChangeText,
-  themeColor
+  themeColor,
+  preview
 }) => {
+  const rtl = _translation.default.dir() === 'rtl';
   const {
     fontColor,
     colorScheme
   } = (0, _theme.useTheme)();
-  const isDarkMode = true; //colorScheme === COLOR_SCHEMES.dark;
+  const isDarkMode = colorScheme === _theme.COLOR_SCHEMES.dark;
 
   const {
     width
@@ -70,33 +71,35 @@ const PictureChoiceOtherItem = ({
     width: itemWidth
   }];
   const [loadingImage, setLoadingImage] = (0, _react.useState)(false);
+  const [isUploading, setIsUploading] = (0, _react.useState)(false);
   const validTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 
-  const uploadPicture = response => {
-    var _response$assets;
+  const uploadPicture = image => {
+    setActionSheetVisible(false);
+    const {
+      path: uri,
+      mime: type,
+      data: base64,
+      size
+    } = image;
+    const pieces = uri.split('/');
+    const name = pieces[pieces.length - 1];
 
-    if (response !== null && response !== void 0 && response.assets && (response === null || response === void 0 ? void 0 : (_response$assets = response.assets) === null || _response$assets === void 0 ? void 0 : _response$assets.length) > 0) {
-      const {
-        uri,
-        fileName: name,
-        type,
-        fileSize
-      } = response.assets[0];
-
-      if (type && !validTypes.includes(type)) {
-        onError(`${_translation.default.t('picture-choice:invalidTypeHint')}`);
-      } else if (fileSize && fileSize > MAXIMUM_SIZE_KB) {
-        onError(`${_translation.default.t('picture-choice:overSizeHint')}`);
-      } else {
-        if (uri && name && type) {
-          const file = {
-            uri,
-            name,
-            type
-          };
-          onUpload(file);
-          onChooseImage();
-        }
+    if (type && !validTypes.includes(type)) {
+      onError(`${_translation.default.t('picture-choice:invalidTypeHint')}`);
+    } else if (size && size > MAXIMUM_SIZE_KB) {
+      onError(`${_translation.default.t('picture-choice:overSizeHint')}`);
+    } else {
+      if (uri && name && type && base64) {
+        setIsUploading(true);
+        const file = {
+          uri,
+          name,
+          type,
+          base64
+        };
+        onUpload(file).then(() => setIsUploading(false));
+        onChooseImage();
       }
     }
   };
@@ -104,39 +107,56 @@ const PictureChoiceOtherItem = ({
   async function hasAndroidPermission() {
     const permission = _reactNative.PermissionsAndroid.PERMISSIONS.CAMERA;
     const hasPermission = await _reactNative.PermissionsAndroid.check(permission);
+    console.log('[hasAndroidPermission] hasPermission: ', hasPermission);
 
     if (hasPermission) {
       return true;
     }
 
+    console.log('[hasAndroidPermission] before request status: ');
     const status = await _reactNative.PermissionsAndroid.request(permission);
+    console.log('[hasAndroidPermission] status: ', status);
     return status === _reactNative.PermissionsAndroid.RESULTS.GRANTED;
   }
 
   const openPhotoLibrary = () => {
-    setActionSheetVisible(false);
-    const options = {
-      selectionLimit: 1,
-      mediaType: 'photo'
-    };
-    (0, _reactNativeImagePicker.launchImageLibrary)(options, uploadPicture);
+    _reactNativeImageCropPicker.default.openPicker({
+      mediaType: 'photo',
+      includeBase64: true
+    }).then(image => {
+      console.log(image);
+      uploadPicture(image);
+    });
   };
 
   const openCamera = () => {
-    setActionSheetVisible(false);
-    const options = {
-      saveToPhotos: true,
-      mediaType: 'photo'
-    };
+    console.log('[openCamera] enter');
 
     if (_reactNative.Platform.OS === 'android') {
+      console.log('[openCamera] before hasAndroidPermission');
       hasAndroidPermission().then(result => {
+        console.log('[openCamera] hasAndroidPermission result: ', result);
+
         if (result) {
-          (0, _reactNativeImagePicker.launchCamera)(options, uploadPicture);
+          console.log('[openCamera] open');
+
+          _reactNativeImageCropPicker.default.openCamera({
+            mediaType: 'photo',
+            includeBase64: true
+          }).then(image => {
+            console.log('[openCamera] open image: ', image);
+            uploadPicture(image);
+          });
         }
       });
     } else {
-      (0, _reactNativeImagePicker.launchCamera)(options, uploadPicture);
+      _reactNativeImageCropPicker.default.openCamera({
+        mediaType: 'photo',
+        includeBase64: true
+      }).then(image => {
+        console.log(image);
+        uploadPicture(image);
+      });
     }
   };
 
@@ -161,11 +181,17 @@ const PictureChoiceOtherItem = ({
     color: fontColor
   }];
   const reloadStyle = [styles.pictureReloadContainer, {
-    width: itemWidth
+    width: itemWidth,
+    backgroundColor: (0, _styles.addOpacityToHex)(themeColor, 0.1),
+    borderColor: themeColor
+  }];
+  const reloadPlacholderStyle = [styles.reloadPlaceholderImage, iconStyle];
+  const reloadTextStyle = [styles.reloadText, {
+    color: fontColor
   }];
 
   const actionSheet = /*#__PURE__*/_react.default.createElement(_reactNative.Modal, {
-    animationType: "none",
+    animationType: "fade",
     transparent: true,
     visible: actionSheetVisible
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
@@ -192,6 +218,8 @@ const PictureChoiceOtherItem = ({
   }, `${_translation.default.t('picture-choice:cancel')}`)))));
 
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, null, /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+    style: styles.buttonContainer,
+    disabled: preview,
     onPress: () => {
       if (imageLoadError) {
         setImageLoadError(false);
@@ -203,15 +231,16 @@ const PictureChoiceOtherItem = ({
   }, imageLoadError ? /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: reloadStyle
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
-    style: styles.reloadPlaceholderImage,
+    style: reloadPlacholderStyle,
     source: require('../assets/ic_image_placeholder.png')
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: _styles.default.row
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
+    style: iconStyle,
     source: require('../assets/ic_reload.png')
   }), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-    style: styles.reloadText
-  }, `${_translation.default.t('picture-choice:reload')}`))) : selected && otherPicture.image.length > 0 ? /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
+    style: reloadTextStyle
+  }, `${_translation.default.t('picture-choice:reload')}`))) : selected && otherPicture.image.length > 0 ? /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
     style: pictureSelectedStyle,
     source: {
       uri: otherPicture.image
@@ -222,7 +251,9 @@ const PictureChoiceOtherItem = ({
       setImageLoadError(true);
       setLoadingImage(false);
     }
-  }) : /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+  }), /*#__PURE__*/_react.default.createElement(_ActivityIndicatorMask.default, {
+    loading: loadingImage
+  })) : /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: nonSelectedOtherPictureContainerStyle
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.placeholderGroup
@@ -236,9 +267,10 @@ const PictureChoiceOtherItem = ({
   }, `${_translation.default.t('picture-choice:chooseImage')}`)), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: optionalTextStyle
   }, `${_translation.default.t('picture-choice:optional')}`))), /*#__PURE__*/_react.default.createElement(_ActivityIndicatorMask.default, {
-    loading: isUploading || loadingImage
+    loading: selected && isUploading
   })), /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
-    style: styles.optionContainer,
+    style: [styles.optionContainer, rtl && _styles.default.flexRowReverse],
+    disabled: preview,
     onPress: () => {
       if (!selected) {
         setActionSheetVisible(true);
@@ -255,6 +287,7 @@ const PictureChoiceOtherItem = ({
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: optionTextStyle
   }, `${_translation.default.t('picture-choice:other')}`), /*#__PURE__*/_react.default.createElement(_reactNative.TextInput, {
+    multiline: true,
     style: inputStyle,
     maxLength: 100,
     editable: selected,
@@ -270,6 +303,10 @@ var _default = PictureChoiceOtherItem;
 exports.default = _default;
 
 const styles = _reactNative.StyleSheet.create({
+  buttonContainer: {
+    borderRadius: 12,
+    overflow: 'hidden'
+  },
   optionContainer: {
     flexDirection: 'row',
     marginTop: 16,

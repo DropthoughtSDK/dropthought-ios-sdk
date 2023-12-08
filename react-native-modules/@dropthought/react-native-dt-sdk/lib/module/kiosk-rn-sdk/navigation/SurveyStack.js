@@ -1,21 +1,19 @@
 import React, { useCallback, useState } from 'react';
 import { View, StyleSheet, NativeModules } from 'react-native';
 import { isEmpty, isNil } from 'ramda';
-import { PlaceholderImageTypes, PlaceholderScreen, i18n, SurveyScreenLayout, ActivityIndicatorMask } from '@dropthought/react-native-ui';
+import { PlaceholderImageTypes, PlaceholderScreen, i18n, SurveyScreenLayout, ActivityIndicatorMask } from '@dropthought/react-native-ui/src';
 import { useAsync } from 'react-async';
 import { useMetadata } from '../contexts/custom-props';
 import StartScreen from '../screens/StartScreen';
 import EndScreen from '../screens/EndScreen';
-import FakeScreen from '../screens/FakeScreen';
+import ErrorHintScreen from '../screens/ErrorHintScreen';
 import { useSurveyContext } from '../contexts/survey';
 import { submitFeedback } from '../../lib/Feedback';
 import ScreenWrapper from './ScreenWrapper';
 import Header from './Header';
 import { fromJSToAPIDateStr } from '../../lib/DateTimerParser';
 import { uploadPicture } from '../../lib/UploadPicture';
-
 const noData = a => isNil(a) || isEmpty(a);
-
 const Stack = ({
   preview
 }) => {
@@ -64,7 +62,8 @@ const Stack = ({
         timeZone
       } = NativeModules.DtSdk.getConstants();
       setSurveyFeedback(feedback);
-      run({ ...feedback,
+      run({
+        ...feedback,
         metadata,
         createdTime: fromJSToAPIDateStr(Date.now()),
         timeZone
@@ -72,11 +71,9 @@ const Stack = ({
     }
   }, [metadata, preview, run]);
   const [isUploading, setIsUploading] = useState(false);
-
   const handleUpload = async file => {
     if (file) {
       setIsUploading(true);
-
       try {
         const {
           url
@@ -85,13 +82,12 @@ const Stack = ({
         return url;
       } catch (reason) {
         setIsUploading(false);
-        return undefined;
+        return reason;
       }
     } else {
       return undefined;
     }
   };
-
   return /*#__PURE__*/React.createElement(View, {
     style: styles.flexOne
   }, /*#__PURE__*/React.createElement(Header, {
@@ -102,7 +98,8 @@ const Stack = ({
     style: styles.flexOne
   }, /*#__PURE__*/React.createElement(ScreenWrapper, {
     visible: true,
-    isOnTop: !endScreenvisible && visiblePageIds.length === 0
+    isOnTop: !endScreenvisible && visiblePageIds.length === 0,
+    rtl: survey.language === 'ar'
   }, /*#__PURE__*/React.createElement(StartScreen, {
     onStart: handleStart,
     onClose: onClose
@@ -110,7 +107,8 @@ const Stack = ({
     return /*#__PURE__*/React.createElement(ScreenWrapper, {
       key: pageId,
       visible: visiblePageIds.includes(pageId),
-      isOnTop: visiblePageIds[visiblePageIds.length - 1] === pageId
+      isOnTop: visiblePageIds[visiblePageIds.length - 1] === pageId,
+      rtl: survey.language === 'ar'
     }, /*#__PURE__*/React.createElement(SurveyScreenLayout, {
       survey: survey,
       pageIndex: pageIndex,
@@ -119,11 +117,13 @@ const Stack = ({
       onPrevPage: handlePrevPage,
       onSubmit: handleSubmit,
       onUpload: handleUpload,
-      isUploading: isUploading
+      isUploading: isUploading,
+      preview: preview
     }));
   }), /*#__PURE__*/React.createElement(ScreenWrapper, {
     visible: endScreenvisible,
-    isOnTop: endScreenvisible
+    isOnTop: endScreenvisible,
+    rtl: survey.language === 'ar'
   }, /*#__PURE__*/React.createElement(EndScreen, {
     error: error,
     surveyFeedback: surveyFeedback,
@@ -132,30 +132,27 @@ const Stack = ({
     loading: loading
   }));
 };
-
 const SurveyStack = ({
   preview
 }) => {
   const {
     survey,
     onClose
-  } = useSurveyContext(); // check if survey data is valid
-
+  } = useSurveyContext();
+  // check if survey data is valid
   if (noData(survey.pages) || noData(survey.surveyProperty) || noData(survey.surveyStartDate) || noData(survey.surveyEndDate)) {
     // need to render placeholder
-    return /*#__PURE__*/React.createElement(FakeScreen, {
+    return /*#__PURE__*/React.createElement(ErrorHintScreen, {
       onClose: onClose
     }, /*#__PURE__*/React.createElement(PlaceholderScreen, {
       imageType: PlaceholderImageTypes.ProgramUnavailable,
       message: i18n.t('start-survey:placeholder-message')
     }));
   }
-
   return /*#__PURE__*/React.createElement(Stack, {
     preview: preview
   });
 };
-
 export default SurveyStack;
 const styles = StyleSheet.create({
   flexOne: {

@@ -1,8 +1,8 @@
 export var __esModule: boolean;
-export default _default;
+export default SurveyStackContainer;
 /**
  * @param {{preview: boolean}} param0
  */
-declare function _default({ preview }: {
+declare function SurveyStackContainer({ preview }: {
     preview: boolean;
 }): any;

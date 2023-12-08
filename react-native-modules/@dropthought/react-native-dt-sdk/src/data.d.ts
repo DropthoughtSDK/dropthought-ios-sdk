@@ -32,10 +32,19 @@ export interface Question {
   questionBrand?: QuestionBrandType;
   metaDataType?: QuestionMetaDataType;
   mandatory: boolean;
-  options?: string[];
+  options: string[];
   type: QuestionType;
   subType?: QuestionSubType;
-  scale?: number;
+  scale?: string;
+  category: string;
+  responseErrorText: string;
+  questionTitles: string[];
+  optionsForMatrix: string[][];
+  optional: boolean;
+  phiData: boolean;
+  phiDataList: boolean[];
+  optionImages: string[];
+  otherTextLabel: string;
 }
 
 export interface Page {
@@ -59,6 +68,7 @@ export interface SurveyProperty {
   imageBase64?: string;
   width?: number;
   height?: number;
+  themeName?: string;
 }
 
 export interface ProgramInterface {
@@ -76,11 +86,27 @@ export interface ProgramInterface {
   timezone: string;
 }
 
+export declare type SurveyState =
+  | 'drafts'
+  | 'scheduled'
+  | 'active'
+  | 'expired'
+  | 'inactive';
 export interface Survey extends ProgramInterface {
   state: ProgramStateType;
   qrCode: string;
   surveyEndDate: string;
   surveyStartDate: string;
+  status: SurveyState;
+  endDate: string;
+  startDate: string;
+  backPage: string;
+  nextPage: string;
+  submitSurvey: string;
+  surveyStatus: SurveyState;
+  mandatoryErrorMessage: string;
+  surveyType: number;
+  takeSurvey: string;
 }
 
 export interface SurveyWithQRCode extends Survey {
@@ -120,7 +146,8 @@ export interface Visibility {
     | 'option2'
     | 'option3'
     | 'option4'
-    | 'option6';
+    | 'option6'
+    | 'bijliride';
   fontColor: string;
   backgroundColor: string;
   backgroundImage: string;
@@ -138,7 +165,8 @@ export interface ThemeData {
     | 'option2'
     | 'option3'
     | 'option4'
-    | 'option6';
+    | 'option6'
+    | 'bijliride';
   appearance: 'system' | 'light' | 'dark';
   fontColor: string;
   backgroundColor: string;

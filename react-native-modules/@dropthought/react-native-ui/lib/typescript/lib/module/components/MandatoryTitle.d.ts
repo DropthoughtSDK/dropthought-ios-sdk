@@ -1,7 +1,8 @@
 export default MandatoryTitle;
-declare function MandatoryTitle({ forgot, invalidMessage, question, style }: {
+declare function MandatoryTitle({ forgot, invalidMessage, mandatoryErrorMessage, question, style }: {
     forgot: any;
     invalidMessage?: string | undefined;
+    mandatoryErrorMessage: any;
     question: any;
     style: any;
 }): React.CElement<import("react-native").ViewProps, View>;

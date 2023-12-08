@@ -4,6 +4,29 @@ import type { Question, Feedback } from '../data';
 
 const DefaultPictureAnswer = { image: '', value: '' };
 
+export const multiplePictureChoiceValidator = (
+  question: Question,
+  feedback: Feedback
+) => {
+  const { answers } = feedback ?? {};
+  const lastItem =
+    answers && answers.length > 0 ? answers[answers.length - 1] : undefined;
+  if (answers && answers.length > 0) {
+    if (
+      lastItem &&
+      typeof lastItem !== 'number' &&
+      typeof lastItem !== 'string'
+    ) {
+      return lastItem.image.length > 0 && lastItem.value.length > 0;
+    } else {
+      return true;
+    }
+  } else {
+    // if mandatory return false
+    return !question.mandatory;
+  }
+};
+
 export const usePictureChoice = (
   question: Question,
   onFeedback: (feedback: Feedback) => void,

@@ -25,6 +25,7 @@ function EndScreenLayout({
 
   switch (themeOption) {
     case _theme.THEME_OPTION.CLASSIC:
+    case _theme.THEME_OPTION.BIJLIRIDE:
       return /*#__PURE__*/_react.default.createElement(_ClassicEndScreen.default, {
         survey: survey
       });

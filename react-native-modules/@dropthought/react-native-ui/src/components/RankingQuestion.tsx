@@ -19,6 +19,7 @@ import GlobalStyle, { Colors, addOpacityToColor } from '../styles';
 import type {
   Feedback as OriginFeedback,
   Question as OriginQuestion,
+  Survey,
 } from '../data';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import DraggableList from '../utils/react-native-draggable-list/DraggableList';
@@ -159,6 +160,7 @@ function RankingItem({
 }
 
 type Props = {
+  survey: Survey;
   question: Question;
   onFeedback: (feedback: Feedback) => void;
   forgot: boolean;
@@ -167,6 +169,7 @@ type Props = {
 };
 
 const RankingQuestion = ({
+  survey,
   question,
   onFeedback,
   forgot,
@@ -406,6 +409,7 @@ const RankingQuestion = ({
         <MandatoryTitle
           style={styles.title}
           forgot={forgot}
+          mandatoryErrorMessage={survey.mandatoryErrorMessage}
           question={question}
         />
         <View style={styles.questionContainer}>

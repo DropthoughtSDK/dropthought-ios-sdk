@@ -5,19 +5,18 @@
  * therefore, the children would always be sure to have "survey" in context
  */
 import * as React from 'react';
-import { View, ActivityIndicator, Image, Alert, Appearance } from 'react-native';
+import { View, ActivityIndicator, Image, Alert } from 'react-native';
 import { evolve, merge, isNil } from 'ramda';
 import { useAsync } from 'react-async';
-import { i18n, ActivityIndicatorMask, GlobalStyle, PlaceholderScreen, PlaceholderImageTypes, THEME_OPTION } from '@dropthought/react-native-ui';
-import { ThemeProvider } from '@dropthought/react-native-ui/src/contexts/theme';
-import FakeScreen from '../../screens/FakeScreen';
+import { i18n, ActivityIndicatorMask, GlobalStyle, PlaceholderScreen, PlaceholderImageTypes, THEME_OPTION, ThemeProvider } from '@dropthought/react-native-ui/src';
+import ErrorHintScreen from '../../screens/ErrorHintScreen';
 import { saveCache, loadCache } from '../../../lib/Storage';
 import { apiGetProgramById, apiGetVisibilityById, sdkFetcher } from '../../../lib/API';
 import { isRequestTimeoutError, isNoInternetError } from '../../../lib/Fetcher';
 const DT_ERR_MISSING_PARAMS = 'dt-missing-parameters';
 const DT_ERR_NO_BIND_PROGRAM = 'dt-no-bind-program';
-/** @type {React.Context<SurveyContextValue>} */
 
+/** @type {React.Context<SurveyContextValue>} */
 const SurveyContext = /*#__PURE__*/React.createContext({
   survey: undefined,
   changeLanguage: () => undefined
@@ -29,11 +28,11 @@ export const useSurvey = () => {
   const surveyContextValue = React.useContext(SurveyContext);
   return surveyContextValue.survey;
 };
+
 /**
  * load the visibility data from cache or api
  * @param {{visibilityId: string, language: string, timezone: string}} param0
  */
-
 const getVisibility = async ({
   visibilityId,
   language,
@@ -42,19 +41,16 @@ const getVisibility = async ({
   if (!visibilityId) {
     throw new Error(DT_ERR_MISSING_PARAMS);
   }
+
   /** @type {Visibility} */
-
-
   const visibility = await apiGetVisibilityById(visibilityId, {
     timeout: 10000
   });
-
   if (!visibility.program || !visibility.program.programId) {
     throw new Error(DT_ERR_NO_BIND_PROGRAM);
   }
+
   /** @type {ThemeData} */
-
-
   const theme = {
     themeOption: visibility.themeOption,
     appearance: visibility.appearance,
@@ -68,39 +64,36 @@ const getVisibility = async ({
     theme
   });
 };
+
 /**
  * pre-fetch survey's image, get the width and height of the survey image
  * @param {Survey} survey
  * @return {Promise<Survey>}
  */
-
-
 const preFetchImage = survey => new Promise(resolve => {
   const {
     image: uri,
     width,
     height
   } = (survey === null || survey === void 0 ? void 0 : survey.surveyProperty) || {};
-
   if (!uri || typeof uri !== 'string') {
     resolve(survey);
     return;
-  } // pre-fetch the uri if it is not base64
+  }
 
-
+  // pre-fetch the uri if it is not base64
   const base64Reg = /^data:image\/.+;base64/;
-
   if (!uri.match(base64Reg)) {
     Image.prefetch(uri);
-  } // if height and width already existed
+  }
 
-
+  // if height and width already existed
   if (width && height) {
     resolve(survey);
     return;
-  } // get image's width and height
+  }
 
-
+  // get image's width and height
   Image.getSize(uri, (w, h) => {
     // resolve the updated survey with surveyProperty merge with {width, height}
     resolve(evolve({
@@ -113,12 +106,11 @@ const preFetchImage = survey => new Promise(resolve => {
     resolve(survey);
   });
 });
+
 /**
  * load the program data from cache or api
  * @param {{surveyId: string, language: string, timezone?: string, theme?: ThemeData }} param0
  */
-
-
 const getProgram = async ({
   surveyId,
   language,
@@ -126,15 +118,12 @@ const getProgram = async ({
   theme
 }) => {
   const programCacheKey = `survey-${surveyId}-${language}`;
-
   if (!surveyId) {
     throw new Error(DT_ERR_MISSING_PARAMS);
   }
+
   /** @type {Survey} */
-
-
   let survey = await loadCache(programCacheKey);
-
   if (!survey) {
     survey = await apiGetProgramById({
       programId: surveyId,
@@ -143,32 +132,30 @@ const getProgram = async ({
     }, {
       timeout: 10000
     });
-  } // pre-fetch image
+  }
+  // pre-fetch image
+  survey = await preFetchImage(survey);
 
-
-  survey = await preFetchImage(survey); // only save to cache when state is active
-
+  // only save to cache when state is active
   if (survey.state === 'active') {
     await saveCache(programCacheKey, survey);
-  } // change the i18n language
+  }
 
-
+  // change the i18n language
   i18n.changeLanguage(survey.language);
   return {
     survey,
     theme
   };
 };
+
 /**
  * extract questions in page and make them as its' independent page
  * @param {Survey} survey
  */
-
-
 const singleQuestionPerPageTransformer = survey => {
   /** @type {Survey} */
   let result = {};
-
   if (survey) {
     const newPageOrder = [];
     const newPages = [];
@@ -183,52 +170,51 @@ const singleQuestionPerPageTransformer = survey => {
       questions.forEach((question, index) => {
         const newPageId = `${pageId}_${index}`;
         newPageOrder.push(newPageId);
-        const newPage = { ...page,
+        const newPage = {
+          ...page,
           pageId: newPageId,
           questions: [question]
         };
         newPages.push(newPage);
       });
     });
-    result = { ...survey,
+    result = {
+      ...survey,
       pageOrder: newPageOrder,
       pages: newPages
     };
   }
-
   return result;
-}; // we want to "remember" the previous selected language
+};
+
+// we want to "remember" the previous selected language
 // so that, later when there's error, we could fallback to the previous selected language
-
-
 const useSelectedLanguageState = defaultLanguage => {
   const [selectedLanguage, setSelectedLanguage] = React.useState(defaultLanguage);
-  const prevSelectedLanguage = React.useRef(); // backup the previous selected language
+  const prevSelectedLanguage = React.useRef();
 
+  // backup the previous selected language
   const setSelectedLanguageWithBackup = React.useCallback(languageToSet => {
     prevSelectedLanguage.current = selectedLanguage;
     setSelectedLanguage(languageToSet);
   }, [selectedLanguage]);
   return [selectedLanguage, prevSelectedLanguage.current, setSelectedLanguageWithBackup, setSelectedLanguage];
 };
-
 const showAlert = () => {
   const title = 'Unable to fetch data';
-  const message = 'Please check if you are connected to the internet'; // @TODO: SurveyNativeBridge
-
+  const message = 'Please check if you are connected to the internet';
+  // @TODO: SurveyNativeBridge
   Alert.alert(title, message, [{
     text: 'OK'
   }]);
 };
-
 const defaultOnCloseHandler = () => {
   console.log('please provide your own onClose function when using SDKEntry');
 };
+
 /**
  * @param {Props} param0
  */
-
-
 export const SurveyContextProvider = ({
   baseURL,
   apiKey,
@@ -249,15 +235,15 @@ export const SurveyContextProvider = ({
       apiKey
     });
   }
-
   const themeDataFromSDKEntry = {
     themeOption,
     appearance,
     fontColor,
     backgroundColor
   };
-  const [selectedLanguage, prevSelectedLanguage, setSelectedLanguageWithBackup, setSelectedLanguage] = useSelectedLanguageState(defaultLanguage); // handler the rejection when switching language
+  const [selectedLanguage, prevSelectedLanguage, setSelectedLanguageWithBackup, setSelectedLanguage] = useSelectedLanguageState(defaultLanguage);
 
+  // handler the rejection when switching language
   const onRejectHandler = React.useCallback(() => {
     if (!isNil(prevSelectedLanguage) && prevSelectedLanguage !== selectedLanguage) {
       // fallback to previous language directly
@@ -282,15 +268,26 @@ export const SurveyContextProvider = ({
   const {
     survey,
     theme = themeDataFromSDKEntry
-  } = data !== null && data !== void 0 ? data : {};
-  /** @type {SurveyContextValue} */
+  } = data ?? {};
+  let transformedThemeOption = theme.themeOption;
+  let transformedHexCode = (survey === null || survey === void 0 ? void 0 : survey.surveyProperty.hexCode) ?? '';
+  if ((survey === null || survey === void 0 ? void 0 : survey.surveyProperty.themeName) === 'Bijiliride Theme' || (survey === null || survey === void 0 ? void 0 : survey.surveyProperty.themeName) === 'Bijliride Theme') {
+    transformedThemeOption = THEME_OPTION.BIJLIRIDE;
+  }
+  const transformedTheme = {
+    ...theme,
+    themeOption: transformedThemeOption,
+    hexCode: transformedHexCode
+  };
 
+  /** @type {SurveyContextValue} */
   const contextValue = React.useMemo(() => ({
     onClose,
-    survey: (theme === null || theme === void 0 ? void 0 : theme.themeOption) === THEME_OPTION.CLASSIC ? survey : singleQuestionPerPageTransformer(survey),
+    survey: transformedThemeOption === THEME_OPTION.CLASSIC || transformedThemeOption === THEME_OPTION.BIJLIRIDE ? survey : singleQuestionPerPageTransformer(survey),
     changeLanguage: setSelectedLanguageWithBackup
-  }), [survey, onClose, setSelectedLanguageWithBackup, theme]); // initial loading data view
+  }), [onClose, transformedThemeOption, survey, setSelectedLanguageWithBackup]);
 
+  // initial loading data view
   if (!data) {
     // loading
     let content = /*#__PURE__*/React.createElement(View, {
@@ -298,36 +295,33 @@ export const SurveyContextProvider = ({
     }, /*#__PURE__*/React.createElement(ActivityIndicator, {
       size: "large"
     }));
-
     if (error) {
       let placeholderProps = {
         imageType: PlaceholderImageTypes.ProgramUnavailable,
         message: 'Sorry for the inconvenience.\nPlease come back and check later on.'
       };
-
       if (isRequestTimeoutError(error) || isNoInternetError(error)) {
         placeholderProps = {
           imageType: PlaceholderImageTypes.NoInternet,
           message: 'Please check if you are connected to the internet'
         };
       }
-
       content = /*#__PURE__*/React.createElement(PlaceholderScreen, placeholderProps);
     }
-
-    return /*#__PURE__*/React.createElement(FakeScreen, {
-      onClose: onClose
+    return /*#__PURE__*/React.createElement(ErrorHintScreen, {
+      onClose: onClose,
+      hideCloseButton: !error
     }, content);
   }
-
   return /*#__PURE__*/React.createElement(SurveyContext.Provider, {
     value: contextValue
-  }, /*#__PURE__*/React.createElement(ThemeProvider, theme, /*#__PURE__*/React.createElement(View, {
+  }, /*#__PURE__*/React.createElement(ThemeProvider, transformedTheme, /*#__PURE__*/React.createElement(View, {
     style: GlobalStyle.flex1
   }, children, /*#__PURE__*/React.createElement(ActivityIndicatorMask, {
     loading: isPending
   }))));
 };
+
 /** @typedef {import('../../SDKEntry').SDKEntryProps} Props */
 
 /**
@@ -336,10 +330,7 @@ export const SurveyContextProvider = ({
  * @property {(language: string) => void} changeLanguage
  * @property {() => void} onClose
  */
-
 /** @typedef {import('../../../data').Survey} Survey */
-
 /** @typedef {import('../../../data').Visibility} Visibility */
-
 /** @typedef {import('../../../data').ThemeData} ThemeData */
 //# sourceMappingURL=SurveyContext.js.map

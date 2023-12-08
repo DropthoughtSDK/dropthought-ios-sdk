@@ -9,6 +9,7 @@ var _exportNames = {
   feedbackUploader: true,
   initializeWithAPIKey: true
 };
+exports.feedbackUploader = exports.BASE_URL = void 0;
 exports.initialize = initialize;
 Object.defineProperty(exports, "initializeWithAPIKey", {
   enumerable: true,
@@ -16,14 +17,9 @@ Object.defineProperty(exports, "initializeWithAPIKey", {
     return _initialize.initializeWithAPIKey;
   }
 });
-exports.feedbackUploader = exports.BASE_URL = void 0;
-
 var _initialize = require("./initialize");
-
 var _FeedbacksUploader = require("./lib/FeedbacksUploader");
-
 var _kioskRnSdk = require("./kiosk-rn-sdk");
-
 Object.keys(_kioskRnSdk).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
@@ -36,24 +32,20 @@ Object.keys(_kioskRnSdk).forEach(function (key) {
   });
 });
 // @ts-ignore
-const BASE_URL = 'https://api.dropthought.com/dtapp';
-exports.BASE_URL = BASE_URL;
 
+const BASE_URL = exports.BASE_URL = 'https://api.dropthought.com/dtapp';
 function initialize(params) {
-  (0, _initialize.initializeWithAPIKey)({ ...params,
+  (0, _initialize.initializeWithAPIKey)({
+    ...params,
     baseURL: BASE_URL
   });
 }
-
-const feedbackUploader = {
+const feedbackUploader = exports.feedbackUploader = {
   upload() {
     return _FeedbacksUploader.feedbackUploader.upload();
   },
-
   clear() {
     return _FeedbacksUploader.feedbackUploader.clear();
   }
-
 };
-exports.feedbackUploader = feedbackUploader;
 //# sourceMappingURL=index.js.map

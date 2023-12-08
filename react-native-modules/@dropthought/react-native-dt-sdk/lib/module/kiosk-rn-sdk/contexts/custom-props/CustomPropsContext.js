@@ -1,7 +1,7 @@
 import * as React from 'react';
 const defaultCallback = undefined;
-/** @type {React.Context<CustomProps>} */
 
+/** @type {React.Context<CustomProps>} */
 const CustomPropsContext = /*#__PURE__*/React.createContext({
   onSubmit: defaultCallback,
   metadata: {},
@@ -17,10 +17,10 @@ export const useOnSubmitCallback = () => {
 export const useMetadata = () => {
   return React.useContext(CustomPropsContext).metadata;
 };
+
 /**
  * @param {CustomProps} param0
  */
-
 export const CustomPropsContextProvider = ({
   onSubmit = defaultCallback,
   onSubmitSuccess = defaultCallback,
@@ -35,6 +35,7 @@ export const CustomPropsContextProvider = ({
     }
   }, children);
 };
+
 /**
  * @typedef {object} CustomProps
  * @property {(surveyFeedback: SurveyFeedback) => void} onSubmitSuccess

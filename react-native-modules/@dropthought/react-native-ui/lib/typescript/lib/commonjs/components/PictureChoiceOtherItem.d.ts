@@ -1,6 +1,6 @@
 export var __esModule: boolean;
 export default _default;
-declare function _default({ otherPicture, isMultipleChoice, selected, placeholder, columnGap, onChooseImage, onSelect, onUpload, isUploading, onError, onChangeText, themeColor }: {
+declare function _default({ otherPicture, isMultipleChoice, selected, placeholder, columnGap, onChooseImage, onSelect, onUpload, onError, onChangeText, themeColor, preview }: {
     otherPicture: any;
     isMultipleChoice: any;
     selected: any;
@@ -9,8 +9,8 @@ declare function _default({ otherPicture, isMultipleChoice, selected, placeholde
     onChooseImage: any;
     onSelect: any;
     onUpload: any;
-    isUploading: any;
     onError: any;
     onChangeText: any;
     themeColor: any;
+    preview: any;
 }): any;

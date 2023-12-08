@@ -1,7 +1,5 @@
 com/reactlibrary/securekeystore/Constants.java
  com.reactlibrary.securekeystore.Constants
-com/reactlibrary/securekeystore/Storage.java
- com.reactlibrary.securekeystore.Storage
 com/reactlibrary/securekeystore/RNSecureKeyStorePackage.java
  com.reactlibrary.securekeystore.RNSecureKeyStorePackage
 com/reactlibrary/securekeystore/RNSecureKeyStoreModule.java

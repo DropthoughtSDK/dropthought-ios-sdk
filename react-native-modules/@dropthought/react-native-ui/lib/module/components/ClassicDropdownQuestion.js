@@ -14,6 +14,7 @@ const radioIconSource = {
 };
 
 const ClassicDropdownQuestion = ({
+  mandatoryErrorMessage,
   question,
   onFeedback,
   feedback,
@@ -98,6 +99,7 @@ const ClassicDropdownQuestion = ({
   }, /*#__PURE__*/React.createElement(ClassicMandatoryTitle, {
     forgot: forgot,
     invalidMessage: invalidMessage,
+    mandatoryErrorMessage: mandatoryErrorMessage,
     question: question,
     style: styles.title
   }), /*#__PURE__*/React.createElement(TouchableOpacity, {

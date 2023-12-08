@@ -5,8 +5,8 @@ import { apiUploadFileEvent } from './API';
  */
 export const uploadPicture = async (file) => {
   return apiUploadFileEvent(file, {
-    // use shorter timeout here,
-    timeout: 10000,
+    // use shorter timeout here, because the server is unstable, so we need to get the timer longer
+    timeout: 100000,
   }).catch((error) => {
     // save result when there's error
     throw error;

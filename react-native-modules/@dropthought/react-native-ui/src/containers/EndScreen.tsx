@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { Colors, GlobalStyle } from '../styles';
@@ -7,11 +7,10 @@ import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import type { Survey } from '../data';
 // @ts-ignore
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-const iconSource = {
-  [COLOR_SCHEMES.light]: require('../assets/rating.png'),
-  [COLOR_SCHEMES.dark]: require('../assets/rating_dark.png'),
-};
+import {
+  DimensionWidthType,
+  useDimensionWidthType,
+} from '../hooks/useWindowDimensions';
 
 const logoSource = {
   [COLOR_SCHEMES.light]: require('../assets/ic_dtlogo.png'),
@@ -23,12 +22,46 @@ type Props = {
   onClose: () => void;
 };
 
+const defaultIconSource = require('../assets/rating.png');
+const defaultIconSize = {
+  [DimensionWidthType.phone]: 65,
+  [DimensionWidthType.tablet]: 72,
+};
+
 const EndScreen = ({ survey, onClose }: Props) => {
   const insets = useSafeAreaInsets();
-  const { colorScheme, fontColor, backgroundColor } = useTheme();
+  const { hexCode, colorScheme, fontColor, backgroundColor } = useTheme();
   const rtl = i18n.dir() === 'rtl';
+  const dimensionWidthType = useDimensionWidthType();
 
-  const { thankYouText } = survey;
+  const { surveyProperty, thankYouTextPlain } = survey;
+  const { image } = surveyProperty;
+  const [imageHeight, setImageHeight] = useState(65);
+  const iconStyle = {
+    width: '100%',
+    height: imageHeight,
+  };
+
+  useEffect(() => {
+    Image.getSize(
+      image,
+      (_, height) => {
+        if (height < defaultIconSize[dimensionWidthType]) {
+          setImageHeight(height);
+        }
+      },
+      (_) => {}
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const iconSource = image === undefined ? defaultIconSource : { uri: image };
+
+  const iconView = (
+    <View style={GlobalStyle.row}>
+      <Image resizeMode="contain" style={iconStyle} source={iconSource} />
+    </View>
+  );
 
   const powerByStyle = [styles.power_by, { color: fontColor }];
   const powerByBoldStyle = [styles.power_by_bold, { color: fontColor }];
@@ -42,7 +75,7 @@ const EndScreen = ({ survey, onClose }: Props) => {
     },
   ];
   const titleStyle = [styles.headerTitle, { color: fontColor }];
-  const headerIconStyle = { tintColor: survey.surveyProperty.hexCode };
+  const headerIconStyle = { tintColor: hexCode };
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <View style={containerStyle}>
@@ -59,13 +92,9 @@ const EndScreen = ({ survey, onClose }: Props) => {
         </View>
       </View>
       <View style={styles.main}>
-        {/* @ts-ignore */}
-        <Image source={iconSource[colorScheme]} />
-        <Text style={[styles.title, { color: fontColor }]}>
-          {i18n.t('end-survey:thank')}
-        </Text>
+        {iconView}
         <Text style={[styles.subtitle, { color: fontColor }]}>
-          {thankYouText}
+          {thankYouTextPlain}
         </Text>
       </View>
       <View style={styles.vertical}>
@@ -102,11 +131,11 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   subtitle: {
-    lineHeight: 23,
     marginTop: 17,
     fontSize: 19,
     textAlign: 'center',
     opacity: 0.72,
+    paddingBottom: 10,
   },
   vertical: {
     alignItems: 'center',

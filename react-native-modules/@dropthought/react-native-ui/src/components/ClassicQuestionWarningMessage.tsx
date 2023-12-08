@@ -16,19 +16,18 @@ const ClassicQuestionWarningMessage = ({ message }: Props) => {
 
   if (!message) return null;
 
+  const textStyle = [
+    styles.hint,
+    isDarkMode && styles.darkModeHint,
+    rtl && GlobalStyle.horizontalFlip,
+    { lineHeight: i18n.language === 'te' ? 22 : undefined },
+  ];
+
   return (
     <View style={[styles.container, rtl && GlobalStyle.horizontalFlip]}>
       <View style={[styles.tip, isDarkMode && styles.darkModeTip]} />
       <View style={[styles.bubble, isDarkMode && styles.darkModeBubble]}>
-        <Text
-          style={[
-            styles.hint,
-            isDarkMode && styles.darkModeHint,
-            rtl && GlobalStyle.horizontalFlip,
-          ]}
-        >
-          {message}
-        </Text>
+        <Text style={textStyle}>{message}</Text>
       </View>
     </View>
   );

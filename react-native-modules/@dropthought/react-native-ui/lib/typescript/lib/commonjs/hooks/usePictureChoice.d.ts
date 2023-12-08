@@ -1,4 +1,5 @@
 export var __esModule: boolean;
+export function multiplePictureChoiceValidator(question: any, feedback: any): boolean;
 export function usePictureChoice(question: any, onFeedback: any, feedback: any): {
     images: any;
     otherPictureEnable: boolean;

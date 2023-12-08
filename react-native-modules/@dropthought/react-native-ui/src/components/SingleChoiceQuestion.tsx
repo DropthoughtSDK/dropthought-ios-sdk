@@ -5,6 +5,7 @@ import MandatoryTitle from './MandatoryTitle';
 import type {
   Feedback as OriginFeedback,
   Question as OriginQuestion,
+  Survey,
 } from '../data';
 import { getOptionsFromQuestion } from '../utils/data';
 import { isNil } from 'ramda';
@@ -24,6 +25,7 @@ type Feedback = OriginFeedback & {
 };
 
 type Props = {
+  survey: Survey;
   anonymous: boolean;
   question: Question;
   onFeedback: (feedback: Feedback) => void;
@@ -33,6 +35,7 @@ type Props = {
 };
 
 const SingleChoiceQuestion = ({
+  survey,
   anonymous,
   question,
   onFeedback,
@@ -137,7 +140,11 @@ const SingleChoiceQuestion = ({
   return (
     // @ts-ignore
     <ScrollView extraAvoidingSpace={30} style={commonStyles.container}>
-      <MandatoryTitle forgot={forgot} question={question} />
+      <MandatoryTitle
+        forgot={forgot}
+        mandatoryErrorMessage={survey.mandatoryErrorMessage}
+        question={question}
+      />
       {buttonList}
     </ScrollView>
   );

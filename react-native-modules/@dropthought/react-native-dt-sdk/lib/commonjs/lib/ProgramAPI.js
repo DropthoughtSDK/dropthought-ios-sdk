@@ -4,10 +4,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.apiGetProgramById = apiGetProgramById;
-
 var _APIClient = require("./APIClient");
-
 const PROGRAM_PATH = '/api/program';
+
 /**
  * get single language version of a program by id
  * @param {{
@@ -19,7 +18,6 @@ const PROGRAM_PATH = '/api/program';
  * @param {Fetcher=} fetcher
  * @returns {Promise<Survey>}
  */
-
 async function apiGetProgramById({
   programId,
   language = 'en',
@@ -40,6 +38,7 @@ async function apiGetProgramById({
     return response.data.result;
   });
 }
+
 /**
  * @typedef {import('./Fetcher').RequestConfig} RequestConfig
  * @typedef {import('./Fetcher').Fetcher} Fetcher

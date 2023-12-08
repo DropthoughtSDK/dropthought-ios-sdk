@@ -3,6 +3,7 @@ import type { QuestionMetaDataType as TypeQuestionMetaDataType, Question, Feedba
 export declare const metadataTypeKeyboard: (metadataType: TypeQuestionMetaDataType | undefined) => KeyboardTypeOptions | undefined;
 export declare const metadataTypeAutoCapitalize: (metadataType: TypeQuestionMetaDataType | undefined) => "none" | "words" | "sentences";
 declare type Props = {
+    mandatoryErrorMessage: string;
     anonymous: boolean;
     question: Question;
     onFeedback: (feedback: Feedback) => void;
@@ -10,5 +11,5 @@ declare type Props = {
     forgot: boolean;
     themeColor: string;
 };
-declare const OpenQuestion: ({ anonymous, question, onFeedback, feedback, forgot, themeColor, }: Props) => JSX.Element;
+declare const OpenQuestion: ({ mandatoryErrorMessage, anonymous, question, onFeedback, feedback, forgot, themeColor, }: Props) => JSX.Element;
 export default OpenQuestion;

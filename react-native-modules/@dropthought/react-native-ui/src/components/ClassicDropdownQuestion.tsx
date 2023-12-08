@@ -28,6 +28,7 @@ const radioIconSource = {
 };
 
 type Props = {
+  mandatoryErrorMessage: string;
   anonymous: boolean;
   question: Question;
   onFeedback: (feedback: Feedback) => void;
@@ -37,6 +38,7 @@ type Props = {
 };
 
 const ClassicDropdownQuestion = ({
+  mandatoryErrorMessage,
   question,
   onFeedback,
   feedback,
@@ -126,6 +128,7 @@ const ClassicDropdownQuestion = ({
       <ClassicMandatoryTitle
         forgot={forgot}
         invalidMessage={invalidMessage}
+        mandatoryErrorMessage={mandatoryErrorMessage}
         question={question}
         style={styles.title}
       />

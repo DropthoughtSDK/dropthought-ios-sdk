@@ -72,6 +72,7 @@ const metadataTypeAutoCapitalize = metadataType => {
 exports.metadataTypeAutoCapitalize = metadataTypeAutoCapitalize;
 
 const OpenQuestion = ({
+  mandatoryErrorMessage,
   anonymous,
   question,
   onFeedback,
@@ -129,6 +130,7 @@ const OpenQuestion = ({
     forgot: hasForgot,
     invalidMessage: // show the error message after the user has done edited
     hasEdited && !isValid ? (_question$responseErr = question.responseErrorText) !== null && _question$responseErr !== void 0 ? _question$responseErr : _translation.default.t('metadata-invalid-message', question.metaDataType) : '',
+    mandatoryErrorMessage: mandatoryErrorMessage,
     question: question,
     style: styles.title
   }), /*#__PURE__*/_react.default.createElement(_MetadataDesc.default, {

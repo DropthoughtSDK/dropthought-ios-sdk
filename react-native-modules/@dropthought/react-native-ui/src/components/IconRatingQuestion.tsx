@@ -11,7 +11,7 @@ import {
   getSelectedIcons,
   RatingIconType,
 } from '../constants/RatingQuestionConstants';
-import type { Feedback as OriginFeedback, Question } from '../data';
+import type { Feedback as OriginFeedback, Question, Survey } from '../data';
 import {
   DimensionWidthType,
   useDimensionWidthType,
@@ -23,6 +23,7 @@ type Feedback = OriginFeedback & {
 };
 
 type Props = {
+  survey: Survey;
   question: Question;
   onFeedback: ({
     questionId,
@@ -43,6 +44,7 @@ const FakeSmiley = () => {
 };
 
 const ClassicIconRatingQuestion = ({
+  survey,
   question,
   feedback,
   forgot,
@@ -133,7 +135,11 @@ const ClassicIconRatingQuestion = ({
 
   return (
     <View style={commonStyles.container}>
-      <MandatoryTitle forgot={forgot} question={question} />
+      <MandatoryTitle
+        forgot={forgot}
+        mandatoryErrorMessage={survey.mandatoryErrorMessage}
+        question={question}
+      />
       <View style={[styles.smileyRowContainer, rtl && GlobalStyle.flexEnd]}>
         {iconRow}
       </View>

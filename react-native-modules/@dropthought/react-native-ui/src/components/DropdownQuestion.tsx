@@ -17,7 +17,7 @@ import type { TransformOptionType } from '../utils/data';
 import GlobalStyle, { Colors, addOpacityToColor } from '../styles';
 import MandatoryTitle from './MandatoryTitle';
 import i18n from '../translation';
-import type { Question, Feedback } from '../data';
+import type { Question, Feedback, Survey } from '../data';
 import BottomSheet, { NavigationComponent } from './BottomSheet';
 import DropdownOtherOptionInput from './DropdownOtherOptionInput';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
@@ -34,6 +34,7 @@ const radioIconSource = {
 };
 
 type Props = {
+  survey: Survey;
   anonymous: boolean;
   question: Question;
   onFeedback: (feedback: Feedback) => void;
@@ -43,6 +44,7 @@ type Props = {
 };
 
 const DropdownQuestion = ({
+  survey,
   question,
   onFeedback,
   feedback,
@@ -150,6 +152,7 @@ const DropdownQuestion = ({
       <MandatoryTitle
         forgot={forgot}
         invalidMessage={invalidMessage}
+        mandatoryErrorMessage={survey.mandatoryErrorMessage}
         question={question}
         style={styles.title}
       />

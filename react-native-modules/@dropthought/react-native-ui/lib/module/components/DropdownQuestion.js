@@ -16,6 +16,7 @@ const radioIconSource = {
 };
 
 const DropdownQuestion = ({
+  survey,
   question,
   onFeedback,
   feedback,
@@ -109,6 +110,7 @@ const DropdownQuestion = ({
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     forgot: forgot,
     invalidMessage: invalidMessage,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     question: question,
     style: styles.title
   }), /*#__PURE__*/React.createElement(View, {

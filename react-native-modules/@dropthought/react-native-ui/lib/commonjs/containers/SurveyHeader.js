@@ -37,6 +37,7 @@ const SurveyHeader = props => {
     onClose
   } = props;
   const {
+    hexCode,
     fontColor,
     themeOption,
     customFontColor
@@ -50,11 +51,11 @@ const SurveyHeader = props => {
 
   const containerStyle = [styles.container, {
     paddingTop: insets.top
-  }, rtl && _styles.GlobalStyle.flexRowReverse, {
+  }, {
     backgroundColor
   }];
   const iconStyle = {
-    tintColor: survey.surveyProperty.hexCode
+    tintColor: hexCode
   };
   const titleStyle = [styles.title, {
     color
@@ -62,7 +63,7 @@ const SurveyHeader = props => {
   return /*#__PURE__*/React.createElement(_reactNative.View, {
     style: containerStyle
   }, /*#__PURE__*/React.createElement(_reactNative.View, {
-    style: styles.headerRowContainer
+    style: [styles.headerRowContainer, rtl && _styles.GlobalStyle.flexRowReverse]
   }, /*#__PURE__*/React.createElement(_reactNative.TouchableOpacity, {
     style: styles.closeButton,
     onPress: onClose
@@ -75,7 +76,7 @@ const SurveyHeader = props => {
   }, survey.surveyName)), /*#__PURE__*/React.createElement(_ProgressBar.default, {
     value: pageIndex + 1,
     maxValue: survey.pageOrder.length,
-    themeColor: survey.surveyProperty.hexCode,
+    themeColor: hexCode,
     color: color,
     rtl: rtl
   }));

@@ -36,6 +36,7 @@ type RowProps = {
 };
 
 type Props = {
+  mandatoryErrorMessage: string;
   question: Question;
   onFeedback: (feedback: MatrixChoiceFeedback) => void;
   feedback: MatrixChoiceFeedback;
@@ -215,6 +216,7 @@ const MatrixRow = ({
 };
 
 const ClassicMatrixChoiceQuestion = ({
+  mandatoryErrorMessage,
   question,
   onFeedback,
   feedback,
@@ -234,6 +236,7 @@ const ClassicMatrixChoiceQuestion = ({
     <View style={GlobalStyle.questionContainer}>
       <ClassicMandatoryTitle
         forgot={false}
+        mandatoryErrorMessage={mandatoryErrorMessage}
         question={question}
         style={styles.title}
         invalidMessage={handleMatrixChoiceErrorHint(forgot)}

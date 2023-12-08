@@ -4,52 +4,36 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.SurveyModal = SurveyModal;
-exports.SurveyModalContainer = exports.useOpenSurvey = exports.SurveyModalOpenSurveyContext = void 0;
-
+exports.useOpenSurvey = exports.SurveyModalOpenSurveyContext = exports.SurveyModalContainer = void 0;
 var React = _interopRequireWildcard(require("react"));
-
 var _reactNative = require("react-native");
-
 var _ramda = require("ramda");
-
-var _reactNativeUi = require("@dropthought/react-native-ui");
-
+var _src = require("@dropthought/react-native-ui/src");
 var _SDKEntry = _interopRequireDefault(require("./SDKEntry"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 const ModalProps = ['animated', 'animationType', 'transparent', 'visible', 'onRequestClose', 'onShow', 'presentationStyle', 'supportedOrientations', 'onDismiss', 'onOrientationChange', 'hardwareAccelerated'];
-
 const height = _reactNative.Dimensions.get('window').height;
-
 const width = _reactNative.Dimensions.get('window').width;
 /**
  * @param {SurveyModalProps & SDKEntryProps & ModalProps } props
  */
-
-
 function SurveyModal(props) {
   const sdkProps = (0, _ramda.omit)(ModalProps, props);
-  const modalProps = (0, _ramda.pick)(ModalProps, props); //[DK-3764] add backgroundColor to prevent the broken ui issue
-
+  const modalProps = (0, _ramda.pick)(ModalProps, props);
+  //[DK-3764] add backgroundColor to prevent the broken ui issue
   const {
     backgroundColor,
     appearance
   } = props;
-  let dummyBackgroundColor = _reactNativeUi.Colors.white;
-
+  let dummyBackgroundColor = _src.Colors.white;
   if (backgroundColor) {
     dummyBackgroundColor = backgroundColor;
   } else if (appearance === 'dark') {
-    dummyBackgroundColor = _reactNativeUi.Colors.backgroundColorDark;
+    dummyBackgroundColor = _src.Colors.backgroundColorDark;
   }
-
   const containerStyle = {
     height,
     width,
@@ -61,31 +45,24 @@ function SurveyModal(props) {
     presentationStyle: "overFullScreen",
     transparent: true
   }, modalProps), /*#__PURE__*/React.createElement(_reactNative.View, {
-    style: _reactNativeUi.GlobalStyle.flex1
+    style: _src.GlobalStyle.flex1
   }, /*#__PURE__*/React.createElement(_SDKEntry.default, sdkProps))));
 }
+
 /** @type {React.Context<(param: OpenSurveyProps=) => void>} */
-
-
-const SurveyModalOpenSurveyContext = /*#__PURE__*/React.createContext(() => undefined);
-exports.SurveyModalOpenSurveyContext = SurveyModalOpenSurveyContext;
-
+const SurveyModalOpenSurveyContext = exports.SurveyModalOpenSurveyContext = /*#__PURE__*/React.createContext(() => undefined);
 const useOpenSurvey = () => {
   const context = React.useContext(SurveyModalOpenSurveyContext);
-
   if (context === undefined) {
     throw new Error('useOpenSurvey must be used within a SurveyModalContainer');
   }
-
   return context;
 };
+
 /**
  * @param {SurveyModalProps & SDKEntryProps & ModalProps } param0
  */
-
-
 exports.useOpenSurvey = useOpenSurvey;
-
 const SurveyModalContainer = ({
   children,
   onClose,
@@ -93,9 +70,7 @@ const SurveyModalContainer = ({
 }) => {
   const [visible, setVisible] = React.useState(false);
   const [openSurveyProps, setOpenSurveyProps] = React.useState();
-  const openSurvey = React.useCallback((
-  /** @type {SDKEntryProps} */
-  inputProps) => {
+  const openSurvey = React.useCallback(( /** @type {SDKEntryProps} */inputProps) => {
     setOpenSurveyProps(inputProps);
     setVisible(true);
   }, []);
@@ -110,20 +85,17 @@ const SurveyModalContainer = ({
     onClose: onCloseSurveyHandler
   })) : null);
 };
+
 /**
  * @typedef {import('./SDKEntry').SDKEntryProps} SDKEntryProps
  * @typedef {import('react-native').ModalProps} ModalProps
  */
-
 /**
  * @typedef {object} SurveyModalProps
  * @property {boolean} visible
  */
-
 /**
  * @typedef {SDKEntryProps & ModalProps} OpenSurveyProps
  */
-
-
 exports.SurveyModalContainer = SurveyModalContainer;
 //# sourceMappingURL=SurveyModal.js.map

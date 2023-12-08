@@ -45,6 +45,7 @@ const SmileyRatingQuestionOption6 = ({
     return result;
   }, [scaleLogicList]);
   const {
+    hexCode,
     colorScheme,
     customFontColor
   } = useTheme();
@@ -113,6 +114,7 @@ const SmileyRatingQuestionOption6 = ({
     style: commonStyles.container
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     question: question,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     forgot: forgot
   }), /*#__PURE__*/React.createElement(View, {
     style: commonStyles.contentContainer
@@ -121,7 +123,8 @@ const SmileyRatingQuestionOption6 = ({
   }, /*#__PURE__*/React.createElement(Text, {
     style: hintTextStyle
   }, i18n.t('option6HintDescription:title'))) : /*#__PURE__*/React.createElement(React.Fragment, null, lottieContainer, scoreContainer))), /*#__PURE__*/React.createElement(SurveyFooter, {
-    surveyColor: survey.surveyProperty.hexCode,
+    submitSurvey: survey.submitSurvey,
+    surveyColor: hexCode,
     isFirstPage: pageIndex === 0,
     isLastPage: pageIndex === survey.pageOrder.length - 1,
     onPrevPage: onPrevPage,

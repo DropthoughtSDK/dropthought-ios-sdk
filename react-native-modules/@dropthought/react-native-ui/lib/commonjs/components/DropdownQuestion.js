@@ -39,6 +39,7 @@ const radioIconSource = {
 };
 
 const DropdownQuestion = ({
+  survey,
   question,
   onFeedback,
   feedback,
@@ -132,6 +133,7 @@ const DropdownQuestion = ({
   }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
     forgot: forgot,
     invalidMessage: invalidMessage,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     question: question,
     style: styles.title
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {

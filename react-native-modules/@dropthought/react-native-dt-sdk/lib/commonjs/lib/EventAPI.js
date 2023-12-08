@@ -4,19 +4,17 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.apiPostEvent = apiPostEvent;
-
 var _ramda = require("ramda");
-
 var _APIClient = require("./APIClient");
-
 var _Fetcher = require("./Fetcher");
-
 /**
  * @description
  * https://docs.dropthought.com/docs/2_0/api.html#event
  * submit feedback
  */
+
 const EVENT_PATH = '/api/event';
+
 /**
  * post event (feedback)
  * @param {{
@@ -31,7 +29,6 @@ const EVENT_PATH = '/api/event';
  * @param {Fetcher=} fetcher
  * @returns {Promise<Survey>}
  */
-
 async function apiPostEvent({
   programId,
   feedbacks = [],
@@ -48,7 +45,8 @@ async function apiPostEvent({
       refId: programId,
       data: feedbacks.map(feedback => ({
         dataId: feedback.questionId,
-        dataValue: // for not answered question, server doesn't allow empty array for dataValue
+        dataValue:
+        // for not answered question, server doesn't allow empty array for dataValue
         // it accept [''] for not answered question
         (0, _ramda.isNil)(feedback.answers) || (0, _ramda.isEmpty)(feedback.answers) ? [''] : feedback.answers,
         dataType: feedback.type,
@@ -68,10 +66,10 @@ async function apiPostEvent({
       (0, _Fetcher.throwRequestError)(response);
       return;
     }
-
     return response.data;
   });
 }
+
 /**
  * @typedef {import('./Fetcher').RequestConfig} RequestConfig
  * @typedef {import('./Fetcher').Fetcher} Fetcher

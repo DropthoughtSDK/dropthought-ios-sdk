@@ -83,18 +83,13 @@ function OptionWithHighlight({
 
   let content;
   if (typeof title === 'string') {
-    content = (
-      <Text
-        style={[
-          styles.text,
-          { color: fontColor },
-          checked ? styles.checkedText : {},
-          QuestionContentTextSize[dimensionWidthType],
-        ]}
-      >
-        {title}
-      </Text>
-    );
+    const textStyle = [
+      styles.text,
+      { color: fontColor, minHeight: i18n.language === 'te' ? 30 : undefined },
+      checked ? styles.checkedText : {},
+      QuestionContentTextSize[dimensionWidthType],
+    ];
+    content = <Text style={textStyle}>{title}</Text>;
   } else {
     content = title;
   }

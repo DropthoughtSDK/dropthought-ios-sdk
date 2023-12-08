@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Dimensions } from 'react-native';
-
 function useWindowDimensions() {
   const [dimensions, setDimensions] = React.useState(() => {
     const {
@@ -24,24 +23,21 @@ function useWindowDimensions() {
         if (width === d.width && height === d.height) {
           return d;
         }
-
         return {
           width,
           height
         };
       });
     };
-
     onChange({
       window: Dimensions.get('window')
     });
     const listener = Dimensions.addEventListener('change', onChange);
     return () => {
-      listener === null || listener === void 0 ? void 0 : listener.remove();
+      listener === null || listener === void 0 || listener.remove();
     };
   }, []);
   return dimensions;
 }
-
 export default useWindowDimensions;
 //# sourceMappingURL=useWindowDimensions.js.map

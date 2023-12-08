@@ -92,7 +92,7 @@ function NewOtherOptionWithHighlight(props: Props) {
       <NewOptionWithHighlight
         {...props}
         onPress={onPressHandler}
-        title={'Others'}
+        title={question.otherTextLabel}
       />
       <MultiLineTextInput
         onEndEditingHandler={() => {}}

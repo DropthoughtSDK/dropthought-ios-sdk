@@ -8,16 +8,17 @@ import ClassicMandatoryTitle from './ClassicMandatoryTitle';
 import i18n from '../translation';
 
 const ClassicPictureChoiceQuestion = ({
+  mandatoryErrorMessage,
   question,
   feedback,
   onFeedback,
   forgot,
   themeColor,
   onUpload,
-  isUploading
+  preview
 }) => {
   const {
-    otherText
+    otherText = ''
   } = question;
   const {
     images,
@@ -35,6 +36,7 @@ const ClassicPictureChoiceQuestion = ({
     invalidMessage,
     setInvalidMessage
   } = usePictureChoice(question, onFeedback, feedback);
+  const rtl = i18n.dir() === 'rtl';
   const imageItems = images.map(({
     uri,
     option
@@ -93,28 +95,31 @@ const ClassicPictureChoiceQuestion = ({
       setInvalidMessage(undefined);
       const url = await onUpload(file);
 
-      if (url) {
+      if (typeof url !== 'string') {
+        setInvalidMessage(`${i18n.t('picture-choice:uploadFailed')}`);
+      } else if (url) {
         setOtherPictureAnswerUrl(url);
       }
     },
     onError: msg => {
       setInvalidMessage(msg);
     },
-    isUploading: isUploading,
     onChangeText: text => {
       setOtherPictureAnswerText(text);
     },
-    themeColor: themeColor
+    themeColor: themeColor,
+    preview: preview
   }) : null;
   return /*#__PURE__*/React.createElement(View, {
     style: GlobalStyle.questionContainer
   }, /*#__PURE__*/React.createElement(ClassicMandatoryTitle, {
     forgot: forgot,
+    mandatoryErrorMessage: mandatoryErrorMessage,
     question: question,
     style: styles.mandatoryTitle,
     invalidMessage: invalidMessage
   }), /*#__PURE__*/React.createElement(View, {
-    style: styles.pictureGridContainer
+    style: [styles.pictureGridContainer, rtl && GlobalStyle.flexRowReverse]
   }, imageItems, otherImageItem));
 };
 

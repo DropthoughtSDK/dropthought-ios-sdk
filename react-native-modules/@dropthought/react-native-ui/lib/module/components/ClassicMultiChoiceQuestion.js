@@ -131,6 +131,7 @@ class ClassicMultiChoiceQuestion extends PureComponent {
       style: GlobalStyles.questionContainer
     }, /*#__PURE__*/React.createElement(ClassicMandatoryTitle, {
       forgot: this.props.forgot,
+      mandatoryErrorMessage: this.props.mandatoryErrorMessage,
       question: this.props.question
     }), /*#__PURE__*/React.createElement(View, {
       style: styles.title

@@ -25,20 +25,27 @@ import GlobalStyle from '../styles';
 import type { Question, Feedback, ImageFileProps } from '../data';
 
 const TempComponent = ({
+  mandatoryErrorMessage,
   question,
   forgot,
 }: {
+  mandatoryErrorMessage: string;
   question: Question;
   forgot: boolean;
 }) => {
   return (
     <View style={GlobalStyle.questionContainer}>
-      <ClassicMandatoryTitle question={question} forgot={forgot} />
+      <ClassicMandatoryTitle
+        question={question}
+        mandatoryErrorMessage={mandatoryErrorMessage}
+        forgot={forgot}
+      />
     </View>
   );
 };
 
 type Props = {
+  mandatoryErrorMessage: string;
   anonymous: boolean;
   question: Question;
   validationStarted: boolean;
@@ -48,6 +55,7 @@ type Props = {
   isUploading?: boolean;
   onDragGrant: () => void;
   onDragEnd: () => void;
+  preview: boolean;
 };
 
 const ClassicQuestionContainer = (props: Props) => {

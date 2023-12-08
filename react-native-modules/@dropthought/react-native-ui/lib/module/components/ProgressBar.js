@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { GlobalStyle, opacity30 } from '../styles';
-import i18n from '../translation';
 /**
  * The ProgressBar will use `value` and `maxValue` to
  * compute the percentage
@@ -16,26 +15,26 @@ const ProgressBar = ({
 }) => {
   // compute the percentage value: (value/maxValue)*100
   const percentage = Math.round(value * 100 / maxValue);
-  const containerStyle = [styles.container, rtl && GlobalStyle.flexRowReverse];
   const trackStyle = [styles.track, {
     backgroundColor: opacity30(themeColor)
   }];
   const progressBarStyle = [styles.progressBar, styles.track, {
     width: `${percentage}%`,
-    backgroundColor: themeColor
+    backgroundColor: themeColor,
+    right: rtl ? 0 : undefined
   }];
   const textStyle = [styles.title, rtl && GlobalStyle.textAlignRight, {
     color
   }];
   return /*#__PURE__*/React.createElement(View, {
-    style: containerStyle
+    style: styles.container
   }, /*#__PURE__*/React.createElement(View, {
     style: trackStyle
   }), /*#__PURE__*/React.createElement(View, {
     style: progressBarStyle
   }), /*#__PURE__*/React.createElement(Text, {
     style: textStyle
-  }, `${i18n.t('survey:new-progress-bar')} ${value}/${maxValue}`));
+  }, `${value}/${maxValue}`));
 };
 
 const styles = StyleSheet.create({

@@ -49,6 +49,7 @@ const SmileyRatingQuestionOption2 = ({
   const answered = feedback && feedback.answers && !(0, _ramda.isNil)(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
   const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
   const {
+    hexCode,
     backgroundColor: themeBackgroundColor,
     fontColor,
     colorScheme
@@ -106,6 +107,7 @@ const SmileyRatingQuestionOption2 = ({
     style: commonStyles.infoContainer
   }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
     question: question,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     forgot: forgot
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: commonStyles.centerContainer
@@ -129,6 +131,7 @@ const SmileyRatingQuestionOption2 = ({
     style: commonStyles.infoContainer
   }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
     question: question,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     forgot: forgot
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: commonStyles.centerContainer
@@ -147,7 +150,8 @@ const SmileyRatingQuestionOption2 = ({
     key: 'WheelPicker-dummyDescroptions',
     itemHeight: _reactNative.Platform.OS === 'android' ? 60 : undefined
   })))), /*#__PURE__*/_react.default.createElement(_SurveyFooter.default, {
-    surveyColor: survey.surveyProperty.hexCode,
+    submitSurvey: survey.submitSurvey,
+    surveyColor: hexCode,
     isFirstPage: pageIndex === 0,
     isLastPage: pageIndex === survey.pageOrder.length - 1,
     onPrevPage: onPrevPage,

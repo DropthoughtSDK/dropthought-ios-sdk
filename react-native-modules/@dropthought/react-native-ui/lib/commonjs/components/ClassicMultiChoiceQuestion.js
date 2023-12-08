@@ -151,6 +151,7 @@ class ClassicMultiChoiceQuestion extends _react.PureComponent {
       style: _styles.default.questionContainer
     }, /*#__PURE__*/_react.default.createElement(_ClassicMandatoryTitle.default, {
       forgot: this.props.forgot,
+      mandatoryErrorMessage: this.props.mandatoryErrorMessage,
       question: this.props.question
     }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
       style: styles.title

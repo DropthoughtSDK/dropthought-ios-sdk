@@ -99,6 +99,7 @@ function RankingItem({
 }
 
 const RankingQuestion = ({
+  survey,
   question,
   onFeedback,
   forgot,
@@ -328,6 +329,7 @@ const RankingQuestion = ({
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     style: styles.title,
     forgot: forgot,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     question: question
   }), /*#__PURE__*/React.createElement(View, {
     style: styles.questionContainer

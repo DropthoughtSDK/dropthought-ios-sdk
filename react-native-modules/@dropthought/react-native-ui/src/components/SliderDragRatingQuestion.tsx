@@ -16,6 +16,7 @@ import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import type {
   Feedback as OriginFeedback,
   Question as OriginQuestion,
+  Survey,
 } from '../data';
 import { sliderRatingAboveThumbFace } from '../constants/SliderDragQuestionConstants';
 import CustomSlider from '../components/Slider';
@@ -34,6 +35,7 @@ type Question = OriginQuestion & {
 };
 
 type Props = {
+  survey: Survey;
   question: Question;
   onFeedback: ({
     questionId,
@@ -124,6 +126,7 @@ const AboveThumbComponent = ({
 };
 
 const SliderDragRatingQuestion = ({
+  survey,
   question,
   onFeedback,
   feedback,
@@ -278,35 +281,34 @@ const SliderDragRatingQuestion = ({
     <ScrollView contentContainerStyle={styles.container}>
       <MandatoryTitle
         forgot={forgot}
+        mandatoryErrorMessage={survey.mandatoryErrorMessage}
         question={question}
         style={styles.mandatoryTitle}
       />
-      <View style={styles.contentContainer}>
-        <View style={styles.questionContainer}>
-          <View style={styles.sliderLabelContainer}>
+      <View style={styles.questionContainer}>
+        <View style={styles.sliderLabelContainer}>
+          <View style={[GlobalStyle.flex1, GlobalStyle.flexEnd]}>
+            <Text style={[styles.sliderLabel, GlobalStyle.textAlignLeft]}>
+              {includeCustomLabel ? options[0] : minScale}
+            </Text>
+          </View>
+          {includeCenterLabel ? (
             <View style={[GlobalStyle.flex1, GlobalStyle.flexEnd]}>
-              <Text style={[styles.sliderLabel, GlobalStyle.textAlignLeft]}>
-                {includeCustomLabel ? options[0] : minScale}
+              <Text style={styles.sliderLabel}>
+                {includeCustomLabel ? options[1] : middle}
               </Text>
             </View>
-            {includeCenterLabel ? (
-              <View style={[GlobalStyle.flex1, GlobalStyle.flexEnd]}>
-                <Text style={styles.sliderLabel}>
-                  {includeCustomLabel ? options[1] : middle}
-                </Text>
-              </View>
-            ) : null}
-            <View style={[GlobalStyle.flex1, GlobalStyle.flexEnd]}>
-              <Text style={[styles.sliderLabel, GlobalStyle.textAlignRight]}>
-                {includeCustomLabel ? options[options.length - 1] : maxScale}
-              </Text>
-            </View>
-            <View style={styles.dummyLabel} />
+          ) : null}
+          <View style={[GlobalStyle.flex1, GlobalStyle.flexEnd]}>
+            <Text style={[styles.sliderLabel, GlobalStyle.textAlignRight]}>
+              {includeCustomLabel ? options[options.length - 1] : maxScale}
+            </Text>
           </View>
-          <View style={GlobalStyle.row}>
-            <View style={GlobalStyle.flex1}>{slider}</View>
-            {textField}
-          </View>
+          <View style={styles.dummyLabel} />
+        </View>
+        <View style={GlobalStyle.row}>
+          <View style={GlobalStyle.flex1}>{slider}</View>
+          {textField}
         </View>
       </View>
       <View style={styles.hintContainer}>
@@ -323,11 +325,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     flex: 1,
     width: '100%',
-  },
-  contentContainer: {
-    flex: 1,
-    width: '100%',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
   },
   questionContainer: {
     marginRight: 35,

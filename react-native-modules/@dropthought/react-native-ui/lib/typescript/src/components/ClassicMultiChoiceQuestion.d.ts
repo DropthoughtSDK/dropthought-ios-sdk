@@ -4,6 +4,7 @@ declare type Feedback = OriginFeedback & {
     answers: (string | number)[];
 };
 declare type Props = {
+    mandatoryErrorMessage: string;
     question: Question;
     onFeedback: (feedback: Feedback) => void;
     forgot: boolean;

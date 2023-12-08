@@ -164,6 +164,7 @@ const MatrixRow = ({
 };
 
 const MatrixChoiceQuestion = ({
+  survey,
   question,
   onFeedback,
   feedback,
@@ -184,6 +185,7 @@ const MatrixChoiceQuestion = ({
     style: styles.container
   }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
     forgot: false,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     question: question,
     style: styles.title,
     invalidMessage: handleMatrixChoiceErrorHint(forgot)

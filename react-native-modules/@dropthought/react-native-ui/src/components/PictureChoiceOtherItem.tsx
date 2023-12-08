@@ -14,17 +14,13 @@ import {
 import GlobalStyle, { Colors, addOpacityToHex } from '../styles';
 import i18n from '../translation';
 import ActivityIndicatorMask from './ActivityIndicatorMask';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 import { ChooseIcon } from './PictureChoiceItem';
-import type {
-  ImagePickerResponse,
-  ImageLibraryOptions,
-  CameraOptions,
-} from 'react-native-image-picker';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import type { ImageFileProps } from '../data';
+import type { Image as ImageCropType } from 'react-native-image-crop-picker';
 
-const MAXIMUM_SIZE_KB = 5 * 1024 * 1024; // 2MB
+const MAXIMUM_SIZE_KB = 5 * 1024 * 1024; // 5MB
 
 type Props = {
   otherPicture: { image: string; value: string };
@@ -34,11 +30,11 @@ type Props = {
   columnGap: number;
   onChooseImage: () => void;
   onSelect: () => void;
-  onUpload: (file: ImageFileProps) => void;
-  isUploading: boolean;
+  onUpload: (file: ImageFileProps) => Promise<void>;
   onError: (msg: string) => void;
   onChangeText: (text: string) => void;
   themeColor: string;
+  preview: boolean;
 };
 
 const PictureChoiceOtherItem = ({
@@ -50,13 +46,14 @@ const PictureChoiceOtherItem = ({
   onChooseImage,
   onSelect,
   onUpload,
-  isUploading,
   onError,
   onChangeText,
   themeColor,
+  preview,
 }: Props) => {
+  const rtl = i18n.dir() === 'rtl';
   const { fontColor, colorScheme } = useTheme();
-  const isDarkMode = true; //colorScheme === COLOR_SCHEMES.dark;
+  const isDarkMode = colorScheme === COLOR_SCHEMES.dark;
 
   const { width } = Dimensions.get('window');
   const questionMargin = 30;
@@ -81,23 +78,25 @@ const PictureChoiceOtherItem = ({
   ];
 
   const [loadingImage, setLoadingImage] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const validTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 
-  const uploadPicture = (response: ImagePickerResponse) => {
-    if (response?.assets && response?.assets?.length > 0) {
-      const { uri, fileName: name, type, fileSize } = response.assets[0];
-
-      if (type && !validTypes.includes(type)) {
-        onError(`${i18n.t('picture-choice:invalidTypeHint')}`);
-      } else if (fileSize && fileSize > MAXIMUM_SIZE_KB) {
-        onError(`${i18n.t('picture-choice:overSizeHint')}`);
-      } else {
-        if (uri && name && type) {
-          const file: ImageFileProps = { uri, name, type };
-          onUpload(file);
-          onChooseImage();
-        }
+  const uploadPicture = (image: ImageCropType) => {
+    setActionSheetVisible(false);
+    const { path: uri, mime: type, data: base64, size } = image;
+    const pieces = uri.split('/');
+    const name = pieces[pieces.length - 1];
+    if (type && !validTypes.includes(type)) {
+      onError(`${i18n.t('picture-choice:invalidTypeHint')}`);
+    } else if (size && size > MAXIMUM_SIZE_KB) {
+      onError(`${i18n.t('picture-choice:overSizeHint')}`);
+    } else {
+      if (uri && name && type && base64) {
+        setIsUploading(true);
+        const file: ImageFileProps = { uri, name, type, base64 };
+        onUpload(file).then(() => setIsUploading(false));
+        onChooseImage();
       }
     }
   };
@@ -105,36 +104,51 @@ const PictureChoiceOtherItem = ({
   async function hasAndroidPermission() {
     const permission = PermissionsAndroid.PERMISSIONS.CAMERA;
     const hasPermission = await PermissionsAndroid.check(permission);
+    console.log('[hasAndroidPermission] hasPermission: ', hasPermission);
     if (hasPermission) {
       return true;
     }
+    console.log('[hasAndroidPermission] before request status: ');
     const status = await PermissionsAndroid.request(permission);
+    console.log('[hasAndroidPermission] status: ', status);
     return status === PermissionsAndroid.RESULTS.GRANTED;
   }
 
   const openPhotoLibrary = () => {
-    setActionSheetVisible(false);
-    const options: ImageLibraryOptions = {
-      selectionLimit: 1,
+    ImagePicker.openPicker({
       mediaType: 'photo',
-    };
-    launchImageLibrary(options, uploadPicture);
+      includeBase64: true,
+    }).then((image) => {
+      console.log(image);
+      uploadPicture(image);
+    });
   };
 
   const openCamera = () => {
-    setActionSheetVisible(false);
-    const options: CameraOptions = {
-      saveToPhotos: true,
-      mediaType: 'photo',
-    };
+    console.log('[openCamera] enter');
     if (Platform.OS === 'android') {
+      console.log('[openCamera] before hasAndroidPermission');
       hasAndroidPermission().then((result) => {
+        console.log('[openCamera] hasAndroidPermission result: ', result);
         if (result) {
-          launchCamera(options, uploadPicture);
+          console.log('[openCamera] open');
+          ImagePicker.openCamera({
+            mediaType: 'photo',
+            includeBase64: true,
+          }).then((image) => {
+            console.log('[openCamera] open image: ', image);
+            uploadPicture(image);
+          });
         }
       });
     } else {
-      launchCamera(options, uploadPicture);
+      ImagePicker.openCamera({
+        mediaType: 'photo',
+        includeBase64: true,
+      }).then((image) => {
+        console.log(image);
+        uploadPicture(image);
+      });
     }
   };
 
@@ -161,10 +175,26 @@ const PictureChoiceOtherItem = ({
       ? [styles.input, { color: fontColor ?? Colors.appearanceSubBlack }]
       : [styles.input, { color: fontColor }];
 
-  const reloadStyle = [styles.pictureReloadContainer, { width: itemWidth }];
+  const reloadStyle = [
+    styles.pictureReloadContainer,
+    {
+      width: itemWidth,
+      backgroundColor: addOpacityToHex(themeColor, 0.1),
+      borderColor: themeColor,
+    },
+  ];
+
+  const reloadPlacholderStyle = [styles.reloadPlaceholderImage, iconStyle];
+
+  const reloadTextStyle = [
+    styles.reloadText,
+    {
+      color: fontColor,
+    },
+  ];
 
   const actionSheet = (
-    <Modal animationType="none" transparent visible={actionSheetVisible}>
+    <Modal animationType="fade" transparent visible={actionSheetVisible}>
       <View style={styles.actionModalContainer}>
         <View style={styles.actionContainer}>
           <View style={styles.actions}>
@@ -209,6 +239,8 @@ const PictureChoiceOtherItem = ({
   return (
     <View>
       <TouchableOpacity
+        style={styles.buttonContainer}
+        disabled={preview}
         onPress={() => {
           if (imageLoadError) {
             setImageLoadError(false);
@@ -221,27 +253,33 @@ const PictureChoiceOtherItem = ({
         {imageLoadError ? (
           <View style={reloadStyle}>
             <Image
-              style={styles.reloadPlaceholderImage}
+              style={reloadPlacholderStyle}
               source={require('../assets/ic_image_placeholder.png')}
             />
             <View style={GlobalStyle.row}>
-              <Image source={require('../assets/ic_reload.png')} />
-              <Text style={styles.reloadText}>
+              <Image
+                style={iconStyle}
+                source={require('../assets/ic_reload.png')}
+              />
+              <Text style={reloadTextStyle}>
                 {`${i18n.t('picture-choice:reload')}`}
               </Text>
             </View>
           </View>
         ) : selected && otherPicture.image.length > 0 ? (
-          <Image
-            style={pictureSelectedStyle}
-            source={{ uri: otherPicture.image }}
-            onLoadStart={() => setLoadingImage(true)}
-            onLoadEnd={() => setLoadingImage(false)}
-            onError={(_error) => {
-              setImageLoadError(true);
-              setLoadingImage(false);
-            }}
-          />
+          <>
+            <Image
+              style={pictureSelectedStyle}
+              source={{ uri: otherPicture.image }}
+              onLoadStart={() => setLoadingImage(true)}
+              onLoadEnd={() => setLoadingImage(false)}
+              onError={(_error) => {
+                setImageLoadError(true);
+                setLoadingImage(false);
+              }}
+            />
+            <ActivityIndicatorMask loading={loadingImage} />
+          </>
         ) : (
           <View style={nonSelectedOtherPictureContainerStyle}>
             <View style={styles.placeholderGroup}>
@@ -261,10 +299,11 @@ const PictureChoiceOtherItem = ({
             </View>
           </View>
         )}
-        <ActivityIndicatorMask loading={isUploading || loadingImage} />
+        <ActivityIndicatorMask loading={selected && isUploading} />
       </TouchableOpacity>
       <TouchableOpacity
-        style={styles.optionContainer}
+        style={[styles.optionContainer, rtl && GlobalStyle.flexRowReverse]}
+        disabled={preview}
         onPress={() => {
           if (!selected) {
             setActionSheetVisible(true);
@@ -282,6 +321,7 @@ const PictureChoiceOtherItem = ({
             {`${i18n.t('picture-choice:other')}`}
           </Text>
           <TextInput
+            multiline
             style={inputStyle}
             maxLength={100}
             editable={selected}
@@ -301,6 +341,10 @@ const PictureChoiceOtherItem = ({
 export default PictureChoiceOtherItem;
 
 const styles = StyleSheet.create({
+  buttonContainer: {
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
   optionContainer: {
     flexDirection: 'row',
     marginTop: 16,

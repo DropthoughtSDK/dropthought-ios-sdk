@@ -1,9 +1,10 @@
 import React from 'react';
-import type { Feedback as OriginFeedback, Question } from '../data';
+import type { Feedback as OriginFeedback, Question, Survey } from '../data';
 declare type Feedback = OriginFeedback & {
     answers: string[];
 };
 declare type Props = {
+    survey: Survey;
     question: Question;
     onFeedback: ({ questionId, answers, type, }: {
         questionId: string;
@@ -14,5 +15,5 @@ declare type Props = {
     forgot: boolean;
     themeColor: string;
 };
-declare const _default: React.MemoExoticComponent<({ question, feedback, forgot, onFeedback, }: Props) => JSX.Element>;
+declare const _default: React.MemoExoticComponent<({ survey, question, feedback, forgot, onFeedback, }: Props) => JSX.Element>;
 export default _default;

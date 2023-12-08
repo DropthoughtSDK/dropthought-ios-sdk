@@ -30,6 +30,7 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 const ClassicMandatoryTitle = ({
   forgot,
   invalidMessage = '',
+  mandatoryErrorMessage,
   question,
   style
 }) => {
@@ -45,20 +46,22 @@ const ClassicMandatoryTitle = ({
       addMandatoryRef(question.questionId, ref.current);
     }
   }, [addMandatoryRef, question.questionId]);
+  const textStyle = [styles.questionTitle, questionTitleSize[dimensionWidthType], {
+    color: fontColor,
+    minHeight: _translation.default.language === 'te' ? 30 : undefined
+  }];
   return /*#__PURE__*/React.createElement(_reactNative.View, {
     ref: ref,
     style: [styles.horizontal, style, rtl && _styles.default.flexRowReverse]
   }, question.questionTitle.split(' ').map((text, index) => /*#__PURE__*/React.createElement(_reactNative.Text, {
     key: index,
-    style: [styles.questionTitle, questionTitleSize[dimensionWidthType], {
-      color: fontColor
-    }]
+    style: textStyle
   }, text + ' ')), //optional was been used on matrix question
   (question.mandatory || question.optional) && /*#__PURE__*/React.createElement(_reactNative.Text, {
     style: styles.hint
   }, "*"), /*#__PURE__*/React.createElement(_ClassicQuestionWarningMessage.default // forgot message has higher priority than custom invalid message
   , {
-    message: forgot ? _translation.default.t('survey:mandatory') : invalidMessage
+    message: forgot ? mandatoryErrorMessage : invalidMessage
   }));
 };
 

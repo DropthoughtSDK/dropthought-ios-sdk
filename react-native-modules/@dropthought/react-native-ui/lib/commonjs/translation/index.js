@@ -19,7 +19,7 @@ _i18next.default.init({
   debug: false,
   fallbackLng: 'en',
   lng: 'en',
-  ns: ['common', 'start-survey', 'survey', 'end-survey'],
+  ns: ['common', 'start-survey', 'survey'],
   resources: {
     en: _en.default,
     ar: _ar.default

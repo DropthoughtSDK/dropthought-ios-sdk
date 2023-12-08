@@ -101,7 +101,7 @@ const SmileyRatingQuestionOption6 = ({
     return result;
   }, [scaleLogicList]);
 
-  const { colorScheme, customFontColor } = useTheme();
+  const { hexCode, colorScheme, customFontColor } = useTheme();
 
   const totalScore = scale;
   const isAtCoverScreen = selectedIndex === -1;
@@ -166,7 +166,11 @@ const SmileyRatingQuestionOption6 = ({
         onClose={onClose}
       />
       <View style={commonStyles.container}>
-        <MandatoryTitle question={question} forgot={forgot} />
+        <MandatoryTitle
+          question={question}
+          mandatoryErrorMessage={survey.mandatoryErrorMessage}
+          forgot={forgot}
+        />
         <View style={commonStyles.contentContainer}>
           {isAtCoverScreen ? (
             <View style={commonStyles.hintContainer}>
@@ -183,7 +187,8 @@ const SmileyRatingQuestionOption6 = ({
         </View>
       </View>
       <SurveyFooter
-        surveyColor={survey.surveyProperty.hexCode}
+        submitSurvey={survey.submitSurvey}
+        surveyColor={hexCode}
         isFirstPage={pageIndex === 0}
         isLastPage={pageIndex === survey.pageOrder.length - 1}
         onPrevPage={onPrevPage}

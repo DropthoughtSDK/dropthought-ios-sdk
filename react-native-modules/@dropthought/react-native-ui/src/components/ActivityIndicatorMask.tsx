@@ -1,12 +1,15 @@
 import React from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { View, ActivityIndicator, ViewStyle } from 'react-native';
 import { GlobalStyle } from '../styles';
 
-type Props = { loading: boolean };
+interface Props {
+  loading?: boolean;
+  style?: ViewStyle;
+}
 
-const ActivityIndicatorMask = ({ loading = false }: Props) => {
+const ActivityIndicatorMask: React.FC<Props> = ({ loading = false, style }) => {
   return loading ? (
-    <View style={[GlobalStyle.loadingMask, GlobalStyle.fullCenter]}>
+    <View style={[GlobalStyle.loadingMask, GlobalStyle.fullCenter, style]}>
       <ActivityIndicator />
     </View>
   ) : null;

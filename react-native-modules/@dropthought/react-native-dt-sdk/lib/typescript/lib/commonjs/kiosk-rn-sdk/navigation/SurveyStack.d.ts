@@ -1,5 +1,5 @@
 export var __esModule: boolean;
-export default _default;
-declare function _default({ preview }: {
+export default SurveyStack;
+declare function SurveyStack({ preview }: {
     preview: any;
 }): any;

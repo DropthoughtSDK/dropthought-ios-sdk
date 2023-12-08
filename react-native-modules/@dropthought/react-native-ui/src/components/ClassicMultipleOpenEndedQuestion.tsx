@@ -11,6 +11,7 @@ import i18n from '../translation';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 
 type Props = {
+  mandatoryErrorMessage: string;
   question: Question;
   onFeedback: (feedback: Feedback) => void;
   feedback: Feedback;
@@ -164,6 +165,7 @@ const RowComponent = ({
 };
 
 const ClassicMultipleOpenEndedQuestion = ({
+  mandatoryErrorMessage,
   question,
   onFeedback,
   feedback,
@@ -189,6 +191,7 @@ const ClassicMultipleOpenEndedQuestion = ({
     <View style={styles.questionContainer}>
       <ClassicMandatoryTitle
         forgot={false}
+        mandatoryErrorMessage={mandatoryErrorMessage}
         question={question}
         style={styles.title}
         invalidMessage={handleErrorHint(forgot)}

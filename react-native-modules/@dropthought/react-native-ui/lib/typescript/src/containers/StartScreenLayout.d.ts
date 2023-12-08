@@ -1,6 +1,6 @@
 import type { Survey as OriginSurvey } from '../data';
 declare type Survey = OriginSurvey & {
-    languages: ('en' | 'ar')[];
+    languages: string[];
 };
 declare type Props = {
     onLanguageSelect: (language: string) => void;

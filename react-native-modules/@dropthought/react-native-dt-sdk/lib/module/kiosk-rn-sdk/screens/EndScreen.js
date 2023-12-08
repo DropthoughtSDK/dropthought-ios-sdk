@@ -1,9 +1,8 @@
 import React from 'react';
 import { useBackHandler } from '@react-native-community/hooks';
-import { EndScreenLayout } from '@dropthought/react-native-ui';
+import { EndScreenLayout } from '@dropthought/react-native-ui/src';
 import { useSurvey, useSurveyContext } from '../contexts/survey';
 import { useOnSubmitSuccessCallback, useOnSubmitCallback } from '../contexts/custom-props';
-
 const useBackForDismiss = () => {
   const {
     onClose
@@ -14,12 +13,11 @@ const useBackForDismiss = () => {
   }, [onClose]);
   useBackHandler(backHandler);
 };
+
 /**
  * @type {React.FunctionComponent<ScreenProps>}
  * @param {ScreenProps} props
  */
-
-
 const EndScreen = ({
   error,
   surveyFeedback,
@@ -31,15 +29,15 @@ const EndScreen = ({
   React.useEffect(() => {
     // passing data to native, if error is undefined, null, 0, it means success
     if (onSubmitCallback) {
-      onSubmitCallback(surveyFeedback, error); // deprecate later
-
+      onSubmitCallback(surveyFeedback, error);
+      // deprecate later
       if (!error && onSubmitSuccessCallback) {
         onSubmitSuccessCallback(surveyFeedback);
       }
-    } // if (surveyFeedback)
+    }
+    // if (surveyFeedback)
     //     SurveyNativeBridge.onFeedbackResult(surveyFeedback, error || 0)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-
   }, []);
   useBackForDismiss();
   return /*#__PURE__*/React.createElement(EndScreenLayout, {
@@ -47,8 +45,8 @@ const EndScreen = ({
     onClose: onClose
   });
 };
-
 export default EndScreen;
+
 /**
  * @typedef {import('../../data').SurveyFeedback} SurveyFeedback
  */

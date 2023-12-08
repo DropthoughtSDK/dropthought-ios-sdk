@@ -38,6 +38,7 @@ const getLabelText = ({
 };
 
 const SliderRatingQuestion = ({
+  survey,
   question,
   onFeedback,
   feedback,
@@ -102,6 +103,7 @@ const SliderRatingQuestion = ({
     style: commonStyles.container
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     forgot: forgot,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     question: question
   }), getSliderIndicator());
 };

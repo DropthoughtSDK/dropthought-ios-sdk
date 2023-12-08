@@ -39,6 +39,7 @@ function OtherOptionWithHighlightProps(props) {
   } = props;
   const {
     otherText = '',
+    otherTextLabel,
     questionBrand = ''
   } = question;
   const {
@@ -96,22 +97,29 @@ function OtherOptionWithHighlightProps(props) {
     });
     return () => {
       hideSubscription.remove();
-    }; // eslint-disable-next-line react-hooks/exhaustive-deps
+    };
   }, []);
+  const inputStyle = [styles.textInput, {
+    color: fontColor,
+    minHeight: i18n.language === 'te' ? 50 : undefined,
+    ...Platform.select({
+      ios: {
+        paddingVertical: i18n.language === 'te' ? undefined : 13
+      }
+    })
+  }, rtl && GlobalStyles.textAlignRight, isFocused ? {
+    borderBottomColor: checkedColor
+  } : {}, QuestionContentTextSize[dimensionWidthType]];
   const textInput = /*#__PURE__*/React.createElement(View, {
     style: [styles.textInputContainer, rtl && GlobalStyles.flexRowReverse]
   }, /*#__PURE__*/React.createElement(Text, {
     style: [styles.otherText, {
       color: fontColor
     }, checked ? styles.checkedOtherText : {}, QuestionContentTextSize[dimensionWidthType]]
-  }, i18n.t('survey:other-option')), /*#__PURE__*/React.createElement(TextInput, _extends({
+  }, otherTextLabel), /*#__PURE__*/React.createElement(TextInput, _extends({
     ref: inputRef,
-    style: [styles.textInput, {
-      color: fontColor
-    }, rtl && GlobalStyles.textAlignRight, isFocused ? {
-      borderBottomColor: checkedColor
-    } : {}, QuestionContentTextSize[dimensionWidthType]],
-    placeholder: otherText.length > 0 ? otherText : questionBrand.length > 0 ? questionBrand : i18n.t('survey:other-placeholder'),
+    style: inputStyle,
+    placeholder: otherText.length > 0 ? otherText : questionBrand.length > 0 ? questionBrand : otherText,
     placeholderTextColor: Colors.inputPlaceholder,
     onChangeText: onChangeTextHandler,
     underlineColorAndroid: Colors.transparent,
@@ -146,12 +154,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     textAlignVertical: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: Colors.inputPlaceholder,
-    ...Platform.select({
-      ios: {
-        paddingVertical: 13
-      }
-    })
+    borderBottomColor: Colors.inputPlaceholder
   },
   textInputContainer: {
     flex: 1,

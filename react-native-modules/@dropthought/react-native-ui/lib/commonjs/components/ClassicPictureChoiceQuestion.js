@@ -24,16 +24,17 @@ var _translation = _interopRequireDefault(require("../translation"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const ClassicPictureChoiceQuestion = ({
+  mandatoryErrorMessage,
   question,
   feedback,
   onFeedback,
   forgot,
   themeColor,
   onUpload,
-  isUploading
+  preview
 }) => {
   const {
-    otherText
+    otherText = ''
   } = question;
   const {
     images,
@@ -51,6 +52,7 @@ const ClassicPictureChoiceQuestion = ({
     invalidMessage,
     setInvalidMessage
   } = (0, _usePictureChoice.usePictureChoice)(question, onFeedback, feedback);
+  const rtl = _translation.default.dir() === 'rtl';
   const imageItems = images.map(({
     uri,
     option
@@ -109,28 +111,31 @@ const ClassicPictureChoiceQuestion = ({
       setInvalidMessage(undefined);
       const url = await onUpload(file);
 
-      if (url) {
+      if (typeof url !== 'string') {
+        setInvalidMessage(`${_translation.default.t('picture-choice:uploadFailed')}`);
+      } else if (url) {
         setOtherPictureAnswerUrl(url);
       }
     },
     onError: msg => {
       setInvalidMessage(msg);
     },
-    isUploading: isUploading,
     onChangeText: text => {
       setOtherPictureAnswerText(text);
     },
-    themeColor: themeColor
+    themeColor: themeColor,
+    preview: preview
   }) : null;
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: _styles.default.questionContainer
   }, /*#__PURE__*/_react.default.createElement(_ClassicMandatoryTitle.default, {
     forgot: forgot,
+    mandatoryErrorMessage: mandatoryErrorMessage,
     question: question,
     style: styles.mandatoryTitle,
     invalidMessage: invalidMessage
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
-    style: styles.pictureGridContainer
+    style: [styles.pictureGridContainer, rtl && _styles.default.flexRowReverse]
   }, imageItems, otherImageItem));
 };
 

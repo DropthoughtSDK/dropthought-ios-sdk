@@ -1,3 +1,3 @@
 export var __esModule: boolean;
-export default _default;
-declare function _default(): any;
+export default useWindowDimensions;
+declare function useWindowDimensions(): any;

@@ -13,6 +13,9 @@ const ClassicQuestionWarningMessage = ({
   const isDarkMode = colorScheme === COLOR_SCHEMES.dark;
   const rtl = i18n.dir() === 'rtl';
   if (!message) return null;
+  const textStyle = [styles.hint, isDarkMode && styles.darkModeHint, rtl && GlobalStyle.horizontalFlip, {
+    lineHeight: i18n.language === 'te' ? 22 : undefined
+  }];
   return /*#__PURE__*/React.createElement(View, {
     style: [styles.container, rtl && GlobalStyle.horizontalFlip]
   }, /*#__PURE__*/React.createElement(View, {
@@ -20,7 +23,7 @@ const ClassicQuestionWarningMessage = ({
   }), /*#__PURE__*/React.createElement(View, {
     style: [styles.bubble, isDarkMode && styles.darkModeBubble]
   }, /*#__PURE__*/React.createElement(Text, {
-    style: [styles.hint, isDarkMode && styles.darkModeHint, rtl && GlobalStyle.horizontalFlip]
+    style: textStyle
   }, message)));
 };
 

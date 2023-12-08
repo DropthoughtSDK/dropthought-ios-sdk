@@ -24,6 +24,7 @@ var _MetadataDesc = _interopRequireDefault(require("./MetadataDesc"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const OpenQuestion = ({
+  survey,
   anonymous,
   question,
   // onValueChange, // Keep it for Kiosk usage
@@ -80,6 +81,7 @@ const OpenQuestion = ({
     forgot: hasForgot,
     invalidMessage: // show the error message after the user has done edited
     hasEdited && !isValid ? (_question$responseErr = question.responseErrorText) !== null && _question$responseErr !== void 0 ? _question$responseErr : _translation.default.t('metadata-invalid-message', question.metaDataType) : '',
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     question: question
   }), /*#__PURE__*/_react.default.createElement(_MetadataDesc.default, {
     question: question,

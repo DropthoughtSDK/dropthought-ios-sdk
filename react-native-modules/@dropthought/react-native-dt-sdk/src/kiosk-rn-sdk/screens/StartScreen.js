@@ -4,7 +4,8 @@ import {
   PlaceholderImageTypes,
   PlaceholderScreen,
   i18n,
-} from '@dropthought/react-native-ui';
+} from '@dropthought/react-native-ui/src';
+import ErrorHintScreen from './ErrorHintScreen';
 import { useSurveyContext } from '../contexts/survey';
 import { fromAPIDateStrToJS } from '../../lib/DateTimerParser';
 
@@ -25,6 +26,9 @@ const checkSurveyStatus = (surveyState, surveyStartDate, surveyEndDate) => {
       break;
     case 'scheduled':
       imageType = PlaceholderImageTypes.ProgramScheduled;
+      break;
+    case 'inactive':
+      imageType = PlaceholderImageTypes.ProgramDeactivated;
       break;
     case 'drafts':
     default:
@@ -73,10 +77,12 @@ const StartScreen = (props) => {
   if (imageType) {
     // need to render placeholder
     return (
-      <PlaceholderScreen
-        imageType={imageType}
-        message={i18n.t('start-survey:placeholder-message')}
-      />
+      <ErrorHintScreen onClose={onClose}>
+        <PlaceholderScreen
+          imageType={imageType}
+          message={i18n.t('start-survey:placeholder-message')}
+        />
+      </ErrorHintScreen>
     );
   }
 

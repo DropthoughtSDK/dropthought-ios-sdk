@@ -76,7 +76,7 @@ const getFeedbacks = (feedbackState: FeedbackReducerState): Feedback[] => {
   );
 };
 
-type Props = {
+interface Props {
   pageIndex: number; //current page index (start from 0)
   survey: Survey;
   onClose?: () => void;
@@ -91,23 +91,24 @@ type Props = {
   SurveyProgressBar?: any;
   surveyProgressBarPosition?: number;
   SurveyPageIndicator?: any;
-};
+  preview: boolean;
+}
 
-const SurveyScreenLayout = (props: Props) => {
-  const { themeOption, backgroundColor } = useTheme();
-  const {
-    pageIndex = 0,
-    survey,
-    onClose,
-    onPrevPage,
-    onNextPage,
-    onSubmit,
-    onUpload,
-    isUploading,
-    SurveyPageIndicator = DefaultSurveyPageIndicator,
-    SurveyProgressBar = DefaultSurveyProgressBar,
-    surveyProgressBarPosition = SurveyProgressBarPosition.FixedBottom,
-  } = props;
+const SurveyScreenLayout = ({
+  pageIndex = 0,
+  survey,
+  onClose,
+  onPrevPage,
+  onNextPage,
+  onSubmit,
+  onUpload,
+  isUploading,
+  SurveyPageIndicator = DefaultSurveyPageIndicator,
+  SurveyProgressBar = DefaultSurveyProgressBar,
+  surveyProgressBarPosition = SurveyProgressBarPosition.FixedBottom,
+  preview,
+}: Props) => {
+  const { hexCode, themeOption, backgroundColor } = useTheme();
   const scrollViewRef = React.useRef<RNScrollView>(null);
   const [scrollEnabled, setScrollEnabled] = React.useState(true);
 
@@ -207,14 +208,16 @@ const SurveyScreenLayout = (props: Props) => {
     return (
       <ClassicQuestionContainer
         key={question.questionId}
+        mandatoryErrorMessage={survey.mandatoryErrorMessage}
         anonymous={survey.anonymous}
         question={question}
         validationStarted={validationStarted}
-        themeColor={survey.surveyProperty.hexCode}
+        themeColor={hexCode}
         onDragGrant={() => setScrollEnabled(false)}
         onDragEnd={() => setScrollEnabled(true)}
         onUpload={onUpload}
         isUploading={isUploading}
+        preview={preview}
       />
     );
   });
@@ -273,7 +276,7 @@ const SurveyScreenLayout = (props: Props) => {
         anonymous={survey.anonymous}
         question={singleQuestion}
         validationStarted={validationStarted}
-        themeColor={survey.surveyProperty.hexCode}
+        themeColor={hexCode}
         onClose={onCloseHandler}
         onPrevPage={onPrevPageHandler}
         onNextPage={onNextPageHandler}
@@ -282,11 +285,13 @@ const SurveyScreenLayout = (props: Props) => {
         survey={survey}
         pageIndex={pageIndex}
         themeOption={themeOption}
+        preview={preview}
       />
       {singleQuestion.type === 'rating' &&
       singleQuestion.subType === 'smiley' ? null : (
         <SurveyFooter
-          surveyColor={survey.surveyProperty.hexCode}
+          submitSurvey={survey.submitSurvey}
+          surveyColor={hexCode}
           isFirstPage={pageIndex === 0}
           isLastPage={pageIndex === survey.pageOrder.length - 1}
           onPrevPage={onPrevPageHandler}
@@ -298,29 +303,18 @@ const SurveyScreenLayout = (props: Props) => {
   );
 
   return (
-    <View style={[GlobalStyle.flex1, { backgroundColor }]}>
-      {themeOption === THEME_OPTION.CLASSIC ? classicLayout : newLayout}
-    </View>
-  );
-};
-
-const SurveyScreenLayoutWrapper = (props: Props) => {
-  return (
     <SurveyPageProvider>
-      <SurveyScreenLayout {...props} />
+      <View style={[GlobalStyle.flex1, { backgroundColor }]}>
+        {themeOption === THEME_OPTION.CLASSIC ||
+        themeOption === THEME_OPTION.BIJLIRIDE
+          ? classicLayout
+          : newLayout}
+      </View>
     </SurveyPageProvider>
   );
 };
 
-export default SurveyScreenLayoutWrapper;
-
-const noop = () => undefined;
-SurveyScreenLayout.defaultProps = {
-  pageIndex: 0,
-  onSubmit: noop,
-  onNextPage: noop,
-  onPrevPage: noop,
-};
+export default SurveyScreenLayout;
 
 const styles = StyleSheet.create({
   scrollView: {

@@ -10,6 +10,7 @@ import { useTheme } from '../contexts/theme';
 const ClassicMandatoryTitle = ({
   forgot,
   invalidMessage = '',
+  mandatoryErrorMessage,
   question,
   style
 }) => {
@@ -25,20 +26,22 @@ const ClassicMandatoryTitle = ({
       addMandatoryRef(question.questionId, ref.current);
     }
   }, [addMandatoryRef, question.questionId]);
+  const textStyle = [styles.questionTitle, questionTitleSize[dimensionWidthType], {
+    color: fontColor,
+    minHeight: i18n.language === 'te' ? 30 : undefined
+  }];
   return /*#__PURE__*/React.createElement(View, {
     ref: ref,
     style: [styles.horizontal, style, rtl && GlobalStyle.flexRowReverse]
   }, question.questionTitle.split(' ').map((text, index) => /*#__PURE__*/React.createElement(Text, {
     key: index,
-    style: [styles.questionTitle, questionTitleSize[dimensionWidthType], {
-      color: fontColor
-    }]
+    style: textStyle
   }, text + ' ')), //optional was been used on matrix question
   (question.mandatory || question.optional) && /*#__PURE__*/React.createElement(Text, {
     style: styles.hint
   }, "*"), /*#__PURE__*/React.createElement(ClassicQuestionWarningMessage // forgot message has higher priority than custom invalid message
   , {
-    message: forgot ? i18n.t('survey:mandatory') : invalidMessage
+    message: forgot ? mandatoryErrorMessage : invalidMessage
   }));
 };
 

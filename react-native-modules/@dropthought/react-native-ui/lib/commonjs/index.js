@@ -148,6 +148,20 @@ Object.keys(_useWindowDimensions).forEach(function (key) {
   });
 });
 
+var _feedback = require("./contexts/feedback");
+
+Object.keys(_feedback).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  if (key in exports && exports[key] === _feedback[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _feedback[key];
+    }
+  });
+});
+
 var _theme = require("./contexts/theme");
 
 Object.keys(_theme).forEach(function (key) {
@@ -158,6 +172,20 @@ Object.keys(_theme).forEach(function (key) {
     enumerable: true,
     get: function () {
       return _theme[key];
+    }
+  });
+});
+
+var _Button = require("./components/Button");
+
+Object.keys(_Button).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  if (key in exports && exports[key] === _Button[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _Button[key];
     }
   });
 });

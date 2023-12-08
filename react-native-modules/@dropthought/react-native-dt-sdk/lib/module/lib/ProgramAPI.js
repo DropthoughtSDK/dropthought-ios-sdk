@@ -1,5 +1,6 @@
 import { fetcherInstance } from './APIClient';
 const PROGRAM_PATH = '/api/program';
+
 /**
  * get single language version of a program by id
  * @param {{
@@ -11,7 +12,6 @@ const PROGRAM_PATH = '/api/program';
  * @param {Fetcher=} fetcher
  * @returns {Promise<Survey>}
  */
-
 export async function apiGetProgramById({
   programId,
   language = 'en',
@@ -32,6 +32,7 @@ export async function apiGetProgramById({
     return response.data.result;
   });
 }
+
 /**
  * @typedef {import('./Fetcher').RequestConfig} RequestConfig
  * @typedef {import('./Fetcher').Fetcher} Fetcher

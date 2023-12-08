@@ -1,5 +1,8 @@
-declare type Props = {
-    loading: boolean;
-};
-declare const ActivityIndicatorMask: ({ loading }: Props) => JSX.Element | null;
+import React from 'react';
+import { ViewStyle } from 'react-native';
+interface Props {
+    loading?: boolean;
+    style?: ViewStyle;
+}
+declare const ActivityIndicatorMask: React.FC<Props>;
 export default ActivityIndicatorMask;

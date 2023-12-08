@@ -51,6 +51,7 @@ const SmileyRatingQuestionOption3 = ({
   const answered = feedback && feedback.answers && !(0, _ramda.isNil)(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
   const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
   const {
+    hexCode,
     backgroundColor: themeBackgroundColor,
     fontColor,
     colorScheme
@@ -200,7 +201,6 @@ const SmileyRatingQuestionOption3 = ({
     ref: lottieRef,
     source: loopLotties[selectedIndex],
     autoPlay: true,
-    style: commonStyles.lottieContent,
     loop: true,
     speed: 0.5
   }));
@@ -230,13 +230,15 @@ const SmileyRatingQuestionOption3 = ({
     style: commonStyles.contentContainer
   }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
     question: question,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     forgot: forgot
   }), score >= 0 ? /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, lottieContainer, scoreContainer) : null, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: hintContainerStyle
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: hintTextStyle
   }, _translation.default.t('option3HintDescription:title'))))), /*#__PURE__*/_react.default.createElement(_SurveyFooter.default, {
-    surveyColor: survey.surveyProperty.hexCode,
+    submitSurvey: survey.submitSurvey,
+    surveyColor: hexCode,
     isFirstPage: pageIndex === 0,
     isLastPage: pageIndex === survey.pageOrder.length - 1,
     onPrevPage: onPrevPage,
@@ -282,10 +284,7 @@ const commonStyles = _reactNative.StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 42
-  },
-  lottieContent: {
-    width: '60%'
+    flex: 1.2
   },
   scoreContainer: {
     flex: 1,

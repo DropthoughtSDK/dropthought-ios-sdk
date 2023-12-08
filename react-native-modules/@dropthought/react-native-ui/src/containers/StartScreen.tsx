@@ -1,29 +1,32 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { Colors, GlobalStyle } from '../styles';
+import React, { useEffect, useState } from 'react';
+import {
+  ScrollView,
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
+import { Colors } from '../styles';
 import {
   DimensionWidthType,
   useDimensionWidthType,
 } from '../hooks/useWindowDimensions';
-import i18n from '../translation';
 import { useTheme } from '../contexts/theme';
 import type { Survey as OriginSurvey } from '../data';
 // @ts-ignore
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { getLanguageBy } from '../utils/LanguageUtils';
+
 type Survey = OriginSurvey & {
-  languages: ('en' | 'ar')[];
+  languages: string[];
 };
 
 const defaultIconSource = require('../assets/rating.png');
 const defaultIconSize = {
   [DimensionWidthType.phone]: 65,
   [DimensionWidthType.tablet]: 72,
-};
-
-const LANG_TITLE = {
-  en: 'English',
-  ar: 'العربي',
 };
 
 type Props = {
@@ -34,26 +37,37 @@ type Props = {
 };
 
 const StartScreen = ({ onLanguageSelect, onClose, onStart, survey }: Props) => {
-  const rtl = i18n.dir() === 'rtl';
   const insets = useSafeAreaInsets();
   const dimensionWidthType = useDimensionWidthType();
-  const { fontColor, backgroundColor } = useTheme();
+  const { hexCode, fontColor, backgroundColor } = useTheme();
 
-  const { surveyProperty, surveyName, welcomeTextPlain } = survey;
-  const {
-    image,
-    hexCode,
-    width = defaultIconSize[dimensionWidthType],
-    height = defaultIconSize[dimensionWidthType],
-  } = surveyProperty;
+  const { surveyProperty, surveyName, welcomeTextPlain, language, takeSurvey } =
+    survey;
+  const { image } = surveyProperty;
+
+  const [imageHeight, setImageHeight] = useState(65);
   const iconStyle = {
-    width,
-    height,
+    width: '100%',
+    height: imageHeight,
   };
+
+  useEffect(() => {
+    Image.getSize(
+      image,
+      (_, height) => {
+        if (height < defaultIconSize[dimensionWidthType]) {
+          setImageHeight(height);
+        }
+      },
+      (_) => {}
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const iconSource = image === undefined ? defaultIconSource : { uri: image };
 
   const iconView = (
-    <Image resizeMode="cover" style={iconStyle} source={iconSource} />
+    <Image resizeMode="contain" style={iconStyle} source={iconSource} />
   );
 
   const languagesView = () => {
@@ -62,25 +76,22 @@ const StartScreen = ({ onLanguageSelect, onClose, onStart, survey }: Props) => {
     // if there's only one language or no languages, no need to display
     if (!languages || !languages.length || languages.length <= 1) return null;
 
-    const languageView = languages.map((language: 'en' | 'ar', index) => (
+    const languageView = languages.map((lang, index) => (
       <TouchableOpacity
         key={index}
         onPress={() => {
-          onLanguageSelect && onLanguageSelect(language);
+          onLanguageSelect && onLanguageSelect(lang);
         }}
       >
         <Text
           style={[
             styles.language_label,
             {
-              color:
-                language !== survey.language
-                  ? survey.surveyProperty.hexCode
-                  : fontColor,
+              color: lang !== language ? hexCode : fontColor,
             },
           ]}
         >
-          {LANG_TITLE[language]}
+          {getLanguageBy(lang)}
         </Text>
       </TouchableOpacity>
     ));
@@ -91,15 +102,14 @@ const StartScreen = ({ onLanguageSelect, onClose, onStart, survey }: Props) => {
   const containerStyle = [
     styles.headerContainer,
     { paddingTop: insets.top },
-    rtl && GlobalStyle.flexRowReverse,
     {
       backgroundColor,
     },
   ];
   const titleStyle = [styles.headerTitle, { color: fontColor }];
-  const headerIconStyle = { tintColor: survey.surveyProperty.hexCode };
+  const headerIconStyle = { tintColor: hexCode };
   return (
-    <View style={[styles.container, { backgroundColor }]}>
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor }]}>
       <View style={containerStyle}>
         <View style={styles.headerRowContainer}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
@@ -109,7 +119,7 @@ const StartScreen = ({ onLanguageSelect, onClose, onStart, survey }: Props) => {
             />
           </TouchableOpacity>
           <Text style={titleStyle} numberOfLines={1}>
-            {survey.surveyName}
+            {surveyName}
           </Text>
         </View>
       </View>
@@ -122,13 +132,11 @@ const StartScreen = ({ onLanguageSelect, onClose, onStart, survey }: Props) => {
           </Text>
         )}
         <TouchableOpacity style={buttonStyle} onPress={onStart}>
-          <Text style={styles.buttonTitle}>
-            {i18n.t('start-survey:start-btn')}
-          </Text>
+          <Text style={styles.buttonTitle}>{takeSurvey}</Text>
         </TouchableOpacity>
       </View>
       {languagesView()}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -177,13 +185,15 @@ const styles = StyleSheet.create({
   },
   language_label: {
     fontSize: 13,
-    marginRight: 19,
+    paddingHorizontal: 8,
   },
   languages: {
     flexDirection: 'row',
     justifyContent: 'center',
     height: '12%',
     maxHeight: 90,
+    flexWrap: 'wrap',
+    marginHorizontal: 30,
   },
   headerContainer: {
     width: '100%',

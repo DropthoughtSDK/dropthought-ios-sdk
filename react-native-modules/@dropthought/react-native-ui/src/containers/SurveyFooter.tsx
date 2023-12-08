@@ -24,6 +24,7 @@ import i18n from '../translation';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 
 type Props = {
+  submitSurvey: string;
   surveyColor: string;
   isFirstPage: boolean;
   isLastPage: boolean;
@@ -39,6 +40,7 @@ const isAndroid = Platform.OS === 'android';
 const SurveyFooter = (props: Props) => {
   const rtl = i18n.dir() === 'rtl';
   const {
+    submitSurvey,
     surveyColor,
     isFirstPage,
     isLastPage,
@@ -81,6 +83,29 @@ const SurveyFooter = (props: Props) => {
 
   const [submitDisabled, setSubmitDisabled] = React.useState(false);
 
+  const leftIcon = (
+    <>
+      <Image
+        style={iconBgStyle}
+        source={require('../assets/icPreviousButtonBg.png')}
+      />
+      <Image
+        style={iconStyle}
+        source={require('../assets/icPreviousButton.png')}
+      />
+    </>
+  );
+
+  const rightIcon = (
+    <>
+      <Image
+        style={iconBgStyle}
+        source={require('../assets/icNextButtonBg.png')}
+      />
+      <Image style={iconStyle} source={require('../assets/icNextButton.png')} />
+    </>
+  );
+
   const submitButton = (
     <TouchableOpacity
       style={submitButtonStyle}
@@ -91,37 +116,19 @@ const SurveyFooter = (props: Props) => {
         onNextPage();
       }}
     >
-      <Text style={styles.submitText}>{i18n.t('survey:survey-submit')}</Text>
+      <Text style={styles.submitText}>{submitSurvey}</Text>
     </TouchableOpacity>
   );
 
   const leftButton = (
     <TouchableOpacity style={styles.leftButtonContainer} onPress={onPrevPage}>
-      <>
-        <Image
-          style={iconBgStyle}
-          source={require('../assets/icPreviousButtonBg.png')}
-        />
-        <Image
-          style={iconStyle}
-          source={require('../assets/icPreviousButton.png')}
-        />
-      </>
+      {rtl ? rightIcon : leftIcon}
     </TouchableOpacity>
   );
 
   const rightButton = (
     <TouchableOpacity style={styles.rightButtonContainer} onPress={onNextPage}>
-      <>
-        <Image
-          style={iconBgStyle}
-          source={require('../assets/icNextButtonBg.png')}
-        />
-        <Image
-          style={iconStyle}
-          source={require('../assets/icNextButton.png')}
-        />
-      </>
+      {rtl ? leftIcon : rightIcon}
     </TouchableOpacity>
   );
 

@@ -1,5 +1,6 @@
 import type { Question, Feedback, ImageFileProps } from '../data';
 declare type Props = {
+    mandatoryErrorMessage: string;
     anonymous: boolean;
     question: Question;
     validationStarted: boolean;
@@ -9,6 +10,7 @@ declare type Props = {
     isUploading?: boolean;
     onDragGrant: () => void;
     onDragEnd: () => void;
+    preview: boolean;
 };
 declare const ClassicQuestionContainer: (props: Props) => JSX.Element;
 export default ClassicQuestionContainer;

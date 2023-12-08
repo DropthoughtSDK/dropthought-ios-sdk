@@ -26,6 +26,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const ScrollView = _reactNative.Platform.OS === 'ios' ? _KeyboardAvoidingView.KeyboardAvoidingScrollView : _reactNative.ScrollView;
 
 const SingleChoiceQuestion = ({
+  survey,
   anonymous,
   question,
   onFeedback,
@@ -135,6 +136,7 @@ const SingleChoiceQuestion = ({
       style: commonStyles.container
     }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
       forgot: forgot,
+      mandatoryErrorMessage: survey.mandatoryErrorMessage,
       question: question
     }), buttonList)
   );

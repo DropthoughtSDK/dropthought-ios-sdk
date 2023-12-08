@@ -1,49 +1,69 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Colors } from '../styles';
 import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
-import i18n from '../translation';
-import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
-const iconSource = {
-  [COLOR_SCHEMES.light]: require('../assets/rating.png'),
-  [COLOR_SCHEMES.dark]: require('../assets/rating_dark.png')
-};
+import { useTheme } from '../contexts/theme';
+import { GlobalStyle } from '../styles';
 
 const logoSource = require('../assets/ic_dtlogo.png');
+
+const defaultIconSource = require('../assets/rating.png');
+
+const defaultIconSize = {
+  [DimensionWidthType.phone]: 65,
+  [DimensionWidthType.tablet]: 72
+};
 
 const ClassicEndScreen = ({
   survey
 }) => {
   const dimensionWidthType = useDimensionWidthType();
   const {
-    colorScheme,
     fontColor,
     backgroundColor
   } = useTheme();
   const isPhone = dimensionWidthType === DimensionWidthType.phone;
   const styles = isPhone ? phoneStyles : tabletStyles;
-  const iconStyle = styles.icon;
   const {
-    thankYouText
+    surveyProperty,
+    thankYouTextPlain
   } = survey;
+  const {
+    image
+  } = surveyProperty;
+  const [imageHeight, setImageHeight] = useState(65);
+  const iconStyle = {
+    width: '100%',
+    height: imageHeight
+  };
+  useEffect(() => {
+    Image.getSize(image, (_, height) => {
+      if (height < defaultIconSize[dimensionWidthType]) {
+        setImageHeight(height);
+      }
+    }, _ => {}); // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const iconSource = image === undefined ? defaultIconSource : {
+    uri: image
+  };
+  const iconView = /*#__PURE__*/React.createElement(View, {
+    style: GlobalStyle.row
+  }, /*#__PURE__*/React.createElement(Image, {
+    resizeMode: "contain",
+    style: iconStyle,
+    source: iconSource
+  }));
   return /*#__PURE__*/React.createElement(View, {
     style: [shareStyles.container, {
       backgroundColor
     }]
   }, /*#__PURE__*/React.createElement(View, {
     style: styles.main
-  }, /*#__PURE__*/React.createElement(Image, {
-    style: iconStyle,
-    source: iconSource[colorScheme]
-  }), /*#__PURE__*/React.createElement(Text, {
-    style: [styles.title, {
-      color: fontColor
-    }]
-  }, i18n.t('end-survey:thank')), /*#__PURE__*/React.createElement(Text, {
+  }, iconView, /*#__PURE__*/React.createElement(Text, {
     style: [styles.subtitle, {
       color: fontColor
     }]
-  }, thankYouText)), /*#__PURE__*/React.createElement(View, {
+  }, thankYouTextPlain)), /*#__PURE__*/React.createElement(View, {
     style: styles.vertical
   }, /*#__PURE__*/React.createElement(View, {
     style: styles.horizontal
@@ -74,10 +94,6 @@ const phoneStyles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 38
   },
-  icon: {
-    height: 65,
-    width: 65
-  },
   title: {
     lineHeight: 27,
     marginTop: 44,
@@ -85,11 +101,11 @@ const phoneStyles = StyleSheet.create({
     opacity: 0.9
   },
   subtitle: {
-    lineHeight: 23,
     marginTop: 17,
     fontSize: 19,
     textAlign: 'center',
-    opacity: 0.72
+    opacity: 0.72,
+    paddingBottom: 10
   },
   vertical: {
     alignItems: 'center',

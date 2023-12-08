@@ -10,6 +10,7 @@ import { useTheme, THEME_OPTION } from '../contexts/theme';
 const MandatoryTitle = ({
   forgot,
   invalidMessage = '',
+  mandatoryErrorMessage,
   question,
   style
 }) => {
@@ -54,7 +55,7 @@ const MandatoryTitle = ({
     style: styles.hint
   }, "*")), /*#__PURE__*/React.createElement(QuestionWarningMessage // forgot message has higher priority than custom invalid message
   , {
-    message: forgot ? i18n.t('survey:mandatory') : invalidMessage
+    message: forgot ? mandatoryErrorMessage : invalidMessage
   }));
 };
 

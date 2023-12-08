@@ -10,7 +10,7 @@ i18n.init({
   fallbackLng: 'en',
   lng: 'en',
 
-  ns: ['common', 'start-survey', 'survey', 'end-survey'],
+  ns: ['common', 'start-survey', 'survey'],
 
   resources: {
     en,

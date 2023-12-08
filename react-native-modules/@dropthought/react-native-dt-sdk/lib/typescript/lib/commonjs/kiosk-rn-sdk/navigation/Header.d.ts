@@ -1,8 +1,19 @@
 export var __esModule: boolean;
-export default _default;
+export default Header;
 export type Props = {
     title: string;
     themeColor: string;
     onClose?: (() => void) | undefined;
 };
-declare var _default: React.FunctionComponent<Props>;
+/**
+ * @typedef {object} Props
+ * @property {string} title
+ * @property {string} themeColor
+ * @property {()=>void=} onClose
+ */
+/**
+ * @type {React.FunctionComponent<Props>}
+ * @param {Props} props
+ */
+declare const Header: React.FunctionComponent<Props>;
+declare var React: any;

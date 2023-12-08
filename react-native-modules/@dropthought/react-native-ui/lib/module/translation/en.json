@@ -19,10 +19,6 @@
     "ProgramUnavailable": "This program is not available"
   },
   "start-survey": {
-    "start-btn": "Take Survey",
-    "start-btn-desc": "Press on this button",
-    "qrcode-desc": "Scan this QR",
-    "or": "OR",
     "placeholder-message": "Sorry for the inconvenience.\nPlease come back and check later on."
   },
   "survey": {
@@ -36,7 +32,6 @@
     "other-option": "Other:",
     "other-placeholder": "What's on your mind?",
     "metadata-anonymous-warning": "Personal information will not be shared.",
-    "new-progress-bar": "Question",
     "select-Your-Option": "Select Your Option",
     "find-Option": "Find Option",
     "error-hint-required-all": "Please answer all of these labels",
@@ -57,9 +52,6 @@
     "Phone": "Please respond with phone.",
     "Number": "Please respond with numbers.",
     "Date": "Please respond with date."
-  },
-  "end-survey": {
-    "thank": "Thank you for taking our survey"
   },
   "option1HintDescription": {
     "title": "Please select your ratings below"

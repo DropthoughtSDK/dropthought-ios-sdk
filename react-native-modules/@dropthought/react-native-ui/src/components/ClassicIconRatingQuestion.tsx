@@ -23,6 +23,7 @@ type Feedback = OriginFeedback & {
 };
 
 type Props = {
+  mandatoryErrorMessage: string;
   question: Question;
   onFeedback: ({
     questionId,
@@ -43,6 +44,7 @@ const FakeSmiley = () => {
 };
 
 const ClassicIconRatingQuestion = ({
+  mandatoryErrorMessage,
   question,
   feedback,
   forgot,
@@ -133,7 +135,11 @@ const ClassicIconRatingQuestion = ({
 
   return (
     <View style={GlobalStyle.questionContainer}>
-      <ClassicMandatoryTitle forgot={forgot} question={question} />
+      <ClassicMandatoryTitle
+        forgot={forgot}
+        mandatoryErrorMessage={mandatoryErrorMessage}
+        question={question}
+      />
       <View style={[styles.smileyRowContainer, rtl && GlobalStyle.flexEnd]}>
         {iconRow}
       </View>

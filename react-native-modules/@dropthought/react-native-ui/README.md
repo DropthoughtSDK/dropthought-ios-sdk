@@ -1,6 +1,10 @@
-# react-native-sdk-ui
+# react-native-ui
 
 UI element for Dropthought React Native SDK
+
+## Latest version
+
+- 5.5.0
 
 ## Installation
 
@@ -29,7 +33,7 @@ yarn add @dropthought/react-native-ui
 This component provides the theme (classic) setting to all components.
 
 - Props:
-  - `themeOption`: THEME_OPTION.CLASSIC | THEME_OPTION.OPTION1 | THEME_OPTION.OPTION2 | THEME_OPTION.OPTION3 | THEME_OPTION.OPTION4 | THEME_OPTION.OPTION6
+  - `themeOption`: THEME_OPTION.CLASSIC | THEME_OPTION.OPTION1 | THEME_OPTION.OPTION2 | THEME_OPTION.OPTION3 | THEME_OPTION.OPTION4 | THEME_OPTION.OPTION6 | THEME_OPTION.BIJLIRIDE(NEW)
   - `appearance`: APPEARANCE.SYSTEM | APPEARANCE.LIGHT | APPEARANCE.DARK
   - `fontColor`: [React Native Color Reference](https://reactnative.dev/docs/colors)
   - `backgroundColor`: [React Native Color Reference](https://reactnative.dev/docs/colors)

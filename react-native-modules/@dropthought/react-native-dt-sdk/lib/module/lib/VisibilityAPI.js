@@ -1,6 +1,6 @@
 import { fetcherInstance } from './APIClient';
-
 const VISIBILITY_PATH = visibilityId => `/api/sdk/visibility/${visibilityId}`;
+
 /**
  * get single visibility data
  * @param {string} visibilityId
@@ -8,8 +8,6 @@ const VISIBILITY_PATH = visibilityId => `/api/sdk/visibility/${visibilityId}`;
  * @param {Fetcher=} fetcher
  * @returns {Promise<Visibility>}
  */
-
-
 export async function apiGetVisibilityById(visibilityId, requestConfig = {}, fetcher = fetcherInstance) {
   /** @type {RequestConfig} */
   const params = {
@@ -21,6 +19,7 @@ export async function apiGetVisibilityById(visibilityId, requestConfig = {}, fet
     return response.data.result;
   });
 }
+
 /**
  * @typedef {import('./Fetcher').RequestConfig} RequestConfig
  * @typedef {import('./Fetcher').Fetcher} Fetcher

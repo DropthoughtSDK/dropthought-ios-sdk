@@ -9,7 +9,7 @@ import GlobalStyle from '../styles';
 import PictureChoiceItem from './PictureChoiceItem';
 import PictureChoiceOtherItem from './PictureChoiceOtherItem';
 import { usePictureChoice } from '../hooks/usePictureChoice';
-import type { Question, Feedback, ImageFileProps } from '../data';
+import type { Question, Feedback, ImageFileProps, Survey } from '../data';
 import MandatoryTitle from './MandatoryTitle';
 import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import i18n from '../translation';
@@ -18,6 +18,7 @@ const ScrollView =
   Platform.OS === 'ios' ? KeyboardAvoidingScrollView : RNScrollView;
 
 type Props = {
+  survey: Survey;
   question: Question;
   onFeedback: (feedback: Feedback) => void;
   onUpload: (file: ImageFileProps) => Promise<string | undefined>;
@@ -25,18 +26,20 @@ type Props = {
   feedback?: Feedback;
   forgot: boolean;
   themeColor: string;
+  preview: boolean;
 };
 
 const PictureChoiceQuestion = ({
+  survey,
   question,
   feedback,
   onFeedback,
   forgot,
   themeColor,
   onUpload,
-  isUploading,
+  preview,
 }: Props) => {
-  const { otherText } = question;
+  const { otherText = '' } = question;
 
   const {
     images,
@@ -54,6 +57,7 @@ const PictureChoiceQuestion = ({
     invalidMessage,
     setInvalidMessage,
   } = usePictureChoice(question, onFeedback, feedback);
+  const rtl = i18n.dir() === 'rtl';
 
   const imageItems = images.map(({ uri, option }, index) => {
     const selected = selectIndex.includes(index);
@@ -111,18 +115,20 @@ const PictureChoiceQuestion = ({
       onUpload={async (file) => {
         setInvalidMessage(undefined);
         const url = await onUpload(file);
-        if (url) {
+        if (typeof url !== 'string') {
+          setInvalidMessage(`${i18n.t('picture-choice:uploadFailed')}`);
+        } else if (url) {
           setOtherPictureAnswerUrl(url);
         }
       }}
       onError={(msg) => {
         setInvalidMessage(msg);
       }}
-      isUploading={isUploading}
       onChangeText={(text) => {
         setOtherPictureAnswerText(text);
       }}
       themeColor={themeColor}
+      preview={preview}
     />
   ) : null;
 
@@ -130,11 +136,14 @@ const PictureChoiceQuestion = ({
     <ScrollView extraAvoidingSpace={30} style={styles.container}>
       <MandatoryTitle
         forgot={forgot}
+        mandatoryErrorMessage={survey.mandatoryErrorMessage}
         question={question}
         style={styles.mandatoryTitle}
         invalidMessage={invalidMessage}
       />
-      <View style={styles.pictureGridContainer}>
+      <View
+        style={[styles.pictureGridContainer, rtl && GlobalStyle.flexRowReverse]}
+      >
         {imageItems}
         {otherImageItem}
       </View>

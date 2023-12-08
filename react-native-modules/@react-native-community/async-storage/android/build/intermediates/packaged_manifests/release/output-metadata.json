@@ -10,7 +10,7 @@
     {
       "type": "SINGLE",
       "filters": [],
-      "outputFile": "../../library_manifest/release/AndroidManifest.xml"
+      "outputFile": "../../merged_manifest/release/AndroidManifest.xml"
     }
   ]
 }

@@ -7,6 +7,7 @@ import { useKeyboard } from '@react-native-community/hooks';
 import ClassicProgressBar from '../components/ClassicProgressBar';
 import { useFeedbackState } from '../contexts/feedback';
 import { opacity10 } from '../styles';
+import { useTheme } from '../contexts/theme';
 
 const numValidFeedbacks = ({
   answeredQuestionIds,
@@ -42,7 +43,10 @@ const SurveyProgressBar = ({
   ...props
 }) => {
   const feedbackState = useFeedbackState();
-  const themeColor = props.survey.surveyProperty.hexCode;
+  const {
+    hexCode
+  } = useTheme();
+  const themeColor = hexCode;
   const insets = useSafeAreaInsets();
   const {
     keyboardShown

@@ -31,6 +31,14 @@ const SmileyIcon = (props: Props) => {
     ? [styles.container, rtl && GlobalStyle.flexRowReverse]
     : styles.container;
 
+  const textStyle = [
+    styles.label,
+    props.selected ? styles.labelSelected : {},
+    {
+      color: fontColor,
+      minHeight: i18n.language === 'te' ? 30 : undefined,
+    },
+  ];
   return (
     <TouchableWithoutFeedback onPress={props.onPress}>
       <View style={containerStyle}>
@@ -41,15 +49,7 @@ const SmileyIcon = (props: Props) => {
               style={styles.emoji}
               source={props.source}
             />
-            <Text
-              style={[
-                styles.label,
-                props.selected ? styles.labelSelected : {},
-                { color: fontColor },
-              ]}
-            >
-              {props.label}
-            </Text>
+            <Text style={textStyle}>{props.label}</Text>
           </>
         ) : null}
       </View>

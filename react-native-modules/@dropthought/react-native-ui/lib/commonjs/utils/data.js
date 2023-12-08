@@ -13,6 +13,8 @@ var _useMultipleOpenEnded = require("../hooks/useMultipleOpenEnded");
 
 var _useMatrixChoice = require("../hooks/useMatrixChoice");
 
+var _usePictureChoice = require("../hooks/usePictureChoice");
+
 /** @enum {'other'} */
 const QuestionBrandType = {
   Other: 'other'
@@ -116,6 +118,9 @@ const mandatoryQuestionValidator = (question, feedback = {}) => {
   } else if (question.type === 'matrixChoice') {
     // @ts-ignore
     return (0, _useMatrixChoice.matrixChoiceValidator)(question, feedback);
+  } else if (question.type === 'pictureChoice') {
+    // @ts-ignore
+    return (0, _usePictureChoice.multiplePictureChoiceValidator)(question, feedback);
   }
 
   if (!question.mandatory) {

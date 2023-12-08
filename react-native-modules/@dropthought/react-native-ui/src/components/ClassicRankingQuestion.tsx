@@ -159,6 +159,7 @@ type Question = OriginQuestion & {
 };
 
 type Props = {
+  mandatoryErrorMessage: string;
   question: Question;
   onFeedback: (feedback: Feedback) => void;
   forgot: boolean;
@@ -169,6 +170,7 @@ type Props = {
 };
 
 const ClassicRankingQuestion = ({
+  mandatoryErrorMessage,
   question,
   onFeedback,
   forgot,
@@ -411,6 +413,7 @@ const ClassicRankingQuestion = ({
         <ClassicMandatoryTitle
           style={styles.mandatoryTitle}
           forgot={forgot}
+          mandatoryErrorMessage={mandatoryErrorMessage}
           question={question}
         />
         <View style={styles.questionContainer}>

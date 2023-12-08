@@ -65,6 +65,7 @@ const getLabelText = ({
 };
 
 type Props = {
+  mandatoryErrorMessage: string;
   question: Question;
   onFeedback: ({
     questionId,
@@ -81,6 +82,7 @@ type Props = {
 };
 
 const ClassicSliderRatingQuestion = ({
+  mandatoryErrorMessage,
   question,
   onFeedback,
   feedback,
@@ -118,6 +120,15 @@ const ClassicSliderRatingQuestion = ({
   };
 
   const getSliderIndicator = () => {
+    const textStyle = [
+      styles.label,
+      {
+        color: fontColor,
+        minHeight: i18n.language === 'te' ? 25 : 0,
+        marginTop: i18n.language === 'te' ? 8 : 0,
+        marginBottom: i18n.language === 'te' ? 2 : 0,
+      },
+    ];
     return [...Array(maximumValue).keys()].map((valueData, index) => (
       <TouchableHighlight
         underlayColor={themeBackgroundColor}
@@ -141,11 +152,7 @@ const ClassicSliderRatingQuestion = ({
           ]}
         >
           <Text
-            style={[
-              styles.label,
-              { color: fontColor },
-              index === value ? styles.selectedLabel : {},
-            ]}
+            style={[textStyle, index === value ? styles.selectedLabel : {}]}
           >
             {getLabelText({
               isPhone,
@@ -173,8 +180,9 @@ const ClassicSliderRatingQuestion = ({
   return (
     <View style={GlobalStyle.questionContainer}>
       <ClassicMandatoryTitle
-        forgot={forgot}
         style={styles.marginBottom25}
+        forgot={forgot}
+        mandatoryErrorMessage={mandatoryErrorMessage}
         question={question}
       />
       {isPhone ? (
@@ -220,7 +228,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.sliderShadowColor,
     borderRadius: 2,
     elevation: 5,
-    height: 33,
+    minHeight: 33,
     justifyContent: 'center',
     shadowColor: Colors.black,
     shadowOffset: {
@@ -231,6 +239,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     width: '100%',
     marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   backgroundTablet: {
     backgroundColor: Colors.white,

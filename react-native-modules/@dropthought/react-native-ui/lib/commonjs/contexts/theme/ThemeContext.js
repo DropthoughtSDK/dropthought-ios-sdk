@@ -13,6 +13,7 @@ var _theme = require("./theme.const");
 
 const ThemeContext = /*#__PURE__*/(0, _react.createContext)({
   themeOption: _theme.THEME_OPTION.CLASSIC,
+  hexCode: '',
   colorScheme: 'light',
   fontColor: _styles.Colors.fontColorLight,
   backgroundColor: _styles.Colors.backgroundColorLight,

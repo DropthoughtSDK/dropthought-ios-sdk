@@ -9,6 +9,7 @@ import ClassicProgressBar from '../components/ClassicProgressBar';
 import { useFeedbackState } from '../contexts/feedback';
 import { opacity10 } from '../styles';
 import type { Survey, Feedback } from '../data';
+import { useTheme } from '../contexts/theme';
 
 const numValidFeedbacks = ({
   answeredQuestionIds,
@@ -49,7 +50,8 @@ type Props = {
 
 const SurveyProgressBar = ({ rtl, ...props }: Props) => {
   const feedbackState = useFeedbackState();
-  const themeColor = props.survey.surveyProperty.hexCode;
+  const { hexCode } = useTheme();
+  const themeColor = hexCode;
   const insets = useSafeAreaInsets();
   const { keyboardShown } = useKeyboard();
 

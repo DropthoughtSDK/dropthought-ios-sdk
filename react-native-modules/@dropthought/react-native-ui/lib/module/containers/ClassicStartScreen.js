@@ -1,20 +1,16 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Colors } from '../styles';
 import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
 import Button from '../components/Button';
-import i18n from '../translation';
-import { useTheme } from '../contexts/theme';
+import { THEME_OPTION, useTheme } from '../contexts/theme';
+import { getLanguageBy } from '../utils/LanguageUtils';
 
 const defaultIconSource = require('../assets/rating.png');
 
 const defaultIconSize = {
   [DimensionWidthType.phone]: 65,
   [DimensionWidthType.tablet]: 72
-};
-const LANG_TITLE = {
-  en: 'English',
-  ar: 'العربي'
 };
 
 const ClassicStartScreen = ({
@@ -24,6 +20,8 @@ const ClassicStartScreen = ({
 }) => {
   const dimensionWidthType = useDimensionWidthType();
   const {
+    themeOption,
+    hexCode,
     fontColor,
     backgroundColor
   } = useTheme();
@@ -32,23 +30,30 @@ const ClassicStartScreen = ({
   const {
     surveyProperty,
     surveyName,
-    welcomeTextPlain
+    welcomeTextPlain,
+    language,
+    takeSurvey
   } = survey;
   const {
-    image,
-    hexCode,
-    width = defaultIconSize[dimensionWidthType],
-    height = defaultIconSize[dimensionWidthType]
+    image
   } = surveyProperty;
+  const [imageHeight, setImageHeight] = useState(65);
   const iconStyle = {
-    width,
-    height
+    width: '100%',
+    height: imageHeight
   };
+  useEffect(() => {
+    Image.getSize(image, (_, height) => {
+      if (height < defaultIconSize[dimensionWidthType]) {
+        setImageHeight(height);
+      }
+    }, _ => {}); // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const iconSource = image === undefined ? defaultIconSource : {
     uri: image
   };
   const iconView = /*#__PURE__*/React.createElement(Image, {
-    resizeMode: "cover",
+    resizeMode: "contain",
     style: iconStyle,
     source: iconSource
   });
@@ -60,25 +65,26 @@ const ClassicStartScreen = ({
     } = survey; // if there's only one language or no languages, no need to display
 
     if (!languages || !languages.length || languages.length <= 1) return null;
-    const languageView = languages.map((language, index) => /*#__PURE__*/React.createElement(TouchableOpacity, {
+    const languageView = languages.map((lang, index) => /*#__PURE__*/React.createElement(TouchableOpacity, {
       key: index,
       onPress: () => {
-        onLanguageSelect && onLanguageSelect(language);
+        onLanguageSelect && onLanguageSelect(lang);
       }
     }, /*#__PURE__*/React.createElement(Text, {
       style: [styles.language_label, {
-        color: language !== survey.language ? survey.surveyProperty.hexCode : fontColor
+        color: lang !== language ? hexCode : fontColor
       }]
-    }, LANG_TITLE[language])));
+    }, getLanguageBy(lang))));
     return /*#__PURE__*/React.createElement(View, {
       style: styles.languages
     }, languageView);
   };
 
-  return /*#__PURE__*/React.createElement(View, {
-    style: [shareStyles.container, {
-      backgroundColor
-    }]
+  const containerStyle = [shareStyles.container, {
+    backgroundColor: themeOption === THEME_OPTION.BIJLIRIDE ? Colors.bijlirideBackgroundColor : backgroundColor
+  }];
+  return /*#__PURE__*/React.createElement(ScrollView, {
+    contentContainerStyle: containerStyle
   }, /*#__PURE__*/React.createElement(View, {
     style: styles.main
   }, iconView, /*#__PURE__*/React.createElement(Text, {
@@ -93,11 +99,9 @@ const ClassicStartScreen = ({
     style: styles.divider
   }), /*#__PURE__*/React.createElement(Button, {
     width: buttonWidth,
-    title: i18n.t('start-survey:start-btn'),
+    title: takeSurvey,
     color: hexCode,
-    onPress: () => {
-      onStart();
-    },
+    onPress: onStart,
     containerStyle: styles.takeSurveyButton
   })), languagesView());
 };
@@ -106,8 +110,7 @@ export default ClassicStartScreen;
 const shareStyles = StyleSheet.create({
   container: {
     backgroundColor: Colors.white,
-    flex: 1,
-    alignItems: 'center'
+    flex: 1
   }
 });
 const phoneStyles = StyleSheet.create({
@@ -143,13 +146,15 @@ const phoneStyles = StyleSheet.create({
   },
   language_label: {
     fontSize: 13,
-    marginRight: 19
+    paddingHorizontal: 8
   },
   languages: {
     flexDirection: 'row',
     justifyContent: 'center',
     height: '12%',
-    maxHeight: 90
+    maxHeight: 90,
+    flexWrap: 'wrap',
+    marginHorizontal: 38
   }
 });
 const tabletStyles = StyleSheet.create({
@@ -185,7 +190,7 @@ const tabletStyles = StyleSheet.create({
   },
   language_label: {
     fontSize: 13,
-    marginRight: 19
+    paddingHorizontal: 8
   },
   languages: {
     flexDirection: 'row',

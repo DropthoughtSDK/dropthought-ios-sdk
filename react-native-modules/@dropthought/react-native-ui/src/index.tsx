@@ -11,7 +11,11 @@ import { KioskProvider, KioskProviderProps } from './KioskProvider';
 import i18n from './translation';
 export { Colors, GlobalStyle } from './styles';
 export * from './hooks/useWindowDimensions';
+
+export * from './contexts/feedback';
 export * from './contexts/theme';
+
+export * from './components/Button';
 
 import ActivityIndicatorMask from './components/ActivityIndicatorMask';
 import { KeyboardAvoidingScrollView } from './components/KeyboardAvoidingView';

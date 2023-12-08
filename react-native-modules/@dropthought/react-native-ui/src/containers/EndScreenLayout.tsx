@@ -5,7 +5,7 @@ import ClassicEndScreen from './ClassicEndScreen';
 import type { Survey as OriginSurvey } from '../data';
 
 type Survey = OriginSurvey & {
-  languages: ('en' | 'ar')[];
+  languages: string[];
 };
 
 type Props = {
@@ -21,6 +21,7 @@ export default function EndScreenLayout({
 
   switch (themeOption) {
     case THEME_OPTION.CLASSIC:
+    case THEME_OPTION.BIJLIRIDE:
       return <ClassicEndScreen survey={survey} />;
     default:
       return <EndScreen survey={survey} onClose={onClose} />;

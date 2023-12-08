@@ -89,7 +89,7 @@ function NewOtherOptionWithHighlight(props) {
 
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(_NewOptionWithHighlight.default, _extends({}, props, {
     onPress: onPressHandler,
-    title: 'Others'
+    title: question.otherTextLabel
   })), /*#__PURE__*/React.createElement(_MultiLineTextInput.default, {
     onEndEditingHandler: () => {},
     onChangeTextHandler: onChangeTextHandler,

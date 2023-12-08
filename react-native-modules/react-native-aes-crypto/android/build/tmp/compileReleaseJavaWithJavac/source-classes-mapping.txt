@@ -1,6 +1,6 @@
-com/tectiv3/aes/RCTAes.java
- com.tectiv3.aes.RCTAes
 com/tectiv3/aes/BuildConfig.java
  com.tectiv3.aes.BuildConfig
+com/tectiv3/aes/RCTAes.java
+ com.tectiv3.aes.RCTAes
 com/tectiv3/aes/RCTAesPackage.java
  com.tectiv3.aes.RCTAesPackage

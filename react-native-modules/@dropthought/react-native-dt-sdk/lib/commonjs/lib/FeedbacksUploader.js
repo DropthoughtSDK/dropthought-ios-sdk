@@ -3,48 +3,36 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.feedbackUploader = exports.UploaderStates = exports.FailedReasonsQueue = exports.FailedFeedbacksQueue = exports.FeedbacksQueue = void 0;
-
+exports.feedbackUploader = exports.UploaderStates = exports.FeedbacksQueue = exports.FailedReasonsQueue = exports.FailedFeedbacksQueue = void 0;
 var _ramda = require("ramda");
-
 var _v = _interopRequireDefault(require("uuid/v4"));
-
 var _API = require("./API");
-
 var _QueueStorage = _interopRequireDefault(require("./QueueStorage"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 const KEY_FEEDBACKS = 'KEY_FEEDBACKS';
 const KEY_FAILED_FEEDBACKS_DURING_PROCESSING = 'KEY_FAILED_FEEDBACKS_DURING_PROCESSING';
 const KEY_FAILED_REASONS_DURING_PROCESSING = 'KEY_FAILED_REASONS_DURING_PROCESSING';
-/** @type {QueueStorage<SurveyFeedback>} */
 
-const FeedbacksQueue = new _QueueStorage.default({
+/** @type {QueueStorage<SurveyFeedback>} */
+const FeedbacksQueue = exports.FeedbacksQueue = new _QueueStorage.default({
   key: KEY_FEEDBACKS,
   encrypted: true
 });
 /** @type {QueueStorage<SurveyFeedback>} */
-
-exports.FeedbacksQueue = FeedbacksQueue;
-const FailedFeedbacksQueue = new _QueueStorage.default({
+const FailedFeedbacksQueue = exports.FailedFeedbacksQueue = new _QueueStorage.default({
   key: KEY_FAILED_FEEDBACKS_DURING_PROCESSING,
   encrypted: true
 });
 /** @type {QueueStorage<FailedReason>} */
-
-exports.FailedFeedbacksQueue = FailedFeedbacksQueue;
-const FailedReasonsQueue = new _QueueStorage.default({
+const FailedReasonsQueue = exports.FailedReasonsQueue = new _QueueStorage.default({
   key: KEY_FAILED_REASONS_DURING_PROCESSING,
   encrypted: true
 });
+
 /**
  * @param {SurveyFeedback} surveyFeedback
  * @param {*} cancelSource
  */
-
-exports.FailedReasonsQueue = FailedReasonsQueue;
-
 async function sendFeedback(surveyFeedback) {
   return (0, _API.apiPostEvent)({
     programId: surveyFeedback.surveyId,
@@ -54,19 +42,18 @@ async function sendFeedback(surveyFeedback) {
     timeZone: surveyFeedback.timeZone
   });
 }
+
 /** @enum {'idle' | 'processing' } */
-
-
-const UploaderStates = {
+const UploaderStates = exports.UploaderStates = {
   Idle: 'idle',
   Processing: 'processing'
 };
+
 /**
  * @typedef {Object} FeedbackUploaderSubscription
  * @property {string} id
  * @property {FeedbackUploaderSubscriber} subscriber
  */
-
 /**
  * @typedef {Object} FeedbackUploaderPublishState
  * @property {UploaderStates} uploadStatus
@@ -76,7 +63,6 @@ const UploaderStates = {
  * @property {FailedReason[]} failedReasons
  * @property {boolean} userCanceled
  */
-
 /**
  * @typedef {(state: FeedbackUploaderPublishState) => void} FeedbackUploaderSubscriber
  */
@@ -85,9 +71,6 @@ const UploaderStates = {
  * @param {() => boolean} check
  * @returns
  */
-
-exports.UploaderStates = UploaderStates;
-
 const waitUntil = async check => {
   let round = 0;
   return new Promise(resolve => {
@@ -102,22 +85,18 @@ const waitUntil = async check => {
         }
       }, 500);
     };
-
     timeout();
   });
 };
-
 function CreateFeedbacksUploader() {
   /** @type {boolean | null | undefined} */
   let initialized = null; // null -> not start yet, undefined -> in progress, true -> finished
-
   let state = UploaderStates.Idle;
   let numOfProcessed = 0;
   let userCanceled = false;
+
   /** @type {FeedbackUploaderSubscription[]} */
-
   let subscriptions = [];
-
   function publish() {
     if ((0, _ramda.isEmpty)(subscriptions)) return;
     const [queuedFeedbacks, failedFeedbacksDuringProcessing, failedReasons] = [FeedbacksQueue.getAll(), FailedFeedbacksQueue.getAll(), FailedReasonsQueue.getAll()];
@@ -134,25 +113,22 @@ function CreateFeedbacksUploader() {
       }
     });
   }
-
   async function uploadSingle() {
     // if user cancel, stop process the next feedback
     if (userCanceled) {
       return;
     }
+    const feedback = FeedbacksQueue.front();
 
-    const feedback = FeedbacksQueue.front(); // no more feedback in the queue, stop
-
+    // no more feedback in the queue, stop
     if (!feedback) return;
-
     try {
       await sendFeedback(feedback);
       numOfProcessed++;
     } catch (err) {
       var _err$response;
-
-      console.log('failed when sending feedback', feedback.surveyId, err.message); // failed, add to failed queue
-
+      console.log('failed when sending feedback', feedback.surveyId, err.message);
+      // failed, add to failed queue
       FailedFeedbacksQueue.enqueue(feedback);
       FailedReasonsQueue.enqueue({
         message: err.message,
@@ -164,12 +140,10 @@ function CreateFeedbacksUploader() {
       await uploadSingle();
     }
   }
-
   function uploadDone() {
     state = UploaderStates.Idle;
     publish();
   }
-
   function retryFailed() {
     // get failed feedbacks and save to processing queue
     // clear failed feedback queue
@@ -178,7 +152,6 @@ function CreateFeedbacksUploader() {
     FailedFeedbacksQueue.clear();
     FailedReasonsQueue.clear();
   }
-
   function uploadStart() {
     // reset states
     state = UploaderStates.Processing;
@@ -187,73 +160,66 @@ function CreateFeedbacksUploader() {
     retryFailed();
     publish();
   }
-
   function uploadContinue() {
     retryFailed();
     publish();
   }
+
   /**
    * @public
    */
-
-
   function cancel() {
     userCanceled = true;
     publish();
   }
+
   /**
    * @public
    */
-
-
   async function clear() {
     cancel();
     await Promise.all([FeedbacksQueue.clear(), FailedFeedbacksQueue.clear(), FailedReasonsQueue.clear()]);
   }
+
   /**
    * @public
    */
-
-
   async function initialize() {
     // only initialize once
     if (initialized === true) return;
-
     if (typeof initialized === 'undefined') {
       return waitUntil(() => initialized === true);
     }
+    initialized = undefined;
 
-    initialized = undefined; // check queues are initialized
-
+    // check queues are initialized
     await Promise.all([FeedbacksQueue.initialize(), FailedFeedbacksQueue.initialize(), FailedReasonsQueue.initialize()]);
     initialized = true;
   }
+
   /**
    * @public
    */
-
-
   async function upload() {
     if (initialized !== true) return;
-
     if (state === UploaderStates.Processing) {
       // upload is in process
       uploadContinue();
       return;
     }
+    uploadStart();
 
-    uploadStart(); // upload feedback one by one
+    // upload feedback one by one
+    await uploadSingle();
 
-    await uploadSingle(); // all the feedbacks are processed
-
+    // all the feedbacks are processed
     uploadDone();
   }
+
   /**
    * @public
    * @param {FeedbackUploaderSubscriber} subscriber
    */
-
-
   function subscribe(subscriber) {
     const id = (0, _v.default)();
     const subscription = {
@@ -266,7 +232,6 @@ function CreateFeedbacksUploader() {
       subscriptions = subscriptions.filter(sub => sub.id !== id);
     };
   }
-
   return {
     upload,
     subscribe,
@@ -275,6 +240,7 @@ function CreateFeedbacksUploader() {
     initialize
   };
 }
+
 /**
  * @description singleton uploader
  * @example
@@ -295,11 +261,9 @@ function CreateFeedbacksUploader() {
  *     // to unsubscribe
  *     unSubscribe()
  */
+const feedbackUploader = exports.feedbackUploader = CreateFeedbacksUploader();
 
-
-const feedbackUploader = CreateFeedbacksUploader();
 /**@typedef {import('../data').Feedback} Feedback */
-
 /**@typedef {import('../data').SurveyFeedback} SurveyFeedback */
 
 /**
@@ -307,6 +271,4 @@ const feedbackUploader = CreateFeedbacksUploader();
  * @property {string} message
  * @property {number|undefined} status
  */
-
-exports.feedbackUploader = feedbackUploader;
 //# sourceMappingURL=FeedbacksUploader.js.map

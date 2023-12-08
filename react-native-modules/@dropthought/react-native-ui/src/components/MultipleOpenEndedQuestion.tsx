@@ -10,7 +10,7 @@ import {
 import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import GlobalStyle, { Colors, addOpacityToColor } from '../styles';
 import MandatoryTitle from './MandatoryTitle';
-import type { Question, Feedback } from '../data';
+import type { Question, Feedback, Survey } from '../data';
 import useMultipleOpenEnded from '../hooks/useMultipleOpenEnded';
 import useOpenEnded from '../hooks/useOpenEnded';
 import { metaDataFormatValidator } from '../utils/data';
@@ -22,6 +22,7 @@ const ScrollView =
   Platform.OS === 'ios' ? KeyboardAvoidingScrollView : RNScrollView;
 
 type Props = {
+  survey: Survey;
   question: Question;
   onFeedback: (feedback: Feedback) => void;
   feedback: Feedback;
@@ -175,6 +176,7 @@ const RowComponent = ({
 };
 
 const MultipleOpenEndedQuestion = ({
+  survey,
   question,
   onFeedback,
   feedback,
@@ -200,6 +202,7 @@ const MultipleOpenEndedQuestion = ({
     <ScrollView extraAvoidingSpace={30} style={styles.container}>
       <MandatoryTitle
         forgot={false}
+        mandatoryErrorMessage={survey.mandatoryErrorMessage}
         question={question}
         style={styles.title}
         invalidMessage={handleErrorHint(forgot)}

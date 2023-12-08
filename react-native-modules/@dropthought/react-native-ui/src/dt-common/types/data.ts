@@ -48,7 +48,7 @@ export interface Question {
   metaDataTypeList?: QuestionMetaDataType[];
   responseErrorText: string;
   responseErrorTextList?: string[];
-  otherText: string;
+  otherText?: string;
   exampleMetadataText?: string;
   exampleMetadataTextList?: string[];
   questionTitles: string[];
@@ -57,6 +57,7 @@ export interface Question {
   phiData: boolean;
   phiDataList: boolean[];
   optionImages: string[];
+  otherTextLabel: string;
 }
 
 export interface Page {
@@ -87,6 +88,7 @@ export interface SurveyProperty {
   imageBase64?: string;
   width?: number;
   height?: number;
+  themeName?: string;
 }
 
 export interface ProgramContent {
@@ -113,11 +115,12 @@ export interface Survey {
   timezone: string;
   startDate: string;
   thankYouText?: string;
+  thankYouTextPlain?: string;
   welcomeText?: string;
   welcomeTextPlain?: string;
-  backPage?: string;
-  nextPage?: string;
-  submitSurvey?: string;
+  backPage: string;
+  nextPage: string;
+  submitSurvey: string;
   characterCountIndicator?: string;
   inactiveSurveyText?: string;
   metaDataPlaceHolders?: object;
@@ -131,6 +134,7 @@ export interface Survey {
   surveyType: number;
   pageOrder: string[];
   state: ProgramStateType;
+  takeSurvey: string;
 }
 
 export interface TransformedOption {

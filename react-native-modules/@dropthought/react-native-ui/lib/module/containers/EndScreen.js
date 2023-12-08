@@ -1,17 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Colors, GlobalStyle } from '../styles';
 import i18n from '../translation';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 // @ts-ignore
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-const iconSource = {
-  [COLOR_SCHEMES.light]: require('../assets/rating.png'),
-  [COLOR_SCHEMES.dark]: require('../assets/rating_dark.png')
-};
+import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
 const logoSource = {
   [COLOR_SCHEMES.light]: require('../assets/ic_dtlogo.png'),
   [COLOR_SCHEMES.dark]: require('../assets/ic_dtlogo_dark.png')
+};
+
+const defaultIconSource = require('../assets/rating.png');
+
+const defaultIconSize = {
+  [DimensionWidthType.phone]: 65,
+  [DimensionWidthType.tablet]: 72
 };
 
 const EndScreen = ({
@@ -20,14 +24,42 @@ const EndScreen = ({
 }) => {
   const insets = useSafeAreaInsets();
   const {
+    hexCode,
     colorScheme,
     fontColor,
     backgroundColor
   } = useTheme();
   const rtl = i18n.dir() === 'rtl';
+  const dimensionWidthType = useDimensionWidthType();
   const {
-    thankYouText
+    surveyProperty,
+    thankYouTextPlain
   } = survey;
+  const {
+    image
+  } = surveyProperty;
+  const [imageHeight, setImageHeight] = useState(65);
+  const iconStyle = {
+    width: '100%',
+    height: imageHeight
+  };
+  useEffect(() => {
+    Image.getSize(image, (_, height) => {
+      if (height < defaultIconSize[dimensionWidthType]) {
+        setImageHeight(height);
+      }
+    }, _ => {}); // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const iconSource = image === undefined ? defaultIconSource : {
+    uri: image
+  };
+  const iconView = /*#__PURE__*/React.createElement(View, {
+    style: GlobalStyle.row
+  }, /*#__PURE__*/React.createElement(Image, {
+    resizeMode: "contain",
+    style: iconStyle,
+    source: iconSource
+  }));
   const powerByStyle = [styles.power_by, {
     color: fontColor
   }];
@@ -43,7 +75,7 @@ const EndScreen = ({
     color: fontColor
   }];
   const headerIconStyle = {
-    tintColor: survey.surveyProperty.hexCode
+    tintColor: hexCode
   };
   return /*#__PURE__*/React.createElement(View, {
     style: [styles.container, {
@@ -64,17 +96,11 @@ const EndScreen = ({
     numberOfLines: 1
   }, survey.surveyName))), /*#__PURE__*/React.createElement(View, {
     style: styles.main
-  }, /*#__PURE__*/React.createElement(Image, {
-    source: iconSource[colorScheme]
-  }), /*#__PURE__*/React.createElement(Text, {
-    style: [styles.title, {
-      color: fontColor
-    }]
-  }, i18n.t('end-survey:thank')), /*#__PURE__*/React.createElement(Text, {
+  }, iconView, /*#__PURE__*/React.createElement(Text, {
     style: [styles.subtitle, {
       color: fontColor
     }]
-  }, thankYouText)), /*#__PURE__*/React.createElement(View, {
+  }, thankYouTextPlain)), /*#__PURE__*/React.createElement(View, {
     style: styles.vertical
   }, /*#__PURE__*/React.createElement(View, {
     style: styles.horizontal
@@ -109,11 +135,11 @@ const styles = StyleSheet.create({
     fontWeight: '500'
   },
   subtitle: {
-    lineHeight: 23,
     marginTop: 17,
     fontSize: 19,
     textAlign: 'center',
-    opacity: 0.72
+    opacity: 0.72,
+    paddingBottom: 10
   },
   vertical: {
     alignItems: 'center',

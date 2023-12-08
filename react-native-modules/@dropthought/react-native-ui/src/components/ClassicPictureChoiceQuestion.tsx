@@ -9,6 +9,7 @@ import ClassicMandatoryTitle from './ClassicMandatoryTitle';
 import i18n from '../translation';
 
 type Props = {
+  mandatoryErrorMessage: string;
   question: Question;
   onFeedback: (feedback: Feedback) => void;
   feedback?: Feedback;
@@ -16,18 +17,20 @@ type Props = {
   isUploading: boolean;
   forgot: boolean;
   themeColor: string;
+  preview: boolean;
 };
 
 const ClassicPictureChoiceQuestion = ({
+  mandatoryErrorMessage,
   question,
   feedback,
   onFeedback,
   forgot,
   themeColor,
   onUpload,
-  isUploading,
+  preview,
 }: Props) => {
-  const { otherText } = question;
+  const { otherText = '' } = question;
 
   const {
     images,
@@ -45,6 +48,7 @@ const ClassicPictureChoiceQuestion = ({
     invalidMessage,
     setInvalidMessage,
   } = usePictureChoice(question, onFeedback, feedback);
+  const rtl = i18n.dir() === 'rtl';
 
   const imageItems = images.map(({ uri, option }, index) => {
     const selected = selectIndex.includes(index);
@@ -102,18 +106,20 @@ const ClassicPictureChoiceQuestion = ({
       onUpload={async (file) => {
         setInvalidMessage(undefined);
         const url = await onUpload(file);
-        if (url) {
+        if (typeof url !== 'string') {
+          setInvalidMessage(`${i18n.t('picture-choice:uploadFailed')}`);
+        } else if (url) {
           setOtherPictureAnswerUrl(url);
         }
       }}
       onError={(msg) => {
         setInvalidMessage(msg);
       }}
-      isUploading={isUploading}
       onChangeText={(text) => {
         setOtherPictureAnswerText(text);
       }}
       themeColor={themeColor}
+      preview={preview}
     />
   ) : null;
 
@@ -121,11 +127,14 @@ const ClassicPictureChoiceQuestion = ({
     <View style={GlobalStyle.questionContainer}>
       <ClassicMandatoryTitle
         forgot={forgot}
+        mandatoryErrorMessage={mandatoryErrorMessage}
         question={question}
         style={styles.mandatoryTitle}
         invalidMessage={invalidMessage}
       />
-      <View style={styles.pictureGridContainer}>
+      <View
+        style={[styles.pictureGridContainer, rtl && GlobalStyle.flexRowReverse]}
+      >
         {imageItems}
         {otherImageItem}
       </View>

@@ -1,6 +1,6 @@
 {
   "name": "@dropthought/react-native-ui",
-  "version": "5.4.0-beta.21",
+  "version": "5.5.1-crop.1",
   "description": "UI element for Dropthought React Native SDK",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -77,12 +77,8 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "@react-native-community/hooks": "^2.6.0",
-    "i18next": "^21.3.0",
-    "lodash": "^4.17.11",
     "lottie-react-native": "^5.1.5",
-    "ramda": "^0.27.1",
-    "react-native-image-picker": "^7.0.1",
+    "react-native-image-crop-picker": "^0.36.2",
     "react-native-safe-area-context": "^3.0.2"
   },
   "jest": {
@@ -165,7 +161,7 @@
     "lodash": "^4.17.11",
     "lottie-react-native": "^5.1.5",
     "ramda": "^0.27.1",
-    "react-native-image-picker": "^7.0.1",
+    "react-native-image-crop-picker": "^0.36.2",
     "react-native-safe-area-context": "^3.0.2"
   }
 }

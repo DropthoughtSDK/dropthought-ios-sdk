@@ -93,12 +93,12 @@ export const option3LoopFaceTable: Map<string, {
                         };
                         t: number;
                         s: {
+                            i: number[][];
+                            o: number[][];
                             /**
                              * given a Question type, return ['option label1', 'option label2', 'option label3', true]
                              * if the type is boolean at the last, it means it is an "other" option
                              */
-                            i: number[][];
-                            o: number[][];
                             v: number[][];
                             c: boolean;
                         }[];
@@ -128,9 +128,6 @@ export const option3LoopFaceTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 sk?: undefined;
                 sa?: undefined;
@@ -180,9 +177,6 @@ export const option3LoopFaceTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 sk?: undefined;
                 sa?: undefined;
@@ -302,9 +296,6 @@ export const option3LoopFaceTable: Map<string, {
                     hd: boolean;
                     c?: undefined;
                     o?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     bm?: undefined;
                     p?: undefined;
@@ -313,6 +304,9 @@ export const option3LoopFaceTable: Map<string, {
                     sk?: undefined;
                     sa?: undefined;
                 } | {
+                    /**
+                     * if mandatory question has feedback
+                     */
                     ty: string;
                     c: {
                         a: number;
@@ -409,9 +403,6 @@ export const option3LoopFaceTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 o?: undefined;
                 sk?: undefined;
@@ -536,9 +527,6 @@ export const option3LoopFaceTable: Map<string, {
                     p?: undefined;
                     a?: undefined;
                     s?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     sk?: undefined;
                     sa?: undefined;
@@ -588,9 +576,6 @@ export const option3LoopFaceTable: Map<string, {
                     p?: undefined;
                     a?: undefined;
                     s?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     sk?: undefined;
                     sa?: undefined;
@@ -654,9 +639,6 @@ export const option3LoopFaceTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 o?: undefined;
                 sk?: undefined;
@@ -772,9 +754,6 @@ export const option3LoopFaceTable: Map<string, {
                 mm?: undefined;
                 c?: undefined;
                 o?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 bm?: undefined;
                 p?: undefined;
@@ -793,9 +772,6 @@ export const option3LoopFaceTable: Map<string, {
                 ks?: undefined;
                 c?: undefined;
                 o?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 bm?: undefined;
                 p?: undefined;
@@ -967,9 +943,6 @@ export const option3LoopFaceTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 sk?: undefined;
                 sa?: undefined;
@@ -1019,9 +992,6 @@ export const option3LoopFaceTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 sk?: undefined;
                 sa?: undefined;
@@ -1141,9 +1111,6 @@ export const option3LoopFaceTable: Map<string, {
                     hd: boolean;
                     c?: undefined;
                     o?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     bm?: undefined;
                     p?: undefined;
@@ -1248,9 +1215,6 @@ export const option3LoopFaceTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 o?: undefined;
                 sk?: undefined;
@@ -1375,9 +1339,6 @@ export const option3LoopFaceTable: Map<string, {
                     p?: undefined;
                     a?: undefined;
                     s?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     sk?: undefined;
                     sa?: undefined;
@@ -1427,9 +1388,6 @@ export const option3LoopFaceTable: Map<string, {
                     p?: undefined;
                     a?: undefined;
                     s?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     sk?: undefined;
                     sa?: undefined;
@@ -1493,9 +1451,6 @@ export const option3LoopFaceTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 o?: undefined;
                 sk?: undefined;
@@ -1611,9 +1566,6 @@ export const option3LoopFaceTable: Map<string, {
                 mm?: undefined;
                 c?: undefined;
                 o?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 bm?: undefined;
                 p?: undefined;
@@ -1632,9 +1584,6 @@ export const option3LoopFaceTable: Map<string, {
                 ks?: undefined;
                 c?: undefined;
                 o?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 bm?: undefined;
                 p?: undefined;
@@ -1806,9 +1755,6 @@ export const option3LoopFaceTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 sk?: undefined;
                 sa?: undefined;
@@ -1842,9 +1788,6 @@ export const option3LoopFaceTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 sk?: undefined;
                 sa?: undefined;
@@ -1964,9 +1907,6 @@ export const option3LoopFaceTable: Map<string, {
                     hd: boolean;
                     c?: undefined;
                     o?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     bm?: undefined;
                     p?: undefined;
@@ -2055,9 +1995,6 @@ export const option3LoopFaceTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 o?: undefined;
                 sk?: undefined;
@@ -2182,9 +2119,6 @@ export const option3LoopFaceTable: Map<string, {
                     p?: undefined;
                     a?: undefined;
                     s?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     sk?: undefined;
                     sa?: undefined;
@@ -2218,9 +2152,6 @@ export const option3LoopFaceTable: Map<string, {
                     p?: undefined;
                     a?: undefined;
                     s?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     sk?: undefined;
                     sa?: undefined;
@@ -2284,9 +2215,6 @@ export const option3LoopFaceTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 o?: undefined;
                 sk?: undefined;
@@ -2402,9 +2330,6 @@ export const option3LoopFaceTable: Map<string, {
                 mm?: undefined;
                 c?: undefined;
                 o?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 bm?: undefined;
                 p?: undefined;
@@ -2423,9 +2348,6 @@ export const option3LoopFaceTable: Map<string, {
                 ks?: undefined;
                 c?: undefined;
                 o?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 bm?: undefined;
                 p?: undefined;
@@ -2534,9 +2456,6 @@ export const option3LoopFaceTable: Map<string, {
                 hd: boolean;
                 c?: undefined;
                 o?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 bm?: undefined;
                 p?: undefined;
@@ -2686,7 +2605,7 @@ export const option4LoopFaceTable: Map<string, {
                 ix: number;
             };
             a: {
-                a: number;
+                a: number; /** @enum {'other'} */
                 k: number[];
                 ix: number;
             };
@@ -2718,9 +2637,6 @@ export const option4LoopFaceTable: Map<string, {
                 hd: boolean;
                 c?: undefined;
                 o?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 bm?: undefined;
                 p?: undefined;
@@ -2879,9 +2795,6 @@ export const option4LoopFaceTable: Map<string, {
                 hd: boolean;
                 c?: undefined;
                 o?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 bm?: undefined;
                 p?: undefined;
@@ -3006,9 +2919,6 @@ export const option4LoopFaceTable: Map<string, {
                     hd: boolean;
                     c?: undefined;
                     o?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     bm?: undefined;
                     p?: undefined;
@@ -3097,9 +3007,6 @@ export const option4LoopFaceTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 o?: undefined;
                 sk?: undefined;
@@ -3232,9 +3139,6 @@ export const option4LoopFaceTable: Map<string, {
                     hd: boolean;
                     c?: undefined;
                     o?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     bm?: undefined;
                     p?: undefined;
@@ -3323,9 +3227,6 @@ export const option4LoopFaceTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 o?: undefined;
                 sk?: undefined;
@@ -3442,9 +3343,6 @@ export const option4LoopFaceTable: Map<string, {
                     hd: boolean;
                     c?: undefined;
                     o?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     bm?: undefined;
                     p?: undefined;
@@ -3533,9 +3431,6 @@ export const option4LoopFaceTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 o?: undefined;
                 sk?: undefined;
@@ -3614,9 +3509,6 @@ export const option4LoopFaceTable: Map<string, {
                 hd: boolean;
                 c?: undefined;
                 o?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 bm?: undefined;
                 p?: undefined;
@@ -3781,10 +3673,7 @@ export const option4TransformTable: Map<string, {
             ty: string;
             it: ({
                 ind: number;
-                ty: string; /**
-                 * given a Question type, return ['option label1', 'option label2', 'option label3', true]
-                 * if the type is boolean at the last, it means it is an "other" option
-                 */
+                ty: string;
                 ix: number;
                 ks: {
                     a: number;
@@ -3801,9 +3690,6 @@ export const option4TransformTable: Map<string, {
                 hd: boolean;
                 c?: undefined;
                 o?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 bm?: undefined;
                 p?: undefined;
@@ -3950,9 +3836,6 @@ export const option4TransformTable: Map<string, {
                         hd: boolean;
                         c?: undefined;
                         o?: undefined;
-                        /**
-                         * validate if value match metaDataType question' rule
-                         */
                         r?: undefined;
                         bm?: undefined;
                         p?: undefined;
@@ -4034,6 +3917,9 @@ export const option4TransformTable: Map<string, {
                     nm: string;
                     np: number;
                     cix: number;
+                    /**
+                     * if mandatory question has feedback
+                     */
                     bm: number;
                     ix: number;
                     mn: string;
@@ -4041,9 +3927,6 @@ export const option4TransformTable: Map<string, {
                     p?: undefined;
                     a?: undefined;
                     s?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     o?: undefined;
                     sk?: undefined;
@@ -4104,9 +3987,6 @@ export const option4TransformTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 o?: undefined;
                 sk?: undefined;
@@ -4223,9 +4103,6 @@ export const option4TransformTable: Map<string, {
                     hd: boolean;
                     c?: undefined;
                     o?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     bm?: undefined;
                     p?: undefined;
@@ -4314,9 +4191,6 @@ export const option4TransformTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 o?: undefined;
                 sk?: undefined;
@@ -4447,9 +4321,6 @@ export const option4TransformTable: Map<string, {
                 hd: boolean;
                 c?: undefined;
                 o?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 bm?: undefined;
                 p?: undefined;
@@ -4615,9 +4486,6 @@ export const option4TransformTable: Map<string, {
                 hd: boolean;
                 c?: undefined;
                 o?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 bm?: undefined;
                 p?: undefined;
@@ -4764,9 +4632,6 @@ export const option4TransformTable: Map<string, {
                         hd: boolean;
                         c?: undefined;
                         o?: undefined;
-                        /**
-                         * validate if value match metaDataType question' rule
-                         */
                         r?: undefined;
                         bm?: undefined;
                         p?: undefined;
@@ -4855,9 +4720,6 @@ export const option4TransformTable: Map<string, {
                     p?: undefined;
                     a?: undefined;
                     s?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     o?: undefined;
                     sk?: undefined;
@@ -4918,9 +4780,6 @@ export const option4TransformTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 o?: undefined;
                 sk?: undefined;
@@ -5037,9 +4896,6 @@ export const option4TransformTable: Map<string, {
                     hd: boolean;
                     c?: undefined;
                     o?: undefined;
-                    /**
-                     * validate if value match metaDataType question' rule
-                     */
                     r?: undefined;
                     bm?: undefined;
                     p?: undefined;
@@ -5128,9 +4984,6 @@ export const option4TransformTable: Map<string, {
                 p?: undefined;
                 a?: undefined;
                 s?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 o?: undefined;
                 sk?: undefined;
@@ -5261,9 +5114,6 @@ export const option4TransformTable: Map<string, {
                 hd: boolean;
                 c?: undefined;
                 o?: undefined;
-                /**
-                 * validate if value match metaDataType question' rule
-                 */
                 r?: undefined;
                 bm?: undefined;
                 p?: undefined;

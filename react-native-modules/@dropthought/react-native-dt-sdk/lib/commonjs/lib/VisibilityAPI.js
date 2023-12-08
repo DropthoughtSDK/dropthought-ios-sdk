@@ -4,10 +4,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.apiGetVisibilityById = apiGetVisibilityById;
-
 var _APIClient = require("./APIClient");
-
 const VISIBILITY_PATH = visibilityId => `/api/sdk/visibility/${visibilityId}`;
+
 /**
  * get single visibility data
  * @param {string} visibilityId
@@ -15,8 +14,6 @@ const VISIBILITY_PATH = visibilityId => `/api/sdk/visibility/${visibilityId}`;
  * @param {Fetcher=} fetcher
  * @returns {Promise<Visibility>}
  */
-
-
 async function apiGetVisibilityById(visibilityId, requestConfig = {}, fetcher = _APIClient.fetcherInstance) {
   /** @type {RequestConfig} */
   const params = {
@@ -28,6 +25,7 @@ async function apiGetVisibilityById(visibilityId, requestConfig = {}, fetcher = 
     return response.data.result;
   });
 }
+
 /**
  * @typedef {import('./Fetcher').RequestConfig} RequestConfig
  * @typedef {import('./Fetcher').Fetcher} Fetcher

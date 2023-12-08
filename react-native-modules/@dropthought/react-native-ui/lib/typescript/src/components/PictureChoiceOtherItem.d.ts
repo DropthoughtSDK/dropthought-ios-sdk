@@ -10,11 +10,11 @@ declare type Props = {
     columnGap: number;
     onChooseImage: () => void;
     onSelect: () => void;
-    onUpload: (file: ImageFileProps) => void;
-    isUploading: boolean;
+    onUpload: (file: ImageFileProps) => Promise<void>;
     onError: (msg: string) => void;
     onChangeText: (text: string) => void;
     themeColor: string;
+    preview: boolean;
 };
-declare const PictureChoiceOtherItem: ({ otherPicture, isMultipleChoice, selected, placeholder, columnGap, onChooseImage, onSelect, onUpload, isUploading, onError, onChangeText, themeColor, }: Props) => JSX.Element;
+declare const PictureChoiceOtherItem: ({ otherPicture, isMultipleChoice, selected, placeholder, columnGap, onChooseImage, onSelect, onUpload, onError, onChangeText, themeColor, preview, }: Props) => JSX.Element;
 export default PictureChoiceOtherItem;

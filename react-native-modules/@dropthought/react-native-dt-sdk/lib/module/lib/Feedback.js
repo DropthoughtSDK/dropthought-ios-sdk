@@ -1,10 +1,10 @@
 import { apiPostEvent } from './API';
 import { FeedbacksQueue } from './FeedbacksUploader';
+
 /**
  * the format is to fit in the react-async deferFn
  * @param {[SurveyFeedback]} surveyFeedback
  */
-
 export const submitFeedback = async ([surveyFeedback]) => {
   return apiPostEvent({
     programId: surveyFeedback.surveyId,
@@ -22,14 +22,14 @@ export const submitFeedback = async ([surveyFeedback]) => {
     throw error;
   });
 };
+
 /**
  * @param {SurveyFeedback} surveyFeedback
  */
-
 export const saveFeedback = async surveyFeedback => {
   return FeedbacksQueue.enqueue(surveyFeedback);
 };
-/**@typedef {import('../data').Feedback} Feedback */
 
+/**@typedef {import('../data').Feedback} Feedback */
 /**@typedef {import('../data').SurveyFeedback} SurveyFeedback */
 //# sourceMappingURL=Feedback.js.map

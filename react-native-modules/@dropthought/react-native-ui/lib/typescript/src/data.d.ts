@@ -16,4 +16,5 @@ export interface ImageFileProps {
     uri: string;
     name: string;
     type: string;
+    base64: string;
 }

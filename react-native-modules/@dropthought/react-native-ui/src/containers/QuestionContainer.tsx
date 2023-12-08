@@ -31,15 +31,21 @@ import type { Question, Feedback, Survey, ImageFileProps } from '../data';
 import type { THEME_OPTION } from '../contexts/theme';
 
 const TempComponent = ({
+  mandatoryErrorMessage,
   question,
   forgot,
 }: {
+  mandatoryErrorMessage: string;
   question: Question;
   forgot: boolean;
 }) => {
   return (
     <View style={GlobalStyle.questionContainer}>
-      <MandatoryTitle question={question} forgot={forgot} />
+      <MandatoryTitle
+        question={question}
+        mandatoryErrorMessage={mandatoryErrorMessage}
+        forgot={forgot}
+      />
     </View>
   );
 };
@@ -58,6 +64,7 @@ type Props = {
   survey: Survey;
   pageIndex: number;
   themeOption: THEME_OPTION;
+  preview: boolean;
 };
 
 const QuestionContainer = (props: Props) => {

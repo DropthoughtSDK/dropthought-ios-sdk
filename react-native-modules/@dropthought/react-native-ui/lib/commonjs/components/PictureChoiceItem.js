@@ -62,6 +62,18 @@ const PictureChoiceItem = ({
     fontColor,
     colorScheme
   } = (0, _theme.useTheme)();
+  const rtl = _translation.default.dir() === 'rtl';
+  const itemGapStyle = (0, _react.useMemo)(() => {
+    if (rtl) {
+      return {
+        marginLeft: index % 2 === 0 ? columnGap : 0
+      };
+    } else {
+      return {
+        marginRight: index % 2 === 0 ? columnGap : 0
+      };
+    }
+  }, [columnGap, index, rtl]);
 
   const {
     width
@@ -72,27 +84,36 @@ const PictureChoiceItem = ({
   const [loadingImage, setLoadingImage] = (0, _react.useState)(true);
   const [imageLoadError, setImageLoadError] = (0, _react.useState)(false);
   const photo = (0, _react.useMemo)(() => {
+    const iconStyle = {
+      tintColor: themeColor
+    };
     const photoStyle = [styles.picture, {
-      width: itemWidth,
-      marginRight: index % 2 === 0 ? columnGap : 0
+      width: itemWidth
+    }];
+    const reloadTextStyle = [styles.reloadText, {
+      color: fontColor
     }];
 
     if (imageLoadError) {
       const reloadStyle = [styles.pictureReloadContainer, {
         width: itemWidth,
-        marginRight: index % 2 === 0 ? columnGap : 0
+        backgroundColor: (0, _styles.addOpacityToHex)(themeColor, 0.1),
+        borderColor: themeColor,
+        ...itemGapStyle
       }];
+      const reloadPlacholderStyle = [styles.reloadPlaceholderImage, iconStyle];
       return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
         style: reloadStyle
       }, /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
-        style: styles.reloadPlaceholderImage,
+        style: reloadPlacholderStyle,
         source: require('../assets/ic_image_placeholder.png')
       }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
         style: _styles.default.row
       }, /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
+        style: iconStyle,
         source: require('../assets/ic_reload.png')
       }), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-        style: styles.reloadText
+        style: reloadTextStyle
       }, `${_translation.default.t('picture-choice:reload')}`)));
     } else {
       return /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
@@ -108,24 +129,25 @@ const PictureChoiceItem = ({
         }
       });
     }
-  }, [columnGap, imageLoadError, index, itemWidth, uri]);
+  }, [fontColor, imageLoadError, itemGapStyle, itemWidth, themeColor, uri]);
   const border = (0, _react.useMemo)(() => {
     const containerStyle = [styles.borderContainer, {
       borderWidth: selected ? 2 : 1,
       borderColor: selected ? themeColor : _styles.Colors.rankingBorder,
-      width: itemWidth,
-      marginRight: index % 2 === 0 ? columnGap : 0
+      width: itemWidth
     }];
+    const maskStyle = {
+      backgroundColor: (0, _styles.addOpacityToHex)(themeColor, 0.1)
+    };
     return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
       style: containerStyle
     }, /*#__PURE__*/_react.default.createElement(_ActivityIndicatorMask.default, {
-      loading: loadingImage
+      loading: loadingImage,
+      style: maskStyle
     }));
-  }, [columnGap, index, itemWidth, loadingImage, selected, themeColor]);
+  }, [itemWidth, loadingImage, selected, themeColor]);
   const selection = (0, _react.useMemo)(() => {
-    const containerStyle = [styles.optionContainer, {
-      marginRight: index % 2 === 0 ? columnGap : 0
-    }];
+    const containerStyle = [styles.optionContainer, rtl && _styles.default.flexRowReverse];
     const textStyle = colorScheme === _theme.COLOR_SCHEMES.dark ? [styles.optionText, {
       color: fontColor !== null && fontColor !== void 0 ? fontColor : _styles.Colors.appearanceSubBlack
     }] : [styles.optionText, {
@@ -140,8 +162,9 @@ const PictureChoiceItem = ({
     }), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
       style: textStyle
     }, title));
-  }, [colorScheme, columnGap, fontColor, index, isMultipleChoice, selected, themeColor, title]);
+  }, [colorScheme, fontColor, isMultipleChoice, rtl, selected, themeColor, title]);
   return /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+    style: itemGapStyle,
     onPress: () => {
       if (imageLoadError) {
         setImageLoadError(false);
@@ -165,9 +188,9 @@ const styles = _reactNative.StyleSheet.create({
     minHeight: 20
   },
   optionText: {
-    marginLeft: 5,
     flex: 1,
-    fontSize: 16
+    fontSize: 16,
+    paddingHorizontal: 5
   },
   picture: {
     height: 138,
@@ -210,7 +233,8 @@ const styles = _reactNative.StyleSheet.create({
     position: 'absolute',
     height: 138,
     borderRadius: 12,
-    borderColor: 'red'
+    borderColor: 'red',
+    overflow: 'hidden'
   }
 });
 //# sourceMappingURL=PictureChoiceItem.js.map

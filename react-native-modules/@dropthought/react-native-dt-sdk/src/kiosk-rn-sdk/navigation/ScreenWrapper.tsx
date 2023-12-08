@@ -6,12 +6,14 @@ type Props = {
   children: React.ReactNode;
   visible: boolean;
   isOnTop: boolean;
+  rtl: boolean;
 };
 
 const DefaultScreenWrapper: React.FunctionComponent<Props> = ({
   children,
   visible,
   isOnTop,
+  rtl,
 }) => {
   const [localVisible, setLocalVisible] = React.useState(visible);
   const { width } = useWindowDimensions();
@@ -27,6 +29,7 @@ const DefaultScreenWrapper: React.FunctionComponent<Props> = ({
       setLocalVisible(visible);
     });
   }, [visible, isOnTop]);
+  const pageVector = rtl ? [width, -1 * width] : [-1 * width, width];
 
   return (
     <View
@@ -43,7 +46,7 @@ const DefaultScreenWrapper: React.FunctionComponent<Props> = ({
               {
                 translateX: animatedValueRef.current.interpolate({
                   inputRange: [-1, 1],
-                  outputRange: [-1 * width, width],
+                  outputRange: pageVector,
                   extrapolate: 'clamp',
                 }),
               },

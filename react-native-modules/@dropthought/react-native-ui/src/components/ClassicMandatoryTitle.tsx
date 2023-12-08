@@ -15,6 +15,7 @@ import type { Question } from '../data';
 type Props = {
   forgot?: boolean;
   invalidMessage?: string;
+  mandatoryErrorMessage: string;
   question: Question;
   style?: ViewStyle;
 };
@@ -22,6 +23,7 @@ type Props = {
 const ClassicMandatoryTitle = ({
   forgot,
   invalidMessage = '',
+  mandatoryErrorMessage,
   question,
   style,
 }: Props) => {
@@ -38,20 +40,22 @@ const ClassicMandatoryTitle = ({
     }
   }, [addMandatoryRef, question.questionId]);
 
+  const textStyle = [
+    styles.questionTitle,
+    questionTitleSize[dimensionWidthType],
+    {
+      color: fontColor,
+      minHeight: i18n.language === 'te' ? 30 : undefined,
+    },
+  ];
+
   return (
     <View
       ref={ref}
       style={[styles.horizontal, style, rtl && GlobalStyle.flexRowReverse]}
     >
       {question.questionTitle.split(' ').map((text, index) => (
-        <Text
-          key={index}
-          style={[
-            styles.questionTitle,
-            questionTitleSize[dimensionWidthType],
-            { color: fontColor },
-          ]}
-        >
+        <Text key={index} style={textStyle}>
           {text + ' '}
         </Text>
       ))}
@@ -63,7 +67,7 @@ const ClassicMandatoryTitle = ({
       }
       <ClassicQuestionWarningMessage
         // forgot message has higher priority than custom invalid message
-        message={forgot ? i18n.t('survey:mandatory') : invalidMessage}
+        message={forgot ? mandatoryErrorMessage : invalidMessage}
       />
     </View>
   );

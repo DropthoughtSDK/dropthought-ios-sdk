@@ -1,7 +1,7 @@
 export var __esModule: boolean;
-export default _default;
+export default EncryptStorage;
 export function initialize(apiKey: any, AsyncStorage: any): Promise<any>;
-declare namespace _default {
+declare namespace EncryptStorage {
     /** @param {string} key */
     function removeItem(key: string): any;
     /** @param {string} key */

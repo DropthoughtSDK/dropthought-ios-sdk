@@ -28,6 +28,10 @@ const SmileyIcon = props => {
   const styles = isPhone ? phoneStyles : tabletStyles;
   const rtl = _translation.default.dir() === 'rtl';
   const containerStyle = isPhone ? [styles.container, rtl && _styles.default.flexRowReverse] : styles.container;
+  const textStyle = [styles.label, props.selected ? styles.labelSelected : {}, {
+    color: fontColor,
+    minHeight: _translation.default.language === 'te' ? 30 : undefined
+  }];
   return /*#__PURE__*/_react.default.createElement(_reactNative.TouchableWithoutFeedback, {
     onPress: props.onPress
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
@@ -37,9 +41,7 @@ const SmileyIcon = props => {
     style: styles.emoji,
     source: props.source
   }), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-    style: [styles.label, props.selected ? styles.labelSelected : {}, {
-      color: fontColor
-    }]
+    style: textStyle
   }, props.label)) : null));
 };
 

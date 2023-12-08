@@ -7,12 +7,12 @@ import {
   i18n,
   SurveyScreenLayout,
   ActivityIndicatorMask,
-} from '@dropthought/react-native-ui';
+} from '@dropthought/react-native-ui/src';
 import { useAsync } from 'react-async';
 import { useMetadata } from '../contexts/custom-props';
 import StartScreen from '../screens/StartScreen';
 import EndScreen from '../screens/EndScreen';
-import FakeScreen from '../screens/FakeScreen';
+import ErrorHintScreen from '../screens/ErrorHintScreen';
 import { useSurveyContext } from '../contexts/survey';
 import { submitFeedback } from '../../lib/Feedback';
 import ScreenWrapper from './ScreenWrapper';
@@ -99,7 +99,7 @@ const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
         return url;
       } catch (reason) {
         setIsUploading(false);
-        return undefined;
+        return reason;
       }
     } else {
       return undefined;
@@ -117,6 +117,7 @@ const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
         <ScreenWrapper
           visible
           isOnTop={!endScreenvisible && visiblePageIds.length === 0}
+          rtl={survey.language === 'ar'}
         >
           <StartScreen onStart={handleStart} onClose={onClose} />
         </ScreenWrapper>
@@ -126,6 +127,7 @@ const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
               key={pageId}
               visible={visiblePageIds.includes(pageId)}
               isOnTop={visiblePageIds[visiblePageIds.length - 1] === pageId}
+              rtl={survey.language === 'ar'}
             >
               <SurveyScreenLayout
                 survey={survey}
@@ -136,11 +138,16 @@ const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
                 onSubmit={handleSubmit}
                 onUpload={handleUpload}
                 isUploading={isUploading}
+                preview={preview}
               />
             </ScreenWrapper>
           );
         })}
-        <ScreenWrapper visible={endScreenvisible} isOnTop={endScreenvisible}>
+        <ScreenWrapper
+          visible={endScreenvisible}
+          isOnTop={endScreenvisible}
+          rtl={survey.language === 'ar'}
+        >
           <EndScreen
             error={error}
             surveyFeedback={surveyFeedback}
@@ -170,12 +177,12 @@ const SurveyStack: React.FunctionComponent<SurveyStackProps> = ({
   ) {
     // need to render placeholder
     return (
-      <FakeScreen onClose={onClose}>
+      <ErrorHintScreen onClose={onClose}>
         <PlaceholderScreen
           imageType={PlaceholderImageTypes.ProgramUnavailable}
           message={i18n.t('start-survey:placeholder-message')}
         />
-      </FakeScreen>
+      </ErrorHintScreen>
     );
   }
   return <Stack preview={preview} />;

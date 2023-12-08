@@ -3,7 +3,7 @@ export declare const SurveyProgressBarPosition: {
     FixedBottom: number;
     BelowBody: number;
 };
-declare type Props = {
+interface Props {
     pageIndex: number;
     survey: Survey;
     onClose?: () => void;
@@ -18,6 +18,7 @@ declare type Props = {
     SurveyProgressBar?: any;
     surveyProgressBarPosition?: number;
     SurveyPageIndicator?: any;
-};
-declare const SurveyScreenLayoutWrapper: (props: Props) => JSX.Element;
-export default SurveyScreenLayoutWrapper;
+    preview: boolean;
+}
+declare const SurveyScreenLayout: ({ pageIndex, survey, onClose, onPrevPage, onNextPage, onSubmit, onUpload, isUploading, SurveyPageIndicator, SurveyProgressBar, surveyProgressBarPosition, preview, }: Props) => JSX.Element;
+export default SurveyScreenLayout;

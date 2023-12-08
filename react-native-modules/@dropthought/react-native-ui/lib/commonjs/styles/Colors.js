@@ -66,7 +66,9 @@ const Colors = {
   contentBackground: '#F3F5F8',
   nonSelectCircle: '#aeb3be',
   lightActionText: '#121212',
-  darkActionText: '#e1e1e1'
+  darkActionText: '#e1e1e1',
+  bijlirideBackgroundColor: '#32cbf1',
+  bijlirideHexCode: '#407d37'
 };
 exports.Colors = Colors;
 

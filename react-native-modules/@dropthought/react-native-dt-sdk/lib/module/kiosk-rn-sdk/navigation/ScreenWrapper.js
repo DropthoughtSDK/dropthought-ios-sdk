@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { Platform, View, Animated, Easing, StyleSheet } from 'react-native';
 import useWindowDimensions from './useWindowDimensions';
-
 const DefaultScreenWrapper = ({
   children,
   visible,
-  isOnTop
+  isOnTop,
+  rtl
 }) => {
   const [localVisible, setLocalVisible] = React.useState(visible);
   const {
@@ -22,6 +22,7 @@ const DefaultScreenWrapper = ({
       setLocalVisible(visible);
     });
   }, [visible, isOnTop]);
+  const pageVector = rtl ? [width, -1 * width] : [-1 * width, width];
   return /*#__PURE__*/React.createElement(View, {
     style: StyleSheet.absoluteFill,
     collapsable: false,
@@ -31,7 +32,7 @@ const DefaultScreenWrapper = ({
       transform: [{
         translateX: animatedValueRef.current.interpolate({
           inputRange: [-1, 1],
-          outputRange: [-1 * width, width],
+          outputRange: pageVector,
           extrapolate: 'clamp'
         })
       }]
@@ -39,7 +40,6 @@ const DefaultScreenWrapper = ({
     collapsable: false
   }, visible || localVisible ? children : null));
 };
-
 const AndroidScreenWrapper = ({
   children,
   visible,
@@ -77,7 +77,6 @@ const AndroidScreenWrapper = ({
     collapsable: false
   }, visible || localVisible ? children : null));
 };
-
 export default Platform.select({
   android: AndroidScreenWrapper,
   default: DefaultScreenWrapper

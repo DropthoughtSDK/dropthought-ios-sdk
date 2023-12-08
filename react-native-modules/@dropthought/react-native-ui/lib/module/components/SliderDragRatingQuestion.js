@@ -67,6 +67,7 @@ const AboveThumbComponent = ({
 };
 
 const SliderDragRatingQuestion = ({
+  survey,
   question,
   onFeedback,
   feedback,
@@ -216,11 +217,10 @@ const SliderDragRatingQuestion = ({
     contentContainerStyle: styles.container
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     forgot: forgot,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     question: question,
     style: styles.mandatoryTitle
   }), /*#__PURE__*/React.createElement(View, {
-    style: styles.contentContainer
-  }, /*#__PURE__*/React.createElement(View, {
     style: styles.questionContainer
   }, /*#__PURE__*/React.createElement(View, {
     style: styles.sliderLabelContainer
@@ -242,7 +242,7 @@ const SliderDragRatingQuestion = ({
     style: GlobalStyle.row
   }, /*#__PURE__*/React.createElement(View, {
     style: GlobalStyle.flex1
-  }, slider), textField))), /*#__PURE__*/React.createElement(View, {
+  }, slider), textField)), /*#__PURE__*/React.createElement(View, {
     style: styles.hintContainer
   }, /*#__PURE__*/React.createElement(Text, {
     style: hintTextStyle
@@ -254,12 +254,8 @@ const styles = StyleSheet.create({
   container: {
     alignSelf: 'center',
     flex: 1,
-    width: '100%'
-  },
-  contentContainer: {
-    flex: 1,
     width: '100%',
-    justifyContent: 'center'
+    justifyContent: 'space-between'
   },
   questionContainer: {
     marginRight: 35,

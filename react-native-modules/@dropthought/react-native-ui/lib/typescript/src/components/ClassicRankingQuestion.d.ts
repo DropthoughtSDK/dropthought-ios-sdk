@@ -10,6 +10,7 @@ declare type Question = OriginQuestion & {
     allowNAForRanking: boolean;
 };
 declare type Props = {
+    mandatoryErrorMessage: string;
     question: Question;
     onFeedback: (feedback: Feedback) => void;
     forgot: boolean;
@@ -18,5 +19,5 @@ declare type Props = {
     onDragGrant: () => void;
     onDragEnd: () => void;
 };
-declare const _default: React.MemoExoticComponent<({ question, onFeedback, forgot, feedback, themeColor, onDragGrant, onDragEnd, }: Props) => JSX.Element>;
+declare const _default: React.MemoExoticComponent<({ mandatoryErrorMessage, question, onFeedback, forgot, feedback, themeColor, onDragGrant, onDragEnd, }: Props) => JSX.Element>;
 export default _default;

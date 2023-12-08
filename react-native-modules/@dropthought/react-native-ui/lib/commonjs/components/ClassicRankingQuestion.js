@@ -118,6 +118,7 @@ function RankingItem({
 }
 
 const ClassicRankingQuestion = ({
+  mandatoryErrorMessage,
   question,
   onFeedback,
   forgot,
@@ -349,6 +350,7 @@ const ClassicRankingQuestion = ({
   }, /*#__PURE__*/_react.default.createElement(_ClassicMandatoryTitle.default, {
     style: styles.mandatoryTitle,
     forgot: forgot,
+    mandatoryErrorMessage: mandatoryErrorMessage,
     question: question
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.questionContainer

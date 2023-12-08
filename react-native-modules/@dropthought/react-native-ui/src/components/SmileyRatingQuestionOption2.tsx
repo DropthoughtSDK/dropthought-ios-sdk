@@ -78,6 +78,7 @@ const SmileyRatingQuestionOption2 = ({
     : 0;
 
   const {
+    hexCode,
     backgroundColor: themeBackgroundColor,
     fontColor,
     colorScheme,
@@ -141,7 +142,11 @@ const SmileyRatingQuestionOption2 = ({
       <View style={questionContainerStyle}>
         {feedback && hasSelected ? (
           <View style={commonStyles.infoContainer}>
-            <MandatoryTitle question={question} forgot={forgot} />
+            <MandatoryTitle
+              question={question}
+              mandatoryErrorMessage={survey.mandatoryErrorMessage}
+              forgot={forgot}
+            />
             <View style={commonStyles.centerContainer}>
               <LottieView
                 source={lotties[lottieSelectedIndex]}
@@ -165,7 +170,11 @@ const SmileyRatingQuestionOption2 = ({
           </View>
         ) : (
           <View style={commonStyles.infoContainer}>
-            <MandatoryTitle question={question} forgot={forgot} />
+            <MandatoryTitle
+              question={question}
+              mandatoryErrorMessage={survey.mandatoryErrorMessage}
+              forgot={forgot}
+            />
             <View style={commonStyles.centerContainer}>
               <Text style={hintTextStyle}>
                 {i18n.t('option1HintDescription:title')}
@@ -188,7 +197,8 @@ const SmileyRatingQuestionOption2 = ({
         )}
       </View>
       <SurveyFooter
-        surveyColor={survey.surveyProperty.hexCode}
+        submitSurvey={survey.submitSurvey}
+        surveyColor={hexCode}
         isFirstPage={pageIndex === 0}
         isLastPage={pageIndex === survey.pageOrder.length - 1}
         onPrevPage={onPrevPage}

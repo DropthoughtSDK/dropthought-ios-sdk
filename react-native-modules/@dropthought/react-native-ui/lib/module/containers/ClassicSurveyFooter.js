@@ -13,6 +13,7 @@ import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDim
 import Button from '../components/Button';
 import { GlobalStyle } from '../styles';
 import i18n from '../translation';
+import { useTheme } from '../contexts/theme';
 
 const DummyButton = ({
   width
@@ -23,6 +24,9 @@ const DummyButton = ({
 });
 
 const ClassicSurveyFooter = props => {
+  const {
+    hexCode
+  } = useTheme();
   const dimensionWidthType = useDimensionWidthType();
   const rtl = i18n.dir() === 'rtl';
   const {
@@ -40,14 +44,14 @@ const ClassicSurveyFooter = props => {
     LeftButtonComponent = DummyButton;
   }
 
-  const themeColor = props.survey.surveyProperty.hexCode;
+  const themeColor = hexCode;
   const btnWidth = dimensionWidthType === DimensionWidthType.phone ? 76 : 100;
   const [submitDisabled, setSubmitDisabled] = React.useState(false);
   return /*#__PURE__*/React.createElement(View, {
     style: [styles.container, rtl && GlobalStyle.flexRowReverse]
   }, /*#__PURE__*/React.createElement(LeftButtonComponent, {
     width: btnWidth,
-    title: i18n.t('survey:survey-back'),
+    title: survey.backPage,
     color: themeColor,
     onPress: onPrevPage // @ts-ignore
     ,
@@ -55,7 +59,7 @@ const ClassicSurveyFooter = props => {
   }), lastPage ? /*#__PURE__*/React.createElement(Button, {
     disabled: submitDisabled,
     width: btnWidth,
-    title: i18n.t('survey:survey-submit'),
+    title: survey.submitSurvey,
     color: themeColor,
     onPress: () => {
       setSubmitDisabled(true);
@@ -66,7 +70,7 @@ const ClassicSurveyFooter = props => {
     containerStyle: styles.rightBtnContainer
   }) : /*#__PURE__*/React.createElement(Button, {
     width: btnWidth,
-    title: i18n.t('survey:survey-next'),
+    title: survey.nextPage,
     color: themeColor,
     onPress: onNextPage // @ts-ignore
     ,

@@ -9,6 +9,7 @@ import {
 import type {
   Question as OriginQuestion,
   Feedback as OriginFeedback,
+  Survey,
 } from '../data';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import { isNil } from 'ramda';
@@ -23,6 +24,7 @@ type Question = OriginQuestion & {
 };
 
 type Props = {
+  survey: Survey;
   question: Question;
   onFeedback: ({
     questionId,
@@ -74,6 +76,7 @@ const getLabelText = ({
 };
 
 const SliderRatingQuestion = ({
+  survey,
   question,
   onFeedback,
   feedback,
@@ -144,7 +147,11 @@ const SliderRatingQuestion = ({
 
   return (
     <ScrollView style={commonStyles.container}>
-      <MandatoryTitle forgot={forgot} question={question} />
+      <MandatoryTitle
+        forgot={forgot}
+        mandatoryErrorMessage={survey.mandatoryErrorMessage}
+        question={question}
+      />
       {getSliderIndicator()}
     </ScrollView>
   );

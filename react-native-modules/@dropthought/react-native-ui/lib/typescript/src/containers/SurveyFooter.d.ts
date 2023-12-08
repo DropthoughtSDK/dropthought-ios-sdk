@@ -9,6 +9,7 @@
  */
 import * as React from 'react';
 declare type Props = {
+    submitSurvey: string;
     surveyColor: string;
     isFirstPage: boolean;
     isLastPage: boolean;

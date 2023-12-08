@@ -20,6 +20,7 @@ const isAndroid = Platform.OS === 'android';
 const SurveyFooter = props => {
   const rtl = i18n.dir() === 'rtl';
   const {
+    submitSurvey,
     surveyColor,
     isFirstPage,
     isLastPage,
@@ -53,6 +54,20 @@ const SurveyFooter = props => {
     backgroundColor: surveyColor
   }];
   const [submitDisabled, setSubmitDisabled] = React.useState(false);
+  const leftIcon = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Image, {
+    style: iconBgStyle,
+    source: require('../assets/icPreviousButtonBg.png')
+  }), /*#__PURE__*/React.createElement(Image, {
+    style: iconStyle,
+    source: require('../assets/icPreviousButton.png')
+  }));
+  const rightIcon = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Image, {
+    style: iconBgStyle,
+    source: require('../assets/icNextButtonBg.png')
+  }), /*#__PURE__*/React.createElement(Image, {
+    style: iconStyle,
+    source: require('../assets/icNextButton.png')
+  }));
   const submitButton = /*#__PURE__*/React.createElement(TouchableOpacity, {
     style: submitButtonStyle,
     disabled: submitDisabled,
@@ -63,27 +78,15 @@ const SurveyFooter = props => {
     }
   }, /*#__PURE__*/React.createElement(Text, {
     style: styles.submitText
-  }, i18n.t('survey:survey-submit')));
+  }, submitSurvey));
   const leftButton = /*#__PURE__*/React.createElement(TouchableOpacity, {
     style: styles.leftButtonContainer,
     onPress: onPrevPage
-  }, /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Image, {
-    style: iconBgStyle,
-    source: require('../assets/icPreviousButtonBg.png')
-  }), /*#__PURE__*/React.createElement(Image, {
-    style: iconStyle,
-    source: require('../assets/icPreviousButton.png')
-  })));
+  }, rtl ? rightIcon : leftIcon);
   const rightButton = /*#__PURE__*/React.createElement(TouchableOpacity, {
     style: styles.rightButtonContainer,
     onPress: onNextPage
-  }, /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Image, {
-    style: iconBgStyle,
-    source: require('../assets/icNextButtonBg.png')
-  }), /*#__PURE__*/React.createElement(Image, {
-    style: iconStyle,
-    source: require('../assets/icNextButton.png')
-  }))); // hide this bar when it is android and keyboard is shown
+  }, rtl ? leftIcon : rightIcon); // hide this bar when it is android and keyboard is shown
 
   if (isAndroid && keyboardShown) return null;
   return /*#__PURE__*/React.createElement(View, {

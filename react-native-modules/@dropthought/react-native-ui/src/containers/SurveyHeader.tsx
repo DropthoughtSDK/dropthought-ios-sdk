@@ -22,7 +22,7 @@ const SurveyHeader = (props: Props) => {
   const insets = useSafeAreaInsets();
   const { survey, pageIndex, backgroundColor, question, onClose } = props;
 
-  const { fontColor, themeOption, customFontColor } = useTheme();
+  const { hexCode, fontColor, themeOption, customFontColor } = useTheme();
 
   let color = fontColor;
   const isOption6Smiley =
@@ -39,18 +39,19 @@ const SurveyHeader = (props: Props) => {
   const containerStyle = [
     styles.container,
     { paddingTop: insets.top },
-    rtl && GlobalStyle.flexRowReverse,
     {
       backgroundColor,
     },
   ];
 
-  const iconStyle = { tintColor: survey.surveyProperty.hexCode };
+  const iconStyle = { tintColor: hexCode };
   const titleStyle = [styles.title, { color }];
 
   return (
     <View style={containerStyle}>
-      <View style={styles.headerRowContainer}>
+      <View
+        style={[styles.headerRowContainer, rtl && GlobalStyle.flexRowReverse]}
+      >
         <TouchableOpacity style={styles.closeButton} onPress={onClose}>
           <Image
             style={iconStyle}
@@ -64,7 +65,7 @@ const SurveyHeader = (props: Props) => {
       <ProgressBar
         value={pageIndex + 1}
         maxValue={survey.pageOrder.length}
-        themeColor={survey.surveyProperty.hexCode}
+        themeColor={hexCode}
         color={color}
         rtl={rtl}
       />

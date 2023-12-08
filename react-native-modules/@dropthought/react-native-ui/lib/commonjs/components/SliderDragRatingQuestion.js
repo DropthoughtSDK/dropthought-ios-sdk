@@ -87,6 +87,7 @@ const AboveThumbComponent = ({
 };
 
 const SliderDragRatingQuestion = ({
+  survey,
   question,
   onFeedback,
   feedback,
@@ -248,11 +249,10 @@ const SliderDragRatingQuestion = ({
     contentContainerStyle: styles.container
   }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
     forgot: forgot,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     question: question,
     style: styles.mandatoryTitle
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
-    style: styles.contentContainer
-  }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.questionContainer
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.sliderLabelContainer
@@ -274,7 +274,7 @@ const SliderDragRatingQuestion = ({
     style: _styles.default.row
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: _styles.default.flex1
-  }, slider), textField))), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+  }, slider), textField)), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.hintContainer
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: hintTextStyle
@@ -289,12 +289,8 @@ const styles = _reactNative.StyleSheet.create({
   container: {
     alignSelf: 'center',
     flex: 1,
-    width: '100%'
-  },
-  contentContainer: {
-    flex: 1,
     width: '100%',
-    justifyContent: 'center'
+    justifyContent: 'space-between'
   },
   questionContainer: {
     marginRight: 35,

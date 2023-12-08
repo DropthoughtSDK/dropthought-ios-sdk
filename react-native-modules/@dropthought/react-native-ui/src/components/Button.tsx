@@ -10,7 +10,7 @@ import {
 
 import { Colors } from '../styles';
 
-interface Props extends TouchableOpacityProps {
+interface Props {
   title: string;
   width?: number;
   color?: string;
@@ -25,14 +25,14 @@ const Button = ({
   containerStyle,
   color = Colors.purple,
   ...props
-}: Props) => {
+}: Props & TouchableOpacityProps) => {
   const buttonStyle: ViewStyle[] = [
     styles.button,
     {
       backgroundColor: color,
     },
     disabled ? styles.disabledButton : {},
-    width ? { width } : {},
+    width ? { minWidth: width } : {},
   ];
 
   return (
@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 3,
     flex: undefined,
+    paddingHorizontal: 10,
   },
   title: {
     color: Colors.white,

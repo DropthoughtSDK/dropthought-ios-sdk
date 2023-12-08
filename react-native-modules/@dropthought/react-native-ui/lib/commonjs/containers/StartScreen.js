@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _react = _interopRequireDefault(require("react"));
+var _react = _interopRequireWildcard(require("react"));
 
 var _reactNative = require("react-native");
 
@@ -13,13 +13,15 @@ var _styles = require("../styles");
 
 var _useWindowDimensions = require("../hooks/useWindowDimensions");
 
-var _translation = _interopRequireDefault(require("../translation"));
-
 var _theme = require("../contexts/theme");
 
 var _reactNativeSafeAreaContext = require("react-native-safe-area-context");
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _LanguageUtils = require("../utils/LanguageUtils");
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 // @ts-ignore
 const defaultIconSource = require('../assets/rating.png');
@@ -28,10 +30,6 @@ const defaultIconSize = {
   [_useWindowDimensions.DimensionWidthType.phone]: 65,
   [_useWindowDimensions.DimensionWidthType.tablet]: 72
 };
-const LANG_TITLE = {
-  en: 'English',
-  ar: 'العربي'
-};
 
 const StartScreen = ({
   onLanguageSelect,
@@ -39,34 +37,42 @@ const StartScreen = ({
   onStart,
   survey
 }) => {
-  const rtl = _translation.default.dir() === 'rtl';
   const insets = (0, _reactNativeSafeAreaContext.useSafeAreaInsets)();
   const dimensionWidthType = (0, _useWindowDimensions.useDimensionWidthType)();
   const {
+    hexCode,
     fontColor,
     backgroundColor
   } = (0, _theme.useTheme)();
   const {
     surveyProperty,
     surveyName,
-    welcomeTextPlain
+    welcomeTextPlain,
+    language,
+    takeSurvey
   } = survey;
   const {
-    image,
-    hexCode,
-    width = defaultIconSize[dimensionWidthType],
-    height = defaultIconSize[dimensionWidthType]
+    image
   } = surveyProperty;
+  const [imageHeight, setImageHeight] = (0, _react.useState)(65);
   const iconStyle = {
-    width,
-    height
+    width: '100%',
+    height: imageHeight
   };
+  (0, _react.useEffect)(() => {
+    _reactNative.Image.getSize(image, (_, height) => {
+      if (height < defaultIconSize[dimensionWidthType]) {
+        setImageHeight(height);
+      }
+    }, _ => {}); // eslint-disable-next-line react-hooks/exhaustive-deps
+
+  }, []);
   const iconSource = image === undefined ? defaultIconSource : {
     uri: image
   };
 
   const iconView = /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
-    resizeMode: "cover",
+    resizeMode: "contain",
     style: iconStyle,
     source: iconSource
   });
@@ -77,16 +83,16 @@ const StartScreen = ({
     } = survey; // if there's only one language or no languages, no need to display
 
     if (!languages || !languages.length || languages.length <= 1) return null;
-    const languageView = languages.map((language, index) => /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+    const languageView = languages.map((lang, index) => /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
       key: index,
       onPress: () => {
-        onLanguageSelect && onLanguageSelect(language);
+        onLanguageSelect && onLanguageSelect(lang);
       }
     }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
       style: [styles.language_label, {
-        color: language !== survey.language ? survey.surveyProperty.hexCode : fontColor
+        color: lang !== language ? hexCode : fontColor
       }]
-    }, LANG_TITLE[language])));
+    }, (0, _LanguageUtils.getLanguageBy)(lang))));
     return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
       style: styles.languages
     }, languageView);
@@ -97,17 +103,17 @@ const StartScreen = ({
   }];
   const containerStyle = [styles.headerContainer, {
     paddingTop: insets.top
-  }, rtl && _styles.GlobalStyle.flexRowReverse, {
+  }, {
     backgroundColor
   }];
   const titleStyle = [styles.headerTitle, {
     color: fontColor
   }];
   const headerIconStyle = {
-    tintColor: survey.surveyProperty.hexCode
+    tintColor: hexCode
   };
-  return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
-    style: [styles.container, {
+  return /*#__PURE__*/_react.default.createElement(_reactNative.ScrollView, {
+    contentContainerStyle: [styles.container, {
       backgroundColor
     }]
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
@@ -123,7 +129,7 @@ const StartScreen = ({
   })), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: titleStyle,
     numberOfLines: 1
-  }, survey.surveyName))), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+  }, surveyName))), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.main
   }, iconView, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: [styles.title, {
@@ -138,7 +144,7 @@ const StartScreen = ({
     onPress: onStart
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: styles.buttonTitle
-  }, _translation.default.t('start-survey:start-btn')))), languagesView());
+  }, takeSurvey))), languagesView());
 };
 
 var _default = StartScreen;
@@ -187,13 +193,15 @@ const styles = _reactNative.StyleSheet.create({
   },
   language_label: {
     fontSize: 13,
-    marginRight: 19
+    paddingHorizontal: 8
   },
   languages: {
     flexDirection: 'row',
     justifyContent: 'center',
     height: '12%',
-    maxHeight: 90
+    maxHeight: 90,
+    flexWrap: 'wrap',
+    marginHorizontal: 30
   },
   headerContainer: {
     width: '100%',

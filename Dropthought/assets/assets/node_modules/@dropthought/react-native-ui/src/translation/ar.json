@@ -9,10 +9,6 @@
     "ProgramUnavailable": "هذا البرنامج غير متاح"
   },
   "start-survey": {
-    "start-btn": "بدأ الاستبيان",
-    "start-btn-desc": "اضغط على هذا الزر",
-    "qrcode-desc": "مسح QR هذا",
-    "or": "أو",
     "placeholder-message": "آسف للإزعاج.\nيرجى العودة والتحقق لاحقا."
   },
   "survey": {
@@ -39,9 +35,6 @@
     "Phone": "الرجاء الرد بالهاتف",
     "Number": "الرجاء الرد بالأرقام",
     "Date": "الرجاء الرد بالتاريخ"
-  },
-  "end-survey": {
-    "thank": "شكرا للمشاركة"
   },
   "picture-choice": {
     "other": "آخر:"

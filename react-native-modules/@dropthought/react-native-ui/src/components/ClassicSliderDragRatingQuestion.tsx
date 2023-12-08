@@ -33,6 +33,7 @@ type Question = OriginQuestion & {
 };
 
 type Props = {
+  mandatoryErrorMessage: string;
   question: Question;
   onFeedback: ({
     questionId,
@@ -123,6 +124,7 @@ const AboveThumbComponent = ({
 };
 
 const ClassicSliderDragRatingQuestion = ({
+  mandatoryErrorMessage,
   question,
   onFeedback,
   feedback,
@@ -279,6 +281,7 @@ const ClassicSliderDragRatingQuestion = ({
     <View style={GlobalStyle.questionContainer}>
       <ClassicMandatoryTitle
         forgot={forgot}
+        mandatoryErrorMessage={mandatoryErrorMessage}
         question={question}
         style={styles.mandatoryTitle}
       />

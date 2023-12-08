@@ -7,11 +7,12 @@ import {
 import MandatoryTitle from './MandatoryTitle';
 import i18n from '../translation';
 import { useTheme } from '../contexts/theme';
-import type { Question, Feedback } from '../data';
+import type { Question, Feedback, Survey } from '../data';
 import MultiLineTextInput from './MultiLineTextInput';
 import MetadataDesc from './MetadataDesc';
 
 type Props = {
+  survey: Survey;
   anonymous: boolean;
   question: Question;
   onFeedback: (feedback: Feedback) => void;
@@ -21,6 +22,7 @@ type Props = {
 };
 
 const OpenQuestion = ({
+  survey,
   anonymous,
   question,
   // onValueChange, // Keep it for Kiosk usage
@@ -82,6 +84,7 @@ const OpenQuestion = ({
               i18n.t('metadata-invalid-message', question.metaDataType)
             : ''
         }
+        mandatoryErrorMessage={survey.mandatoryErrorMessage}
         question={question}
       />
       <MetadataDesc question={question} rtl={rtl} />

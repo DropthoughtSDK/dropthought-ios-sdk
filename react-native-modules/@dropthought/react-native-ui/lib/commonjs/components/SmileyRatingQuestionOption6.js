@@ -71,6 +71,7 @@ const SmileyRatingQuestionOption6 = ({
     return result;
   }, [scaleLogicList]);
   const {
+    hexCode,
     colorScheme,
     customFontColor
   } = (0, _theme.useTheme)();
@@ -144,6 +145,7 @@ const SmileyRatingQuestionOption6 = ({
     style: commonStyles.container
   }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
     question: question,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     forgot: forgot
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: commonStyles.contentContainer
@@ -152,7 +154,8 @@ const SmileyRatingQuestionOption6 = ({
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: hintTextStyle
   }, _translation.default.t('option6HintDescription:title'))) : /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, lottieContainer, scoreContainer))), /*#__PURE__*/_react.default.createElement(_SurveyFooter.default, {
-    surveyColor: survey.surveyProperty.hexCode,
+    submitSurvey: survey.submitSurvey,
+    surveyColor: hexCode,
     isFirstPage: pageIndex === 0,
     isLastPage: pageIndex === survey.pageOrder.length - 1,
     onPrevPage: onPrevPage,

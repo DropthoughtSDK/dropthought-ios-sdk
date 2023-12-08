@@ -59,6 +59,8 @@ export declare const Colors: {
     nonSelectCircle: string;
     lightActionText: string;
     darkActionText: string;
+    bijlirideBackgroundColor: string;
+    bijlirideHexCode: string;
 };
 export declare const addOpacityToColor: (hexColor: string, opacity: number) => string;
 export declare const opacity10: (color: string) => string;

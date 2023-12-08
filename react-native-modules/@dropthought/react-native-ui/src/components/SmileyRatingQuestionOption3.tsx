@@ -80,6 +80,7 @@ const SmileyRatingQuestionOption3 = ({
     : 0;
 
   const {
+    hexCode,
     backgroundColor: themeBackgroundColor,
     fontColor,
     colorScheme,
@@ -265,7 +266,6 @@ const SmileyRatingQuestionOption3 = ({
         ref={lottieRef}
         source={loopLotties[selectedIndex]}
         autoPlay
-        style={commonStyles.lottieContent}
         loop
         speed={0.5}
       />
@@ -292,7 +292,11 @@ const SmileyRatingQuestionOption3 = ({
       />
       <View style={containerStyle} {...panResponder.panHandlers}>
         <View style={commonStyles.contentContainer}>
-          <MandatoryTitle question={question} forgot={forgot} />
+          <MandatoryTitle
+            question={question}
+            mandatoryErrorMessage={survey.mandatoryErrorMessage}
+            forgot={forgot}
+          />
           {score >= 0 ? (
             <>
               {lottieContainer}
@@ -307,7 +311,8 @@ const SmileyRatingQuestionOption3 = ({
         </View>
       </View>
       <SurveyFooter
-        surveyColor={survey.surveyProperty.hexCode}
+        submitSurvey={survey.submitSurvey}
+        surveyColor={hexCode}
         isFirstPage={pageIndex === 0}
         isLastPage={pageIndex === survey.pageOrder.length - 1}
         onPrevPage={onPrevPage}
@@ -354,10 +359,7 @@ const commonStyles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 42,
-  },
-  lottieContent: {
-    width: '60%',
+    flex: 1.2,
   },
   scoreContainer: {
     flex: 1,

@@ -10,6 +10,10 @@ buildscript {
     if (project == rootProject) {
         repositories {
             google()
+            mavenCentral()
+            // JCenter is going read-only repository indefinitely
+            // Gradle is discouraging jcenter to avoid to avoid build issues - pipeline
+            // ref: https://blog.gradle.org/jcenter-shutdown
             jcenter()
         }
 
@@ -26,7 +30,7 @@ android {
     buildToolsVersion safeExtGet('buildToolsVersion', '28.0.3')
 
     defaultConfig {
-        minSdkVersion safeExtGet('minSdkVersion', 16)
+        minSdkVersion safeExtGet('minSdkVersion', 23)
         targetSdkVersion safeExtGet('targetSdkVersion', 28)
         versionCode 1
         versionName "1.0"
@@ -38,10 +42,11 @@ android {
 
 repositories {
     google()
-    jcenter()
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
+    implementation "androidx.security:security-crypto:1.0.0-rc03"
 }

@@ -53,10 +53,12 @@ function OptionWithHighlight({
   let content;
 
   if (typeof title === 'string') {
+    const textStyle = [styles.text, {
+      color: fontColor,
+      minHeight: i18n.language === 'te' ? 30 : undefined
+    }, checked ? styles.checkedText : {}, QuestionContentTextSize[dimensionWidthType]];
     content = /*#__PURE__*/React.createElement(Text, {
-      style: [styles.text, {
-        color: fontColor
-      }, checked ? styles.checkedText : {}, QuestionContentTextSize[dimensionWidthType]]
+      style: textStyle
     }, title);
   } else {
     content = title;

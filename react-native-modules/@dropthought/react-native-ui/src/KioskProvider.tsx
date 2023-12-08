@@ -13,6 +13,7 @@ export type KioskProviderProps = {
   children: React.ReactNode;
   themeOption: IThemeOptionType;
   appearance: IAppearanceType;
+  hexCode: string;
   fontColor: FontColor;
   backgroundColor: BackgroundColor;
 };
@@ -21,6 +22,7 @@ export const KioskProvider = ({
   children,
   themeOption,
   appearance,
+  hexCode,
   fontColor,
   backgroundColor,
 }: KioskProviderProps) => {
@@ -28,6 +30,7 @@ export const KioskProvider = ({
     <ThemeProvider
       themeOption={themeOption}
       appearance={appearance}
+      hexCode={hexCode}
       fontColor={fontColor}
       backgroundColor={backgroundColor}
     >

@@ -27,6 +27,7 @@ const SmileyRatingQuestionOption2 = ({
   const answered = feedback && feedback.answers && !isNil(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
   const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
   const {
+    hexCode,
     backgroundColor: themeBackgroundColor,
     fontColor,
     colorScheme
@@ -81,6 +82,7 @@ const SmileyRatingQuestionOption2 = ({
     style: commonStyles.infoContainer
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     question: question,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     forgot: forgot
   }), /*#__PURE__*/React.createElement(View, {
     style: commonStyles.centerContainer
@@ -104,6 +106,7 @@ const SmileyRatingQuestionOption2 = ({
     style: commonStyles.infoContainer
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     question: question,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     forgot: forgot
   }), /*#__PURE__*/React.createElement(View, {
     style: commonStyles.centerContainer
@@ -122,7 +125,8 @@ const SmileyRatingQuestionOption2 = ({
     key: 'WheelPicker-dummyDescroptions',
     itemHeight: Platform.OS === 'android' ? 60 : undefined
   })))), /*#__PURE__*/React.createElement(SurveyFooter, {
-    surveyColor: survey.surveyProperty.hexCode,
+    submitSurvey: survey.submitSurvey,
+    surveyColor: hexCode,
     isFirstPage: pageIndex === 0,
     isLastPage: pageIndex === survey.pageOrder.length - 1,
     onPrevPage: onPrevPage,

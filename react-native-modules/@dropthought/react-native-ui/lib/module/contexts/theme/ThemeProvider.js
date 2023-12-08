@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useColorScheme } from 'react-native';
 import { Colors } from '../../styles';
 import { ThemeContext } from './ThemeContext';
-import { APPEARANCE, COLOR_SCHEMES } from './theme.const';
+import { APPEARANCE, COLOR_SCHEMES, THEME_OPTION } from './theme.const';
 
 function getColorScheme(appearance, systemColorScheme) {
   var _colorScheme;
@@ -47,6 +47,7 @@ function getBackgroundColor(customBackgroundColor, colorScheme) {
 function useTheme({
   themeOption,
   appearance,
+  hexCode,
   fontColor: customFontColor,
   backgroundColor: customBackgroundColor
 }) {
@@ -57,25 +58,34 @@ function useTheme({
   return React.useMemo(() => {
     return {
       themeOption,
+      hexCode,
       colorScheme,
       fontColor,
       backgroundColor,
       customFontColor,
       customBackgroundColor
     };
-  }, [themeOption, colorScheme, fontColor, backgroundColor, customFontColor, customBackgroundColor]);
+  }, [themeOption, hexCode, colorScheme, fontColor, backgroundColor, customFontColor, customBackgroundColor]);
 }
 
 export function ThemeProvider({
   children,
   themeOption,
   appearance,
+  hexCode,
   fontColor,
   backgroundColor
 }) {
+  let transformedHexCode = hexCode;
+
+  if (themeOption === THEME_OPTION.BIJLIRIDE) {
+    transformedHexCode = Colors.bijlirideHexCode;
+  }
+
   const themeValue = useTheme({
     themeOption,
     appearance,
+    hexCode: transformedHexCode,
     fontColor,
     backgroundColor
   });

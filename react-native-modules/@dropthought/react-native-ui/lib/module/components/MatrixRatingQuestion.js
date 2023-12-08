@@ -132,6 +132,7 @@ const MatrixRow = ({
 };
 
 const MatrixRatingQuestion = ({
+  survey,
   question,
   onFeedback,
   feedback,
@@ -152,6 +153,7 @@ const MatrixRatingQuestion = ({
     style: styles.container
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     forgot: false,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     question: question,
     style: styles.title,
     invalidMessage: handleMatrixRatingErrorHint(forgot)

@@ -9,6 +9,7 @@ import NewOptionWithHighlight from './NewOptionWithHighlight';
 const ScrollView = Platform.OS === 'ios' ? KeyboardAvoidingScrollView : RNScrollView;
 
 const SingleChoiceQuestion = ({
+  survey,
   anonymous,
   question,
   onFeedback,
@@ -117,6 +118,7 @@ const SingleChoiceQuestion = ({
       style: commonStyles.container
     }, /*#__PURE__*/React.createElement(MandatoryTitle, {
       forgot: forgot,
+      mandatoryErrorMessage: survey.mandatoryErrorMessage,
       question: question
     }), buttonList)
   );

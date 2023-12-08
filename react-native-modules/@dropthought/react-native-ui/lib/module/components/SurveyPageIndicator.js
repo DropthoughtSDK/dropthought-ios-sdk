@@ -3,6 +3,7 @@ import { StyleSheet, View, Text } from 'react-native';
 import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
 import { opacity10, opacity60, Colors } from '../styles';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
+import i18n from '../translation';
 
 const SurveyPageIndicator = props => {
   const {
@@ -11,19 +12,23 @@ const SurveyPageIndicator = props => {
     rtl
   } = props;
   const {
+    hexCode,
     colorScheme
   } = useTheme();
   const isDarkMode = colorScheme === COLOR_SCHEMES.dark;
-  const themeColor = survey.surveyProperty.hexCode;
+  const themeColor = hexCode;
   const dimensionWidthType = useDimensionWidthType();
   const dimensionStyles = dimensionWidthType === DimensionWidthType.phone ? phoneStyles : tabletStyles;
   const currentPage = survey.pages[pageIndex];
+  const textStyle = [styles.title, dimensionStyles.title, isDarkMode && styles.darkModeTitle, {
+    paddingBottom: i18n.language === 'te' ? 5 : 0
+  }];
   return /*#__PURE__*/React.createElement(View, {
     style: [styles.container, dimensionStyles.container, {
       backgroundColor: opacity10(themeColor)
     }, isDarkMode && styles.darkModeContainer, rtl ? styles.rtl : {}]
   }, /*#__PURE__*/React.createElement(Text, {
-    style: [styles.title, dimensionStyles.title, isDarkMode && styles.darkModeTitle]
+    style: textStyle
   }, currentPage.pageTitle));
 };
 

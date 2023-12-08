@@ -199,7 +199,7 @@ const SmileyRatingQuestionOption4 = ({
       scoreContainerOpacity,
     ]
   );
-  const { backgroundColor, fontColor, colorScheme } = useTheme();
+  const { hexCode, backgroundColor, fontColor, colorScheme } = useTheme();
 
   const dimensionWidthType = useDimensionWidthType();
   const isPhone = dimensionWidthType === DimensionWidthType.phone;
@@ -319,7 +319,11 @@ const SmileyRatingQuestionOption4 = ({
         onClose={onClose}
       />
       <View style={containerStyle}>
-        <MandatoryTitle question={question} forgot={forgot} />
+        <MandatoryTitle
+          question={question}
+          mandatoryErrorMessage={survey.mandatoryErrorMessage}
+          forgot={forgot}
+        />
         <View style={commonStyles.contentContainer}>
           {hasEdited ? (
             <>
@@ -347,7 +351,8 @@ const SmileyRatingQuestionOption4 = ({
         </View>
       </View>
       <SurveyFooter
-        surveyColor={survey.surveyProperty.hexCode}
+        submitSurvey={survey.submitSurvey}
+        surveyColor={hexCode}
         isFirstPage={pageIndex === 0}
         isLastPage={pageIndex === survey.pageOrder.length - 1}
         onPrevPage={onPrevPage}

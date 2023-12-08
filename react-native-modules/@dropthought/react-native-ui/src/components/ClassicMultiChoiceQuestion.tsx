@@ -43,6 +43,7 @@ const getInitialSelectedValuesFromFeedbackProps = (
 };
 
 type Props = {
+  mandatoryErrorMessage: string;
   question: Question;
   onFeedback: (feedback: Feedback) => void;
   forgot: boolean;
@@ -168,6 +169,7 @@ class ClassicMultiChoiceQuestion extends PureComponent<Props, State> {
       <View style={GlobalStyles.questionContainer}>
         <ClassicMandatoryTitle
           forgot={this.props.forgot}
+          mandatoryErrorMessage={this.props.mandatoryErrorMessage}
           question={this.props.question}
         />
         <View style={styles.title} />

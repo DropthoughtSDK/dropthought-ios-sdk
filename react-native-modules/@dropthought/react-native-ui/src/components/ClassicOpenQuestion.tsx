@@ -65,6 +65,7 @@ export const metadataTypeAutoCapitalize = (
 };
 
 type Props = {
+  mandatoryErrorMessage: string;
   anonymous: boolean;
   question: Question;
   onFeedback: (feedback: Feedback) => void;
@@ -74,6 +75,7 @@ type Props = {
 };
 
 const OpenQuestion = ({
+  mandatoryErrorMessage,
   anonymous,
   question,
   onFeedback,
@@ -141,6 +143,7 @@ const OpenQuestion = ({
               i18n.t('metadata-invalid-message', question.metaDataType)
             : ''
         }
+        mandatoryErrorMessage={mandatoryErrorMessage}
         question={question}
         style={styles.title}
       />

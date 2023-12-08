@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { i18n, useDimensionWidthType, DimensionWidthType, useTheme, THEME_OPTION } from '@dropthought/react-native-ui';
+import { i18n, useDimensionWidthType, DimensionWidthType, useTheme, THEME_OPTION, Colors } from '@dropthought/react-native-ui/src';
 import CloseButton, { ICON_SIZE } from '../components/CloseButton';
+
 /**
  * @typedef {object} Props
  * @property {string} title
@@ -14,7 +15,6 @@ import CloseButton, { ICON_SIZE } from '../components/CloseButton';
  * @type {React.FunctionComponent<Props>}
  * @param {Props} props
  */
-
 const Header = ({
   title,
   themeColor,
@@ -26,9 +26,10 @@ const Header = ({
   const insets = useSafeAreaInsets();
   const isRtl = i18n.dir() === 'rtl';
   const isPhone = useDimensionWidthType() === DimensionWidthType.phone;
+  const backgroundColor = themeOption === THEME_OPTION.BIJLIRIDE ? Colors.bijlirideHexCode : themeColor;
   const classicHeader = /*#__PURE__*/React.createElement(View, {
     style: [styles.container, {
-      backgroundColor: themeColor,
+      backgroundColor,
       paddingTop: insets.top
     }]
   }, /*#__PURE__*/React.createElement(View, {
@@ -41,9 +42,8 @@ const Header = ({
   }, /*#__PURE__*/React.createElement(CloseButton, {
     onPress: onClose
   }))));
-  return themeOption === THEME_OPTION.CLASSIC ? classicHeader : null;
+  return themeOption === THEME_OPTION.CLASSIC || themeOption === THEME_OPTION.BIJLIRIDE ? classicHeader : null;
 };
-
 export default Header;
 const styles = StyleSheet.create({
   container: {

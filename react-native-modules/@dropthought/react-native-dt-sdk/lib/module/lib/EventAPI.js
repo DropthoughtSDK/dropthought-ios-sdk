@@ -7,6 +7,7 @@ import { isNil, isEmpty } from 'ramda';
 import { fetcherInstance } from './APIClient';
 import { throwRequestError } from './Fetcher';
 const EVENT_PATH = '/api/event';
+
 /**
  * post event (feedback)
  * @param {{
@@ -21,7 +22,6 @@ const EVENT_PATH = '/api/event';
  * @param {Fetcher=} fetcher
  * @returns {Promise<Survey>}
  */
-
 export async function apiPostEvent({
   programId,
   feedbacks = [],
@@ -38,7 +38,8 @@ export async function apiPostEvent({
       refId: programId,
       data: feedbacks.map(feedback => ({
         dataId: feedback.questionId,
-        dataValue: // for not answered question, server doesn't allow empty array for dataValue
+        dataValue:
+        // for not answered question, server doesn't allow empty array for dataValue
         // it accept [''] for not answered question
         isNil(feedback.answers) || isEmpty(feedback.answers) ? [''] : feedback.answers,
         dataType: feedback.type,
@@ -58,10 +59,10 @@ export async function apiPostEvent({
       throwRequestError(response);
       return;
     }
-
     return response.data;
   });
 }
+
 /**
  * @typedef {import('./Fetcher').RequestConfig} RequestConfig
  * @typedef {import('./Fetcher').Fetcher} Fetcher

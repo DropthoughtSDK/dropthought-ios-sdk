@@ -10,6 +10,7 @@ import {
   FontColor,
   BackgroundColor,
   IThemeOptionType,
+  THEME_OPTION,
 } from './theme.const';
 
 function getColorScheme(
@@ -56,11 +57,13 @@ function getBackgroundColor(
 function useTheme({
   themeOption,
   appearance,
+  hexCode,
   fontColor: customFontColor,
   backgroundColor: customBackgroundColor,
 }: {
   themeOption: IThemeOptionType;
   appearance: IAppearanceType;
+  hexCode: string;
   fontColor: FontColor;
   backgroundColor: BackgroundColor;
 }) {
@@ -75,6 +78,7 @@ function useTheme({
   return React.useMemo(() => {
     return {
       themeOption,
+      hexCode,
       colorScheme,
       fontColor,
       backgroundColor,
@@ -83,6 +87,7 @@ function useTheme({
     };
   }, [
     themeOption,
+    hexCode,
     colorScheme,
     fontColor,
     backgroundColor,
@@ -95,6 +100,7 @@ type Props = {
   children: React.ReactNode;
   themeOption: IThemeOptionType;
   appearance: IAppearanceType;
+  hexCode: string;
   fontColor: FontColor;
   backgroundColor: BackgroundColor;
 };
@@ -103,12 +109,20 @@ export function ThemeProvider({
   children,
   themeOption,
   appearance,
+  hexCode,
   fontColor,
   backgroundColor,
 }: Props) {
+  let transformedHexCode = hexCode;
+
+  if (themeOption === THEME_OPTION.BIJLIRIDE) {
+    transformedHexCode = Colors.bijlirideHexCode;
+  }
+
   const themeValue = useTheme({
     themeOption,
     appearance,
+    hexCode: transformedHexCode,
     fontColor,
     backgroundColor,
   });

@@ -4,27 +4,23 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.uploadFile = uploadFile;
-
 var _ramda = require("ramda");
-
 var _APIClient = require("./APIClient");
-
 var _Fetcher = require("./Fetcher");
-
 const UPLOAD_PATH = '/api/event/storage/file';
+
 /**
  * @param {ImageFormData} file
  * @param {AxiosRequestConfig} axiosConfig
  * @param {Fetcher=} fetcher
  * @returns {Promise<UploadFileResult>}
  */
-
 async function uploadFile(file, axiosConfig = {}, fetcher = _APIClient.fetcherInstance) {
-  let formData = new FormData(); // @ts-ignore
-
+  let formData = new FormData();
+  // @ts-ignore
   formData.append('file', file);
-  /** @type {AxiosRequestConfig} */
 
+  /** @type {AxiosRequestConfig} */
   const params = {
     method: 'POST',
     authRequired: true,
@@ -42,10 +38,10 @@ async function uploadFile(file, axiosConfig = {}, fetcher = _APIClient.fetcherIn
       (0, _Fetcher.throwRequestError)(response);
       return;
     }
-
     return response.data;
   });
 }
+
 /**
  * @typedef {Object} ImageFormData
  * @property {string} uri

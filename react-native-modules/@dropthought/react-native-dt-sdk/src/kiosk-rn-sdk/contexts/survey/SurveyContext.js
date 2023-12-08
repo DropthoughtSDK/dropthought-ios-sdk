@@ -5,13 +5,7 @@
  * therefore, the children would always be sure to have "survey" in context
  */
 import * as React from 'react';
-import {
-  View,
-  ActivityIndicator,
-  Image,
-  Alert,
-  Appearance,
-} from 'react-native';
+import { View, ActivityIndicator, Image, Alert } from 'react-native';
 
 import { evolve, merge, isNil } from 'ramda';
 import { useAsync } from 'react-async';
@@ -22,10 +16,10 @@ import {
   PlaceholderScreen,
   PlaceholderImageTypes,
   THEME_OPTION,
-} from '@dropthought/react-native-ui';
-import { ThemeProvider } from '@dropthought/react-native-ui/src/contexts/theme';
+  ThemeProvider,
+} from '@dropthought/react-native-ui/src';
 
-import FakeScreen from '../../screens/FakeScreen';
+import ErrorHintScreen from '../../screens/ErrorHintScreen';
 import { saveCache, loadCache } from '../../../lib/Storage';
 import {
   apiGetProgramById,
@@ -296,17 +290,32 @@ export const SurveyContextProvider = ({
 
   const { survey, theme = themeDataFromSDKEntry } = data ?? {};
 
+  let transformedThemeOption = theme.themeOption;
+  let transformedHexCode = survey?.surveyProperty.hexCode ?? '';
+  if (
+    survey?.surveyProperty.themeName === 'Bijiliride Theme' ||
+    survey?.surveyProperty.themeName === 'Bijliride Theme'
+  ) {
+    transformedThemeOption = THEME_OPTION.BIJLIRIDE;
+  }
+  const transformedTheme = {
+    ...theme,
+    themeOption: transformedThemeOption,
+    hexCode: transformedHexCode,
+  };
+
   /** @type {SurveyContextValue} */
   const contextValue = React.useMemo(
     () => ({
       onClose,
       survey:
-        theme?.themeOption === THEME_OPTION.CLASSIC
+        transformedThemeOption === THEME_OPTION.CLASSIC ||
+        transformedThemeOption === THEME_OPTION.BIJLIRIDE
           ? survey
           : singleQuestionPerPageTransformer(survey),
       changeLanguage: setSelectedLanguageWithBackup,
     }),
-    [survey, onClose, setSelectedLanguageWithBackup, theme]
+    [onClose, transformedThemeOption, survey, setSelectedLanguageWithBackup]
   );
 
   // initial loading data view
@@ -331,11 +340,15 @@ export const SurveyContextProvider = ({
       }
       content = <PlaceholderScreen {...placeholderProps} />;
     }
-    return <FakeScreen onClose={onClose}>{content}</FakeScreen>;
+    return (
+      <ErrorHintScreen onClose={onClose} hideCloseButton={!error}>
+        {content}
+      </ErrorHintScreen>
+    );
   }
   return (
     <SurveyContext.Provider value={contextValue}>
-      <ThemeProvider {...theme}>
+      <ThemeProvider {...transformedTheme}>
         <View style={GlobalStyle.flex1}>
           {children}
           <ActivityIndicatorMask loading={isPending} />

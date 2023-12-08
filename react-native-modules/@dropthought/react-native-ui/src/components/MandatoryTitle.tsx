@@ -15,6 +15,7 @@ import type { Question } from '../data';
 type Props = {
   forgot?: boolean;
   invalidMessage?: string;
+  mandatoryErrorMessage: string;
   question: Question;
   style?: ViewStyle;
 };
@@ -22,6 +23,7 @@ type Props = {
 const MandatoryTitle = ({
   forgot,
   invalidMessage = '',
+  mandatoryErrorMessage,
   question,
   style,
 }: Props) => {
@@ -74,7 +76,7 @@ const MandatoryTitle = ({
       </Text>
       <QuestionWarningMessage
         // forgot message has higher priority than custom invalid message
-        message={forgot ? i18n.t('survey:mandatory') : invalidMessage}
+        message={forgot ? mandatoryErrorMessage : invalidMessage}
       />
     </View>
   );

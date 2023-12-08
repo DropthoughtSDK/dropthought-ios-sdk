@@ -4,45 +4,25 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireWildcard(require("react"));
-
 var _reactNative = require("react-native");
-
 var _ramda = require("ramda");
-
-var _reactNativeUi = require("@dropthought/react-native-ui");
-
+var _src = require("@dropthought/react-native-ui/src");
 var _reactAsync = require("react-async");
-
 var _customProps = require("../contexts/custom-props");
-
 var _StartScreen = _interopRequireDefault(require("../screens/StartScreen"));
-
 var _EndScreen = _interopRequireDefault(require("../screens/EndScreen"));
-
-var _FakeScreen = _interopRequireDefault(require("../screens/FakeScreen"));
-
+var _ErrorHintScreen = _interopRequireDefault(require("../screens/ErrorHintScreen"));
 var _survey = require("../contexts/survey");
-
 var _Feedback = require("../../lib/Feedback");
-
 var _ScreenWrapper = _interopRequireDefault(require("./ScreenWrapper"));
-
 var _Header = _interopRequireDefault(require("./Header"));
-
 var _DateTimerParser = require("../../lib/DateTimerParser");
-
 var _UploadPicture = require("../../lib/UploadPicture");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 const noData = a => (0, _ramda.isNil)(a) || (0, _ramda.isEmpty)(a);
-
 const Stack = ({
   preview
 }) => {
@@ -90,9 +70,9 @@ const Stack = ({
       const {
         timeZone
       } = _reactNative.NativeModules.DtSdk.getConstants();
-
       setSurveyFeedback(feedback);
-      run({ ...feedback,
+      run({
+        ...feedback,
         metadata,
         createdTime: (0, _DateTimerParser.fromJSToAPIDateStr)(Date.now()),
         timeZone
@@ -100,11 +80,9 @@ const Stack = ({
     }
   }, [metadata, preview, run]);
   const [isUploading, setIsUploading] = (0, _react.useState)(false);
-
   const handleUpload = async file => {
     if (file) {
       setIsUploading(true);
-
       try {
         const {
           url
@@ -113,13 +91,12 @@ const Stack = ({
         return url;
       } catch (reason) {
         setIsUploading(false);
-        return undefined;
+        return reason;
       }
     } else {
       return undefined;
     }
   };
-
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.flexOne
   }, /*#__PURE__*/_react.default.createElement(_Header.default, {
@@ -130,7 +107,8 @@ const Stack = ({
     style: styles.flexOne
   }, /*#__PURE__*/_react.default.createElement(_ScreenWrapper.default, {
     visible: true,
-    isOnTop: !endScreenvisible && visiblePageIds.length === 0
+    isOnTop: !endScreenvisible && visiblePageIds.length === 0,
+    rtl: survey.language === 'ar'
   }, /*#__PURE__*/_react.default.createElement(_StartScreen.default, {
     onStart: handleStart,
     onClose: onClose
@@ -138,8 +116,9 @@ const Stack = ({
     return /*#__PURE__*/_react.default.createElement(_ScreenWrapper.default, {
       key: pageId,
       visible: visiblePageIds.includes(pageId),
-      isOnTop: visiblePageIds[visiblePageIds.length - 1] === pageId
-    }, /*#__PURE__*/_react.default.createElement(_reactNativeUi.SurveyScreenLayout, {
+      isOnTop: visiblePageIds[visiblePageIds.length - 1] === pageId,
+      rtl: survey.language === 'ar'
+    }, /*#__PURE__*/_react.default.createElement(_src.SurveyScreenLayout, {
       survey: survey,
       pageIndex: pageIndex,
       onClose: onClose,
@@ -147,46 +126,43 @@ const Stack = ({
       onPrevPage: handlePrevPage,
       onSubmit: handleSubmit,
       onUpload: handleUpload,
-      isUploading: isUploading
+      isUploading: isUploading,
+      preview: preview
     }));
   }), /*#__PURE__*/_react.default.createElement(_ScreenWrapper.default, {
     visible: endScreenvisible,
-    isOnTop: endScreenvisible
+    isOnTop: endScreenvisible,
+    rtl: survey.language === 'ar'
   }, /*#__PURE__*/_react.default.createElement(_EndScreen.default, {
     error: error,
     surveyFeedback: surveyFeedback,
     onClose: onClose
-  }))), /*#__PURE__*/_react.default.createElement(_reactNativeUi.ActivityIndicatorMask, {
+  }))), /*#__PURE__*/_react.default.createElement(_src.ActivityIndicatorMask, {
     loading: loading
   }));
 };
-
 const SurveyStack = ({
   preview
 }) => {
   const {
     survey,
     onClose
-  } = (0, _survey.useSurveyContext)(); // check if survey data is valid
-
+  } = (0, _survey.useSurveyContext)();
+  // check if survey data is valid
   if (noData(survey.pages) || noData(survey.surveyProperty) || noData(survey.surveyStartDate) || noData(survey.surveyEndDate)) {
     // need to render placeholder
-    return /*#__PURE__*/_react.default.createElement(_FakeScreen.default, {
+    return /*#__PURE__*/_react.default.createElement(_ErrorHintScreen.default, {
       onClose: onClose
-    }, /*#__PURE__*/_react.default.createElement(_reactNativeUi.PlaceholderScreen, {
-      imageType: _reactNativeUi.PlaceholderImageTypes.ProgramUnavailable,
-      message: _reactNativeUi.i18n.t('start-survey:placeholder-message')
+    }, /*#__PURE__*/_react.default.createElement(_src.PlaceholderScreen, {
+      imageType: _src.PlaceholderImageTypes.ProgramUnavailable,
+      message: _src.i18n.t('start-survey:placeholder-message')
     }));
   }
-
   return /*#__PURE__*/_react.default.createElement(Stack, {
     preview: preview
   });
 };
-
-var _default = SurveyStack;
-exports.default = _default;
-
+var _default = exports.default = SurveyStack;
 const styles = _reactNative.StyleSheet.create({
   flexOne: {
     flex: 1

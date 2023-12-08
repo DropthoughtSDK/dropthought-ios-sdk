@@ -1,5 +1,5 @@
 export var __esModule: boolean;
-export default _default;
+export default QueueStorage;
 /**
  * @example
  *     const basicTextQueue = new QueueStorage({ key: 'Storage-basic-text'})
@@ -56,4 +56,3 @@ export class QueueStorage<T> {
      */
     dequeue(): T | undefined;
 }
-declare var _default: typeof QueueStorage;

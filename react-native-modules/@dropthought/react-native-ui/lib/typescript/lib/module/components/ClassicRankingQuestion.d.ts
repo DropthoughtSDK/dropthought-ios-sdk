@@ -1,4 +1,5 @@
-declare var _default: React.MemoExoticComponent<({ question, onFeedback, forgot, feedback, themeColor, onDragGrant, onDragEnd }: {
+declare var _default: React.MemoExoticComponent<({ mandatoryErrorMessage, question, onFeedback, forgot, feedback, themeColor, onDragGrant, onDragEnd }: {
+    mandatoryErrorMessage: any;
     question: any;
     onFeedback: any;
     forgot: any;

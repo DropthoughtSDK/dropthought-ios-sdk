@@ -4,9 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 var _exportNames = {
-  SDKEntry: true,
-  APPEARANCE: true,
-  THEME_OPTION: true
+  SDKEntry: true
 };
 Object.defineProperty(exports, "SDKEntry", {
   enumerable: true,
@@ -14,21 +12,7 @@ Object.defineProperty(exports, "SDKEntry", {
     return _SDKEntry.default;
   }
 });
-Object.defineProperty(exports, "APPEARANCE", {
-  enumerable: true,
-  get: function () {
-    return _reactNativeUi.APPEARANCE;
-  }
-});
-Object.defineProperty(exports, "THEME_OPTION", {
-  enumerable: true,
-  get: function () {
-    return _reactNativeUi.THEME_OPTION;
-  }
-});
-
 var _SurveyModal = require("./SurveyModal");
-
 Object.keys(_SurveyModal).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
@@ -40,10 +24,6 @@ Object.keys(_SurveyModal).forEach(function (key) {
     }
   });
 });
-
 var _SDKEntry = _interopRequireDefault(require("./SDKEntry"));
-
-var _reactNativeUi = require("@dropthought/react-native-ui");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 //# sourceMappingURL=index.js.map

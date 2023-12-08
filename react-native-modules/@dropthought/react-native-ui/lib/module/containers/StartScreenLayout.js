@@ -14,6 +14,7 @@ export default function StartScreenLayout({
 
   switch (themeOption) {
     case THEME_OPTION.CLASSIC:
+    case THEME_OPTION.BIJLIRIDE:
       return /*#__PURE__*/React.createElement(ClassicStartScreen, {
         survey: survey,
         onLanguageSelect: onLanguageSelect,

@@ -39,6 +39,7 @@ const getLabelText = ({
 };
 
 const ClassicSliderRatingQuestion = ({
+  mandatoryErrorMessage,
   question,
   onFeedback,
   feedback,
@@ -76,6 +77,12 @@ const ClassicSliderRatingQuestion = ({
   };
 
   const getSliderIndicator = () => {
+    const textStyle = [styles.label, {
+      color: fontColor,
+      minHeight: i18n.language === 'te' ? 25 : 0,
+      marginTop: i18n.language === 'te' ? 8 : 0,
+      marginBottom: i18n.language === 'te' ? 2 : 0
+    }];
     return [...Array(maximumValue).keys()].map((valueData, index) => /*#__PURE__*/React.createElement(TouchableHighlight, {
       underlayColor: themeBackgroundColor,
       key: index.toString(),
@@ -93,9 +100,7 @@ const ClassicSliderRatingQuestion = ({
         darkMode: colorScheme === COLOR_SCHEMES.dark
       })]
     }, /*#__PURE__*/React.createElement(Text, {
-      style: [styles.label, {
-        color: fontColor
-      }, index === value ? styles.selectedLabel : {}]
+      style: [textStyle, index === value ? styles.selectedLabel : {}]
     }, getLabelText({
       isPhone,
       question,
@@ -117,8 +122,9 @@ const ClassicSliderRatingQuestion = ({
   return /*#__PURE__*/React.createElement(View, {
     style: GlobalStyle.questionContainer
   }, /*#__PURE__*/React.createElement(ClassicMandatoryTitle, {
-    forgot: forgot,
     style: styles.marginBottom25,
+    forgot: forgot,
+    mandatoryErrorMessage: mandatoryErrorMessage,
     question: question
   }), isPhone ? /*#__PURE__*/React.createElement(View, {
     style: [styles.vertical]
@@ -148,7 +154,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.sliderShadowColor,
     borderRadius: 2,
     elevation: 5,
-    height: 33,
+    minHeight: 33,
     justifyContent: 'center',
     shadowColor: Colors.black,
     shadowOffset: {
@@ -158,7 +164,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.16,
     shadowRadius: 3,
     width: '100%',
-    marginBottom: 8
+    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   backgroundTablet: {
     backgroundColor: Colors.white,

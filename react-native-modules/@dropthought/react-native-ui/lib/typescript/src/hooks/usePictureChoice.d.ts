@@ -1,5 +1,6 @@
 /// <reference types="react" />
 import type { Question, Feedback } from '../data';
+export declare const multiplePictureChoiceValidator: (question: Question, feedback: Feedback) => boolean;
 export declare const usePictureChoice: (question: Question, onFeedback: (feedback: Feedback) => void, feedback?: Feedback | undefined) => {
     images: {
         uri: string;
@@ -14,7 +15,7 @@ export declare const usePictureChoice: (question: Question, onFeedback: (feedbac
     setOtherPictureAnswerUrl: (url: string) => void;
     otherPictureSelected: boolean;
     setOtherPictureSelected: import("react").Dispatch<import("react").SetStateAction<boolean>>;
-    selectIndex: (string | number | import("../dt-common/types/data").PictureChoiceOtherAnswer | undefined)[];
+    selectIndex: (string | number | import("../dt-common").PictureChoiceOtherAnswer | undefined)[];
     onSelectIndex: (selected: number) => void;
     replaceSelectIndex: (selectedList: number[] | []) => void;
     isMultipleChoice: boolean;

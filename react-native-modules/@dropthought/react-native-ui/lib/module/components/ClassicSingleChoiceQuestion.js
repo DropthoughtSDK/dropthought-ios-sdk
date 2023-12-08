@@ -109,6 +109,7 @@ class ClassicSingleChoiceQuestion extends PureComponent {
       style: GlobalStyle.questionContainer
     }, /*#__PURE__*/React.createElement(ClassicMandatoryTitle, {
       forgot: this.props.forgot,
+      mandatoryErrorMessage: this.props.mandatoryErrorMessage,
       question: this.props.question
     }), /*#__PURE__*/React.createElement(View, {
       style: styles.radioForm

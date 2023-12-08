@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { StatusBar } from 'react-native';
-import { useTheme, COLOR_SCHEMES } from '@dropthought/react-native-ui';
+import { useTheme, COLOR_SCHEMES } from '@dropthought/react-native-ui/src';
 import { useSurvey } from './contexts/survey';
 import SurveyStackNavigator from './navigation/SurveyStack';
+
 /**
  * @param {{preview: boolean}} param0
  */
-
 const SurveyStackContainer = ({
   preview = false
 }) => {
@@ -22,6 +22,5 @@ const SurveyStackContainer = ({
     preview: preview
   }));
 };
-
 export default SurveyStackContainer;
 //# sourceMappingURL=SurveyStackContainer.js.map

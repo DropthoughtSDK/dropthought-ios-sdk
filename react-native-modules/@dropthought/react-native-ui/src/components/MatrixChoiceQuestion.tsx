@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import GlobalStyle, { Colors, addOpacityToColor } from '../styles';
 import MandatoryTitle from './MandatoryTitle';
-import type { Question } from '../data';
+import type { Question, Survey } from '../data';
 import useMatrixChoice from '../hooks/useMatrixChoice';
 import type { MatrixChoiceFeedback } from '../hooks/useMatrixChoice';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
@@ -36,6 +36,7 @@ type RowProps = {
 };
 
 type Props = {
+  survey: Survey;
   question: Question;
   onFeedback: (feedback: MatrixChoiceFeedback) => void;
   feedback: MatrixChoiceFeedback;
@@ -215,6 +216,7 @@ const MatrixRow = ({
 };
 
 const MatrixChoiceQuestion = ({
+  survey,
   question,
   onFeedback,
   feedback,
@@ -234,6 +236,7 @@ const MatrixChoiceQuestion = ({
     <View style={styles.container}>
       <MandatoryTitle
         forgot={false}
+        mandatoryErrorMessage={survey.mandatoryErrorMessage}
         question={question}
         style={styles.title}
         invalidMessage={handleMatrixChoiceErrorHint(forgot)}

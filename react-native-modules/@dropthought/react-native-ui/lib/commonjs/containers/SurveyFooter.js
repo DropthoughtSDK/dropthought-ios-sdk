@@ -40,6 +40,7 @@ const isAndroid = _reactNative.Platform.OS === 'android';
 const SurveyFooter = props => {
   const rtl = _translation.default.dir() === 'rtl';
   const {
+    submitSurvey,
     surveyColor,
     isFirstPage,
     isLastPage,
@@ -73,6 +74,20 @@ const SurveyFooter = props => {
     backgroundColor: surveyColor
   }];
   const [submitDisabled, setSubmitDisabled] = React.useState(false);
+  const leftIcon = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(_reactNative.Image, {
+    style: iconBgStyle,
+    source: require('../assets/icPreviousButtonBg.png')
+  }), /*#__PURE__*/React.createElement(_reactNative.Image, {
+    style: iconStyle,
+    source: require('../assets/icPreviousButton.png')
+  }));
+  const rightIcon = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(_reactNative.Image, {
+    style: iconBgStyle,
+    source: require('../assets/icNextButtonBg.png')
+  }), /*#__PURE__*/React.createElement(_reactNative.Image, {
+    style: iconStyle,
+    source: require('../assets/icNextButton.png')
+  }));
   const submitButton = /*#__PURE__*/React.createElement(_reactNative.TouchableOpacity, {
     style: submitButtonStyle,
     disabled: submitDisabled,
@@ -83,27 +98,15 @@ const SurveyFooter = props => {
     }
   }, /*#__PURE__*/React.createElement(_reactNative.Text, {
     style: styles.submitText
-  }, _translation.default.t('survey:survey-submit')));
+  }, submitSurvey));
   const leftButton = /*#__PURE__*/React.createElement(_reactNative.TouchableOpacity, {
     style: styles.leftButtonContainer,
     onPress: onPrevPage
-  }, /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(_reactNative.Image, {
-    style: iconBgStyle,
-    source: require('../assets/icPreviousButtonBg.png')
-  }), /*#__PURE__*/React.createElement(_reactNative.Image, {
-    style: iconStyle,
-    source: require('../assets/icPreviousButton.png')
-  })));
+  }, rtl ? rightIcon : leftIcon);
   const rightButton = /*#__PURE__*/React.createElement(_reactNative.TouchableOpacity, {
     style: styles.rightButtonContainer,
     onPress: onNextPage
-  }, /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(_reactNative.Image, {
-    style: iconBgStyle,
-    source: require('../assets/icNextButtonBg.png')
-  }), /*#__PURE__*/React.createElement(_reactNative.Image, {
-    style: iconStyle,
-    source: require('../assets/icNextButton.png')
-  }))); // hide this bar when it is android and keyboard is shown
+  }, rtl ? leftIcon : rightIcon); // hide this bar when it is android and keyboard is shown
 
   if (isAndroid && keyboardShown) return null;
   return /*#__PURE__*/React.createElement(_reactNative.View, {

@@ -8,6 +8,7 @@ declare type Question = OriginQuestion & {
     scale: string;
 };
 declare type Props = {
+    mandatoryErrorMessage: string;
     question: Question;
     feedback: Feedback;
     onFeedback: (feedback: Feedback) => void;

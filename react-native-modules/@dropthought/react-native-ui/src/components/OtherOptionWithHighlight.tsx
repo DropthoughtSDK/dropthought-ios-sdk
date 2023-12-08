@@ -49,7 +49,7 @@ type Props = OptionWithHighlightProps & {
 function OtherOptionWithHighlightProps(props: Props) {
   const { id, checked, textValue, onChangeValue, checkedColor, question } =
     props;
-  const { otherText = '', questionBrand = '' } = question;
+  const { otherText = '', otherTextLabel, questionBrand = '' } = question;
   const { fontColor } = useTheme();
 
   const dimensionWidthType = useDimensionWidthType();
@@ -105,8 +105,27 @@ function OtherOptionWithHighlightProps(props: Props) {
     return () => {
       hideSubscription.remove();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const inputStyle = [
+    styles.textInput,
+    {
+      color: fontColor,
+      minHeight: i18n.language === 'te' ? 50 : undefined,
+      ...Platform.select({
+        ios: {
+          paddingVertical: i18n.language === 'te' ? undefined : 13,
+        },
+      }),
+    },
+    rtl && GlobalStyles.textAlignRight,
+    isFocused
+      ? {
+          borderBottomColor: checkedColor,
+        }
+      : {},
+    QuestionContentTextSize[dimensionWidthType],
+  ];
 
   const textInput = (
     <View
@@ -120,27 +139,17 @@ function OtherOptionWithHighlightProps(props: Props) {
           QuestionContentTextSize[dimensionWidthType],
         ]}
       >
-        {i18n.t('survey:other-option')}
+        {otherTextLabel}
       </Text>
       <TextInput
         ref={inputRef}
-        style={[
-          styles.textInput,
-          { color: fontColor },
-          rtl && GlobalStyles.textAlignRight,
-          isFocused
-            ? {
-                borderBottomColor: checkedColor,
-              }
-            : {},
-          QuestionContentTextSize[dimensionWidthType],
-        ]}
+        style={inputStyle}
         placeholder={
           otherText.length > 0
             ? otherText
             : questionBrand.length > 0
             ? questionBrand
-            : i18n.t('survey:other-placeholder')
+            : otherText
         }
         placeholderTextColor={Colors.inputPlaceholder}
         onChangeText={onChangeTextHandler}
@@ -184,11 +193,6 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
     borderBottomWidth: 1,
     borderBottomColor: Colors.inputPlaceholder,
-    ...Platform.select({
-      ios: {
-        paddingVertical: 13,
-      },
-    }),
   },
   textInputContainer: {
     flex: 1,

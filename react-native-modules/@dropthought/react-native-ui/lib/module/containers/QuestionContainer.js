@@ -25,6 +25,7 @@ import MandatoryTitle from '../components/MandatoryTitle';
 import GlobalStyle from '../styles';
 
 const TempComponent = ({
+  mandatoryErrorMessage,
   question,
   forgot
 }) => {
@@ -32,6 +33,7 @@ const TempComponent = ({
     style: GlobalStyle.questionContainer
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     question: question,
+    mandatoryErrorMessage: mandatoryErrorMessage,
     forgot: forgot
   }));
 };

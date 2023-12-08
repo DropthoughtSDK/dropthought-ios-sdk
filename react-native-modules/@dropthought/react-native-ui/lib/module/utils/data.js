@@ -2,6 +2,7 @@ import { isEmpty, isNil } from 'ramda';
 import { matrixRatingValidator } from '../hooks/useMatrixRating';
 import { multipleOpenEndedValidator } from '../hooks/useMultipleOpenEnded';
 import { matrixChoiceValidator } from '../hooks/useMatrixChoice';
+import { multiplePictureChoiceValidator } from '../hooks/usePictureChoice';
 /** @enum {'other'} */
 
 export const QuestionBrandType = {
@@ -98,6 +99,9 @@ export const mandatoryQuestionValidator = (question, feedback = {}) => {
   } else if (question.type === 'matrixChoice') {
     // @ts-ignore
     return matrixChoiceValidator(question, feedback);
+  } else if (question.type === 'pictureChoice') {
+    // @ts-ignore
+    return multiplePictureChoiceValidator(question, feedback);
   }
 
   if (!question.mandatory) {

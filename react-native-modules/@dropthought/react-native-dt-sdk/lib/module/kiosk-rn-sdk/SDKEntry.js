@@ -4,6 +4,7 @@ import { SurveyContextProvider } from './contexts/survey';
 import { CustomPropsContextProvider } from './contexts/custom-props';
 import SurveyStackContainer from './SurveyStackContainer';
 import { FeedbackProvider } from '@dropthought/react-native-ui/src/contexts/feedback';
+
 /** @typedef {"system" | "light" | "dark"} ThemeType */
 
 /**
@@ -29,7 +30,6 @@ import { FeedbackProvider } from '@dropthought/react-native-ui/src/contexts/feed
 /**
  * @param {SDKEntryProps} props
  */
-
 export default function SDKEntry(props) {
   return /*#__PURE__*/React.createElement(SafeAreaProvider, null, /*#__PURE__*/React.createElement(FeedbackProvider, null, /*#__PURE__*/React.createElement(CustomPropsContextProvider, props, /*#__PURE__*/React.createElement(SurveyContextProvider, props, /*#__PURE__*/React.createElement(SurveyStackContainer, {
     preview: props.preview

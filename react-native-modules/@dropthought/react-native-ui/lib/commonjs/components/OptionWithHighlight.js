@@ -71,10 +71,12 @@ function OptionWithHighlight({
   let content;
 
   if (typeof title === 'string') {
+    const textStyle = [styles.text, {
+      color: fontColor,
+      minHeight: _translation.default.language === 'te' ? 30 : undefined
+    }, checked ? styles.checkedText : {}, _styles.QuestionContentTextSize[dimensionWidthType]];
     content = /*#__PURE__*/React.createElement(_reactNative.Text, {
-      style: [styles.text, {
-        color: fontColor
-      }, checked ? styles.checkedText : {}, _styles.QuestionContentTextSize[dimensionWidthType]]
+      style: textStyle
     }, title);
   } else {
     content = title;

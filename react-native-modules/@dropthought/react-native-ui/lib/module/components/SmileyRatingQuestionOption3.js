@@ -27,6 +27,7 @@ const SmileyRatingQuestionOption3 = ({
   const answered = feedback && feedback.answers && !isNil(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
   const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
   const {
+    hexCode,
     backgroundColor: themeBackgroundColor,
     fontColor,
     colorScheme
@@ -161,7 +162,6 @@ const SmileyRatingQuestionOption3 = ({
     ref: lottieRef,
     source: loopLotties[selectedIndex],
     autoPlay: true,
-    style: commonStyles.lottieContent,
     loop: true,
     speed: 0.5
   }));
@@ -189,13 +189,15 @@ const SmileyRatingQuestionOption3 = ({
     style: commonStyles.contentContainer
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     question: question,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     forgot: forgot
   }), score >= 0 ? /*#__PURE__*/React.createElement(React.Fragment, null, lottieContainer, scoreContainer) : null, /*#__PURE__*/React.createElement(View, {
     style: hintContainerStyle
   }, /*#__PURE__*/React.createElement(Text, {
     style: hintTextStyle
   }, i18n.t('option3HintDescription:title'))))), /*#__PURE__*/React.createElement(SurveyFooter, {
-    surveyColor: survey.surveyProperty.hexCode,
+    submitSurvey: survey.submitSurvey,
+    surveyColor: hexCode,
     isFirstPage: pageIndex === 0,
     isLastPage: pageIndex === survey.pageOrder.length - 1,
     onPrevPage: onPrevPage,
@@ -239,10 +241,7 @@ const commonStyles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 42
-  },
-  lottieContent: {
-    width: '60%'
+    flex: 1.2
   },
   scoreContainer: {
     flex: 1,

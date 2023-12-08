@@ -8,6 +8,7 @@ import {
 import { opacity10, opacity60, Colors } from '../styles';
 import type { Survey } from '../data';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
+import i18n from '../translation';
 
 type Props = {
   pageIndex: number;
@@ -17,9 +18,9 @@ type Props = {
 
 const SurveyPageIndicator = (props: Props) => {
   const { survey, pageIndex = 0, rtl } = props;
-  const { colorScheme } = useTheme();
+  const { hexCode, colorScheme } = useTheme();
   const isDarkMode = colorScheme === COLOR_SCHEMES.dark;
-  const themeColor = survey.surveyProperty.hexCode;
+  const themeColor = hexCode;
 
   const dimensionWidthType = useDimensionWidthType();
   const dimensionStyles =
@@ -29,6 +30,12 @@ const SurveyPageIndicator = (props: Props) => {
 
   const currentPage = survey.pages[pageIndex];
 
+  const textStyle = [
+    styles.title,
+    dimensionStyles.title,
+    isDarkMode && styles.darkModeTitle,
+    { paddingBottom: i18n.language === 'te' ? 5 : 0 },
+  ];
   return (
     <View
       style={[
@@ -41,15 +48,7 @@ const SurveyPageIndicator = (props: Props) => {
         rtl ? styles.rtl : {},
       ]}
     >
-      <Text
-        style={[
-          styles.title,
-          dimensionStyles.title,
-          isDarkMode && styles.darkModeTitle,
-        ]}
-      >
-        {currentPage.pageTitle}
-      </Text>
+      <Text style={textStyle}>{currentPage.pageTitle}</Text>
     </View>
   );
 };

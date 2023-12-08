@@ -8,6 +8,7 @@ import MultiLineTextInput from './MultiLineTextInput';
 import MetadataDesc from './MetadataDesc';
 
 const OpenQuestion = ({
+  survey,
   anonymous,
   question,
   // onValueChange, // Keep it for Kiosk usage
@@ -60,6 +61,7 @@ const OpenQuestion = ({
     forgot: hasForgot,
     invalidMessage: // show the error message after the user has done edited
     hasEdited && !isValid ? (_question$responseErr = question.responseErrorText) !== null && _question$responseErr !== void 0 ? _question$responseErr : i18n.t('metadata-invalid-message', question.metaDataType) : '',
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     question: question
   }), /*#__PURE__*/React.createElement(MetadataDesc, {
     question: question,

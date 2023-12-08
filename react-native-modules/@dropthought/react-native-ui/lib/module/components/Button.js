@@ -15,7 +15,7 @@ const Button = ({
   const buttonStyle = [styles.button, {
     backgroundColor: color
   }, disabled ? styles.disabledButton : {}, width ? {
-    width
+    minWidth: width
   } : {}];
   return /*#__PURE__*/React.createElement(View, {
     style: [styles.container, containerStyle]
@@ -36,7 +36,8 @@ const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
     borderRadius: 3,
-    flex: undefined
+    flex: undefined,
+    paddingHorizontal: 10
   },
   title: {
     color: Colors.white,

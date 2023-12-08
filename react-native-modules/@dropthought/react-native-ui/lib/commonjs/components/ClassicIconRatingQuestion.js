@@ -40,6 +40,7 @@ const FakeSmiley = () => {
 };
 
 const ClassicIconRatingQuestion = ({
+  mandatoryErrorMessage,
   question,
   feedback,
   forgot,
@@ -117,6 +118,7 @@ const ClassicIconRatingQuestion = ({
     style: _styles.default.questionContainer
   }, /*#__PURE__*/_react.default.createElement(_ClassicMandatoryTitle.default, {
     forgot: forgot,
+    mandatoryErrorMessage: mandatoryErrorMessage,
     question: question
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: [styles.smileyRowContainer, rtl && _styles.default.flexEnd]

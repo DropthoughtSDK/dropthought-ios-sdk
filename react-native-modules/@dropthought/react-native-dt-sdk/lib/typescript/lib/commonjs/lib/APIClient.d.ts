@@ -1,8 +1,17 @@
 export var __esModule: boolean;
+export var BASE_URL: string;
+export var DEFAULT_TIMEOUT: number;
+export var fetcherInstance: _Fetcher.Fetcher;
 export type APIInitializeParams = import('./Fetcher').InitializeParams;
 export type RequestConfig = import('./Fetcher').RequestConfig;
 export type AuthToken = import('./Fetcher').AuthToken;
-export function apiInitialize(param?: {}): void;
+/** @typedef {import('./Fetcher').InitializeParams} APIInitializeParams */
+/** @typedef {import('./Fetcher').RequestConfig} RequestConfig */
+/** @typedef {import('./Fetcher').AuthToken} AuthToken */
+/**
+ * @param {APIInitializeParams} param
+ */
+export function apiInitialize(param?: APIInitializeParams): void;
 /**
  * @template T
  * @param {string} url
@@ -10,7 +19,4 @@ export function apiInitialize(param?: {}): void;
  * @returns {import('axios').AxiosPromise<T>}
  */
 export function apiRequest<T>(url: string, requestConfig: RequestConfig): import("axios").AxiosPromise<T>;
-export const BASE_URL: string;
-export const DEFAULT_TIMEOUT: 30000;
-export const fetcherInstance: _Fetcher.Fetcher;
 import _Fetcher = require("./Fetcher");

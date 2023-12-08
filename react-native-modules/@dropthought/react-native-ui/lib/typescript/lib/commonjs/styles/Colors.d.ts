@@ -61,6 +61,8 @@ export namespace Colors {
     const nonSelectCircle: string;
     const lightActionText: string;
     const darkActionText: string;
+    const bijlirideBackgroundColor: string;
+    const bijlirideHexCode: string;
 }
 export function addOpacityToColor(hexColor: any, opacity: any): string;
 export function opacity10(color: any): string;

@@ -60,6 +60,7 @@ const getLabelText = ({
 };
 
 const ClassicSliderRatingQuestion = ({
+  mandatoryErrorMessage,
   question,
   onFeedback,
   feedback,
@@ -99,6 +100,12 @@ const ClassicSliderRatingQuestion = ({
   };
 
   const getSliderIndicator = () => {
+    const textStyle = [styles.label, {
+      color: fontColor,
+      minHeight: _translation.default.language === 'te' ? 25 : 0,
+      marginTop: _translation.default.language === 'te' ? 8 : 0,
+      marginBottom: _translation.default.language === 'te' ? 2 : 0
+    }];
     return [...Array(maximumValue).keys()].map((valueData, index) => /*#__PURE__*/_react.default.createElement(_reactNative.TouchableHighlight, {
       underlayColor: themeBackgroundColor,
       key: index.toString(),
@@ -116,9 +123,7 @@ const ClassicSliderRatingQuestion = ({
         darkMode: colorScheme === _theme.COLOR_SCHEMES.dark
       })]
     }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-      style: [styles.label, {
-        color: fontColor
-      }, index === value ? styles.selectedLabel : {}]
+      style: [textStyle, index === value ? styles.selectedLabel : {}]
     }, getLabelText({
       isPhone,
       question,
@@ -140,8 +145,9 @@ const ClassicSliderRatingQuestion = ({
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: _styles.default.questionContainer
   }, /*#__PURE__*/_react.default.createElement(_ClassicMandatoryTitle.default, {
-    forgot: forgot,
     style: styles.marginBottom25,
+    forgot: forgot,
+    mandatoryErrorMessage: mandatoryErrorMessage,
     question: question
   }), isPhone ? /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: [styles.vertical]
@@ -174,7 +180,7 @@ const styles = _reactNative.StyleSheet.create({
     borderColor: _styles.Colors.sliderShadowColor,
     borderRadius: 2,
     elevation: 5,
-    height: 33,
+    minHeight: 33,
     justifyContent: 'center',
     shadowColor: _styles.Colors.black,
     shadowOffset: {
@@ -184,7 +190,9 @@ const styles = _reactNative.StyleSheet.create({
     shadowOpacity: 0.16,
     shadowRadius: 3,
     width: '100%',
-    marginBottom: 8
+    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   backgroundTablet: {
     backgroundColor: _styles.Colors.white,

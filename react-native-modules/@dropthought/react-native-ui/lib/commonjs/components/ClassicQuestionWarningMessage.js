@@ -30,6 +30,9 @@ const ClassicQuestionWarningMessage = ({
   const isDarkMode = colorScheme === _theme.COLOR_SCHEMES.dark;
   const rtl = _translation.default.dir() === 'rtl';
   if (!message) return null;
+  const textStyle = [styles.hint, isDarkMode && styles.darkModeHint, rtl && _styles.default.horizontalFlip, {
+    lineHeight: _translation.default.language === 'te' ? 22 : undefined
+  }];
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: [styles.container, rtl && _styles.default.horizontalFlip]
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
@@ -37,7 +40,7 @@ const ClassicQuestionWarningMessage = ({
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: [styles.bubble, isDarkMode && styles.darkModeBubble]
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-    style: [styles.hint, isDarkMode && styles.darkModeHint, rtl && _styles.default.horizontalFlip]
+    style: textStyle
   }, message)));
 };
 

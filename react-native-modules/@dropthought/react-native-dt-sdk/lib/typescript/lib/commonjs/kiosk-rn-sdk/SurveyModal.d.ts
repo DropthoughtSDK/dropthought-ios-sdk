@@ -1,4 +1,5 @@
 export var __esModule: boolean;
+export var SurveyModalOpenSurveyContext: React.Context<(param?: OpenSurveyProps) => void>;
 export type SDKEntryProps = import('./SDKEntry').SDKEntryProps;
 export type ModalProps = any;
 export type SurveyModalProps = {
@@ -9,8 +10,7 @@ export type OpenSurveyProps = SDKEntryProps & ModalProps;
  * @param {SurveyModalProps & SDKEntryProps & ModalProps } props
  */
 export function SurveyModal(props: SurveyModalProps & SDKEntryProps & ModalProps): any;
-/** @type {React.Context<(param: OpenSurveyProps=) => void>} */
-export const SurveyModalOpenSurveyContext: React.Context<(param?: OpenSurveyProps) => void>;
+declare var React: any;
 export function useOpenSurvey(): any;
 export function SurveyModalContainer({ children, onClose, ...props }: {
     [x: string]: any;
@@ -18,5 +18,4 @@ export function SurveyModalContainer({ children, onClose, ...props }: {
     onClose: any;
 }): any;
 declare const ModalProps: string[];
-declare var React: any;
 export {};

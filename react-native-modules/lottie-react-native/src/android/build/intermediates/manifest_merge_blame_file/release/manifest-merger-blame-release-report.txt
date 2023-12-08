@@ -3,9 +3,9 @@
 3    package="com.airbnb.android.react.lottie" >
 4
 5    <uses-sdk
-6        android:minSdkVersion="22"
+6        android:minSdkVersion="23"
 6-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/lottie-react-native/src/android/src/main/AndroidManifest.xml
-7        android:targetSdkVersion="29" />
+7        android:targetSdkVersion="30" />
 7-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/lottie-react-native/src/android/src/main/AndroidManifest.xml
 8
 9    <uses-permission android:name="android.permission.INTERNET" />

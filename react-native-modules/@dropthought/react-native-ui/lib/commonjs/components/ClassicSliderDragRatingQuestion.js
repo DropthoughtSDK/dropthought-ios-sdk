@@ -87,6 +87,7 @@ const AboveThumbComponent = ({
 };
 
 const ClassicSliderDragRatingQuestion = ({
+  mandatoryErrorMessage,
   question,
   onFeedback,
   feedback,
@@ -251,6 +252,7 @@ const ClassicSliderDragRatingQuestion = ({
     style: _styles.default.questionContainer
   }, /*#__PURE__*/_react.default.createElement(_ClassicMandatoryTitle.default, {
     forgot: forgot,
+    mandatoryErrorMessage: mandatoryErrorMessage,
     question: question,
     style: styles.mandatoryTitle
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {

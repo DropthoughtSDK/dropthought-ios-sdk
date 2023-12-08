@@ -122,6 +122,7 @@ const RowComponent = ({
 };
 
 const MultipleOpenEndedQuestion = ({
+  survey,
   question,
   onFeedback,
   feedback,
@@ -149,6 +150,7 @@ const MultipleOpenEndedQuestion = ({
     style: styles.container
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     forgot: false,
+    mandatoryErrorMessage: survey.mandatoryErrorMessage,
     question: question,
     style: styles.title,
     invalidMessage: handleErrorHint(forgot)

@@ -7,7 +7,7 @@ import {
   Text,
   Dimensions,
 } from 'react-native';
-import GlobalStyle, { Colors } from '../styles';
+import GlobalStyle, { Colors, addOpacityToHex } from '../styles';
 import ActivityIndicatorMask from './ActivityIndicatorMask';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import i18n from '../translation';
@@ -67,6 +67,19 @@ const PictureChoiceItem = ({
   themeColor,
 }: Props) => {
   const { fontColor, colorScheme } = useTheme();
+  const rtl = i18n.dir() === 'rtl';
+
+  const itemGapStyle = useMemo(() => {
+    if (rtl) {
+      return {
+        marginLeft: index % 2 === 0 ? columnGap : 0,
+      };
+    } else {
+      return {
+        marginRight: index % 2 === 0 ? columnGap : 0,
+      };
+    }
+  }, [columnGap, index, rtl]);
 
   const { width } = Dimensions.get('window');
   const questionMargin = 30;
@@ -76,24 +89,37 @@ const PictureChoiceItem = ({
   const [imageLoadError, setImageLoadError] = useState(false);
 
   const photo = useMemo(() => {
-    const photoStyle = [
-      styles.picture,
-      { width: itemWidth, marginRight: index % 2 === 0 ? columnGap : 0 },
+    const iconStyle = { tintColor: themeColor };
+    const photoStyle = [styles.picture, { width: itemWidth }];
+    const reloadTextStyle = [
+      styles.reloadText,
+      {
+        color: fontColor,
+      },
     ];
     if (imageLoadError) {
       const reloadStyle = [
         styles.pictureReloadContainer,
-        { width: itemWidth, marginRight: index % 2 === 0 ? columnGap : 0 },
+        {
+          width: itemWidth,
+          backgroundColor: addOpacityToHex(themeColor, 0.1),
+          borderColor: themeColor,
+          ...itemGapStyle,
+        },
       ];
+      const reloadPlacholderStyle = [styles.reloadPlaceholderImage, iconStyle];
       return (
         <View style={reloadStyle}>
           <Image
-            style={styles.reloadPlaceholderImage}
+            style={reloadPlacholderStyle}
             source={require('../assets/ic_image_placeholder.png')}
           />
           <View style={GlobalStyle.row}>
-            <Image source={require('../assets/ic_reload.png')} />
-            <Text style={styles.reloadText}>
+            <Image
+              style={iconStyle}
+              source={require('../assets/ic_reload.png')}
+            />
+            <Text style={reloadTextStyle}>
               {`${i18n.t('picture-choice:reload')}`}
             </Text>
           </View>
@@ -113,7 +139,7 @@ const PictureChoiceItem = ({
         />
       );
     }
-  }, [columnGap, imageLoadError, index, itemWidth, uri]);
+  }, [fontColor, imageLoadError, itemGapStyle, itemWidth, themeColor, uri]);
 
   const border = useMemo(() => {
     const containerStyle = [
@@ -122,20 +148,22 @@ const PictureChoiceItem = ({
         borderWidth: selected ? 2 : 1,
         borderColor: selected ? themeColor : Colors.rankingBorder,
         width: itemWidth,
-        marginRight: index % 2 === 0 ? columnGap : 0,
       },
     ];
+    const maskStyle = {
+      backgroundColor: addOpacityToHex(themeColor, 0.1),
+    };
     return (
       <View style={containerStyle}>
-        <ActivityIndicatorMask loading={loadingImage} />
+        <ActivityIndicatorMask loading={loadingImage} style={maskStyle} />
       </View>
     );
-  }, [columnGap, index, itemWidth, loadingImage, selected, themeColor]);
+  }, [itemWidth, loadingImage, selected, themeColor]);
 
   const selection = useMemo(() => {
     const containerStyle = [
       styles.optionContainer,
-      { marginRight: index % 2 === 0 ? columnGap : 0 },
+      rtl && GlobalStyle.flexRowReverse,
     ];
 
     const textStyle =
@@ -154,10 +182,9 @@ const PictureChoiceItem = ({
     );
   }, [
     colorScheme,
-    columnGap,
     fontColor,
-    index,
     isMultipleChoice,
+    rtl,
     selected,
     themeColor,
     title,
@@ -165,6 +192,7 @@ const PictureChoiceItem = ({
 
   return (
     <TouchableOpacity
+      style={itemGapStyle}
       onPress={() => {
         if (imageLoadError) {
           setImageLoadError(false);
@@ -194,9 +222,9 @@ const styles = StyleSheet.create({
     minHeight: 20,
   },
   optionText: {
-    marginLeft: 5,
     flex: 1,
     fontSize: 16,
+    paddingHorizontal: 5,
   },
   picture: {
     height: 138,
@@ -240,5 +268,6 @@ const styles = StyleSheet.create({
     height: 138,
     borderRadius: 12,
     borderColor: 'red',
+    overflow: 'hidden',
   },
 });

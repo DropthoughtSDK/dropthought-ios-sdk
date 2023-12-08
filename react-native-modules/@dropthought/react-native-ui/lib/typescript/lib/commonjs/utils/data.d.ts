@@ -104,14 +104,13 @@ export const option3LoopFaceTable: Map<string, {
                             c: boolean;
                         }[];
                     } | {
-                        /** @enum {'other'} */
                         t: number;
                         s: {
                             i: number[][];
-                            o: number[][]; /** @enum {'Date'|'Name'|'Email'|'Phone'|'Number'|'String'} */
+                            o: number[][];
                             v: number[][];
                             c: boolean;
-                        }[];
+                        }[]; /** @enum {'Date'|'Name'|'Email'|'Phone'|'Number'|'String'} */
                         i?: undefined;
                         o?: undefined;
                     })[];
@@ -2672,6 +2671,7 @@ export const option4LoopFaceTable: Map<string, {
                 ty: string;
                 p: {
                     a: number;
+                    /** @enum {'Date'|'Name'|'Email'|'Phone'|'Number'|'String'} */
                     k: ({
                         i: {
                             x: number;
@@ -3047,10 +3047,7 @@ export const option4LoopFaceTable: Map<string, {
                     k: ({
                         i: {
                             x: number[];
-                            y: number[]; /**
-                             * validate if question's feedback is valid:
-                             * metadata type value check, mandatory check
-                             */
+                            y: number[];
                         };
                         o: {
                             x: number[];
@@ -3073,6 +3070,10 @@ export const option4LoopFaceTable: Map<string, {
                 };
                 o: {
                     a: number;
+                    /**
+                     * validate if question's feedback is valid:
+                     * metadata type value check, mandatory check
+                     */
                     k: ({
                         i: {
                             x: number[];
@@ -3739,6 +3740,10 @@ export const option4TransformTable: Map<string, {
                         };
                         t: number;
                         s: number[];
+                        /**
+                         * given a Question type, return ['option label1', 'option label2', 'option label3', true]
+                         * if the type is boolean at the last, it means it is an "other" option
+                         */
                         to: number[];
                         ti: number[];
                     } | {

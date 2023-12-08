@@ -121,6 +121,7 @@ const RowComponent = ({
 };
 
 const ClassicMultipleOpenEndedQuestion = ({
+  mandatoryErrorMessage,
   question,
   onFeedback,
   feedback,
@@ -147,6 +148,7 @@ const ClassicMultipleOpenEndedQuestion = ({
     style: styles.questionContainer
   }, /*#__PURE__*/React.createElement(ClassicMandatoryTitle, {
     forgot: false,
+    mandatoryErrorMessage: mandatoryErrorMessage,
     question: question,
     style: styles.title,
     invalidMessage: handleErrorHint(forgot)
