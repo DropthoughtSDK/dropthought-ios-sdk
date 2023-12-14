@@ -126,7 +126,10 @@ const SmileyRatingQuestionOption6 = ({
       ? Colors.white
       : customFontColor;
   const scoreSelectedStyle = [styles.scoreSelected, { color: textColor }];
-  const descStyle = [styles.desc, { color: textColor }];
+  const descStyle = [
+    styles.desc,
+    { color: textColor, lineHeight: i18n.language === 'te' ? 42 : undefined },
+  ];
   const scoreTotalStyle = [styles.scoreTotal, { color: textColor }];
   const hintTextStyle = [commonStyles.hintText, { color: textColor }];
   const backgroundImage = require('../assets/bg-option6.png');

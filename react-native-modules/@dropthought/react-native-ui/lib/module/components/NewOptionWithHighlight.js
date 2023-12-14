@@ -2,6 +2,7 @@ import * as React from 'react';
 import { StyleSheet, Image, View, Text, TouchableOpacity } from 'react-native';
 import { Colors, addOpacityToColor } from '../styles';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
+import i18n from '../translation';
 
 const noop = _id => undefined;
 
@@ -80,7 +81,8 @@ function NewOptionWithHighlight({
   const textStyle = checked ? {
     color: colorScheme === COLOR_SCHEMES.dark ? fontColor : themeColor
   } : {
-    color: fontColor
+    color: fontColor,
+    lineHeight: i18n.language === 'te' ? 22 : undefined
   };
   let content;
 
@@ -114,6 +116,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 13
   },
   checkboxContent: {

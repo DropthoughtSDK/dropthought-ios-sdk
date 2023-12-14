@@ -290,18 +290,12 @@ export const SurveyContextProvider = ({
 
   const { survey, theme = themeDataFromSDKEntry } = data ?? {};
 
-  let transformedThemeOption = theme.themeOption;
-  let transformedHexCode = survey?.surveyProperty.hexCode ?? '';
-  if (
-    survey?.surveyProperty.themeName === 'Bijiliride Theme' ||
-    survey?.surveyProperty.themeName === 'Bijliride Theme'
-  ) {
-    transformedThemeOption = THEME_OPTION.BIJLIRIDE;
-  }
+  const transformedThemeOption = theme.themeOption;
+  const hexCode = survey?.surveyProperty.hexCode ?? '';
   const transformedTheme = {
     ...theme,
     themeOption: transformedThemeOption,
-    hexCode: transformedHexCode,
+    hexCode,
   };
 
   /** @type {SurveyContextValue} */

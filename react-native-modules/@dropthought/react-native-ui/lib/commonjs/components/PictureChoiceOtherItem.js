@@ -75,7 +75,6 @@ const PictureChoiceOtherItem = ({
   const validTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 
   const uploadPicture = image => {
-    setActionSheetVisible(false);
     const {
       path: uri,
       mime: type,
@@ -107,45 +106,62 @@ const PictureChoiceOtherItem = ({
   async function hasAndroidPermission() {
     const permission = _reactNative.PermissionsAndroid.PERMISSIONS.CAMERA;
     const hasPermission = await _reactNative.PermissionsAndroid.check(permission);
-    console.log('[hasAndroidPermission] hasPermission: ', hasPermission);
 
     if (hasPermission) {
       return true;
     }
 
-    console.log('[hasAndroidPermission] before request status: ');
     const status = await _reactNative.PermissionsAndroid.request(permission);
-    console.log('[hasAndroidPermission] status: ', status);
     return status === _reactNative.PermissionsAndroid.RESULTS.GRANTED;
   }
 
   const openPhotoLibrary = () => {
-    _reactNativeImageCropPicker.default.openPicker({
-      mediaType: 'photo',
-      includeBase64: true
-    }).then(image => {
-      console.log(image);
-      uploadPicture(image);
-    });
+    if (_reactNative.Platform.OS === 'android') {
+      _reactNativeImageCropPicker.default.openPicker({
+        mediaType: 'photo',
+        includeBase64: true
+      }).then(image => {
+        setActionSheetVisible(false);
+        uploadPicture(image);
+      }).catch(() => {
+        setActionSheetVisible(false);
+        onError(`${_translation.default.t('picture-choice:invalidTypeHint')}`);
+      });
+    } else {
+      _reactNativeImageCropPicker.default.openPicker({
+        mediaType: 'photo',
+        multiple: true,
+        maxFiles: 1,
+        includeBase64: true
+      }).then(images => {
+        setActionSheetVisible(false);
+
+        if (images.length > 0) {
+          uploadPicture(images[0]);
+        }
+      }).catch(e => {
+        setActionSheetVisible(false);
+
+        if (e.code !== 'E_PICKER_CANCELLED') {
+          onError(`${_translation.default.t('picture-choice:invalidTypeHint')}`);
+        }
+      });
+    }
   };
 
   const openCamera = () => {
-    console.log('[openCamera] enter');
-
     if (_reactNative.Platform.OS === 'android') {
-      console.log('[openCamera] before hasAndroidPermission');
       hasAndroidPermission().then(result => {
-        console.log('[openCamera] hasAndroidPermission result: ', result);
-
         if (result) {
-          console.log('[openCamera] open');
-
           _reactNativeImageCropPicker.default.openCamera({
             mediaType: 'photo',
             includeBase64: true
           }).then(image => {
-            console.log('[openCamera] open image: ', image);
+            setActionSheetVisible(false);
             uploadPicture(image);
+          }).catch(() => {
+            setActionSheetVisible(false);
+            onError(`${_translation.default.t('picture-choice:invalidTypeHint')}`);
           });
         }
       });
@@ -154,8 +170,11 @@ const PictureChoiceOtherItem = ({
         mediaType: 'photo',
         includeBase64: true
       }).then(image => {
-        console.log(image);
+        setActionSheetVisible(false);
         uploadPicture(image);
+      }).catch(() => {
+        setActionSheetVisible(false);
+        onError(`${_translation.default.t('picture-choice:invalidTypeHint')}`);
       });
     }
   };
@@ -217,6 +236,9 @@ const PictureChoiceOtherItem = ({
     style: isDarkMode ? styles.darkActionText : styles.actionCancelText
   }, `${_translation.default.t('picture-choice:cancel')}`)))));
 
+  const maskStyle = {
+    backgroundColor: (0, _styles.addOpacityToHex)(themeColor, 0.1)
+  };
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, null, /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
     style: styles.buttonContainer,
     disabled: preview,
@@ -252,7 +274,8 @@ const PictureChoiceOtherItem = ({
       setLoadingImage(false);
     }
   }), /*#__PURE__*/_react.default.createElement(_ActivityIndicatorMask.default, {
-    loading: loadingImage
+    loading: loadingImage,
+    style: maskStyle
   })) : /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: nonSelectedOtherPictureContainerStyle
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {

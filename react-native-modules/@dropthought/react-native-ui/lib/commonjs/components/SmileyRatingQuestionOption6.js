@@ -95,7 +95,8 @@ const SmileyRatingQuestionOption6 = ({
     color: textColor
   }];
   const descStyle = [styles.desc, {
-    color: textColor
+    color: textColor,
+    lineHeight: _translation.default.language === 'te' ? 42 : undefined
   }];
   const scoreTotalStyle = [styles.scoreTotal, {
     color: textColor

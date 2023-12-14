@@ -83,7 +83,7 @@ const PictureChoiceItem = ({
 
   const { width } = Dimensions.get('window');
   const questionMargin = 30;
-  const itemWidth = (width - 2 * questionMargin - columnGap) / 2;
+  const itemWidth = Math.floor((width - 2 * questionMargin - columnGap) / 2);
 
   const [loadingImage, setLoadingImage] = useState(true);
   const [imageLoadError, setImageLoadError] = useState(false);
@@ -104,7 +104,6 @@ const PictureChoiceItem = ({
           width: itemWidth,
           backgroundColor: addOpacityToHex(themeColor, 0.1),
           borderColor: themeColor,
-          ...itemGapStyle,
         },
       ];
       const reloadPlacholderStyle = [styles.reloadPlaceholderImage, iconStyle];
@@ -139,7 +138,7 @@ const PictureChoiceItem = ({
         />
       );
     }
-  }, [fontColor, imageLoadError, itemGapStyle, itemWidth, themeColor, uri]);
+  }, [fontColor, imageLoadError, itemWidth, themeColor, uri]);
 
   const border = useMemo(() => {
     const containerStyle = [

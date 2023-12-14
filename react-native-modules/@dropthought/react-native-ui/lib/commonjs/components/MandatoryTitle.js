@@ -63,13 +63,15 @@ const MandatoryTitle = ({
     color = _styles.Colors.white;
   }
 
+  const textStyle = [styles.questionTitle, questionTitleSize[dimensionWidthType], {
+    color,
+    lineHeight: _translation.default.language === 'te' ? 42 : undefined
+  }];
   return /*#__PURE__*/React.createElement(_reactNative.View, {
     ref: ref,
     style: [styles.horizontal, style, rtl && _styles.default.flexRowReverse]
   }, /*#__PURE__*/React.createElement(_reactNative.Text, {
-    style: [styles.questionTitle, questionTitleSize[dimensionWidthType], {
-      color
-    }]
+    style: textStyle
   }, questionTitle, //optional was been used on matrix question
   (mandatory || optional) && /*#__PURE__*/React.createElement(_reactNative.Text, {
     style: styles.hint

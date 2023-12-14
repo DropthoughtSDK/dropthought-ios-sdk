@@ -6,6 +6,7 @@ import { useTheme } from '../contexts/theme';
 // @ts-ignore
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getLanguageBy } from '../utils/LanguageUtils';
+import i18n from '../translation';
 
 const defaultIconSource = require('../assets/rating.png');
 
@@ -80,7 +81,8 @@ const StartScreen = ({
   };
 
   const buttonStyle = [styles.button, {
-    backgroundColor: hexCode
+    backgroundColor: hexCode,
+    borderRadius: i18n.language === 'te' ? 25 : 20
   }];
   const containerStyle = [styles.headerContainer, {
     paddingTop: insets.top
@@ -93,6 +95,9 @@ const StartScreen = ({
   const headerIconStyle = {
     tintColor: hexCode
   };
+  const startTextStyle = [styles.buttonTitle, {
+    lineHeight: i18n.language === 'te' ? 26 : undefined
+  }];
   return /*#__PURE__*/React.createElement(ScrollView, {
     contentContainerStyle: [styles.container, {
       backgroundColor
@@ -124,7 +129,7 @@ const StartScreen = ({
     style: buttonStyle,
     onPress: onStart
   }, /*#__PURE__*/React.createElement(Text, {
-    style: styles.buttonTitle
+    style: startTextStyle
   }, takeSurvey))), languagesView());
 };
 

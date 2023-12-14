@@ -18,6 +18,7 @@ import type { Survey as OriginSurvey } from '../data';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getLanguageBy } from '../utils/LanguageUtils';
+import i18n from '../translation';
 
 type Survey = OriginSurvey & {
   languages: string[];
@@ -97,7 +98,13 @@ const StartScreen = ({ onLanguageSelect, onClose, onStart, survey }: Props) => {
     ));
     return <View style={styles.languages}>{languageView}</View>;
   };
-  const buttonStyle = [styles.button, { backgroundColor: hexCode }];
+  const buttonStyle = [
+    styles.button,
+    {
+      backgroundColor: hexCode,
+      borderRadius: i18n.language === 'te' ? 25 : 20,
+    },
+  ];
 
   const containerStyle = [
     styles.headerContainer,
@@ -108,6 +115,12 @@ const StartScreen = ({ onLanguageSelect, onClose, onStart, survey }: Props) => {
   ];
   const titleStyle = [styles.headerTitle, { color: fontColor }];
   const headerIconStyle = { tintColor: hexCode };
+  const startTextStyle = [
+    styles.buttonTitle,
+    {
+      lineHeight: i18n.language === 'te' ? 26 : undefined,
+    },
+  ];
   return (
     <ScrollView contentContainerStyle={[styles.container, { backgroundColor }]}>
       <View style={containerStyle}>
@@ -132,7 +145,7 @@ const StartScreen = ({ onLanguageSelect, onClose, onStart, survey }: Props) => {
           </Text>
         )}
         <TouchableOpacity style={buttonStyle} onPress={onStart}>
-          <Text style={styles.buttonTitle}>{takeSurvey}</Text>
+          <Text style={startTextStyle}>{takeSurvey}</Text>
         </TouchableOpacity>
       </View>
       {languagesView()}

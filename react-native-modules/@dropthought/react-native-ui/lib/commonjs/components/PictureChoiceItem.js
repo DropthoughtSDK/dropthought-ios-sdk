@@ -80,7 +80,7 @@ const PictureChoiceItem = ({
   } = _reactNative.Dimensions.get('window');
 
   const questionMargin = 30;
-  const itemWidth = (width - 2 * questionMargin - columnGap) / 2;
+  const itemWidth = Math.floor((width - 2 * questionMargin - columnGap) / 2);
   const [loadingImage, setLoadingImage] = (0, _react.useState)(true);
   const [imageLoadError, setImageLoadError] = (0, _react.useState)(false);
   const photo = (0, _react.useMemo)(() => {
@@ -98,8 +98,7 @@ const PictureChoiceItem = ({
       const reloadStyle = [styles.pictureReloadContainer, {
         width: itemWidth,
         backgroundColor: (0, _styles.addOpacityToHex)(themeColor, 0.1),
-        borderColor: themeColor,
-        ...itemGapStyle
+        borderColor: themeColor
       }];
       const reloadPlacholderStyle = [styles.reloadPlaceholderImage, iconStyle];
       return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
@@ -129,7 +128,7 @@ const PictureChoiceItem = ({
         }
       });
     }
-  }, [fontColor, imageLoadError, itemGapStyle, itemWidth, themeColor, uri]);
+  }, [fontColor, imageLoadError, itemWidth, themeColor, uri]);
   const border = (0, _react.useMemo)(() => {
     const containerStyle = [styles.borderContainer, {
       borderWidth: selected ? 2 : 1,

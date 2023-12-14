@@ -269,15 +269,12 @@ export const SurveyContextProvider = ({
     survey,
     theme = themeDataFromSDKEntry
   } = data ?? {};
-  let transformedThemeOption = theme.themeOption;
-  let transformedHexCode = (survey === null || survey === void 0 ? void 0 : survey.surveyProperty.hexCode) ?? '';
-  if ((survey === null || survey === void 0 ? void 0 : survey.surveyProperty.themeName) === 'Bijiliride Theme' || (survey === null || survey === void 0 ? void 0 : survey.surveyProperty.themeName) === 'Bijliride Theme') {
-    transformedThemeOption = THEME_OPTION.BIJLIRIDE;
-  }
+  const transformedThemeOption = theme.themeOption;
+  const hexCode = (survey === null || survey === void 0 ? void 0 : survey.surveyProperty.hexCode) ?? '';
   const transformedTheme = {
     ...theme,
     themeOption: transformedThemeOption,
-    hexCode: transformedHexCode
+    hexCode
   };
 
   /** @type {SurveyContextValue} */

@@ -69,7 +69,8 @@ const SmileyRatingQuestionOption2 = ({
     color: fontColor
   }];
   const itemTextStyle = [commonStyles.itemTextStyle, {
-    color: fontColor
+    color: fontColor,
+    lineHeight: i18n.language === 'te' ? 40 : undefined
   }];
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SurveyHeader, {
     survey: survey,
@@ -101,7 +102,7 @@ const SmileyRatingQuestionOption2 = ({
     itemTextStyle: itemTextStyle,
     selectedIndicatorStyle: commonStyles.selectedIndicatorStyle,
     key: 'WheelPicker-descriptions',
-    itemHeight: Platform.OS === 'android' ? 60 : undefined
+    itemHeight: Platform.OS === 'android' ? 60 : i18n.language === 'te' ? 50 : undefined
   }))) : /*#__PURE__*/React.createElement(View, {
     style: commonStyles.infoContainer
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
@@ -123,7 +124,7 @@ const SmileyRatingQuestionOption2 = ({
     itemTextStyle: itemTextStyle,
     selectedIndicatorStyle: commonStyles.selectedIndicatorStyle,
     key: 'WheelPicker-dummyDescroptions',
-    itemHeight: Platform.OS === 'android' ? 60 : undefined
+    itemHeight: Platform.OS === 'android' ? 60 : i18n.language === 'te' ? 50 : undefined
   })))), /*#__PURE__*/React.createElement(SurveyFooter, {
     submitSurvey: survey.submitSurvey,
     surveyColor: hexCode,

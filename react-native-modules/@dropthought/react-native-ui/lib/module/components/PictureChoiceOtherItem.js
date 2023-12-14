@@ -52,7 +52,6 @@ const PictureChoiceOtherItem = ({
   const validTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 
   const uploadPicture = image => {
-    setActionSheetVisible(false);
     const {
       path: uri,
       mime: type,
@@ -84,44 +83,62 @@ const PictureChoiceOtherItem = ({
   async function hasAndroidPermission() {
     const permission = PermissionsAndroid.PERMISSIONS.CAMERA;
     const hasPermission = await PermissionsAndroid.check(permission);
-    console.log('[hasAndroidPermission] hasPermission: ', hasPermission);
 
     if (hasPermission) {
       return true;
     }
 
-    console.log('[hasAndroidPermission] before request status: ');
     const status = await PermissionsAndroid.request(permission);
-    console.log('[hasAndroidPermission] status: ', status);
     return status === PermissionsAndroid.RESULTS.GRANTED;
   }
 
   const openPhotoLibrary = () => {
-    ImagePicker.openPicker({
-      mediaType: 'photo',
-      includeBase64: true
-    }).then(image => {
-      console.log(image);
-      uploadPicture(image);
-    });
+    if (Platform.OS === 'android') {
+      ImagePicker.openPicker({
+        mediaType: 'photo',
+        includeBase64: true
+      }).then(image => {
+        setActionSheetVisible(false);
+        uploadPicture(image);
+      }).catch(() => {
+        setActionSheetVisible(false);
+        onError(`${i18n.t('picture-choice:invalidTypeHint')}`);
+      });
+    } else {
+      ImagePicker.openPicker({
+        mediaType: 'photo',
+        multiple: true,
+        maxFiles: 1,
+        includeBase64: true
+      }).then(images => {
+        setActionSheetVisible(false);
+
+        if (images.length > 0) {
+          uploadPicture(images[0]);
+        }
+      }).catch(e => {
+        setActionSheetVisible(false);
+
+        if (e.code !== 'E_PICKER_CANCELLED') {
+          onError(`${i18n.t('picture-choice:invalidTypeHint')}`);
+        }
+      });
+    }
   };
 
   const openCamera = () => {
-    console.log('[openCamera] enter');
-
     if (Platform.OS === 'android') {
-      console.log('[openCamera] before hasAndroidPermission');
       hasAndroidPermission().then(result => {
-        console.log('[openCamera] hasAndroidPermission result: ', result);
-
         if (result) {
-          console.log('[openCamera] open');
           ImagePicker.openCamera({
             mediaType: 'photo',
             includeBase64: true
           }).then(image => {
-            console.log('[openCamera] open image: ', image);
+            setActionSheetVisible(false);
             uploadPicture(image);
+          }).catch(() => {
+            setActionSheetVisible(false);
+            onError(`${i18n.t('picture-choice:invalidTypeHint')}`);
           });
         }
       });
@@ -130,8 +147,11 @@ const PictureChoiceOtherItem = ({
         mediaType: 'photo',
         includeBase64: true
       }).then(image => {
-        console.log(image);
+        setActionSheetVisible(false);
         uploadPicture(image);
+      }).catch(() => {
+        setActionSheetVisible(false);
+        onError(`${i18n.t('picture-choice:invalidTypeHint')}`);
       });
     }
   };
@@ -191,6 +211,9 @@ const PictureChoiceOtherItem = ({
   }, /*#__PURE__*/React.createElement(Text, {
     style: isDarkMode ? styles.darkActionText : styles.actionCancelText
   }, `${i18n.t('picture-choice:cancel')}`)))));
+  const maskStyle = {
+    backgroundColor: addOpacityToHex(themeColor, 0.1)
+  };
   return /*#__PURE__*/React.createElement(View, null, /*#__PURE__*/React.createElement(TouchableOpacity, {
     style: styles.buttonContainer,
     disabled: preview,
@@ -226,7 +249,8 @@ const PictureChoiceOtherItem = ({
       setLoadingImage(false);
     }
   }), /*#__PURE__*/React.createElement(ActivityIndicatorMask, {
-    loading: loadingImage
+    loading: loadingImage,
+    style: maskStyle
   })) : /*#__PURE__*/React.createElement(View, {
     style: nonSelectedOtherPictureContainerStyle
   }, /*#__PURE__*/React.createElement(View, {

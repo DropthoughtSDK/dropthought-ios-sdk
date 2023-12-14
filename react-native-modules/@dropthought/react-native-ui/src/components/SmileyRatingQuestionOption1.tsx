@@ -185,7 +185,10 @@ const SmileyRatingQuestionOption1 = ({
   const questionContainerStyle = [commonStyles.container, { backgroundColor }];
 
   const hintTextStyle = [styles.hintText, { color: fontColor }];
-  const descStyle = [styles.desc, { color: fontColor }];
+  const descStyle = [
+    styles.desc,
+    { color: fontColor, lineHeight: i18n.language === 'te' ? 42 : undefined },
+  ];
 
   return (
     <>

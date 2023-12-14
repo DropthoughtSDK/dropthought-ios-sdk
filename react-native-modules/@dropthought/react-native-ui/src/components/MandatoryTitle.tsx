@@ -56,18 +56,18 @@ const MandatoryTitle = ({
     color = Colors.white;
   }
 
+  const textStyle = [
+    styles.questionTitle,
+    questionTitleSize[dimensionWidthType],
+    { color, lineHeight: i18n.language === 'te' ? 42 : undefined },
+  ];
+
   return (
     <View
       ref={ref}
       style={[styles.horizontal, style, rtl && GlobalStyle.flexRowReverse]}
     >
-      <Text
-        style={[
-          styles.questionTitle,
-          questionTitleSize[dimensionWidthType],
-          { color },
-        ]}
-      >
+      <Text style={textStyle}>
         {questionTitle}
         {
           //optional was been used on matrix question

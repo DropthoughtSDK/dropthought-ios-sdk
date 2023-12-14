@@ -30,7 +30,8 @@ const QuestionWarningMessage = ({
   const isDarkMode = colorScheme === _theme.COLOR_SCHEMES.dark;
   const rtl = _translation.default.dir() === 'rtl';
   const hintStyle = [styles.hint, {
-    color: _styles.Colors.warningRed
+    color: _styles.Colors.warningRed,
+    lineHeight: _translation.default.language === 'te' ? 21 : undefined
   }, rtl && _styles.default.horizontalFlip];
   if (!message) return null;
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, {

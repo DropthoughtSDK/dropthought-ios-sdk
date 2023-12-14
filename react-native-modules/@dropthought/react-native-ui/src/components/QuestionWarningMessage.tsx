@@ -15,7 +15,10 @@ const QuestionWarningMessage = ({ message }: Props) => {
   const rtl = i18n.dir() === 'rtl';
   const hintStyle = [
     styles.hint,
-    { color: Colors.warningRed },
+    {
+      color: Colors.warningRed,
+      lineHeight: i18n.language === 'te' ? 21 : undefined,
+    },
     rtl && GlobalStyle.horizontalFlip,
   ];
   if (!message) return null;

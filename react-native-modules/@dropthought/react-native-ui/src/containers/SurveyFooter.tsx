@@ -16,8 +16,6 @@ import {
   View,
   Platform,
 } from 'react-native';
-//@ts-ignore
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useKeyboard } from '@react-native-community/hooks';
 import { Colors, GlobalStyle } from '../styles';
 import i18n from '../translation';
@@ -49,20 +47,13 @@ const SurveyFooter = (props: Props) => {
     backgroundColor,
   } = props;
 
-  const insets = useSafeAreaInsets();
   const { keyboardShown } = useKeyboard();
-
-  const insetsBottom =
-    // if it is android, and the insets bottom is not normal,
-    // maybe it is because the keyboard is showed, don't use this insets
-    isAndroid && insets.bottom >= 100 ? 0 : insets.bottom;
 
   const containerStyle = [
     styles.container,
     rtl && GlobalStyle.flexRowReverse,
     {
       backgroundColor,
-      paddingBottom: insetsBottom || 15,
     },
   ];
   const { colorScheme } = useTheme();
@@ -74,11 +65,6 @@ const SurveyFooter = (props: Props) => {
   const iconBgStyle = [
     styles.iconBg,
     { tintColor: surveyColor, opacity: isDarkMode ? 1 : 0.1 },
-  ];
-
-  const submitButtonStyle = [
-    styles.centerButtonContainer,
-    { backgroundColor: surveyColor },
   ];
 
   const [submitDisabled, setSubmitDisabled] = React.useState(false);
@@ -106,18 +92,33 @@ const SurveyFooter = (props: Props) => {
     </>
   );
 
+  const submitButtonStyle = [
+    styles.centerButtonContainer,
+    {
+      backgroundColor: surveyColor,
+      borderRadius: i18n.language === 'te' ? 25 : 20,
+    },
+  ];
+
+  const textStyle = [
+    styles.submitText,
+    { lineHeight: i18n.language === 'te' ? 26 : undefined },
+  ];
+
   const submitButton = (
-    <TouchableOpacity
-      style={submitButtonStyle}
-      disabled={submitDisabled}
-      onPress={() => {
-        setSubmitDisabled(true);
-        setTimeout(() => setSubmitDisabled(false), 1000);
-        onNextPage();
-      }}
-    >
-      <Text style={styles.submitText}>{submitSurvey}</Text>
-    </TouchableOpacity>
+    <View style={GlobalStyle.row}>
+      <TouchableOpacity
+        style={submitButtonStyle}
+        disabled={submitDisabled}
+        onPress={() => {
+          setSubmitDisabled(true);
+          setTimeout(() => setSubmitDisabled(false), 1000);
+          onNextPage();
+        }}
+      >
+        <Text style={textStyle}>{submitSurvey}</Text>
+      </TouchableOpacity>
+    </View>
   );
 
   const leftButton = (
@@ -144,8 +145,7 @@ const SurveyFooter = (props: Props) => {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    alignItems: 'center',
     width: '100%',
     height: 100,
   },
@@ -158,16 +158,15 @@ const styles = StyleSheet.create({
     right: 0,
   },
   centerButtonContainer: {
-    width: 100,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    minWidth: 100,
     borderRadius: 20,
     top: 14,
+    paddingHorizontal: 30,
+    paddingVertical: 12,
   },
   submitText: {
     color: Colors.white,
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '600',
   },
   icon: {

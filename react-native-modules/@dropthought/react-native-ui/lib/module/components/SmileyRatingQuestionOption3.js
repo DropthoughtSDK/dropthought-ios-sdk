@@ -138,7 +138,8 @@ const SmileyRatingQuestionOption3 = ({
       translateY: descriptionYAxis
     }],
     opacity: scoreContainerOpacity,
-    color: fontColor
+    color: fontColor,
+    lineHeight: i18n.language === 'te' ? 42 : undefined
   }];
   const slashStyle = [styles.slash, {
     opacity: scoreContainerOpacity,

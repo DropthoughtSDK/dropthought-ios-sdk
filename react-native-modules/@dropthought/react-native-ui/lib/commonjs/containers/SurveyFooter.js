@@ -9,8 +9,6 @@ var React = _interopRequireWildcard(require("react"));
 
 var _reactNative = require("react-native");
 
-var _reactNativeSafeAreaContext = require("react-native-safe-area-context");
-
 var _hooks = require("@react-native-community/hooks");
 
 var _styles = require("../styles");
@@ -34,7 +32,6 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
  * When "Back" is pressed, call props.onPrevPage
  * When "Next" or "Submit" is pressed, call props.onNextPage
  */
-//@ts-ignore
 const isAndroid = _reactNative.Platform.OS === 'android';
 
 const SurveyFooter = props => {
@@ -48,16 +45,11 @@ const SurveyFooter = props => {
     onNextPage,
     backgroundColor
   } = props;
-  const insets = (0, _reactNativeSafeAreaContext.useSafeAreaInsets)();
   const {
     keyboardShown
   } = (0, _hooks.useKeyboard)();
-  const insetsBottom = // if it is android, and the insets bottom is not normal,
-  // maybe it is because the keyboard is showed, don't use this insets
-  isAndroid && insets.bottom >= 100 ? 0 : insets.bottom;
   const containerStyle = [styles.container, rtl && _styles.GlobalStyle.flexRowReverse, {
-    backgroundColor,
-    paddingBottom: insetsBottom || 15
+    backgroundColor
   }];
   const {
     colorScheme
@@ -69,9 +61,6 @@ const SurveyFooter = props => {
   const iconBgStyle = [styles.iconBg, {
     tintColor: surveyColor,
     opacity: isDarkMode ? 1 : 0.1
-  }];
-  const submitButtonStyle = [styles.centerButtonContainer, {
-    backgroundColor: surveyColor
   }];
   const [submitDisabled, setSubmitDisabled] = React.useState(false);
   const leftIcon = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(_reactNative.Image, {
@@ -88,7 +77,16 @@ const SurveyFooter = props => {
     style: iconStyle,
     source: require('../assets/icNextButton.png')
   }));
-  const submitButton = /*#__PURE__*/React.createElement(_reactNative.TouchableOpacity, {
+  const submitButtonStyle = [styles.centerButtonContainer, {
+    backgroundColor: surveyColor,
+    borderRadius: _translation.default.language === 'te' ? 25 : 20
+  }];
+  const textStyle = [styles.submitText, {
+    lineHeight: _translation.default.language === 'te' ? 26 : undefined
+  }];
+  const submitButton = /*#__PURE__*/React.createElement(_reactNative.View, {
+    style: _styles.GlobalStyle.row
+  }, /*#__PURE__*/React.createElement(_reactNative.TouchableOpacity, {
     style: submitButtonStyle,
     disabled: submitDisabled,
     onPress: () => {
@@ -97,8 +95,8 @@ const SurveyFooter = props => {
       onNextPage();
     }
   }, /*#__PURE__*/React.createElement(_reactNative.Text, {
-    style: styles.submitText
-  }, submitSurvey));
+    style: textStyle
+  }, submitSurvey)));
   const leftButton = /*#__PURE__*/React.createElement(_reactNative.TouchableOpacity, {
     style: styles.leftButtonContainer,
     onPress: onPrevPage
@@ -116,8 +114,7 @@ const SurveyFooter = props => {
 
 const styles = _reactNative.StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    alignItems: 'center',
     width: '100%',
     height: 100
   },
@@ -130,16 +127,15 @@ const styles = _reactNative.StyleSheet.create({
     right: 0
   },
   centerButtonContainer: {
-    width: 100,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    minWidth: 100,
     borderRadius: 20,
-    top: 14
+    top: 14,
+    paddingHorizontal: 30,
+    paddingVertical: 12
   },
   submitText: {
     color: _styles.Colors.white,
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '600'
   },
   icon: {

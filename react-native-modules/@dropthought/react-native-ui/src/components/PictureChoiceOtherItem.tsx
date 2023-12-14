@@ -83,7 +83,6 @@ const PictureChoiceOtherItem = ({
   const validTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 
   const uploadPicture = (image: ImageCropType) => {
-    setActionSheetVisible(false);
     const { path: uri, mime: type, data: base64, size } = image;
     const pieces = uri.split('/');
     const name = pieces[pieces.length - 1];
@@ -104,51 +103,80 @@ const PictureChoiceOtherItem = ({
   async function hasAndroidPermission() {
     const permission = PermissionsAndroid.PERMISSIONS.CAMERA;
     const hasPermission = await PermissionsAndroid.check(permission);
-    console.log('[hasAndroidPermission] hasPermission: ', hasPermission);
     if (hasPermission) {
       return true;
     }
-    console.log('[hasAndroidPermission] before request status: ');
     const status = await PermissionsAndroid.request(permission);
-    console.log('[hasAndroidPermission] status: ', status);
     return status === PermissionsAndroid.RESULTS.GRANTED;
   }
 
   const openPhotoLibrary = () => {
-    ImagePicker.openPicker({
-      mediaType: 'photo',
-      includeBase64: true,
-    }).then((image) => {
-      console.log(image);
-      uploadPicture(image);
-    });
+    if (Platform.OS === 'android') {
+      ImagePicker.openPicker({
+        mediaType: 'photo',
+        includeBase64: true,
+      })
+        .then((image) => {
+          setActionSheetVisible(false);
+          uploadPicture(image);
+        })
+        .catch(() => {
+          setActionSheetVisible(false);
+          onError(`${i18n.t('picture-choice:invalidTypeHint')}`);
+        });
+    } else {
+      ImagePicker.openPicker({
+        mediaType: 'photo',
+        multiple: true,
+        maxFiles: 1,
+        includeBase64: true,
+      })
+        .then((images) => {
+          setActionSheetVisible(false);
+          if (images.length > 0) {
+            uploadPicture(images[0]);
+          }
+        })
+        .catch((e) => {
+          setActionSheetVisible(false);
+          if (e.code !== 'E_PICKER_CANCELLED') {
+            onError(`${i18n.t('picture-choice:invalidTypeHint')}`);
+          }
+        });
+    }
   };
 
   const openCamera = () => {
-    console.log('[openCamera] enter');
     if (Platform.OS === 'android') {
-      console.log('[openCamera] before hasAndroidPermission');
       hasAndroidPermission().then((result) => {
-        console.log('[openCamera] hasAndroidPermission result: ', result);
         if (result) {
-          console.log('[openCamera] open');
           ImagePicker.openCamera({
             mediaType: 'photo',
             includeBase64: true,
-          }).then((image) => {
-            console.log('[openCamera] open image: ', image);
-            uploadPicture(image);
-          });
+          })
+            .then((image) => {
+              setActionSheetVisible(false);
+              uploadPicture(image);
+            })
+            .catch(() => {
+              setActionSheetVisible(false);
+              onError(`${i18n.t('picture-choice:invalidTypeHint')}`);
+            });
         }
       });
     } else {
       ImagePicker.openCamera({
         mediaType: 'photo',
         includeBase64: true,
-      }).then((image) => {
-        console.log(image);
-        uploadPicture(image);
-      });
+      })
+        .then((image) => {
+          setActionSheetVisible(false);
+          uploadPicture(image);
+        })
+        .catch(() => {
+          setActionSheetVisible(false);
+          onError(`${i18n.t('picture-choice:invalidTypeHint')}`);
+        });
     }
   };
 
@@ -236,6 +264,10 @@ const PictureChoiceOtherItem = ({
     </Modal>
   );
 
+  const maskStyle = {
+    backgroundColor: addOpacityToHex(themeColor, 0.1),
+  };
+
   return (
     <View>
       <TouchableOpacity
@@ -278,7 +310,7 @@ const PictureChoiceOtherItem = ({
                 setLoadingImage(false);
               }}
             />
-            <ActivityIndicatorMask loading={loadingImage} />
+            <ActivityIndicatorMask loading={loadingImage} style={maskStyle} />
           </>
         ) : (
           <View style={nonSelectedOtherPictureContainerStyle}>

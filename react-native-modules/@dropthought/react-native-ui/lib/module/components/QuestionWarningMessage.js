@@ -13,7 +13,8 @@ const QuestionWarningMessage = ({
   const isDarkMode = colorScheme === COLOR_SCHEMES.dark;
   const rtl = i18n.dir() === 'rtl';
   const hintStyle = [styles.hint, {
-    color: Colors.warningRed
+    color: Colors.warningRed,
+    lineHeight: i18n.language === 'te' ? 21 : undefined
   }, rtl && GlobalStyle.horizontalFlip];
   if (!message) return null;
   return /*#__PURE__*/React.createElement(View, {

@@ -1,6 +1,6 @@
 {
   "name": "@dropthought/react-native-dt-sdk",
-  "version": "5.5.1-crop.1",
+  "version": "5.6.0-beta.8",
   "description": "dropthought sdk for react-native app",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -154,7 +154,7 @@
   },
   "dependencies": {
     "@bct-taipei/dt-rn-encrypted-storage": "^2.2.0",
-    "@dropthought/react-native-ui": "5.5.1-crop.1",
+    "@dropthought/react-native-ui": "5.6.0-beta.5",
     "jwt-decode": "^3.1.2",
     "react-async": "^10.0.1",
     "react-native-aes-crypto": "^3.0.1",

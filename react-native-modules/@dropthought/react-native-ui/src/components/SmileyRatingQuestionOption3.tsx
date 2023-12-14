@@ -228,6 +228,7 @@ const SmileyRatingQuestionOption3 = ({
       transform: [{ translateY: descriptionYAxis }],
       opacity: scoreContainerOpacity,
       color: fontColor,
+      lineHeight: i18n.language === 'te' ? 42 : undefined,
     },
   ];
 

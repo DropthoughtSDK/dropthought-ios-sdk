@@ -19,6 +19,10 @@ var _reactNativeSafeAreaContext = require("react-native-safe-area-context");
 
 var _LanguageUtils = require("../utils/LanguageUtils");
 
+var _translation = _interopRequireDefault(require("../translation"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -99,7 +103,8 @@ const StartScreen = ({
   };
 
   const buttonStyle = [styles.button, {
-    backgroundColor: hexCode
+    backgroundColor: hexCode,
+    borderRadius: _translation.default.language === 'te' ? 25 : 20
   }];
   const containerStyle = [styles.headerContainer, {
     paddingTop: insets.top
@@ -112,6 +117,9 @@ const StartScreen = ({
   const headerIconStyle = {
     tintColor: hexCode
   };
+  const startTextStyle = [styles.buttonTitle, {
+    lineHeight: _translation.default.language === 'te' ? 26 : undefined
+  }];
   return /*#__PURE__*/_react.default.createElement(_reactNative.ScrollView, {
     contentContainerStyle: [styles.container, {
       backgroundColor
@@ -143,7 +151,7 @@ const StartScreen = ({
     style: buttonStyle,
     onPress: onStart
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-    style: styles.buttonTitle
+    style: startTextStyle
   }, takeSurvey))), languagesView());
 };
 

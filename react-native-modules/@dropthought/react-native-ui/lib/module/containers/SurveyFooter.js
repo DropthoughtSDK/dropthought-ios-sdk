@@ -8,9 +8,7 @@
  * When "Next" or "Submit" is pressed, call props.onNextPage
  */
 import * as React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native'; //@ts-ignore
-
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Image, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
 import { useKeyboard } from '@react-native-community/hooks';
 import { Colors, GlobalStyle } from '../styles';
 import i18n from '../translation';
@@ -28,16 +26,11 @@ const SurveyFooter = props => {
     onNextPage,
     backgroundColor
   } = props;
-  const insets = useSafeAreaInsets();
   const {
     keyboardShown
   } = useKeyboard();
-  const insetsBottom = // if it is android, and the insets bottom is not normal,
-  // maybe it is because the keyboard is showed, don't use this insets
-  isAndroid && insets.bottom >= 100 ? 0 : insets.bottom;
   const containerStyle = [styles.container, rtl && GlobalStyle.flexRowReverse, {
-    backgroundColor,
-    paddingBottom: insetsBottom || 15
+    backgroundColor
   }];
   const {
     colorScheme
@@ -49,9 +42,6 @@ const SurveyFooter = props => {
   const iconBgStyle = [styles.iconBg, {
     tintColor: surveyColor,
     opacity: isDarkMode ? 1 : 0.1
-  }];
-  const submitButtonStyle = [styles.centerButtonContainer, {
-    backgroundColor: surveyColor
   }];
   const [submitDisabled, setSubmitDisabled] = React.useState(false);
   const leftIcon = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Image, {
@@ -68,7 +58,16 @@ const SurveyFooter = props => {
     style: iconStyle,
     source: require('../assets/icNextButton.png')
   }));
-  const submitButton = /*#__PURE__*/React.createElement(TouchableOpacity, {
+  const submitButtonStyle = [styles.centerButtonContainer, {
+    backgroundColor: surveyColor,
+    borderRadius: i18n.language === 'te' ? 25 : 20
+  }];
+  const textStyle = [styles.submitText, {
+    lineHeight: i18n.language === 'te' ? 26 : undefined
+  }];
+  const submitButton = /*#__PURE__*/React.createElement(View, {
+    style: GlobalStyle.row
+  }, /*#__PURE__*/React.createElement(TouchableOpacity, {
     style: submitButtonStyle,
     disabled: submitDisabled,
     onPress: () => {
@@ -77,8 +76,8 @@ const SurveyFooter = props => {
       onNextPage();
     }
   }, /*#__PURE__*/React.createElement(Text, {
-    style: styles.submitText
-  }, submitSurvey));
+    style: textStyle
+  }, submitSurvey)));
   const leftButton = /*#__PURE__*/React.createElement(TouchableOpacity, {
     style: styles.leftButtonContainer,
     onPress: onPrevPage
@@ -96,8 +95,7 @@ const SurveyFooter = props => {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    alignItems: 'center',
     width: '100%',
     height: 100
   },
@@ -110,16 +108,15 @@ const styles = StyleSheet.create({
     right: 0
   },
   centerButtonContainer: {
-    width: 100,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    minWidth: 100,
     borderRadius: 20,
-    top: 14
+    top: 14,
+    paddingHorizontal: 30,
+    paddingVertical: 12
   },
   submitText: {
     color: Colors.white,
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '600'
   },
   icon: {

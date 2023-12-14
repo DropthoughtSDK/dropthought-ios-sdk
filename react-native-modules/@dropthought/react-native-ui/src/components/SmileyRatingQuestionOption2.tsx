@@ -129,7 +129,13 @@ const SmileyRatingQuestionOption2 = ({
   const questionContainerStyle = [commonStyles.container, { backgroundColor }];
 
   const hintTextStyle = [styles.hintText, { color: fontColor }];
-  const itemTextStyle = [commonStyles.itemTextStyle, { color: fontColor }];
+  const itemTextStyle = [
+    commonStyles.itemTextStyle,
+    {
+      color: fontColor,
+      lineHeight: i18n.language === 'te' ? 40 : undefined,
+    },
+  ];
 
   return (
     <>
@@ -164,7 +170,13 @@ const SmileyRatingQuestionOption2 = ({
                 itemTextStyle={itemTextStyle}
                 selectedIndicatorStyle={commonStyles.selectedIndicatorStyle}
                 key={'WheelPicker-descriptions'}
-                itemHeight={Platform.OS === 'android' ? 60 : undefined}
+                itemHeight={
+                  Platform.OS === 'android'
+                    ? 60
+                    : i18n.language === 'te'
+                    ? 50
+                    : undefined
+                }
               />
             </View>
           </View>
@@ -190,7 +202,13 @@ const SmileyRatingQuestionOption2 = ({
                 itemTextStyle={itemTextStyle}
                 selectedIndicatorStyle={commonStyles.selectedIndicatorStyle}
                 key={'WheelPicker-dummyDescroptions'}
-                itemHeight={Platform.OS === 'android' ? 60 : undefined}
+                itemHeight={
+                  Platform.OS === 'android'
+                    ? 60
+                    : i18n.language === 'te'
+                    ? 50
+                    : undefined
+                }
               />
             </View>
           </View>

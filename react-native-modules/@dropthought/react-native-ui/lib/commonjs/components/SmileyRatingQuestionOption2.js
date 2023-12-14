@@ -94,7 +94,8 @@ const SmileyRatingQuestionOption2 = ({
     color: fontColor
   }];
   const itemTextStyle = [commonStyles.itemTextStyle, {
-    color: fontColor
+    color: fontColor,
+    lineHeight: _translation.default.language === 'te' ? 40 : undefined
   }];
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_SurveyHeader.default, {
     survey: survey,
@@ -126,7 +127,7 @@ const SmileyRatingQuestionOption2 = ({
     itemTextStyle: itemTextStyle,
     selectedIndicatorStyle: commonStyles.selectedIndicatorStyle,
     key: 'WheelPicker-descriptions',
-    itemHeight: _reactNative.Platform.OS === 'android' ? 60 : undefined
+    itemHeight: _reactNative.Platform.OS === 'android' ? 60 : _translation.default.language === 'te' ? 50 : undefined
   }))) : /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: commonStyles.infoContainer
   }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
@@ -148,7 +149,7 @@ const SmileyRatingQuestionOption2 = ({
     itemTextStyle: itemTextStyle,
     selectedIndicatorStyle: commonStyles.selectedIndicatorStyle,
     key: 'WheelPicker-dummyDescroptions',
-    itemHeight: _reactNative.Platform.OS === 'android' ? 60 : undefined
+    itemHeight: _reactNative.Platform.OS === 'android' ? 60 : _translation.default.language === 'te' ? 50 : undefined
   })))), /*#__PURE__*/_react.default.createElement(_SurveyFooter.default, {
     submitSurvey: survey.submitSurvey,
     surveyColor: hexCode,

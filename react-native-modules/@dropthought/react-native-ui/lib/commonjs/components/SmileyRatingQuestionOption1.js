@@ -126,7 +126,8 @@ const SmileyRatingQuestionOption1 = ({
     color: fontColor
   }];
   const descStyle = [styles.desc, {
-    color: fontColor
+    color: fontColor,
+    lineHeight: _translation.default.language === 'te' ? 42 : undefined
   }];
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_SurveyHeader.default, {
     survey: survey,
