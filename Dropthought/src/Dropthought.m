@@ -57,6 +57,7 @@ RCT_EXPORT_MODULE();
 
     NSMutableDictionary *initialProperties = [NSMutableDictionary new];
     [initialProperties setObject:self.apiKey forKey:@"apiKey"];
+    [initialProperties setObject:[NSTimeZone localTimeZone].name forKey:@"timezone"];
     [initialProperties setObject:visibilityId forKey:@"visibilityId"];
     
     if (self.metadata != NULL) {
@@ -93,6 +94,7 @@ RCT_EXPORT_MODULE();
 
     NSMutableDictionary *initialProperties = [NSMutableDictionary new];
     [initialProperties setObject:self.apiKey forKey:@"apiKey"];
+    [initialProperties setObject:[NSTimeZone localTimeZone].name forKey:@"timezone"];
     [initialProperties setObject:surveyId forKey:@"surveyId"];
     switch (appearance) {
         case System:
