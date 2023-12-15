@@ -8,7 +8,9 @@ const ActivityIndicatorMask = ({
 }) => {
   return loading ? /*#__PURE__*/React.createElement(View, {
     style: [GlobalStyle.loadingMask, GlobalStyle.fullCenter, style]
-  }, /*#__PURE__*/React.createElement(ActivityIndicator, null)) : null;
+  }, /*#__PURE__*/React.createElement(ActivityIndicator, {
+    color: "gray"
+  })) : null;
 };
 
 export default ActivityIndicatorMask;

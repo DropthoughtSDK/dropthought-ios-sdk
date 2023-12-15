@@ -10,7 +10,7 @@ interface Props {
 const ActivityIndicatorMask: React.FC<Props> = ({ loading = false, style }) => {
   return loading ? (
     <View style={[GlobalStyle.loadingMask, GlobalStyle.fullCenter, style]}>
-      <ActivityIndicator />
+      <ActivityIndicator color="gray" />
     </View>
   ) : null;
 };

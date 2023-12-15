@@ -19,7 +19,9 @@ const ActivityIndicatorMask = ({
 }) => {
   return loading ? /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: [_styles.GlobalStyle.loadingMask, _styles.GlobalStyle.fullCenter, style]
-  }, /*#__PURE__*/_react.default.createElement(_reactNative.ActivityIndicator, null)) : null;
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.ActivityIndicator, {
+    color: "gray"
+  })) : null;
 };
 
 var _default = ActivityIndicatorMask;

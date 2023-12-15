@@ -4,10 +4,12 @@ This repository contains all Dropthought iOS SDK sources.
 
 ## Latest Version
 
--   5.3.0
+-   5.6.0
 
 ## Features
 
+-   Bijliride Theme
+-   Picture Choice
 -   Matrix choice
 -   Multiple open question
 -   Matrix rating
