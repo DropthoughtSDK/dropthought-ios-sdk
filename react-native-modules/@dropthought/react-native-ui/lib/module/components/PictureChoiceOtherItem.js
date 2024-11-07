@@ -50,7 +50,6 @@ const PictureChoiceOtherItem = ({
   const [loadingImage, setLoadingImage] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const validTypes = ['image/png', 'image/jpg', 'image/jpeg'];
-
   const uploadPicture = image => {
     const {
       path: uri,
@@ -60,7 +59,6 @@ const PictureChoiceOtherItem = ({
     } = image;
     const pieces = uri.split('/');
     const name = pieces[pieces.length - 1];
-
     if (type && !validTypes.includes(type)) {
       onError(`${i18n.t('picture-choice:invalidTypeHint')}`);
     } else if (size && size > MAXIMUM_SIZE_KB) {
@@ -79,19 +77,18 @@ const PictureChoiceOtherItem = ({
       }
     }
   };
-
   async function hasAndroidPermission() {
     const permission = PermissionsAndroid.PERMISSIONS.CAMERA;
-    const hasPermission = await PermissionsAndroid.check(permission);
-
-    if (hasPermission) {
-      return true;
+    if (permission) {
+      const hasPermission = await PermissionsAndroid.check(permission);
+      if (hasPermission) {
+        return true;
+      }
+      const status = await PermissionsAndroid.request(permission);
+      return status === PermissionsAndroid.RESULTS.GRANTED;
     }
-
-    const status = await PermissionsAndroid.request(permission);
-    return status === PermissionsAndroid.RESULTS.GRANTED;
+    return false;
   }
-
   const openPhotoLibrary = () => {
     if (Platform.OS === 'android') {
       ImagePicker.openPicker({
@@ -112,20 +109,17 @@ const PictureChoiceOtherItem = ({
         includeBase64: true
       }).then(images => {
         setActionSheetVisible(false);
-
-        if (images.length > 0) {
+        if (images.length > 0 && images[0]) {
           uploadPicture(images[0]);
         }
       }).catch(e => {
         setActionSheetVisible(false);
-
         if (e.code !== 'E_PICKER_CANCELLED') {
           onError(`${i18n.t('picture-choice:invalidTypeHint')}`);
         }
       });
     }
   };
-
   const openCamera = () => {
     if (Platform.OS === 'android') {
       hasAndroidPermission().then(result => {
@@ -155,24 +149,23 @@ const PictureChoiceOtherItem = ({
       });
     }
   };
-
   const placeholderTextStyle = colorScheme === COLOR_SCHEMES.dark ? [styles.placeholderText, {
-    color: fontColor !== null && fontColor !== void 0 ? fontColor : Colors.appearanceSubBlack
+    color: fontColor ?? Colors.appearanceSubBlack
   }] : [styles.placeholderText, {
     color: fontColor
   }];
   const optionalTextStyle = colorScheme === COLOR_SCHEMES.dark ? [styles.optionalText, {
-    color: fontColor !== null && fontColor !== void 0 ? fontColor : Colors.appearanceSubBlack
+    color: fontColor ?? Colors.appearanceSubBlack
   }] : [styles.optionalText, {
     color: fontColor
   }];
   const optionTextStyle = colorScheme === COLOR_SCHEMES.dark ? [styles.optionText, {
-    color: fontColor !== null && fontColor !== void 0 ? fontColor : Colors.appearanceSubBlack
+    color: fontColor ?? Colors.appearanceSubBlack
   }] : [styles.optionText, {
     color: fontColor
   }];
   const inputStyle = colorScheme === COLOR_SCHEMES.dark ? [styles.input, {
-    color: fontColor !== null && fontColor !== void 0 ? fontColor : Colors.appearanceSubBlack
+    color: fontColor ?? Colors.appearanceSubBlack
   }] : [styles.input, {
     color: fontColor
   }];
@@ -199,6 +192,7 @@ const PictureChoiceOtherItem = ({
     style: isDarkMode ? styles.darkUpperAction : styles.upperAction,
     onPress: openPhotoLibrary
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/picture_choice_photo_lib",
     style: isDarkMode ? styles.darkActionText : styles.actionText
   }, `${i18n.t('picture-choice:photoLibrary')}`)), /*#__PURE__*/React.createElement(TouchableOpacity, {
     style: isDarkMode ? styles.darkBottomAction : styles.bottomAction,
@@ -209,12 +203,14 @@ const PictureChoiceOtherItem = ({
     style: isDarkMode ? styles.darkCancelAction : styles.cancelAction,
     onPress: () => setActionSheetVisible(false)
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/picture_choice_photo_cancel",
     style: isDarkMode ? styles.darkActionText : styles.actionCancelText
   }, `${i18n.t('picture-choice:cancel')}`)))));
   const maskStyle = {
     backgroundColor: addOpacityToHex(themeColor, 0.1)
   };
   return /*#__PURE__*/React.createElement(View, null, /*#__PURE__*/React.createElement(TouchableOpacity, {
+    testID: `test:id/picture_choice_other_loading_${isUploading}`,
     style: styles.buttonContainer,
     disabled: preview,
     onPress: () => {
@@ -267,13 +263,14 @@ const PictureChoiceOtherItem = ({
   }, `${i18n.t('picture-choice:optional')}`))), /*#__PURE__*/React.createElement(ActivityIndicatorMask, {
     loading: selected && isUploading
   })), /*#__PURE__*/React.createElement(TouchableOpacity, {
+    accessible: false,
+    accessibilityLabel: `test:id/picture_choice_selected_${selected}`,
     style: [styles.optionContainer, rtl && GlobalStyle.flexRowReverse],
     disabled: preview,
     onPress: () => {
       if (!selected) {
         setActionSheetVisible(true);
       }
-
       onSelect();
     }
   }, /*#__PURE__*/React.createElement(ChooseIcon, {
@@ -283,8 +280,10 @@ const PictureChoiceOtherItem = ({
   }), /*#__PURE__*/React.createElement(View, {
     style: GlobalStyle.flex1
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/picture_choice_item_other",
     style: optionTextStyle
   }, `${i18n.t('picture-choice:other')}`), /*#__PURE__*/React.createElement(TextInput, {
+    testID: "test:id/field_picture_choice_item_other",
     multiline: true,
     style: inputStyle,
     maxLength: 100,
@@ -296,7 +295,6 @@ const PictureChoiceOtherItem = ({
     onChangeText: onChangeText
   }))), actionSheet);
 };
-
 export default PictureChoiceOtherItem;
 const styles = StyleSheet.create({
   buttonContainer: {

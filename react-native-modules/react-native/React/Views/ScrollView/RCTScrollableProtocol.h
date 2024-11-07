@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -33,7 +33,7 @@
 /**
  * Denotes a view which implements custom pull to refresh functionality.
  */
-@protocol RCTCustomRefreshContolProtocol
+@protocol RCTCustomRefreshControlProtocol
 
 @property (nonatomic, copy) RCTDirectEventBlock onRefresh;
 @property (nonatomic, readonly, getter=isRefreshing) BOOL refreshing;
@@ -41,4 +41,8 @@
 @optional
 @property (nonatomic, weak) UIScrollView *scrollView;
 
+@end
+
+__attribute__((deprecated("Use RCTCustomRefreshControlProtocol instead")))
+@protocol RCTCustomRefreshContolProtocol<RCTCustomRefreshControlProtocol>
 @end

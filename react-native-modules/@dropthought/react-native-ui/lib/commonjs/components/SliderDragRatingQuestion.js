@@ -4,28 +4,18 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireDefault(require("react"));
-
 var _reactNative = require("react-native");
-
 var _MandatoryTitle = _interopRequireDefault(require("./MandatoryTitle"));
-
 var _styles = _interopRequireWildcard(require("../styles"));
-
 var _theme = require("../contexts/theme");
-
 var _SliderDragQuestionConstants = require("../constants/SliderDragQuestionConstants");
-
 var _Slider = _interopRequireDefault(require("../components/Slider"));
-
 var _ramda = require("ramda");
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+// @ts-ignore
 
 const ThumbComponent = ({
   isDark
@@ -47,7 +37,6 @@ const ThumbComponent = ({
     style: thumbContentStyle
   }));
 };
-
 const AboveThumbComponent = ({
   value,
   question,
@@ -56,13 +45,13 @@ const AboveThumbComponent = ({
   if (!hasEdited) {
     return null;
   }
-
   const {
     scale: stringScale,
     minScale: stringMinScale
   } = question;
   const maxScale = Number(stringScale);
   const minScale = Number(stringMinScale);
+  // @ts-ignore
   const face = (0, _SliderDragQuestionConstants.sliderRatingAboveThumbFace)(minScale, value[0], maxScale);
   const containerStyle = {
     transform: [{
@@ -75,7 +64,8 @@ const AboveThumbComponent = ({
     style: containerStyle
   }, /*#__PURE__*/_react.default.createElement(_reactNative.ImageBackground, {
     style: styles.aboveThumbContainer,
-    source: require( // @ts-ignore
+    source: require(
+    // @ts-ignore
     '../assets/ic_slider_above_thumb.png')
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.aboveThumbContent
@@ -85,7 +75,6 @@ const AboveThumbComponent = ({
     style: styles.aboveThumbText
   }, value))));
 };
-
 const SliderDragRatingQuestion = ({
   survey,
   question,
@@ -108,24 +97,17 @@ const SliderDragRatingQuestion = ({
   } = question;
   const maxScale = Number(stringScale);
   const minScale = Number(stringMinScale);
-
   const [value, setValue] = _react.default.useState([minScale]);
-
   const [valueInput, setInputValue] = _react.default.useState();
-
   const [hasEdited, setHasEdited] = _react.default.useState(false);
-
   const [focus, setFocus] = _react.default.useState(false);
-
   const total = maxScale - minScale + 1;
   const middle = Math.round((maxScale + minScale) / 2);
   const isDark = colorScheme === _theme.COLOR_SCHEMES.dark;
-
   const onFeedbackHandler = _react.default.useCallback(() => {
     setHasEdited(true);
     setFocus(false);
     let submitValue = valueInput || 0;
-
     if (submitValue > maxScale) {
       setValue([maxScale]);
       setInputValue(maxScale);
@@ -137,56 +119,54 @@ const SliderDragRatingQuestion = ({
     } else {
       setValue([submitValue]);
     }
-
     onFeedback({
       questionId: questionId,
       answers: [submitValue - 1],
       type: 'ratingSlider'
     });
   }, [valueInput, maxScale, minScale, onFeedback, questionId]);
-
   const getInitialSelectedValueFromFeedbackProps = () => {
     if (feedback && feedback.answers && !(0, _ramda.isNil)(feedback.answers[0])) {
       const {
         answers
       } = feedback;
       const prevAnswer = typeof answers[0] === 'string' ? parseInt(answers[0], 10) : answers[0];
-      setValue([prevAnswer + 1]);
-      setInputValue(prevAnswer + 1);
-      setHasEdited(true);
+      if (prevAnswer !== undefined) {
+        setValue([prevAnswer + 1]);
+        setInputValue(prevAnswer + 1);
+        setHasEdited(true);
+      }
     }
   };
-
   _react.default.useEffect(() => {
-    getInitialSelectedValueFromFeedbackProps(); // eslint-disable-next-line react-hooks/exhaustive-deps
+    getInitialSelectedValueFromFeedbackProps();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   _react.default.useEffect(() => {
     const keyboardDidHideListener = _reactNative.Keyboard.addListener('keyboardDidHide', () => {
       if (focus) {
         onFeedbackHandler();
       }
     });
-
     return () => {
       keyboardDidHideListener.remove();
     };
   }, [focus, onFeedbackHandler]);
-
   const inputStyle = {
     color: fontColor,
     borderColor: isDark ? _styles.Colors.rankingContainerBgDark : _styles.Colors.rankingContainerBorder
   };
-  const trackStyle = { ...styles.track,
+  const trackStyle = {
+    ...styles.track,
     backgroundColor: isDark ? _styles.Colors.rankingContainerBgDark : _styles.Colors.rankingBorder
   };
-  const activeMarkStyle = { ...styles.activeMark,
+  const activeMarkStyle = {
+    ...styles.activeMark,
     opacity: isDark ? 0.3 : 1
   };
   const hintTextStyle = [styles.hintText, {
     color: fontColor
   }];
-
   const textField = /*#__PURE__*/_react.default.createElement(_reactNative.TextInput, {
     style: [styles.input, inputStyle],
     onChangeText: text => {
@@ -201,8 +181,9 @@ const SliderDragRatingQuestion = ({
     placeholderTextColor: fontColor,
     keyboardType: "numeric"
   });
-
-  const slider = /*#__PURE__*/_react.default.createElement(_Slider.default, {
+  const slider = /*#__PURE__*/_react.default.createElement(_Slider.default
+  // @ts-ignore
+  , {
     value: value[0],
     setValue: setValue,
     trackMarks: total % 2 === 0 ? [middle - 0.5] : [middle],
@@ -234,17 +215,18 @@ const SliderDragRatingQuestion = ({
     },
     onSlidingComplete: input => {
       const inputNumber = typeof input !== 'number' ? input[0] : 0;
-      setInputValue(inputNumber);
-      setFocus(false);
-      onFeedback({
-        questionId: questionId,
-        answers: [inputNumber - 1],
-        type: 'ratingSlider'
-      });
+      if (inputNumber) {
+        setInputValue(inputNumber);
+        setFocus(false);
+        onFeedback({
+          questionId: questionId,
+          answers: [inputNumber - 1],
+          type: 'ratingSlider'
+        });
+      }
     },
     animationType: "timing"
   });
-
   return /*#__PURE__*/_react.default.createElement(_reactNative.ScrollView, {
     contentContainerStyle: styles.container
   }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
@@ -280,11 +262,7 @@ const SliderDragRatingQuestion = ({
     style: hintTextStyle
   }, 'Slide left or right to rate')));
 };
-
-var _default = /*#__PURE__*/_react.default.memo(SliderDragRatingQuestion);
-
-exports.default = _default;
-
+var _default = exports.default = /*#__PURE__*/_react.default.memo(SliderDragRatingQuestion);
 const styles = _reactNative.StyleSheet.create({
   container: {
     alignSelf: 'center',

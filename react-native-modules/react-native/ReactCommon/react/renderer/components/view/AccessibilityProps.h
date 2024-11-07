@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,27 +9,45 @@
 
 #include <react/renderer/components/view/AccessibilityPrimitives.h>
 #include <react/renderer/core/Props.h>
+#include <react/renderer/core/PropsParserContext.h>
 #include <react/renderer/core/ReactPrimitives.h>
 #include <react/renderer/debug/DebugStringConvertible.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 class AccessibilityProps {
  public:
   AccessibilityProps() = default;
   AccessibilityProps(
-      AccessibilityProps const &sourceProps,
-      RawProps const &rawProps);
+      const PropsParserContext& context,
+      const AccessibilityProps& sourceProps,
+      const RawProps& rawProps);
+
+  void setProp(
+      const PropsParserContext& context,
+      RawPropsPropNameHash hash,
+      const char* propName,
+      const RawValue& value);
+
+#ifdef ANDROID
+  void propsDiffMapBuffer(const Props* oldProps, MapBufferBuilder& builder)
+      const;
+#endif
 
 #pragma mark - Props
 
   bool accessible{false};
-  AccessibilityTraits accessibilityTraits{AccessibilityTraits::None};
   AccessibilityState accessibilityState;
   std::string accessibilityLabel{""};
+  AccessibilityLabelledBy accessibilityLabelledBy{};
+  AccessibilityLiveRegion accessibilityLiveRegion{
+      AccessibilityLiveRegion::None};
+  AccessibilityTraits accessibilityTraits{AccessibilityTraits::None};
+  std::string accessibilityRole{""};
   std::string accessibilityHint{""};
-  std::vector<std::string> accessibilityActions{};
+  std::string accessibilityLanguage{""};
+  AccessibilityValue accessibilityValue;
+  std::vector<AccessibilityAction> accessibilityActions{};
   bool accessibilityViewIsModal{false};
   bool accessibilityElementsHidden{false};
   bool accessibilityIgnoresInvertColors{false};
@@ -39,6 +57,7 @@ class AccessibilityProps {
   bool onAccessibilityAction{};
   ImportantForAccessibility importantForAccessibility{
       ImportantForAccessibility::Auto};
+  Role role{Role::None};
   std::string testId{""};
 
 #pragma mark - DebugStringConvertible
@@ -48,5 +67,4 @@ class AccessibilityProps {
 #endif
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

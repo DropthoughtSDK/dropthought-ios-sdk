@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,8 +10,7 @@
 #include <functional>
 #include <limits>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 enum class FontStyle { Normal, Italic, Oblique };
 
@@ -46,6 +45,20 @@ enum class FontVariant : int {
   ProportionalNums = 1 << 5
 };
 
+enum class DynamicTypeRamp {
+  Caption2,
+  Caption1,
+  Footnote,
+  Subheadline,
+  Callout,
+  Body,
+  Headline,
+  Title3,
+  Title2,
+  Title1,
+  LargeTitle
+};
+
 enum class EllipsizeMode {
   Clip, // Do not add ellipsize, simply clip.
   Head, // Truncate at head of line: "...wxyz".
@@ -53,7 +66,11 @@ enum class EllipsizeMode {
   Middle // Truncate middle of line: "ab...yz".
 };
 
-enum class TextBreakStrategy { Simple, Balanced, HighQuality };
+enum class TextBreakStrategy {
+  Simple, // Simple strategy.
+  HighQuality, // High-quality strategy, including hyphenation.
+  Balanced // Balances line lengths.
+};
 
 enum class TextAlignment {
   Natural, // Indicates the default alignment for script.
@@ -70,6 +87,15 @@ enum class WritingDirection {
   RightToLeft // Right to left writing direction.
 };
 
+enum class LineBreakStrategy {
+  None, // Don't use any line break strategies
+  PushOut, // Use the push out line break strategy.
+  HangulWordPriority, // When specified, it prohibits breaking between Hangul
+                      // characters.
+  Standard // Use the same configuration of line break strategies that the
+           // system uses for standard UI labels.
+};
+
 enum class TextDecorationLineType {
   None,
   Underline,
@@ -77,123 +103,105 @@ enum class TextDecorationLineType {
   UnderlineStrikethrough
 };
 
-enum class TextDecorationLineStyle { Single, Thick, Double };
+enum class TextDecorationStyle { Solid, Double, Dotted, Dashed };
 
-enum class TextDecorationLinePattern {
-  Solid,
-  Dot,
-  Dash,
-  DashDot,
-  DashDotDot,
-};
-
-enum class AccessibilityRole {
+enum class TextTransform {
   None,
-  Button,
-  Link,
-  Search,
-  Image,
-  Imagebutton,
-  Keyboardkey,
-  Text,
-  Adjustable,
-  Summary,
-  Header,
-  Alert,
-  Checkbox,
-  Combobox,
-  Menu,
-  Menubar,
-  Menuitem,
-  Progressbar,
-  Radio,
-  Radiogroup,
-  Scrollbar,
-  Spinbutton,
-  Switch,
-  Tab,
-  Tablist,
-  Timer,
-  Toolbar,
+  Uppercase,
+  Lowercase,
+  Capitalize,
+  Unset,
 };
 
-} // namespace react
-} // namespace facebook
+enum class HyphenationFrequency {
+  None, // No hyphenation.
+  Normal, // Less frequent hyphenation.
+  Full // Standard amount of hyphenation.
+};
+
+} // namespace facebook::react
 
 namespace std {
 template <>
 struct hash<facebook::react::FontVariant> {
-  size_t operator()(const facebook::react::FontVariant &v) const {
+  size_t operator()(const facebook::react::FontVariant& v) const {
     return hash<int>()(static_cast<int>(v));
   }
 };
 
 template <>
 struct hash<facebook::react::TextAlignment> {
-  size_t operator()(const facebook::react::TextAlignment &v) const {
+  size_t operator()(const facebook::react::TextAlignment& v) const {
     return hash<int>()(static_cast<int>(v));
   }
 };
 
 template <>
 struct hash<facebook::react::FontStyle> {
-  size_t operator()(const facebook::react::FontStyle &v) const {
+  size_t operator()(const facebook::react::FontStyle& v) const {
     return hash<int>()(static_cast<int>(v));
   }
 };
 
 template <>
 struct hash<facebook::react::TextDecorationLineType> {
-  size_t operator()(const facebook::react::TextDecorationLineType &v) const {
+  size_t operator()(const facebook::react::TextDecorationLineType& v) const {
     return hash<int>()(static_cast<int>(v));
   }
 };
 
 template <>
 struct hash<facebook::react::WritingDirection> {
-  size_t operator()(const facebook::react::WritingDirection &v) const {
+  size_t operator()(const facebook::react::WritingDirection& v) const {
     return hash<int>()(static_cast<int>(v));
   }
 };
 
 template <>
-struct hash<facebook::react::TextDecorationLinePattern> {
-  size_t operator()(const facebook::react::TextDecorationLinePattern &v) const {
-    return hash<int>()(static_cast<int>(v));
-  }
-};
-
-template <>
-struct hash<facebook::react::TextDecorationLineStyle> {
-  size_t operator()(const facebook::react::TextDecorationLineStyle &v) const {
+struct hash<facebook::react::TextDecorationStyle> {
+  size_t operator()(const facebook::react::TextDecorationStyle& v) const {
     return hash<int>()(static_cast<int>(v));
   }
 };
 
 template <>
 struct hash<facebook::react::FontWeight> {
-  size_t operator()(const facebook::react::FontWeight &v) const {
+  size_t operator()(const facebook::react::FontWeight& v) const {
+    return hash<int>()(static_cast<int>(v));
+  }
+};
+
+template <>
+struct hash<facebook::react::DynamicTypeRamp> {
+  size_t operator()(const facebook::react::DynamicTypeRamp& v) const {
     return hash<int>()(static_cast<int>(v));
   }
 };
 
 template <>
 struct hash<facebook::react::EllipsizeMode> {
-  size_t operator()(const facebook::react::EllipsizeMode &v) const {
+  size_t operator()(const facebook::react::EllipsizeMode& v) const {
     return hash<int>()(static_cast<int>(v));
   }
 };
 
 template <>
 struct hash<facebook::react::TextBreakStrategy> {
-  size_t operator()(const facebook::react::TextBreakStrategy &v) const {
+  size_t operator()(const facebook::react::TextBreakStrategy& v) const {
     return hash<int>()(static_cast<int>(v));
   }
 };
 
 template <>
-struct hash<facebook::react::AccessibilityRole> {
-  size_t operator()(const facebook::react::AccessibilityRole &v) const {
+struct hash<facebook::react::TextTransform> {
+  size_t operator()(const facebook::react::TextTransform& v) const {
+    return hash<int>()(static_cast<int>(v));
+  }
+};
+
+template <>
+struct hash<facebook::react::HyphenationFrequency> {
+  size_t operator()(const facebook::react::HyphenationFrequency& v) const {
     return hash<int>()(static_cast<int>(v));
   }
 };

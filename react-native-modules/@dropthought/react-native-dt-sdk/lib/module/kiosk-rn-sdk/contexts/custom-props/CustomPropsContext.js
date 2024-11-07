@@ -37,13 +37,7 @@ export const CustomPropsContextProvider = ({
 };
 
 /**
- * @typedef {object} CustomProps
- * @property {(surveyFeedback: SurveyFeedback) => void} onSubmitSuccess
- * @property {(surveyFeedback: SurveyFeedback, error?: Error) => void} onSubmit
- * @property {any} metadata
- */
-
-/**
  * @typedef {import('../../../data').SurveyFeedback} SurveyFeedback
+ * @typedef {import('./CustomPropsContext').CustomProps} CustomProps
  */
 //# sourceMappingURL=CustomPropsContext.js.map

@@ -1,6 +1,7 @@
 import * as React from 'react';
-declare type Props = {
+type Props = {
     children: React.ReactNode;
 };
-export declare function FeedbackProvider({ children }: Props): JSX.Element;
+export declare function FeedbackProvider({ children }: Props): React.JSX.Element;
 export {};
+//# sourceMappingURL=FeedbackProvider.d.ts.map

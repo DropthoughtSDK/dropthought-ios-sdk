@@ -7,14 +7,12 @@ import { useTheme } from '../contexts/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getLanguageBy } from '../utils/LanguageUtils';
 import i18n from '../translation';
-
+import { usePollingRecord } from '../hooks/usePollingRecord';
 const defaultIconSource = require('../assets/rating.png');
-
-const defaultIconSize = {
+const defaultIconSize = Object.freeze({
   [DimensionWidthType.phone]: 65,
   [DimensionWidthType.tablet]: 72
-};
-
+});
 const StartScreen = ({
   onLanguageSelect,
   onClose,
@@ -48,22 +46,32 @@ const StartScreen = ({
       if (height < defaultIconSize[dimensionWidthType]) {
         setImageHeight(height);
       }
-    }, _ => {}); // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, _ => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const {
+    resetRecord
+  } = usePollingRecord();
+  useEffect(() => {
+    resetRecord();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const iconSource = image === undefined ? defaultIconSource : {
     uri: image
   };
   const iconView = /*#__PURE__*/React.createElement(Image, {
-    resizeMode: "contain",
+    resizeMode: "contain"
+    // @ts-ignore
+    ,
     style: iconStyle,
     source: iconSource
   });
-
   const languagesView = () => {
     const {
       languages
-    } = survey; // if there's only one language or no languages, no need to display
+    } = survey;
 
+    // if there's only one language or no languages, no need to display
     if (!languages || !languages.length || languages.length <= 1) return null;
     const languageView = languages.map((lang, index) => /*#__PURE__*/React.createElement(TouchableOpacity, {
       key: index,
@@ -79,7 +87,6 @@ const StartScreen = ({
       style: styles.languages
     }, languageView);
   };
-
   const buttonStyle = [styles.button, {
     backgroundColor: hexCode,
     borderRadius: i18n.language === 'te' ? 25 : 20
@@ -89,12 +96,18 @@ const StartScreen = ({
   }, {
     backgroundColor
   }];
-  const titleStyle = [styles.headerTitle, {
+  const headerStyle = [styles.headerTitle, {
     color: fontColor
   }];
   const headerIconStyle = {
     tintColor: hexCode
   };
+  const titleStyle = [styles.title, {
+    color: fontColor
+  }];
+  const subTitleStyle = [styles.subtitle, {
+    color: fontColor
+  }];
   const startTextStyle = [styles.buttonTitle, {
     lineHeight: i18n.language === 'te' ? 26 : undefined
   }];
@@ -113,26 +126,25 @@ const StartScreen = ({
     style: headerIconStyle,
     source: require('../assets/icClose24Px.png')
   })), /*#__PURE__*/React.createElement(Text, {
-    style: titleStyle,
+    testID: "test:id/custom_survey_name_nav",
+    style: headerStyle,
     numberOfLines: 1
   }, surveyName))), /*#__PURE__*/React.createElement(View, {
     style: styles.main
   }, iconView, /*#__PURE__*/React.createElement(Text, {
-    style: [styles.title, {
-      color: fontColor
-    }]
+    testID: "test:id/custom_take_survey_name",
+    style: titleStyle
   }, surveyName), !!welcomeTextPlain && /*#__PURE__*/React.createElement(Text, {
-    style: [styles.subtitle, {
-      color: fontColor
-    }]
+    testID: "test:id/custom_take_survey_welcome_msg",
+    style: subTitleStyle
   }, welcomeTextPlain), /*#__PURE__*/React.createElement(TouchableOpacity, {
     style: buttonStyle,
     onPress: onStart
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/button_custom_take_survey",
     style: startTextStyle
   }, takeSurvey))), languagesView());
 };
-
 export default StartScreen;
 const styles = StyleSheet.create({
   container: {

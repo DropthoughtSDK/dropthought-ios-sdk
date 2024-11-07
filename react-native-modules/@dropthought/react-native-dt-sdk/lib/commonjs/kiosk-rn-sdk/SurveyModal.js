@@ -8,7 +8,7 @@ exports.useOpenSurvey = exports.SurveyModalOpenSurveyContext = exports.SurveyMod
 var React = _interopRequireWildcard(require("react"));
 var _reactNative = require("react-native");
 var _ramda = require("ramda");
-var _src = require("@dropthought/react-native-ui/src");
+var _reactNativeUi = require("@dropthought/react-native-ui");
 var _SDKEntry = _interopRequireDefault(require("./SDKEntry"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
@@ -28,11 +28,11 @@ function SurveyModal(props) {
     backgroundColor,
     appearance
   } = props;
-  let dummyBackgroundColor = _src.Colors.white;
+  let dummyBackgroundColor = _reactNativeUi.Colors.white;
   if (backgroundColor) {
     dummyBackgroundColor = backgroundColor;
   } else if (appearance === 'dark') {
-    dummyBackgroundColor = _src.Colors.backgroundColorDark;
+    dummyBackgroundColor = _reactNativeUi.Colors.backgroundColorDark;
   }
   const containerStyle = {
     height,
@@ -45,7 +45,7 @@ function SurveyModal(props) {
     presentationStyle: "overFullScreen",
     transparent: true
   }, modalProps), /*#__PURE__*/React.createElement(_reactNative.View, {
-    style: _src.GlobalStyle.flex1
+    style: _reactNativeUi.GlobalStyle.flex1
   }, /*#__PURE__*/React.createElement(_SDKEntry.default, sdkProps))));
 }
 
@@ -87,13 +87,11 @@ const SurveyModalContainer = ({
 };
 
 /**
+ * @typedef {import('./SurveyModal').SurveyModalProps} SurveyModalProps
  * @typedef {import('./SDKEntry').SDKEntryProps} SDKEntryProps
  * @typedef {import('react-native').ModalProps} ModalProps
  */
-/**
- * @typedef {object} SurveyModalProps
- * @property {boolean} visible
- */
+
 /**
  * @typedef {SDKEntryProps & ModalProps} OpenSurveyProps
  */

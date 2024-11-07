@@ -10,7 +10,6 @@ import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import MandatoryTitle from './MandatoryTitle';
 import { scaleLogic, option4FaceTable as faceTable, option4LoopFaceTable as loopFaceTable, option4TransformTable as transformTable } from '../utils/data';
 import { isNil } from 'ramda';
-
 const SmileyRatingQuestionOption4 = ({
   survey,
   pageIndex,
@@ -20,10 +19,11 @@ const SmileyRatingQuestionOption4 = ({
   onPrevPage,
   onNextPage,
   onFeedback,
-  feedback
+  feedback,
+  isLastPage
 }) => {
   const answered = feedback && feedback.answers && !isNil(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
-  const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
+  const answeredValue = answered && feedback.answers[0] ? parseInt(feedback.answers[0], 10) : 0;
   const windowHeight = Dimensions.get('window').height;
   const {
     questionId,
@@ -37,58 +37,56 @@ const SmileyRatingQuestionOption4 = ({
   const [transformLotties, setTransformLotties] = React.useState([]);
   const scoreContainerOpacity = React.useRef(new Animated.Value(answered ? 1 : 0)).current;
   const scoreOpacity = React.useRef(new Animated.Value(answered ? 1 : 0)).current;
-  const descriptionYAxis = React.useRef(new Animated.Value(answered ? 1 : windowHeight / 2 - 246 + 37)).current; // 37 -> one text line height
+  const descriptionYAxis = React.useRef(new Animated.Value(answered ? 1 : windowHeight / 2 - 246 + 37)).current;
+  // 37 -> one text line height
   // 246 -> Padding Vertical 123
 
   const lottieRef = React.useRef();
   const totalScore = Number(scale);
   const renderScore = score + 1;
-  const hasEdited = score >= 0; // choose which scale logic we want to use.
+  const hasEdited = score >= 0;
 
+  // choose which scale logic we want to use.
   const scaleLogicList = scaleLogic[scale];
   useEffect(() => {
-    const loopList = scaleLogicList.map((value, index) => {
-      const scaleKey = String(index + 1) + faceTable[value];
-      return loopFaceTable.get(scaleKey);
-    });
-    const transformList = scaleLogicList.map((value, index, array) => {
-      if (index === 0) return '';
-      const fromScale = String(index) + faceTable[array[index - 1]];
-      const toScale = String(index + 1) + faceTable[value];
-      const key = `${fromScale}-${toScale}`;
-      return transformTable.get(key);
-    });
-    setLoopLotties(loopList);
-    setTransformLotties(transformList);
+    if (scaleLogicList) {
+      const loopList = scaleLogicList.map((value, index) => {
+        const scaleKey = String(index + 1) + faceTable[value];
+        return loopFaceTable.get(scaleKey);
+      });
+      const transformList = scaleLogicList.map((value, index, array) => {
+        if (index === 0) return '';
+        // @ts-ignore
+        const fromScale = String(index) + faceTable[array[index - 1]];
+        const toScale = String(index + 1) + faceTable[value];
+        const key = `${fromScale}-${toScale}`;
+        return transformTable.get(key);
+      });
+      setLoopLotties(loopList);
+      setTransformLotties(transformList);
+    }
   }, [scaleLogicList]);
-
   const imageLignt = require('../assets/icOption4Info.png');
-
   const imageDark = require('../assets/icOption4InfoDark.png');
-
   const updateScore = React.useCallback(number => {
     const isAtCoverScreen = score === -1;
     const newScore = score + number;
     setScore(newScore);
-
     if (!isAtCoverScreen) {
       setSelectedIndex(newScore);
-
       if (number > 0) {
         setIsLoop(false);
       } else {
         setIsLoop(true);
         setTimeout(() => {
           var _lottieRef$current;
-
-          (_lottieRef$current = lottieRef.current) === null || _lottieRef$current === void 0 ? void 0 : _lottieRef$current.play();
+          (_lottieRef$current = lottieRef.current) === null || _lottieRef$current === void 0 || _lottieRef$current.play();
         }, 100);
       }
-    } //animtaion--
+    }
 
-
+    //animtaion--
     scoreOpacity.setValue(0);
-
     if (isAtCoverScreen) {
       Animated.sequence([Animated.timing(descriptionYAxis, {
         toValue: 0,
@@ -109,8 +107,8 @@ const SmileyRatingQuestionOption4 = ({
         duration: 500,
         useNativeDriver: true
       }).start();
-    } //animtaion--
-
+    }
+    //animtaion--
 
     onFeedback({
       questionId,
@@ -161,38 +159,40 @@ const SmileyRatingQuestionOption4 = ({
     if (isLoop) {
       setTimeout(() => {
         var _lottieRef$current2;
-
-        (_lottieRef$current2 = lottieRef.current) === null || _lottieRef$current2 === void 0 ? void 0 : _lottieRef$current2.play();
+        (_lottieRef$current2 = lottieRef.current) === null || _lottieRef$current2 === void 0 || _lottieRef$current2.play();
       }, 100);
     }
   }, [isLoop]);
-
   const handleDecreaseScore = () => {
     if (score > 0) updateScore(-1);
   };
-
   const lottieContainer = isLoop ? /*#__PURE__*/React.createElement(View, {
+    accessibilityLabel: `selected_custom_star_${selectedIndex}`,
     style: commonStyles.lottieContainer
   }, /*#__PURE__*/React.createElement(TouchableWithoutFeedback, {
     onPress: handleDecreaseScore
-  }, /*#__PURE__*/React.createElement(LottieView // @ts-ignore
-  , {
+  }, loopLotties[selectedIndex] ? /*#__PURE__*/React.createElement(LottieView
+  /* @ts-ignore */, {
     ref: lottieRef,
     source: loopLotties[selectedIndex],
+    style: commonStyles.lottieContent,
     autoPlay: true,
     loop: true
-  }))) : /*#__PURE__*/React.createElement(View, {
+  }) : /*#__PURE__*/React.createElement(React.Fragment, null))) : /*#__PURE__*/React.createElement(View, {
     style: commonStyles.lottieContainer
   }, /*#__PURE__*/React.createElement(TouchableWithoutFeedback, {
     onPress: handleDecreaseScore
-  }, /*#__PURE__*/React.createElement(LottieView, {
+  }, transformLotties[selectedIndex] ? /*#__PURE__*/React.createElement(LottieView, {
     source: transformLotties[selectedIndex],
+    style: commonStyles.lottieContent,
     autoPlay: true,
     loop: false,
     onAnimationFinish: isCancel => {
-      if (!isCancel) setIsLoop(true);
+      setTimeout(() => {
+        if (!isCancel) setIsLoop(true);
+      }, 500);
     }
-  })));
+  }) : /*#__PURE__*/React.createElement(React.Fragment, null)));
   const infoImage = /*#__PURE__*/React.createElement(Image, {
     style: commonStyles.infoImage,
     source: colorScheme === COLOR_SCHEMES.dark ? imageDark : imageLignt
@@ -204,14 +204,18 @@ const SmileyRatingQuestionOption4 = ({
   }, /*#__PURE__*/React.createElement(View, {
     style: commonStyles.scoreContainer
   }, /*#__PURE__*/React.createElement(View, {
+    testID: "test:id/custom_star_score_value",
     style: commonStyles.scoreText
   }, /*#__PURE__*/React.createElement(Animated.Text, {
+    testID: "test:id/custom_star_render_score",
     style: scoreSelectedStyle
   }, renderScore), /*#__PURE__*/React.createElement(Animated.Text, {
     style: slashStyle
   }, '/'), /*#__PURE__*/React.createElement(Animated.Text, {
+    testID: "test:id/custom_star_total_score",
     style: scoreTotalStyle
   }, totalScore)), /*#__PURE__*/React.createElement(Animated.Text, {
+    testID: "test:id/custom_star_score_desc",
     style: descStyle
   }, options[selectedIndex])));
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SurveyHeader, {
@@ -232,22 +236,23 @@ const SmileyRatingQuestionOption4 = ({
     disabled: score > -1,
     onPress: () => updateScore(1)
   }, /*#__PURE__*/React.createElement(React.Fragment, null, hasEdited ? null : infoImage, /*#__PURE__*/React.createElement(Text, {
+    testID: `test:id/custom_star_title_${colorScheme}`,
     style: hintTextStyle
-  }, i18n.t('option4HintDescription:title')), /*#__PURE__*/React.createElement(Text, {
+  }, `${i18n.t('option4HintDescription:title')}`), /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/custom_star_subtitle",
     style: hintSubTextStyle
-  }, i18n.t('option4HintDescription:subTitle', {
+  }, `${i18n.t('option4HintDescription:subTitle', {
     count: totalScore
-  })))))), /*#__PURE__*/React.createElement(SurveyFooter, {
+  })}`))))), /*#__PURE__*/React.createElement(SurveyFooter, {
     submitSurvey: survey.submitSurvey,
     surveyColor: hexCode,
     isFirstPage: pageIndex === 0,
-    isLastPage: pageIndex === survey.pageOrder.length - 1,
+    isLastPage: isLastPage,
     onPrevPage: onPrevPage,
     onNextPage: onNextPage,
     backgroundColor: backgroundColor
   }));
 };
-
 export default SmileyRatingQuestionOption4;
 const commonStyles = StyleSheet.create({
   container: {
@@ -298,6 +303,10 @@ const commonStyles = StyleSheet.create({
   scoreText: {
     flexDirection: 'row',
     alignItems: 'flex-end'
+  },
+  lottieContent: {
+    width: '100%',
+    height: '100%'
   }
 });
 const phoneStyles = StyleSheet.create({

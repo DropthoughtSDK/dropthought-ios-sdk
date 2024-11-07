@@ -86,7 +86,7 @@ class ClassicMultiChoiceQuestion extends PureComponent<Props, State> {
           // only return the answer if checked
           if (value) {
             // for 'other option', return the text
-            if (this.state.options[index].isOther) {
+            if (this.state.options[index]?.isOther) {
               return otherText;
             }
             return index;
@@ -139,7 +139,7 @@ class ClassicMultiChoiceQuestion extends PureComponent<Props, State> {
             key={index}
             id={index}
             textValue={this.state.otherText}
-            checked={this.state.values[index]}
+            checked={this.state.values[index] ?? false}
             checkedColor={this.props.themeColor}
             title={option}
             type="checkbox"
@@ -154,7 +154,7 @@ class ClassicMultiChoiceQuestion extends PureComponent<Props, State> {
         <OptionWithHighlight
           key={index}
           id={index}
-          checked={this.state.values[index]}
+          checked={this.state.values[index] ?? false}
           checkedColor={this.props.themeColor}
           title={option}
           type="checkbox"

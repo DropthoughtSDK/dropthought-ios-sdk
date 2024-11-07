@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,15 +9,26 @@
 
 #include <react/renderer/components/scrollview/primitives.h>
 #include <react/renderer/components/view/ViewProps.h>
+#include <react/renderer/core/PropsParserContext.h>
 
-namespace facebook {
-namespace react {
+#include <optional>
+
+namespace facebook::react {
 
 // TODO (T28334063): Consider for codegen.
 class ScrollViewProps final : public ViewProps {
  public:
   ScrollViewProps() = default;
-  ScrollViewProps(ScrollViewProps const &sourceProps, RawProps const &rawProps);
+  ScrollViewProps(
+      const PropsParserContext& context,
+      const ScrollViewProps& sourceProps,
+      const RawProps& rawProps);
+
+  void setProp(
+      const PropsParserContext& context,
+      RawPropsPropNameHash hash,
+      const char* propName,
+      const RawValue& value);
 
 #pragma mark - Props
 
@@ -28,12 +39,15 @@ class ScrollViewProps final : public ViewProps {
   bool canCancelContentTouches{true};
   bool centerContent{};
   bool automaticallyAdjustContentInsets{};
-  Float decelerationRate{0.998};
+  bool automaticallyAdjustsScrollIndicatorInsets{true};
+  Float decelerationRate{0.998f};
   bool directionalLockEnabled{};
   ScrollViewIndicatorStyle indicatorStyle{};
   ScrollViewKeyboardDismissMode keyboardDismissMode{};
-  Float maximumZoomScale{1.0};
-  Float minimumZoomScale{1.0};
+  std::optional<ScrollViewMaintainVisibleContentPosition>
+      maintainVisibleContentPosition{};
+  Float maximumZoomScale{1.0f};
+  Float minimumZoomScale{1.0f};
   bool scrollEnabled{true};
   bool pagingEnabled{};
   bool pinchGestureEnabled{true};
@@ -41,7 +55,7 @@ class ScrollViewProps final : public ViewProps {
   bool showsHorizontalScrollIndicator{true};
   bool showsVerticalScrollIndicator{true};
   Float scrollEventThrottle{};
-  Float zoomScale{1.0};
+  Float zoomScale{1.0f};
   EdgeInsets contentInset{};
   Point contentOffset{};
   EdgeInsets scrollIndicatorInsets{};
@@ -54,6 +68,7 @@ class ScrollViewProps final : public ViewProps {
   ContentInsetAdjustmentBehavior contentInsetAdjustmentBehavior{
       ContentInsetAdjustmentBehavior::Never};
   bool scrollToOverflowEnabled{false};
+  bool isInvertedVirtualizedList{false};
 
 #pragma mark - DebugStringConvertible
 
@@ -62,5 +77,4 @@ class ScrollViewProps final : public ViewProps {
 #endif
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

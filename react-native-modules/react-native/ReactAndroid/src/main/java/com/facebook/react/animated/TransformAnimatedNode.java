@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -66,7 +66,7 @@ import java.util.List;
         int nodeTag = ((AnimatedTransformConfig) transformConfig).mNodeTag;
         AnimatedNode node = mNativeAnimatedNodesManager.getNodeById(nodeTag);
         if (node == null) {
-          throw new IllegalArgumentException("Mapped style node does not exists");
+          throw new IllegalArgumentException("Mapped style node does not exist");
         } else if (node instanceof ValueAnimatedNode) {
           value = ((ValueAnimatedNode) node).getValue();
         } else {

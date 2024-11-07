@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import type { Question, Feedback, QuestionMetaDataType } from '../data';
-export declare type QuestionRowItem = {
+export type QuestionRowItem = {
     questionId: string;
     questionTitle?: string;
     responseErrorText?: string;
@@ -17,3 +17,4 @@ declare const useMultipleOpenEnded: (question: Question, feedback: Feedback, onF
     updateFeedback: (answers: string[]) => void;
 };
 export default useMultipleOpenEnded;
+//# sourceMappingURL=useMultipleOpenEnded.d.ts.map

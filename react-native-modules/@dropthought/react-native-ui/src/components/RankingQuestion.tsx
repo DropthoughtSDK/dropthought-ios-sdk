@@ -53,6 +53,7 @@ type Question = OriginQuestion & {
 
 const swapElements: SwapElements = (array, index1, index2) => {
   let newArray = [...array];
+  // @ts-ignore
   newArray[index1] = newArray.splice(index2, 1, newArray[index1])[0];
   return newArray;
 };
@@ -191,18 +192,7 @@ const RankingQuestion = ({
     })
   );
 
-  const [list, setList] = useState(originListRef.current);
-
-  const [normalList, setNormalList] = useState(list);
-
-  const [visible, setVisible] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<TransformedOption>();
-
-  useEffect(() => {
-    setNormalList(list.filter((current) => !current.isNA));
-  }, [list]);
-
-  useEffect(() => {
+  const [list, setList] = useState(() => {
     const { listForRankingQuestion } = feedback ?? {};
     if (
       feedback &&
@@ -219,10 +209,19 @@ const RankingQuestion = ({
           feedbackToOptions = [...feedbackToOptions, newOption];
         }
       });
-      setList(listForRankingQuestion);
+      return listForRankingQuestion;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return originListRef.current;
+  });
+
+  const [normalList, setNormalList] = useState(list);
+
+  const [visible, setVisible] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<TransformedOption>();
+
+  useEffect(() => {
+    setNormalList(list.filter((current) => !current.isNA));
+  }, [list]);
 
   useEffect(() => {
     const answers: (number | string)[] = list.map(({ isNA, index }) => {
@@ -393,6 +392,7 @@ const RankingQuestion = ({
   const onDragEndHandler = (newList: TransformedOption[]) => {
     setList((prev) => {
       const result = newList.map((newData) => {
+        // @ts-ignore
         const { isNA } = prev.filter(
           ({ option }) => option === newData.option
         )[0];

@@ -4,9 +4,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.SafeAreaView = void 0;
-
 var _reactNative = require("react-native");
-
-const SafeAreaView = _reactNative.View;
-exports.SafeAreaView = SafeAreaView;
+const SafeAreaView = exports.SafeAreaView = _reactNative.View;
 //# sourceMappingURL=SafeAreaView.windows.js.map

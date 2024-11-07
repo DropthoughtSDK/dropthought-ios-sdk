@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,7 +7,6 @@
 
 package com.facebook.react.modules.fresco;
 
-import android.content.Context;
 import androidx.annotation.Nullable;
 import com.facebook.common.logging.FLog;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -77,9 +76,31 @@ public class FrescoModule extends ReactContextBaseJavaModule
    * @param reactContext the context to use
    */
   public FrescoModule(
-      ReactApplicationContext reactContext, ImagePipeline imagePipeline, boolean clearOnDestroy) {
+      ReactApplicationContext reactContext,
+      @Nullable ImagePipeline imagePipeline,
+      boolean clearOnDestroy) {
+    this(reactContext, imagePipeline, clearOnDestroy, false);
+  }
+
+  /**
+   * Create a new Fresco module with a default configuration (or the previously given configuration
+   * via {@link #FrescoModule(ReactApplicationContext, boolean, ImagePipelineConfig)}.
+   *
+   * @param clearOnDestroy whether to clear the memory cache in onHostDestroy: this should be {@code
+   *     true} for pure RN apps and {@code false} for apps that use Fresco outside of RN as well
+   * @param reactContext the context to use
+   * @param hasBeenInitializedExternally whether Fresco has already been initialized
+   */
+  public FrescoModule(
+      ReactApplicationContext reactContext,
+      @Nullable ImagePipeline imagePipeline,
+      boolean clearOnDestroy,
+      boolean hasBeenInitializedExternally) {
     this(reactContext, clearOnDestroy);
     mImagePipeline = imagePipeline;
+    if (hasBeenInitializedExternally) {
+      sHasBeenInitialized = true;
+    }
   }
 
   /**
@@ -105,13 +126,14 @@ public class FrescoModule extends ReactContextBaseJavaModule
   @Override
   public void initialize() {
     super.initialize();
-    getReactApplicationContext().addLifecycleEventListener(this);
+
+    ReactApplicationContext reactContext = getReactApplicationContext();
+    reactContext.addLifecycleEventListener(this);
     if (!hasBeenInitialized()) {
       if (mConfig == null) {
-        mConfig = getDefaultConfig(getReactApplicationContext());
+        mConfig = getDefaultConfig(reactContext);
       }
-      Context context = getReactApplicationContext().getApplicationContext();
-      Fresco.initialize(context, mConfig);
+      Fresco.initialize(reactContext.getApplicationContext(), mConfig);
       sHasBeenInitialized = true;
     } else if (mConfig != null) {
       FLog.w(
@@ -193,5 +215,11 @@ public class FrescoModule extends ReactContextBaseJavaModule
       mImagePipeline = Fresco.getImagePipeline();
     }
     return mImagePipeline;
+  }
+
+  @Override
+  public void invalidate() {
+    getReactApplicationContext().removeLifecycleEventListener(this);
+    super.invalidate();
   }
 }

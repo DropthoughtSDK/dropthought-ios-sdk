@@ -3,9 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
 var _skipLogic = require("./skip-logic");
-
 Object.keys(_skipLogic).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (key in exports && exports[key] === _skipLogic[key]) return;
@@ -16,9 +14,7 @@ Object.keys(_skipLogic).forEach(function (key) {
     }
   });
 });
-
 var _data = require("./types/data");
-
 Object.keys(_data).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (key in exports && exports[key] === _data[key]) return;

@@ -4,10 +4,10 @@ declare const _default: {
     };
     selectedIndicator: {
         position: "absolute";
-        width: string;
+        width: "100%";
         backgroundColor: string;
         borderRadius: number;
-        top: string;
+        top: "50%";
     };
     scrollView: {
         overflow: "hidden";
@@ -21,3 +21,4 @@ declare const _default: {
     };
 };
 export default _default;
+//# sourceMappingURL=WheelPicker.styles.d.ts.map

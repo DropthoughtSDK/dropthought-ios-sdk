@@ -1,0 +1,1 @@
+{"version":3,"file":"EndScreen.d.ts","sourceRoot":"","sources":["../../../../src/containers/EndScreen.tsx"],"names":[],"mappings":"AAAA,OAAO,KAA8B,MAAM,OAAO,CAAC;AAMnD,OAAO,KAAK,EAAE,MAAM,EAAE,MAAM,SAAS,CAAC;AAatC,KAAK,KAAK,GAAG;IACX,MAAM,EAAE,MAAM,CAAC;IACf,OAAO,EAAE,MAAM,IAAI,CAAC;CACrB,CAAC;AAQF,QAAA,MAAM,SAAS,wBAAyB,KAAK,sBAqG5C,CAAC;AAEF,eAAe,SAAS,CAAC"}

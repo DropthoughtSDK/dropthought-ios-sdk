@@ -11,17 +11,13 @@ import LottieView from 'lottie-react-native';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import MandatoryTitle from './MandatoryTitle';
 const lotties = [require('../assets/animations/smiley_option1/option1_1.json'), require('../assets/animations/smiley_option1/option1_2.json'), require('../assets/animations/smiley_option1/option1_3.json'), require('../assets/animations/smiley_option1/option1_4.json'), require('../assets/animations/smiley_option1/option1_5.json')];
-
 const getInitialSelectedValue = (feedback, question) => {
   let prevAnswer;
-
   if (feedback && feedback.answers && !isNil(feedback.answers[0])) {
     prevAnswer = parseInt(feedback.answers[0], 10);
   }
-
   return question.options.map((_option, index) => prevAnswer === index);
 };
-
 const SmileyRatingQuestionOption1 = ({
   survey,
   pageIndex,
@@ -31,10 +27,11 @@ const SmileyRatingQuestionOption1 = ({
   onPrevPage,
   onNextPage,
   onFeedback,
-  feedback
+  feedback,
+  isLastPage
 }) => {
   const answered = feedback && feedback.answers && !isNil(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
-  const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
+  const answeredValue = answered && feedback.answers[0] ? parseInt(feedback.answers[0], 10) : 0;
   const {
     hexCode,
     backgroundColor: themeBackgroundColor,
@@ -48,7 +45,8 @@ const SmileyRatingQuestionOption1 = ({
   } = question;
   const [selectedIndex, setSelectedIndex] = React.useState(answered ? answeredValue : -1);
   const [selected, setSelected] = React.useState(getInitialSelectedValue(feedback, question));
-  const lottieSelectedIndex = scaleLogic[scale][selectedIndex];
+  const scaleLogicArray = scaleLogic[scale];
+  const lottieSelectedIndex = (scaleLogicArray && scaleLogicArray[selectedIndex]) ?? 0;
   const selectedBackgroundColor = colorScheme === COLOR_SCHEMES.dark ? Option1BackgroundColorDark : Option1BackgroundColor;
   const unselectedBackgroundColor = colorScheme === COLOR_SCHEMES.dark ? themeBackgroundColor : Colors.unSelectedBackground;
   const backgroundColor = feedback !== null && feedback !== void 0 && feedback.answers && (feedback === null || feedback === void 0 ? void 0 : feedback.answers.length) > 0 ? selectedBackgroundColor[lottieSelectedIndex] : unselectedBackgroundColor;
@@ -84,10 +82,12 @@ const SmileyRatingQuestionOption1 = ({
       color: fontColor
     }];
     return /*#__PURE__*/React.createElement(TouchableOpacity, {
+      accessibilityLabel: `selected_${isSelected}`,
       style: buttonStyle,
       onPress: () => setSelectedAndFeedback(index),
       key: index.toString()
     }, /*#__PURE__*/React.createElement(Text, {
+      testID: "test:id/smilely3_item",
       style: textStyle
     }, index + 1));
   }));
@@ -109,19 +109,20 @@ const SmileyRatingQuestionOption1 = ({
   }), /*#__PURE__*/React.createElement(View, {
     style: questionContainerStyle
   }, feedback && selectedIndex >= 0 ? /*#__PURE__*/React.createElement(View, {
+    accessibilityLabel: `selected_custom_smilely3_${selectedIndex}`,
     style: commonStyles.infoContainer
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     question: question,
     mandatoryErrorMessage: survey.mandatoryErrorMessage,
     forgot: forgot
-  }), /*#__PURE__*/React.createElement(View, {
-    style: commonStyles.lottieContainer
-  }, /*#__PURE__*/React.createElement(LottieView, {
+  }), /*#__PURE__*/React.createElement(LottieView, {
     source: lotties[lottieSelectedIndex],
     autoPlay: true,
+    loop: true,
     style: commonStyles.lottieContent,
     speed: 0.5
-  })), /*#__PURE__*/React.createElement(Text, {
+  }), /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/custom_smilely3_score_desc",
     style: descStyle
   }, options[selectedIndex])) : /*#__PURE__*/React.createElement(View, {
     style: commonStyles.initInfoContainer
@@ -132,18 +133,18 @@ const SmileyRatingQuestionOption1 = ({
   }), /*#__PURE__*/React.createElement(View, {
     style: commonStyles.hintContainer
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: `test:id/custom_smilely3_title_${colorScheme}`,
     style: hintTextStyle
-  }, i18n.t('option1HintDescription:title')))), ratingComponent), /*#__PURE__*/React.createElement(SurveyFooter, {
+  }, `${i18n.t('option1HintDescription:title')}`))), ratingComponent), /*#__PURE__*/React.createElement(SurveyFooter, {
     submitSurvey: survey.submitSurvey,
     surveyColor: hexCode,
     isFirstPage: pageIndex === 0,
-    isLastPage: pageIndex === survey.pageOrder.length - 1,
+    isLastPage: isLastPage,
     onPrevPage: onPrevPage,
     onNextPage: onNextPage,
     backgroundColor: backgroundColor
   }));
 };
-
 export default /*#__PURE__*/React.memo(SmileyRatingQuestionOption1);
 const commonStyles = StyleSheet.create({
   container: {
@@ -163,14 +164,9 @@ const commonStyles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%'
   },
-  lottieContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%'
-  },
   lottieContent: {
-    width: '100%'
+    width: '100%',
+    height: '100%'
   },
   hintContainer: {
     flex: 1,

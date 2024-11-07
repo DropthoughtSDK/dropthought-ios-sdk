@@ -7,7 +7,8 @@ import { initialize } from './lib/encrypted-storage';
 // @ts-ignore
 import { feedbackUploader } from './lib/FeedbacksUploader';
 
-import { initStorage, Storage } from './lib/Storage';
+import { initStorage } from './lib/Storage';
+import type { Storage } from './lib/Storage';
 
 export async function initializeWithAPIKey(param: {
   apiKey: string;

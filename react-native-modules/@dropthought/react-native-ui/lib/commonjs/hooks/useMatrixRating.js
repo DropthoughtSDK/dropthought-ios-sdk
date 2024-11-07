@@ -4,35 +4,25 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.matrixRatingValidator = exports.default = void 0;
-
 var _react = require("react");
-
 var _data = require("../utils/data");
-
 var _translation = _interopRequireDefault(require("../translation"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 const matrixRatingValidator = (question, feedback) => {
   const {
     answers = []
   } = feedback;
   const matrixRequiredType = (0, _data.getRequiredType)(question);
-
   switch (matrixRequiredType) {
     case 'all':
       return answers.length > 1 && answers.every(value => value !== -1);
-
     case 'one':
       return answers.some(value => value !== -1);
-
     default:
       return true;
   }
 };
-
 exports.matrixRatingValidator = matrixRatingValidator;
-
 const useMatrixRating = (question, feedback, onFeedback) => {
   const {
     questionId,
@@ -51,7 +41,6 @@ const useMatrixRating = (question, feedback, onFeedback) => {
       });
     }
   }, [hasEdited, matrixRequiredType, onFeedback, questionId, selectedAnswer]);
-
   const onRowPress = rowIndex => {
     setCollapseList(previous => {
       const list = previous.map((collapse, index) => {
@@ -64,7 +53,6 @@ const useMatrixRating = (question, feedback, onFeedback) => {
       return list;
     });
   };
-
   const onColoumPress = (rowIndex, coloumIndex) => {
     setSelectedAnswer(previous => {
       const answers = previous.map((answer, index) => index === rowIndex ? coloumIndex : answer);
@@ -77,22 +65,17 @@ const useMatrixRating = (question, feedback, onFeedback) => {
       return list;
     });
   };
-
   const handleMatrixRatingErrorHint = forgot => {
     if (!forgot) return undefined;
-
     switch (matrixRequiredType) {
       case 'all':
         return _translation.default.t('survey:error-hint-required-all');
-
       case 'one':
         return _translation.default.t('survey:error-hint-least-one');
-
       default:
         return undefined;
     }
   };
-
   return {
     collapseList,
     selectedAnswer,
@@ -101,7 +84,5 @@ const useMatrixRating = (question, feedback, onFeedback) => {
     onColoumPress
   };
 };
-
-var _default = useMatrixRating;
-exports.default = _default;
+var _default = exports.default = useMatrixRating;
 //# sourceMappingURL=useMatrixRating.js.map

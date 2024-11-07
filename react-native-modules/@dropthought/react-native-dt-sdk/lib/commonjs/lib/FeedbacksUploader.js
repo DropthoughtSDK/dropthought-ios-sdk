@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.feedbackUploader = exports.UploaderStates = exports.FeedbacksQueue = exports.FailedReasonsQueue = exports.FailedFeedbacksQueue = void 0;
 var _ramda = require("ramda");
-var _v = _interopRequireDefault(require("uuid/v4"));
+var _uuid = require("uuid");
 var _API = require("./API");
 var _QueueStorage = _interopRequireDefault(require("./QueueStorage"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -221,7 +221,7 @@ function CreateFeedbacksUploader() {
    * @param {FeedbackUploaderSubscriber} subscriber
    */
   function subscribe(subscriber) {
-    const id = (0, _v.default)();
+    const id = (0, _uuid.v4)();
     const subscription = {
       id,
       subscriber

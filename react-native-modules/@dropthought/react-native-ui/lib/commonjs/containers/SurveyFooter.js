@@ -4,25 +4,15 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
-var React = _interopRequireWildcard(require("react"));
-
+var _react = _interopRequireWildcard(require("react"));
 var _reactNative = require("react-native");
-
 var _hooks = require("@react-native-community/hooks");
-
 var _styles = require("../styles");
-
 var _translation = _interopRequireDefault(require("../translation"));
-
 var _theme = require("../contexts/theme");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 /**
  * @description a extension UI/UX component of SurveyScreenLayout
  * it displays three buttons:
@@ -32,8 +22,8 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
  * When "Back" is pressed, call props.onPrevPage
  * When "Next" or "Submit" is pressed, call props.onNextPage
  */
-const isAndroid = _reactNative.Platform.OS === 'android';
 
+const isAndroid = _reactNative.Platform.OS === 'android';
 const SurveyFooter = props => {
   const rtl = _translation.default.dir() === 'rtl';
   const {
@@ -48,7 +38,7 @@ const SurveyFooter = props => {
   const {
     keyboardShown
   } = (0, _hooks.useKeyboard)();
-  const containerStyle = [styles.container, rtl && _styles.GlobalStyle.flexRowReverse, {
+  const containerStyle = [styles.container, {
     backgroundColor
   }];
   const {
@@ -62,18 +52,20 @@ const SurveyFooter = props => {
     tintColor: surveyColor,
     opacity: isDarkMode ? 1 : 0.1
   }];
-  const [submitDisabled, setSubmitDisabled] = React.useState(false);
-  const leftIcon = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(_reactNative.Image, {
+  const [submitDisabled, setSubmitDisabled] = (0, _react.useState)(false);
+  const leftIcon = /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
+    accessibilityLabel: "test:id/custom_preview_back",
     style: iconBgStyle,
     source: require('../assets/icPreviousButtonBg.png')
-  }), /*#__PURE__*/React.createElement(_reactNative.Image, {
+  }), /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
     style: iconStyle,
     source: require('../assets/icPreviousButton.png')
   }));
-  const rightIcon = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(_reactNative.Image, {
+  const rightIcon = /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
+    accessibilityLabel: "test:id/custom_preview_next",
     style: iconBgStyle,
     source: require('../assets/icNextButtonBg.png')
-  }), /*#__PURE__*/React.createElement(_reactNative.Image, {
+  }), /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
     style: iconStyle,
     source: require('../assets/icNextButton.png')
   }));
@@ -84,9 +76,9 @@ const SurveyFooter = props => {
   const textStyle = [styles.submitText, {
     lineHeight: _translation.default.language === 'te' ? 26 : undefined
   }];
-  const submitButton = /*#__PURE__*/React.createElement(_reactNative.View, {
+  const submitButton = /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: _styles.GlobalStyle.row
-  }, /*#__PURE__*/React.createElement(_reactNative.TouchableOpacity, {
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
     style: submitButtonStyle,
     disabled: submitDisabled,
     onPress: () => {
@@ -94,24 +86,25 @@ const SurveyFooter = props => {
       setTimeout(() => setSubmitDisabled(false), 1000);
       onNextPage();
     }
-  }, /*#__PURE__*/React.createElement(_reactNative.Text, {
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    testID: "test:id/button_custom_preview_submit",
     style: textStyle
   }, submitSurvey)));
-  const leftButton = /*#__PURE__*/React.createElement(_reactNative.TouchableOpacity, {
+  const leftButton = /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
     style: styles.leftButtonContainer,
-    onPress: onPrevPage
-  }, rtl ? rightIcon : leftIcon);
-  const rightButton = /*#__PURE__*/React.createElement(_reactNative.TouchableOpacity, {
+    onPress: rtl ? onNextPage : onPrevPage
+  }, leftIcon);
+  const rightButton = /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
     style: styles.rightButtonContainer,
-    onPress: onNextPage
-  }, rtl ? leftIcon : rightIcon); // hide this bar when it is android and keyboard is shown
+    onPress: rtl ? onPrevPage : onNextPage
+  }, rightIcon);
 
+  // hide this bar when it is android and keyboard is shown
   if (isAndroid && keyboardShown) return null;
-  return /*#__PURE__*/React.createElement(_reactNative.View, {
+  return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: containerStyle
-  }, isFirstPage ? null : leftButton, isLastPage ? submitButton : rightButton);
+  }, isFirstPage ? null : rtl ? rightButton : leftButton, isLastPage ? submitButton : rtl ? leftButton : rightButton);
 };
-
 const styles = _reactNative.StyleSheet.create({
   container: {
     alignItems: 'center',
@@ -136,7 +129,8 @@ const styles = _reactNative.StyleSheet.create({
   submitText: {
     color: _styles.Colors.white,
     fontSize: 16,
-    fontWeight: '600'
+    fontWeight: '600',
+    textAlign: 'center'
   },
   icon: {
     position: 'absolute',
@@ -147,8 +141,5 @@ const styles = _reactNative.StyleSheet.create({
     opacity: 0.5
   }
 });
-
-var _default = /*#__PURE__*/React.memo(SurveyFooter);
-
-exports.default = _default;
+var _default = exports.default = /*#__PURE__*/(0, _react.memo)(SurveyFooter);
 //# sourceMappingURL=SurveyFooter.js.map

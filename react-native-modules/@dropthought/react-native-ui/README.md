@@ -4,7 +4,11 @@ UI element for Dropthought React Native SDK
 
 ## Latest version
 
-- 5.5.0
+- 5.12.0
+
+## Minimum RN version required
+
+- &gt;= 0.69 (Please refer: [react-native-document-picker](https://github.com/rnmods/react-native-document-picker#rn--069))
 
 ## Installation
 
@@ -23,8 +27,11 @@ yarn add @dropthought/react-native-ui
 ### Installing dependencies
 
 - [lottie-react-native](https://github.com/lottie-react-native/lottie-react-native)
+- [react-native-document-picker](https://github.com/rnmods/react-native-document-picker)
+- [react-native-image-crop-picker](https://github.com/ivpusic/react-native-image-crop-picker)
 - [react-native-safe-area-context](https://github.com/th3rdwave/react-native-safe-area-context#getting-started)
-- [react-native-image-picker](https://github.com/react-native-image-picker/react-native-image-picker)
+- [react-native-webview](https://github.com/react-native-webview/react-native-webview)
+- [react-native-svg](https://github.com/react-native-community/react-native-svg)
 
 ## Usage
 
@@ -35,8 +42,11 @@ This component provides the theme (classic) setting to all components.
 - Props:
   - `themeOption`: THEME_OPTION.CLASSIC | THEME_OPTION.OPTION1 | THEME_OPTION.OPTION2 | THEME_OPTION.OPTION3 | THEME_OPTION.OPTION4 | THEME_OPTION.OPTION6 | THEME_OPTION.BIJLIRIDE(NEW)
   - `appearance`: APPEARANCE.SYSTEM | APPEARANCE.LIGHT | APPEARANCE.DARK
+  - `hexCode`: [React Native Color Reference](https://reactnative.dev/docs/colors)
   - `fontColor`: [React Native Color Reference](https://reactnative.dev/docs/colors)
   - `backgroundColor`: [React Native Color Reference](https://reactnative.dev/docs/colors)
+  - `autoClose`: Boolean (enable auto close on end page)
+  - `autoCloseCountdown`: Number (countdown in ms)
 
 ```js
 import { KioskProvider, APPEARANCE } from '@dropthought/react-native-ui';
@@ -44,8 +54,11 @@ import { KioskProvider, APPEARANCE } from '@dropthought/react-native-ui';
 <KioskProvider
   themeOption={THEME_OPTION.CLASSIC}
   appearance={APPEARANCE.SYSTEM}
+  hex="#4b3693"
   fontColor="white"
   backgroundColor="#4c3794"
+  autoClose={true}
+  autoCloseCountdown={3000}
 >
   {/* ... */}
 </KioskProvider>;
@@ -58,7 +71,15 @@ A custom hook returns theme setting.
 ```js
 import { useTheme } from '@dropthought/react-native-ui';
 
-const { themeOption, colorScheme, fontColor, backgroundColor } = useTheme();
+const {
+  themeOption,
+  colorScheme,
+  hexCode,
+  fontColor,
+  backgroundColor,
+  autoClose,
+  autoCloseCountdown,
+} = useTheme();
 ```
 
 ### useDimensionWidthType

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,22 +8,19 @@
  * @flow strict
  */
 
-'use strict';
+import type {
+  Platform as PlatformType,
+  PlatformSelectSpec,
+} from './Platform.flow';
 
 import NativePlatformConstantsIOS from './NativePlatformConstantsIOS';
 
-export type PlatformSelectSpec<D, N, I> = {
-  default?: D,
-  native?: N,
-  ios?: I,
-  ...
-};
-
-const Platform = {
+const Platform: PlatformType = {
   __constants: null,
   OS: 'ios',
   // $FlowFixMe[unsafe-getters-setters]
   get Version(): string {
+    // $FlowFixMe[object-this-reference]
     return this.constants.osVersion;
   },
   // $FlowFixMe[unsafe-getters-setters]
@@ -31,6 +28,7 @@ const Platform = {
     forceTouchAvailable: boolean,
     interfaceIdiom: string,
     isTesting: boolean,
+    isDisableAnimations?: boolean,
     osVersion: string,
     reactNativeVersion: {|
       major: number,
@@ -40,34 +38,39 @@ const Platform = {
     |},
     systemName: string,
   |} {
+    // $FlowFixMe[object-this-reference]
     if (this.__constants == null) {
+      // $FlowFixMe[object-this-reference]
       this.__constants = NativePlatformConstantsIOS.getConstants();
     }
+    // $FlowFixMe[object-this-reference]
     return this.__constants;
   },
   // $FlowFixMe[unsafe-getters-setters]
   get isPad(): boolean {
+    // $FlowFixMe[object-this-reference]
     return this.constants.interfaceIdiom === 'pad';
-  },
-  /**
-   * Deprecated, use `isTV` instead.
-   */
-  // $FlowFixMe[unsafe-getters-setters]
-  get isTVOS(): boolean {
-    return Platform.isTV;
   },
   // $FlowFixMe[unsafe-getters-setters]
   get isTV(): boolean {
+    // $FlowFixMe[object-this-reference]
     return this.constants.interfaceIdiom === 'tv';
   },
   // $FlowFixMe[unsafe-getters-setters]
   get isTesting(): boolean {
     if (__DEV__) {
+      // $FlowFixMe[object-this-reference]
       return this.constants.isTesting;
     }
     return false;
   },
-  select: <D, N, I>(spec: PlatformSelectSpec<D, N, I>): D | N | I =>
+  // $FlowFixMe[unsafe-getters-setters]
+  get isDisableAnimations(): boolean {
+    // $FlowFixMe[object-this-reference]
+    return this.constants.isDisableAnimations ?? this.isTesting;
+  },
+  select: <T>(spec: PlatformSelectSpec<T>): T =>
+    // $FlowFixMe[incompatible-return]
     'ios' in spec ? spec.ios : 'native' in spec ? spec.native : spec.default,
 };
 

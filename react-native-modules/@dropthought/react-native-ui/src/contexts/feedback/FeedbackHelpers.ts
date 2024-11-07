@@ -1,6 +1,6 @@
 import { FeedbackReducerActionType } from './FeedbackReducer';
 import type { FeedbackReducerDispatch } from './FeedbackReducer';
-import type { Feedback } from 'src/data';
+import type { Feedback } from '../../data';
 
 export function updateFeedback(
   dispatch: FeedbackReducerDispatch,
@@ -17,5 +17,17 @@ export function updateFeedback(
 export function clearFeedbacks(dispatch: FeedbackReducerDispatch) {
   dispatch({
     type: FeedbackReducerActionType.Clear,
+  });
+}
+
+export function removeSingleFeedback(
+  dispatch: FeedbackReducerDispatch,
+  questionId: string
+) {
+  dispatch({
+    type: FeedbackReducerActionType.RemoveSingle,
+    payload: {
+      questionId,
+    },
   });
 }

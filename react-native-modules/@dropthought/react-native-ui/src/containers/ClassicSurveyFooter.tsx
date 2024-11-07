@@ -27,6 +27,7 @@ const DummyButton = ({ width }: { width: number }) => (
 type Props = {
   survey: Survey;
   pageIndex: number;
+  isLast: boolean;
   onPrevPage: () => void;
   onNextPage: () => void;
 };
@@ -35,9 +36,7 @@ const ClassicSurveyFooter = (props: Props) => {
   const { hexCode } = useTheme();
   const dimensionWidthType = useDimensionWidthType();
   const rtl = i18n.dir() === 'rtl';
-  const { survey, pageIndex = 0, onPrevPage, onNextPage } = props;
-
-  const lastPage = pageIndex === survey.pageOrder.length - 1;
+  const { survey, pageIndex = 0, isLast, onPrevPage, onNextPage } = props;
 
   // why use a dummy button here? we use 'space-between' to layout the buttons
   let LeftButtonComponent = Button;
@@ -54,6 +53,7 @@ const ClassicSurveyFooter = (props: Props) => {
   return (
     <View style={[styles.container, rtl && GlobalStyle.flexRowReverse]}>
       <LeftButtonComponent
+        testID="test:id/button_back_preview"
         width={btnWidth}
         title={survey.backPage}
         color={themeColor}
@@ -61,8 +61,9 @@ const ClassicSurveyFooter = (props: Props) => {
         // @ts-ignore
         containerStyle={styles.leftBtnContainer}
       />
-      {lastPage ? (
+      {isLast ? (
         <Button
+          testID="test:id/button_submit_preview"
           disabled={submitDisabled}
           width={btnWidth}
           title={survey.submitSurvey}
@@ -77,6 +78,7 @@ const ClassicSurveyFooter = (props: Props) => {
         />
       ) : (
         <Button
+          testID="test:id/button_next_preview"
           width={btnWidth}
           title={survey.nextPage}
           color={themeColor}

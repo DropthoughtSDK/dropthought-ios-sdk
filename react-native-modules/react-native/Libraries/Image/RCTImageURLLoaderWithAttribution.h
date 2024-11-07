@@ -1,27 +1,26 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
 
-#import <React/RCTImageURLLoader.h>
-#import <React/RCTImageLoaderProtocol.h>
 #import <React/RCTImageLoaderLoggable.h>
+#import <React/RCTImageLoaderProtocol.h>
+#import <React/RCTImageURLLoader.h>
 
 // TODO (T61325135): Remove C++ checks
 #ifdef __cplusplus
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 struct ImageURLLoaderAttribution {
   int32_t nativeViewTag = 0;
   int32_t surfaceId = 0;
+  std::string queryRootName;
   NSString *analyticTag;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react
 #endif
 
 @interface RCTImageURLLoaderRequest : NSObject
@@ -30,7 +29,9 @@ struct ImageURLLoaderAttribution {
 @property (nonatomic, strong, readonly) NSURL *imageURL;
 @property (nonatomic, copy, readonly) RCTImageLoaderCancellationBlock cancellationBlock;
 
-- (instancetype)initWithRequestId:(NSString *)requestId imageURL:(NSURL *)imageURL cancellationBlock:(RCTImageLoaderCancellationBlock)cancellationBlock;
+- (instancetype)initWithRequestId:(NSString *)requestId
+                         imageURL:(NSURL *)imageURL
+                cancellationBlock:(RCTImageLoaderCancellationBlock)cancellationBlock;
 - (void)cancel;
 
 @end
@@ -52,7 +53,7 @@ struct ImageURLLoaderAttribution {
                                         scale:(CGFloat)scale
                                    resizeMode:(RCTResizeMode)resizeMode
                                     requestId:(NSString *)requestId
-                                    priority: (RCTImageLoaderPriority)priority
+                                     priority:(RCTImageLoaderPriority)priority
                                   attribution:(const facebook::react::ImageURLLoaderAttribution &)attribution
                               progressHandler:(RCTImageLoaderProgressBlock)progressHandler
                            partialLoadHandler:(RCTImageLoaderPartialLoadBlock)partialLoadHandler

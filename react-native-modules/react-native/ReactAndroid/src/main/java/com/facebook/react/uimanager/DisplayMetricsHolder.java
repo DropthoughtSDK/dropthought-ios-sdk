@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -13,27 +13,18 @@ import android.view.Display;
 import android.view.WindowManager;
 import androidx.annotation.Nullable;
 import com.facebook.infer.annotation.Assertions;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Holds an instance of the current DisplayMetrics so we don't have to thread it through all the
- * classes that need it. Note: windowDisplayMetrics are deprecated in favor of ScreenDisplayMetrics:
- * window metrics are supposed to return the drawable area but there's no guarantee that they
- * correspond to the actual size of the {@link ReactRootView}. Moreover, they are not consistent
- * with what iOS returns. Screen metrics returns the metrics of the entire screen, is consistent
- * with iOS and should be used instead.
+ * classes that need it.
  */
 public class DisplayMetricsHolder {
 
   private static @Nullable DisplayMetrics sWindowDisplayMetrics;
   private static @Nullable DisplayMetrics sScreenDisplayMetrics;
 
-  /**
-   * @deprecated Use {@link #setScreenDisplayMetrics(DisplayMetrics)} instead. See comment above as
-   *     to why this is not correct to use.
-   */
   public static void setWindowDisplayMetrics(DisplayMetrics displayMetrics) {
     sWindowDisplayMetrics = displayMetrics;
   }
@@ -64,11 +55,7 @@ public class DisplayMetricsHolder {
     DisplayMetricsHolder.setScreenDisplayMetrics(screenDisplayMetrics);
   }
 
-  /**
-   * @deprecated Use {@link #getScreenDisplayMetrics()} instead. See comment above as to why this is
-   *     not correct to use.
-   */
-  @Deprecated
+  /** Returns the metrics of the window associated to the Context used to initialize ReactNative */
   public static DisplayMetrics getWindowDisplayMetrics() {
     return sWindowDisplayMetrics;
   }
@@ -77,44 +64,25 @@ public class DisplayMetricsHolder {
     sScreenDisplayMetrics = screenDisplayMetrics;
   }
 
+  /** Screen metrics returns the metrics of the default screen on the device. */
   public static DisplayMetrics getScreenDisplayMetrics() {
     return sScreenDisplayMetrics;
   }
 
-  public static Map<String, Map<String, Object>> getDisplayMetricsMap(double fontScale) {
+  public static WritableMap getDisplayMetricsWritableMap(double fontScale) {
     Assertions.assertCondition(
         sWindowDisplayMetrics != null && sScreenDisplayMetrics != null,
-        "DisplayMetricsHolder must be initialized with initDisplayMetricsIfNotInitialized or initDisplayMetrics");
-    final Map<String, Map<String, Object>> result = new HashMap<>();
-    result.put("windowPhysicalPixels", getPhysicalPixelsMap(sWindowDisplayMetrics, fontScale));
-    result.put("screenPhysicalPixels", getPhysicalPixelsMap(sScreenDisplayMetrics, fontScale));
-    return result;
-  }
-
-  public static WritableNativeMap getDisplayMetricsNativeMap(double fontScale) {
-    Assertions.assertCondition(
-        sWindowDisplayMetrics != null && sScreenDisplayMetrics != null,
-        "DisplayMetricsHolder must be initialized with initDisplayMetricsIfNotInitialized or initDisplayMetrics");
+        "DisplayMetricsHolder must be initialized with initDisplayMetricsIfNotInitialized or"
+            + " initDisplayMetrics");
     final WritableNativeMap result = new WritableNativeMap();
     result.putMap(
-        "windowPhysicalPixels", getPhysicalPixelsNativeMap(sWindowDisplayMetrics, fontScale));
+        "windowPhysicalPixels", getPhysicalPixelsWritableMap(sWindowDisplayMetrics, fontScale));
     result.putMap(
-        "screenPhysicalPixels", getPhysicalPixelsNativeMap(sScreenDisplayMetrics, fontScale));
+        "screenPhysicalPixels", getPhysicalPixelsWritableMap(sScreenDisplayMetrics, fontScale));
     return result;
   }
 
-  private static Map<String, Object> getPhysicalPixelsMap(
-      DisplayMetrics displayMetrics, double fontScale) {
-    final Map<String, Object> result = new HashMap<>();
-    result.put("width", displayMetrics.widthPixels);
-    result.put("height", displayMetrics.heightPixels);
-    result.put("scale", displayMetrics.density);
-    result.put("fontScale", fontScale);
-    result.put("densityDpi", displayMetrics.densityDpi);
-    return result;
-  }
-
-  private static WritableNativeMap getPhysicalPixelsNativeMap(
+  private static WritableMap getPhysicalPixelsWritableMap(
       DisplayMetrics displayMetrics, double fontScale) {
     final WritableNativeMap result = new WritableNativeMap();
     result.putInt("width", displayMetrics.widthPixels);

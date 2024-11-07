@@ -4,34 +4,24 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireWildcard(require("react"));
-
 var _reactNative = require("react-native");
-
 var _styles = require("../styles");
-
 var _useWindowDimensions = require("../hooks/useWindowDimensions");
-
 var _Button = _interopRequireDefault(require("../components/Button"));
-
+var _HtmlText = _interopRequireDefault(require("../components/HtmlText"));
 var _theme = require("../contexts/theme");
-
 var _LanguageUtils = require("../utils/LanguageUtils");
-
+var _usePollingRecord = require("../hooks/usePollingRecord");
+var _htmlHelper = require("../utils/htmlHelper");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 const defaultIconSource = require('../assets/rating.png');
-
 const defaultIconSize = {
   [_useWindowDimensions.DimensionWidthType.phone]: 65,
   [_useWindowDimensions.DimensionWidthType.tablet]: 72
 };
-
 const ClassicStartScreen = ({
   onLanguageSelect,
   onStart,
@@ -49,6 +39,7 @@ const ClassicStartScreen = ({
   const {
     surveyProperty,
     surveyName,
+    welcomeText,
     welcomeTextPlain,
     language,
     takeSurvey
@@ -66,26 +57,33 @@ const ClassicStartScreen = ({
       if (height < defaultIconSize[dimensionWidthType]) {
         setImageHeight(height);
       }
-    }, _ => {}); // eslint-disable-next-line react-hooks/exhaustive-deps
-
+    }, _ => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const {
+    resetRecord
+  } = (0, _usePollingRecord.usePollingRecord)();
+  (0, _react.useEffect)(() => {
+    resetRecord();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const iconSource = image === undefined ? defaultIconSource : {
     uri: image
   };
-
   const iconView = /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
-    resizeMode: "contain",
+    resizeMode: "contain"
+    // @ts-ignore
+    ,
     style: iconStyle,
     source: iconSource
   });
-
   const buttonWidth = isPhone ? 143 : 160;
-
   const languagesView = () => {
     const {
       languages
-    } = survey; // if there's only one language or no languages, no need to display
+    } = survey;
 
+    // if there's only one language or no languages, no need to display
     if (!languages || !languages.length || languages.length <= 1) return null;
     const languageView = languages.map((lang, index) => /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
       key: index,
@@ -101,25 +99,30 @@ const ClassicStartScreen = ({
       style: styles.languages
     }, languageView);
   };
-
   const containerStyle = [shareStyles.container, {
     backgroundColor: themeOption === _theme.THEME_OPTION.BIJLIRIDE ? _styles.Colors.bijlirideBackgroundColor : backgroundColor
   }];
   return /*#__PURE__*/_react.default.createElement(_reactNative.ScrollView, {
-    contentContainerStyle: containerStyle
+    contentContainerStyle: containerStyle,
+    scrollEnabled: false
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.main
   }, iconView, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    testID: "test:id/take_survey_name",
     style: [styles.title, {
       color: fontColor
     }]
-  }, surveyName), !!welcomeTextPlain && /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-    style: [styles.subtitle, {
-      color: fontColor
-    }]
-  }, welcomeTextPlain), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+  }, surveyName), !!welcomeTextPlain && welcomeText && /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+    style: styles.subtitle
+  }, /*#__PURE__*/_react.default.createElement(_HtmlText.default, {
+    accessibilityLabel: `welcome_${welcomeText}`,
+    html: (0, _htmlHelper.htmlTrim)(welcomeText),
+    width: _reactNative.Dimensions.get('window').width - 76,
+    maxHeight: _reactNative.Dimensions.get('window').height * 0.4
+  })), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.divider
   }), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    testID: "test:id/button_take_survey",
     width: buttonWidth,
     title: takeSurvey,
     color: hexCode,
@@ -127,17 +130,13 @@ const ClassicStartScreen = ({
     containerStyle: styles.takeSurveyButton
   })), languagesView());
 };
-
-var _default = ClassicStartScreen;
-exports.default = _default;
-
+var _default = exports.default = ClassicStartScreen;
 const shareStyles = _reactNative.StyleSheet.create({
   container: {
     backgroundColor: _styles.Colors.white,
     flex: 1
   }
 });
-
 const phoneStyles = _reactNative.StyleSheet.create({
   main: {
     flex: 1,
@@ -154,11 +153,7 @@ const phoneStyles = _reactNative.StyleSheet.create({
     lineHeight: 27
   },
   subtitle: {
-    lineHeight: 23,
-    marginTop: 12,
-    fontSize: 16,
-    textAlign: 'center',
-    opacity: 0.72
+    marginTop: 17
   },
   divider: {
     backgroundColor: '#c3c3c3',
@@ -182,7 +177,6 @@ const phoneStyles = _reactNative.StyleSheet.create({
     marginHorizontal: 38
   }
 });
-
 const tabletStyles = _reactNative.StyleSheet.create({
   main: {
     flex: 1,
@@ -199,11 +193,7 @@ const tabletStyles = _reactNative.StyleSheet.create({
     opacity: 0.9
   },
   subtitle: {
-    lineHeight: 25,
-    marginTop: 17,
-    fontSize: 21,
-    textAlign: 'center',
-    opacity: 0.72
+    marginTop: 17
   },
   divider: {
     backgroundColor: '#c3c3c3',

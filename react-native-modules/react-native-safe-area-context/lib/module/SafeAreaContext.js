@@ -1,24 +1,27 @@
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
+function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 import * as React from 'react';
 import { Dimensions, StyleSheet } from 'react-native';
-import NativeSafeAreaProvider from './NativeSafeAreaProvider';
+import { NativeSafeAreaProvider } from './NativeSafeAreaProvider';
+const isDev = process.env.NODE_ENV !== 'production';
 export const SafeAreaInsetsContext = /*#__PURE__*/React.createContext(null);
-SafeAreaInsetsContext.displayName = 'SafeAreaInsetsContext';
+if (isDev) {
+  SafeAreaInsetsContext.displayName = 'SafeAreaInsetsContext';
+}
 export const SafeAreaFrameContext = /*#__PURE__*/React.createContext(null);
-SafeAreaFrameContext.displayName = 'SafeAreaFrameContext';
+if (isDev) {
+  SafeAreaFrameContext.displayName = 'SafeAreaFrameContext';
+}
 export function SafeAreaProvider({
   children,
   initialMetrics,
   initialSafeAreaInsets,
-  style
+  style,
+  ...others
 }) {
-  var _ref, _ref2, _initialMetrics$inset, _ref3, _initialMetrics$frame;
-
   const parentInsets = useParentSafeAreaInsets();
   const parentFrame = useParentSafeAreaFrame();
-  const [insets, setInsets] = React.useState((_ref = (_ref2 = (_initialMetrics$inset = initialMetrics === null || initialMetrics === void 0 ? void 0 : initialMetrics.insets) !== null && _initialMetrics$inset !== void 0 ? _initialMetrics$inset : initialSafeAreaInsets) !== null && _ref2 !== void 0 ? _ref2 : parentInsets) !== null && _ref !== void 0 ? _ref : null);
-  const [frame, setFrame] = React.useState((_ref3 = (_initialMetrics$frame = initialMetrics === null || initialMetrics === void 0 ? void 0 : initialMetrics.frame) !== null && _initialMetrics$frame !== void 0 ? _initialMetrics$frame : parentFrame) !== null && _ref3 !== void 0 ? _ref3 : {
+  const [insets, setInsets] = React.useState(initialMetrics?.insets ?? initialSafeAreaInsets ?? parentInsets ?? null);
+  const [frame, setFrame] = React.useState(initialMetrics?.frame ?? parentFrame ?? {
     // Backwards compat so we render anyway if we don't have frame.
     x: 0,
     y: 0,
@@ -32,20 +35,27 @@ export function SafeAreaProvider({
         insets: nextInsets
       }
     } = event;
-
-    if ( // Backwards compat with old native code that won't send frame.
-    nextFrame && (nextFrame.height !== frame.height || nextFrame.width !== frame.width || nextFrame.x !== frame.x || nextFrame.y !== frame.y)) {
-      setFrame(nextFrame);
-    }
-
-    if (!insets || nextInsets.bottom !== insets.bottom || nextInsets.left !== insets.left || nextInsets.right !== insets.right || nextInsets.top !== insets.top) {
-      setInsets(nextInsets);
-    }
-  }, [frame, insets]);
-  return /*#__PURE__*/React.createElement(NativeSafeAreaProvider, {
+    setFrame(curFrame => {
+      if (
+      // Backwards compat with old native code that won't send frame.
+      nextFrame && (nextFrame.height !== curFrame.height || nextFrame.width !== curFrame.width || nextFrame.x !== curFrame.x || nextFrame.y !== curFrame.y)) {
+        return nextFrame;
+      } else {
+        return curFrame;
+      }
+    });
+    setInsets(curInsets => {
+      if (!curInsets || nextInsets.bottom !== curInsets.bottom || nextInsets.left !== curInsets.left || nextInsets.right !== curInsets.right || nextInsets.top !== curInsets.top) {
+        return nextInsets;
+      } else {
+        return curInsets;
+      }
+    });
+  }, []);
+  return /*#__PURE__*/React.createElement(NativeSafeAreaProvider, _extends({
     style: [styles.fill, style],
     onInsetsChange: onInsetsChange
-  }, insets != null ? /*#__PURE__*/React.createElement(SafeAreaFrameContext.Provider, {
+  }, others), insets != null ? /*#__PURE__*/React.createElement(SafeAreaFrameContext.Provider, {
     value: frame
   }, /*#__PURE__*/React.createElement(SafeAreaInsetsContext.Provider, {
     value: insets
@@ -56,54 +66,51 @@ const styles = StyleSheet.create({
     flex: 1
   }
 });
-
 function useParentSafeAreaInsets() {
   return React.useContext(SafeAreaInsetsContext);
 }
-
 function useParentSafeAreaFrame() {
   return React.useContext(SafeAreaFrameContext);
 }
-
+const NO_INSETS_ERROR = 'No safe area value available. Make sure you are rendering `<SafeAreaProvider>` at the top of your app.';
 export function useSafeAreaInsets() {
-  const safeArea = React.useContext(SafeAreaInsetsContext);
-
-  if (safeArea == null) {
-    throw new Error('No safe area insets value available. Make sure you are rendering `<SafeAreaProvider>` at the top of your app.');
+  const insets = React.useContext(SafeAreaInsetsContext);
+  if (insets == null) {
+    throw new Error(NO_INSETS_ERROR);
   }
-
-  return safeArea;
+  return insets;
 }
 export function useSafeAreaFrame() {
   const frame = React.useContext(SafeAreaFrameContext);
-
   if (frame == null) {
-    throw new Error('No safe area frame value available. Make sure you are rendering `<SafeAreaProvider>` at the top of your app.');
+    throw new Error(NO_INSETS_ERROR);
   }
-
   return frame;
 }
 export function withSafeAreaInsets(WrappedComponent) {
-  return /*#__PURE__*/React.forwardRef((props, ref) => /*#__PURE__*/React.createElement(SafeAreaConsumer, null, insets => /*#__PURE__*/React.createElement(WrappedComponent, _extends({}, props, {
-    insets: insets,
-    ref: ref
-  }))));
+  return /*#__PURE__*/React.forwardRef((props, ref) => {
+    const insets = useSafeAreaInsets();
+    return /*#__PURE__*/React.createElement(WrappedComponent, _extends({}, props, {
+      insets: insets,
+      ref: ref
+    }));
+  });
 }
+
 /**
  * @deprecated
  */
-
 export function useSafeArea() {
   return useSafeAreaInsets();
 }
+
 /**
  * @deprecated
  */
-
 export const SafeAreaConsumer = SafeAreaInsetsContext.Consumer;
+
 /**
  * @deprecated
  */
-
 export const SafeAreaContext = SafeAreaInsetsContext;
 //# sourceMappingURL=SafeAreaContext.js.map

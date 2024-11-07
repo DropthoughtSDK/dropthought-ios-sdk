@@ -4,7 +4,7 @@ exports.useBackHandler = void 0;
 var react_1 = require("react");
 var react_native_1 = require("react-native");
 function useBackHandler(handler) {
-    react_1.useEffect(function () {
+    (0, react_1.useEffect)(function () {
         react_native_1.BackHandler.addEventListener('hardwareBackPress', handler);
         return function () { return react_native_1.BackHandler.removeEventListener('hardwareBackPress', handler); };
     }, [handler]);

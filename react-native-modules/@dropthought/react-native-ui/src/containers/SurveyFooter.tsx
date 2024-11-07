@@ -7,7 +7,7 @@
  * When "Back" is pressed, call props.onPrevPage
  * When "Next" or "Submit" is pressed, call props.onNextPage
  */
-import * as React from 'react';
+import React, { memo, useState } from 'react';
 import {
   Image,
   StyleSheet,
@@ -51,7 +51,6 @@ const SurveyFooter = (props: Props) => {
 
   const containerStyle = [
     styles.container,
-    rtl && GlobalStyle.flexRowReverse,
     {
       backgroundColor,
     },
@@ -67,11 +66,12 @@ const SurveyFooter = (props: Props) => {
     { tintColor: surveyColor, opacity: isDarkMode ? 1 : 0.1 },
   ];
 
-  const [submitDisabled, setSubmitDisabled] = React.useState(false);
+  const [submitDisabled, setSubmitDisabled] = useState(false);
 
   const leftIcon = (
     <>
       <Image
+        accessibilityLabel="test:id/custom_preview_back"
         style={iconBgStyle}
         source={require('../assets/icPreviousButtonBg.png')}
       />
@@ -85,6 +85,7 @@ const SurveyFooter = (props: Props) => {
   const rightIcon = (
     <>
       <Image
+        accessibilityLabel="test:id/custom_preview_next"
         style={iconBgStyle}
         source={require('../assets/icNextButtonBg.png')}
       />
@@ -116,20 +117,28 @@ const SurveyFooter = (props: Props) => {
           onNextPage();
         }}
       >
-        <Text style={textStyle}>{submitSurvey}</Text>
+        <Text testID="test:id/button_custom_preview_submit" style={textStyle}>
+          {submitSurvey}
+        </Text>
       </TouchableOpacity>
     </View>
   );
 
   const leftButton = (
-    <TouchableOpacity style={styles.leftButtonContainer} onPress={onPrevPage}>
-      {rtl ? rightIcon : leftIcon}
+    <TouchableOpacity
+      style={styles.leftButtonContainer}
+      onPress={rtl ? onNextPage : onPrevPage}
+    >
+      {leftIcon}
     </TouchableOpacity>
   );
 
   const rightButton = (
-    <TouchableOpacity style={styles.rightButtonContainer} onPress={onNextPage}>
-      {rtl ? leftIcon : rightIcon}
+    <TouchableOpacity
+      style={styles.rightButtonContainer}
+      onPress={rtl ? onPrevPage : onNextPage}
+    >
+      {rightIcon}
     </TouchableOpacity>
   );
 
@@ -137,8 +146,8 @@ const SurveyFooter = (props: Props) => {
   if (isAndroid && keyboardShown) return null;
   return (
     <View style={containerStyle}>
-      {isFirstPage ? null : leftButton}
-      {isLastPage ? submitButton : rightButton}
+      {isFirstPage ? null : rtl ? rightButton : leftButton}
+      {isLastPage ? submitButton : rtl ? leftButton : rightButton}
     </View>
   );
 };
@@ -168,6 +177,7 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 16,
     fontWeight: '600',
+    textAlign: 'center',
   },
   icon: {
     position: 'absolute',
@@ -179,4 +189,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(SurveyFooter);
+export default memo(SurveyFooter);

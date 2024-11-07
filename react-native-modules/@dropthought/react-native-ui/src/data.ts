@@ -9,6 +9,8 @@ import type {
   Page,
   Rule,
   SurveyProperty,
+  DisplayLogics,
+  DisplayLogicProperty,
 } from './dt-common/types/data';
 
 export type {
@@ -22,6 +24,8 @@ export type {
   Page,
   Rule,
   SurveyProperty,
+  DisplayLogics,
+  DisplayLogicProperty,
 };
 
 export type {
@@ -51,5 +55,5 @@ export interface ImageFileProps {
   uri: string;
   name: string;
   type: string;
-  base64: string;
+  base64?: string;
 }

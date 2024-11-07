@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import com.facebook.common.logging.FLog;
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.infer.annotation.ThreadConfined;
+import com.facebook.react.common.ReactConstants;
 import com.facebook.react.common.build.ReactBuildConfig;
 
 /**
@@ -52,19 +53,17 @@ public abstract class ReactContextBaseJavaModule extends BaseJavaModule {
    */
   @ThreadConfined(ANY)
   protected @Nullable final ReactApplicationContext getReactApplicationContextIfActiveOrWarn() {
-    if (mReactApplicationContext.hasActiveCatalystInstance()
-        || mReactApplicationContext.isBridgeless()) {
+    if (mReactApplicationContext.hasActiveReactInstance()) {
       return mReactApplicationContext;
     }
 
     // We want to collect data about how often this happens, but SoftExceptions will cause a crash
     // in debug mode, which isn't usually desirable.
     String msg = "Catalyst Instance has already disappeared: requested by " + this.getName();
-    String tag = "ReactContextBaseJavaModule";
     if (ReactBuildConfig.DEBUG) {
-      FLog.w(tag, msg);
+      FLog.w(ReactConstants.TAG, msg);
     } else {
-      ReactSoftException.logSoftException(tag, new RuntimeException(msg));
+      ReactSoftExceptionLogger.logSoftException(ReactConstants.TAG, new RuntimeException(msg));
     }
     return null;
   }

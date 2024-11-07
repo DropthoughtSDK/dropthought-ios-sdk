@@ -1,13 +1,13 @@
 import React from 'react';
 import type { Feedback as OriginFeedback, Question as OriginQuestion, Survey } from '../data';
-declare type Feedback = OriginFeedback & {
+type Feedback = OriginFeedback & {
     answers: string[];
 };
-declare type Question = OriginQuestion & {
+type Question = OriginQuestion & {
     options: string[];
     scale: string;
 };
-declare type Props = {
+type Props = {
     survey: Survey;
     question: Question;
     pageIndex: number;
@@ -21,6 +21,8 @@ declare type Props = {
         type: string;
     }) => void;
     feedback: Feedback;
+    isLastPage: boolean;
 };
-declare const _default: React.MemoExoticComponent<({ survey, pageIndex, question, forgot, onClose, onPrevPage, onNextPage, onFeedback, feedback, }: Props) => JSX.Element>;
+declare const _default: React.MemoExoticComponent<({ survey, pageIndex, question, forgot, onClose, onPrevPage, onNextPage, onFeedback, feedback, isLastPage, }: Props) => React.JSX.Element>;
 export default _default;
+//# sourceMappingURL=SmileyRatingQuestionOption1.d.ts.map

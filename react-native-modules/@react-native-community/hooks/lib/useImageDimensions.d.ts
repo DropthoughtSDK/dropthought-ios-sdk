@@ -2,7 +2,7 @@ import { ImageRequireSource, ImageURISource } from 'react-native';
 export interface URISource {
     uri: string;
 }
-export declare type ImageDimensionsSource = ImageRequireSource | URISource;
+export type ImageDimensionsSource = ImageRequireSource | URISource;
 export interface ImageDimensions {
     width: number;
     height: number;

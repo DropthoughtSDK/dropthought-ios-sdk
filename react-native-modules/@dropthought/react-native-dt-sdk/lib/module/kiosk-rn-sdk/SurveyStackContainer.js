@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { StatusBar } from 'react-native';
-import { useTheme, COLOR_SCHEMES } from '@dropthought/react-native-ui/src';
-import { useSurvey } from './contexts/survey';
+import { useTheme, COLOR_SCHEMES } from '@dropthought/react-native-ui';
+import { useSurvey } from './contexts/survey/SurveyContext';
 import SurveyStackNavigator from './navigation/SurveyStack';
 
 /**

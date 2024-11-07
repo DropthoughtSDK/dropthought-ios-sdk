@@ -47,6 +47,7 @@ const VeryDislikeIcon = ({
   const { colorScheme } = useTheme();
   return (
     <SmileyIcon
+      testID={`test:id/smiley_icon_very_dislike_${selected}`}
       selected={selected}
       onPress={onPress}
       label={label}
@@ -75,6 +76,7 @@ const VeryLikeIcon = ({
   const { colorScheme } = useTheme();
   return (
     <SmileyIcon
+      testID={`test:id/smiley_icon_very_like_${selected}`}
       selected={selected}
       onPress={onPress}
       label={label}
@@ -103,6 +105,7 @@ const NotSureIcon = ({
   const { colorScheme } = useTheme();
   return (
     <SmileyIcon
+      testID={`test:id/smiley_icon_not_sure_${selected}`}
       selected={selected}
       onPress={onPress}
       label={label}
@@ -131,6 +134,7 @@ const LikeIcon = ({
   const { colorScheme } = useTheme();
   return (
     <SmileyIcon
+      testID={`test:id/smiley_icon_like_${selected}`}
       selected={selected}
       onPress={onPress}
       label={label}
@@ -159,6 +163,7 @@ const DislikeIcon = ({
   const { colorScheme } = useTheme();
   return (
     <SmileyIcon
+      testID={`test:id/smiley_icon_dislike_${selected}`}
       selected={selected}
       onPress={onPress}
       label={label}
@@ -202,7 +207,7 @@ const ClassicSmileyRatingQuestion = ({
   );
 
   const setSelectedAndFeedback = React.useCallback(
-    (index) => {
+    (index: number) => {
       let selectedMap = question.options.map(() => false);
       selectedMap[index] = true;
       setSelected(selectedMap);
@@ -221,7 +226,12 @@ const ClassicSmileyRatingQuestion = ({
   const styles = isPhone ? phoneStyles : tabletStyles;
 
   const fakeSmiley = !isPhone && (
-    <SmileyIcon selected={false} onPress={noop} label="" />
+    <SmileyIcon
+      testID="test:id/smiley_icon_fake"
+      selected={false}
+      onPress={noop}
+      label=""
+    />
   );
 
   const renderSmiley = () => {
@@ -235,14 +245,14 @@ const ClassicSmileyRatingQuestion = ({
         return (
           <View style={viewStyle}>
             <VeryDislikeIcon
-              selected={selected[0]}
+              selected={selected[0] ?? false}
               onPress={() => setSelectedAndFeedback(0)}
-              label={options[0]}
+              label={options[0] ?? ''}
             />
             <VeryLikeIcon
-              selected={selected[1]}
+              selected={selected[1] ?? false}
               onPress={() => setSelectedAndFeedback(1)}
-              label={options[1]}
+              label={options[1] ?? ''}
             />
             {fakeSmiley}
             {fakeSmiley}
@@ -253,19 +263,19 @@ const ClassicSmileyRatingQuestion = ({
         return (
           <View style={viewStyle}>
             <VeryDislikeIcon
-              selected={selected[0]}
+              selected={selected[0] ?? false}
               onPress={() => setSelectedAndFeedback(0)}
-              label={options[0]}
+              label={options[0] ?? ''}
             />
             <NotSureIcon
-              selected={selected[1]}
+              selected={selected[1] ?? false}
               onPress={() => setSelectedAndFeedback(1)}
-              label={options[1]}
+              label={options[1] ?? ''}
             />
             <VeryLikeIcon
-              selected={selected[2]}
+              selected={selected[2] ?? false}
               onPress={() => setSelectedAndFeedback(2)}
-              label={options[2]}
+              label={options[2] ?? ''}
             />
             {fakeSmiley}
             {fakeSmiley}
@@ -275,24 +285,24 @@ const ClassicSmileyRatingQuestion = ({
         return (
           <View style={viewStyle}>
             <VeryDislikeIcon
-              selected={selected[0]}
+              selected={selected[0] ?? false}
               onPress={() => setSelectedAndFeedback(0)}
-              label={options[0]}
+              label={options[0] ?? ''}
             />
             <NotSureIcon
-              selected={selected[1]}
+              selected={selected[1] ?? false}
               onPress={() => setSelectedAndFeedback(1)}
-              label={options[1]}
+              label={options[1] ?? ''}
             />
             <LikeIcon
-              selected={selected[2]}
+              selected={selected[2] ?? false}
               onPress={() => setSelectedAndFeedback(2)}
-              label={options[2]}
+              label={options[2] ?? ''}
             />
             <VeryLikeIcon
-              selected={selected[3]}
+              selected={selected[3] ?? false}
               onPress={() => setSelectedAndFeedback(3)}
-              label={options[3]}
+              label={options[3] ?? ''}
             />
             {fakeSmiley}
           </View>
@@ -301,29 +311,29 @@ const ClassicSmileyRatingQuestion = ({
         return (
           <View style={viewStyle}>
             <VeryDislikeIcon
-              selected={selected[0]}
+              selected={selected[0] ?? false}
               onPress={() => setSelectedAndFeedback(0)}
-              label={options[0]}
+              label={options[0] ?? ''}
             />
             <DislikeIcon
-              selected={selected[1]}
+              selected={selected[1] ?? false}
               onPress={() => setSelectedAndFeedback(1)}
-              label={options[1]}
+              label={options[1] ?? ''}
             />
             <NotSureIcon
-              selected={selected[2]}
+              selected={selected[2] ?? false}
               onPress={() => setSelectedAndFeedback(2)}
-              label={options[2]}
+              label={options[2] ?? ''}
             />
             <LikeIcon
-              selected={selected[3]}
+              selected={selected[3] ?? false}
               onPress={() => setSelectedAndFeedback(3)}
-              label={options[3]}
+              label={options[3] ?? ''}
             />
             <VeryLikeIcon
-              selected={selected[4]}
+              selected={selected[4] ?? false}
               onPress={() => setSelectedAndFeedback(4)}
-              label={options[4]}
+              label={options[4] ?? ''}
             />
           </View>
         );

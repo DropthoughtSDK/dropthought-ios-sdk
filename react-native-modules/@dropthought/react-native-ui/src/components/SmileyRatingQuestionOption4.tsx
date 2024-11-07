@@ -61,6 +61,7 @@ type Props = {
     type: string;
   }) => void;
   feedback: Feedback;
+  isLastPage: boolean;
 };
 
 const SmileyRatingQuestionOption4 = ({
@@ -73,15 +74,15 @@ const SmileyRatingQuestionOption4 = ({
   onNextPage,
   onFeedback,
   feedback,
+  isLastPage,
 }: Props) => {
   const answered =
     feedback &&
     feedback.answers &&
     !isNil(feedback.answers[0]) &&
     typeof feedback.answers[0] === 'number';
-  const answeredValue: number = answered
-    ? parseInt(feedback.answers[0], 10)
-    : 0;
+  const answeredValue: number =
+    answered && feedback.answers[0] ? parseInt(feedback.answers[0], 10) : 0;
 
   const windowHeight = Dimensions.get('window').height;
   const { questionId, scale, options } = question;
@@ -116,28 +117,31 @@ const SmileyRatingQuestionOption4 = ({
   const scaleLogicList = scaleLogic[scale];
 
   useEffect(() => {
-    const loopList = scaleLogicList.map((value, index) => {
-      const scaleKey = String(index + 1) + faceTable[value];
-      return loopFaceTable.get(scaleKey);
-    });
+    if (scaleLogicList) {
+      const loopList = scaleLogicList.map((value, index) => {
+        const scaleKey = String(index + 1) + faceTable[value];
+        return loopFaceTable.get(scaleKey);
+      });
 
-    const transformList = scaleLogicList.map((value, index, array) => {
-      if (index === 0) return '';
-      const fromScale = String(index) + faceTable[array[index - 1]];
-      const toScale = String(index + 1) + faceTable[value];
-      const key = `${fromScale}-${toScale}`;
-      return transformTable.get(key);
-    });
+      const transformList = scaleLogicList.map((value, index, array) => {
+        if (index === 0) return '';
+        // @ts-ignore
+        const fromScale = String(index) + faceTable[array[index - 1]];
+        const toScale = String(index + 1) + faceTable[value];
+        const key = `${fromScale}-${toScale}`;
+        return transformTable.get(key);
+      });
 
-    setLoopLotties(loopList);
-    setTransformLotties(transformList);
+      setLoopLotties(loopList);
+      setTransformLotties(transformList);
+    }
   }, [scaleLogicList]);
 
   const imageLignt = require('../assets/icOption4Info.png');
   const imageDark = require('../assets/icOption4InfoDark.png');
 
   const updateScore = React.useCallback(
-    (number) => {
+    (number: number) => {
       const isAtCoverScreen = score === -1;
       const newScore = score + number;
 
@@ -257,28 +261,43 @@ const SmileyRatingQuestionOption4 = ({
   };
 
   const lottieContainer = isLoop ? (
-    <View style={commonStyles.lottieContainer}>
+    <View
+      accessibilityLabel={`selected_custom_star_${selectedIndex}`}
+      style={commonStyles.lottieContainer}
+    >
       <TouchableWithoutFeedback onPress={handleDecreaseScore}>
-        <LottieView
-          // @ts-ignore
-          ref={lottieRef}
-          source={loopLotties[selectedIndex]}
-          autoPlay
-          loop
-        />
+        {loopLotties[selectedIndex] ? (
+          <LottieView
+            /* @ts-ignore */
+            ref={lottieRef}
+            source={loopLotties[selectedIndex]}
+            style={commonStyles.lottieContent}
+            autoPlay
+            loop
+          />
+        ) : (
+          <></>
+        )}
       </TouchableWithoutFeedback>
     </View>
   ) : (
     <View style={commonStyles.lottieContainer}>
       <TouchableWithoutFeedback onPress={handleDecreaseScore}>
-        <LottieView
-          source={transformLotties[selectedIndex]}
-          autoPlay
-          loop={false}
-          onAnimationFinish={(isCancel) => {
-            if (!isCancel) setIsLoop(true);
-          }}
-        />
+        {transformLotties[selectedIndex] ? (
+          <LottieView
+            source={transformLotties[selectedIndex]}
+            style={commonStyles.lottieContent}
+            autoPlay
+            loop={false}
+            onAnimationFinish={(isCancel) => {
+              setTimeout(() => {
+                if (!isCancel) setIsLoop(true);
+              }, 500);
+            }}
+          />
+        ) : (
+          <></>
+        )}
       </TouchableWithoutFeedback>
     </View>
   );
@@ -297,14 +316,28 @@ const SmileyRatingQuestionOption4 = ({
       }}
     >
       <View style={commonStyles.scoreContainer}>
-        <View style={commonStyles.scoreText}>
-          <Animated.Text style={scoreSelectedStyle}>
+        <View
+          testID="test:id/custom_star_score_value"
+          style={commonStyles.scoreText}
+        >
+          <Animated.Text
+            testID="test:id/custom_star_render_score"
+            style={scoreSelectedStyle}
+          >
             {renderScore}
           </Animated.Text>
           <Animated.Text style={slashStyle}>{'/'}</Animated.Text>
-          <Animated.Text style={scoreTotalStyle}>{totalScore}</Animated.Text>
+          <Animated.Text
+            testID="test:id/custom_star_total_score"
+            style={scoreTotalStyle}
+          >
+            {totalScore}
+          </Animated.Text>
         </View>
-        <Animated.Text style={descStyle}>
+        <Animated.Text
+          testID="test:id/custom_star_score_desc"
+          style={descStyle}
+        >
           {options[selectedIndex]}
         </Animated.Text>
       </View>
@@ -339,13 +372,19 @@ const SmileyRatingQuestionOption4 = ({
           >
             <>
               {hasEdited ? null : infoImage}
-              <Text style={hintTextStyle}>
-                {i18n.t('option4HintDescription:title')}
+              <Text
+                testID={`test:id/custom_star_title_${colorScheme}`}
+                style={hintTextStyle}
+              >
+                {`${i18n.t('option4HintDescription:title')}`}
               </Text>
-              <Text style={hintSubTextStyle}>
-                {i18n.t('option4HintDescription:subTitle', {
+              <Text
+                testID="test:id/custom_star_subtitle"
+                style={hintSubTextStyle}
+              >
+                {`${i18n.t('option4HintDescription:subTitle', {
                   count: totalScore,
-                })}
+                })}`}
               </Text>
             </>
           </TouchableOpacity>
@@ -355,7 +394,7 @@ const SmileyRatingQuestionOption4 = ({
         submitSurvey={survey.submitSurvey}
         surveyColor={hexCode}
         isFirstPage={pageIndex === 0}
-        isLastPage={pageIndex === survey.pageOrder.length - 1}
+        isLastPage={isLastPage}
         onPrevPage={onPrevPage}
         onNextPage={onNextPage}
         backgroundColor={backgroundColor}
@@ -415,6 +454,10 @@ const commonStyles = StyleSheet.create({
   scoreText: {
     flexDirection: 'row',
     alignItems: 'flex-end',
+  },
+  lottieContent: {
+    width: '100%',
+    height: '100%',
   },
 });
 

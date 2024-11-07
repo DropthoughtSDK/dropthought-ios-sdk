@@ -8,7 +8,7 @@ var React = _interopRequireWildcard(require("react"));
 var _reactNative = require("react-native");
 var _ramda = require("ramda");
 var _reactAsync = require("react-async");
-var _src = require("@dropthought/react-native-ui/src");
+var _reactNativeUi = require("@dropthought/react-native-ui");
 var _ErrorHintScreen = _interopRequireDefault(require("../../screens/ErrorHintScreen"));
 var _Storage = require("../../../lib/Storage");
 var _API = require("../../../lib/API");
@@ -67,7 +67,9 @@ const getVisibility = async ({
     themeOption: visibility.themeOption,
     appearance: visibility.appearance,
     fontColor: visibility.fontColor,
-    backgroundColor: visibility.backgroundColor
+    backgroundColor: visibility.backgroundColor,
+    autoClose: visibility.autoClose,
+    autoCloseCountdown: visibility.autoCloseCountdown
   };
   return getProgram({
     surveyId: visibility.program.programId,
@@ -144,6 +146,10 @@ const getProgram = async ({
     }, {
       timeout: 10000
     });
+    const token = await (0, _API.apiGetProgramTokenById)({
+      programId: surveyId
+    });
+    survey.token = token;
   }
   // pre-fetch image
   survey = await preFetchImage(survey);
@@ -154,7 +160,7 @@ const getProgram = async ({
   }
 
   // change the i18n language
-  _src.i18n.changeLanguage(survey.language);
+  _reactNativeUi.i18n.changeLanguage(survey.language);
   return {
     survey,
     theme
@@ -225,7 +231,7 @@ const defaultOnCloseHandler = () => {
 };
 
 /**
- * @param {Props} param0
+ * @param {SDKEntryProps} param0
  */
 const SurveyContextProvider = ({
   baseURL,
@@ -236,10 +242,12 @@ const SurveyContextProvider = ({
   defaultLanguage = 'en',
   onClose = defaultOnCloseHandler,
   themeOption,
-  appearance = 'system',
+  appearance,
   fontColor,
   backgroundColor,
-  timezone
+  timezone,
+  autoClose,
+  autoCloseCountdown
 }) => {
   if (baseURL || apiKey) {
     _API.sdkFetcher.init({
@@ -251,7 +259,9 @@ const SurveyContextProvider = ({
     themeOption,
     appearance,
     fontColor,
-    backgroundColor
+    backgroundColor,
+    autoClose,
+    autoCloseCountdown
   };
   const [selectedLanguage, prevSelectedLanguage, setSelectedLanguageWithBackup, setSelectedLanguage] = useSelectedLanguageState(defaultLanguage);
 
@@ -281,41 +291,43 @@ const SurveyContextProvider = ({
     survey,
     theme = themeDataFromSDKEntry
   } = data ?? {};
-  const transformedThemeOption = theme.themeOption;
   const hexCode = (survey === null || survey === void 0 ? void 0 : survey.surveyProperty.hexCode) ?? '';
   const transformedTheme = {
     ...theme,
-    themeOption: transformedThemeOption,
+    autoClose: theme.autoClose ?? autoClose,
+    autoCloseCountdown: theme.autoCloseCountdown ?? autoCloseCountdown,
+    appearance: appearance ?? theme.appearance,
+    // use input appearance first, then use appearance from visibility
     hexCode
   };
 
   /** @type {SurveyContextValue} */
   const contextValue = React.useMemo(() => ({
     onClose,
-    survey: transformedThemeOption === _src.THEME_OPTION.CLASSIC || transformedThemeOption === _src.THEME_OPTION.BIJLIRIDE ? survey : singleQuestionPerPageTransformer(survey),
+    survey: theme.themeOption === _reactNativeUi.THEME_OPTION.CLASSIC || theme.themeOption === _reactNativeUi.THEME_OPTION.BIJLIRIDE ? survey : singleQuestionPerPageTransformer(survey),
     changeLanguage: setSelectedLanguageWithBackup
-  }), [onClose, transformedThemeOption, survey, setSelectedLanguageWithBackup]);
+  }), [onClose, theme.themeOption, survey, setSelectedLanguageWithBackup]);
 
   // initial loading data view
   if (!data) {
     // loading
     let content = /*#__PURE__*/React.createElement(_reactNative.View, {
-      style: _src.GlobalStyle.fullCenter
+      style: _reactNativeUi.GlobalStyle.fullCenter
     }, /*#__PURE__*/React.createElement(_reactNative.ActivityIndicator, {
       size: "large"
     }));
     if (error) {
       let placeholderProps = {
-        imageType: _src.PlaceholderImageTypes.ProgramUnavailable,
+        imageType: _reactNativeUi.PlaceholderImageTypes.ProgramUnavailable,
         message: 'Sorry for the inconvenience.\nPlease come back and check later on.'
       };
       if ((0, _Fetcher.isRequestTimeoutError)(error) || (0, _Fetcher.isNoInternetError)(error)) {
         placeholderProps = {
-          imageType: _src.PlaceholderImageTypes.NoInternet,
+          imageType: _reactNativeUi.PlaceholderImageTypes.NoInternet,
           message: 'Please check if you are connected to the internet'
         };
       }
-      content = /*#__PURE__*/React.createElement(_src.PlaceholderScreen, placeholderProps);
+      content = /*#__PURE__*/React.createElement(_reactNativeUi.PlaceholderScreen, placeholderProps);
     }
     return /*#__PURE__*/React.createElement(_ErrorHintScreen.default, {
       onClose: onClose,
@@ -324,14 +336,12 @@ const SurveyContextProvider = ({
   }
   return /*#__PURE__*/React.createElement(SurveyContext.Provider, {
     value: contextValue
-  }, /*#__PURE__*/React.createElement(_src.ThemeProvider, transformedTheme, /*#__PURE__*/React.createElement(_reactNative.View, {
-    style: _src.GlobalStyle.flex1
-  }, children, /*#__PURE__*/React.createElement(_src.ActivityIndicatorMask, {
+  }, /*#__PURE__*/React.createElement(_reactNativeUi.ThemeProvider, transformedTheme, /*#__PURE__*/React.createElement(_reactNative.View, {
+    style: _reactNativeUi.GlobalStyle.flex1
+  }, children, /*#__PURE__*/React.createElement(_reactNativeUi.ActivityIndicatorMask, {
     loading: isPending
   }))));
 };
-
-/** @typedef {import('../../SDKEntry').SDKEntryProps} Props */
 
 /**
  * @typedef {object} SurveyContextValue
@@ -339,8 +349,9 @@ const SurveyContextProvider = ({
  * @property {(language: string) => void} changeLanguage
  * @property {() => void} onClose
  */
-/** @typedef {import('../../../data').Survey} Survey */
+/** @typedef {import('@dropthought/react-native-ui').Survey} Survey */
 /** @typedef {import('../../../data').Visibility} Visibility */
 /** @typedef {import('../../../data').ThemeData} ThemeData */
+/** @typedef {import('../../SDKEntry').SDKEntryProps} SDKEntryProps */
 exports.SurveyContextProvider = SurveyContextProvider;
 //# sourceMappingURL=SurveyContext.js.map

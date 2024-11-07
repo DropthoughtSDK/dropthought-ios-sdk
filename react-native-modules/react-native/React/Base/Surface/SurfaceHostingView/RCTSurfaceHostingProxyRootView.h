@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,6 +7,7 @@
 
 #import <UIKit/UIKit.h>
 
+#import <React/RCTBridgeModule.h>
 #import <React/RCTRootView.h>
 
 #import "RCTSurfaceHostingView.h"
@@ -30,20 +31,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) RCTRootViewSizeFlexibility sizeFlexibility;
 @property (nonatomic, weak) id<RCTRootViewDelegate> delegate;
 @property (nonatomic, weak) UIViewController *reactViewController;
+@property (nonatomic, strong, readonly) UIView *view;
 @property (nonatomic, strong, readonly) UIView *contentView;
 @property (nonatomic, strong) UIView *loadingView;
 @property (nonatomic, assign) BOOL passThroughTouches;
 @property (nonatomic, assign) NSTimeInterval loadingViewFadeDelay;
 @property (nonatomic, assign) NSTimeInterval loadingViewFadeDuration;
+@property (nonatomic, assign) CGSize minimumSize;
 
-- (instancetype)initWithBridge:(RCTBridge *)bridge
-                    moduleName:(NSString *)moduleName
-             initialProperties:(NSDictionary *)initialProperties NS_DESIGNATED_INITIALIZER;
-
-- (instancetype)initWithBundleURL:(NSURL *)bundleURL
-                       moduleName:(NSString *)moduleName
-                initialProperties:(NSDictionary *)initialProperties
-                    launchOptions:(NSDictionary *)launchOptions;
+- (instancetype)initWithSurface:(id<RCTSurfaceProtocol>)surface NS_DESIGNATED_INITIALIZER;
 
 - (void)cancelTouches;
 

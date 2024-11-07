@@ -1,29 +1,29 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
+ * @flow strict-local
  * @format
- * @flow
  */
 
-'use strict';
+import type {
+  HostComponent,
+  PartialViewConfig,
+} from '../../Renderer/shims/ReactNativeTypes';
+import type {ScrollViewNativeProps as Props} from './ScrollViewNativeComponentType';
 
-import registerGeneratedViewConfig from '../../Utilities/registerGeneratedViewConfig';
-import requireNativeComponent from '../../ReactNative/requireNativeComponent';
+import * as NativeComponentRegistry from '../../NativeComponent/NativeComponentRegistry';
 
-import type {HostComponent} from '../../Renderer/shims/ReactNativeTypes';
-import type {ScrollViewNativeProps} from './ScrollViewNativeComponentType';
-
-const AndroidHorizontalScrollViewViewConfig = {
+export const __INTERNAL_VIEW_CONFIG: PartialViewConfig = {
   uiViewClassName: 'AndroidHorizontalScrollView',
   bubblingEventTypes: {},
   directEventTypes: {},
   validAttributes: {
     decelerationRate: true,
     disableIntervalMomentum: true,
-    endFillColor: {process: require('../../StyleSheet/processColor')},
+    endFillColor: {process: require('../../StyleSheet/processColor').default},
     fadingEdgeLength: true,
     nestedScrollEnabled: true,
     overScrollMode: true,
@@ -33,25 +33,38 @@ const AndroidHorizontalScrollViewViewConfig = {
     scrollPerfTag: true,
     sendMomentumEvents: true,
     showsHorizontalScrollIndicator: true,
+    snapToAlignment: true,
     snapToEnd: true,
     snapToInterval: true,
     snapToStart: true,
     snapToOffsets: true,
     contentOffset: true,
+    borderBottomLeftRadius: true,
+    borderBottomRightRadius: true,
+    borderRadius: true,
+    borderStyle: true,
+    borderRightColor: {
+      process: require('../../StyleSheet/processColor').default,
+    },
+    borderColor: {process: require('../../StyleSheet/processColor').default},
+    borderBottomColor: {
+      process: require('../../StyleSheet/processColor').default,
+    },
+    borderTopLeftRadius: true,
+    borderTopColor: {process: require('../../StyleSheet/processColor').default},
+    removeClippedSubviews: true,
+    borderTopRightRadius: true,
+    borderLeftColor: {
+      process: require('../../StyleSheet/processColor').default,
+    },
+    pointerEvents: true,
   },
 };
 
-let AndroidHorizontalScrollViewNativeComponent;
-if (global.RN$Bridgeless) {
-  registerGeneratedViewConfig(
+const AndroidHorizontalScrollViewNativeComponent: HostComponent<Props> =
+  NativeComponentRegistry.get<Props>(
     'AndroidHorizontalScrollView',
-    AndroidHorizontalScrollViewViewConfig,
+    () => __INTERNAL_VIEW_CONFIG,
   );
-  AndroidHorizontalScrollViewNativeComponent = 'AndroidHorizontalScrollView';
-} else {
-  AndroidHorizontalScrollViewNativeComponent = requireNativeComponent<ScrollViewNativeProps>(
-    'AndroidHorizontalScrollView',
-  );
-}
 
-export default ((AndroidHorizontalScrollViewNativeComponent: any): HostComponent<ScrollViewNativeProps>);
+export default AndroidHorizontalScrollViewNativeComponent;

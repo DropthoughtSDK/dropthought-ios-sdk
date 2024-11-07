@@ -1,16 +1,16 @@
 import React from 'react';
 import type { Feedback as OriginFeedback, Question as OriginQuestion } from '../data';
-declare type Feedback = OriginFeedback & {
+type Feedback = OriginFeedback & {
     answers: string[];
 };
-declare type Question = OriginQuestion & {
+type Question = OriginQuestion & {
     options: string[];
     scale: string;
     minScale: string;
     includeCenterLabel: boolean;
     includeCustomLabel: boolean;
 };
-declare type Props = {
+type Props = {
     mandatoryErrorMessage: string;
     question: Question;
     onFeedback: ({ questionId, answers, type, }: {
@@ -22,5 +22,6 @@ declare type Props = {
     forgot: boolean;
     themeColor: string;
 };
-declare const _default: React.MemoExoticComponent<({ mandatoryErrorMessage, question, onFeedback, feedback, forgot, themeColor, }: Props) => JSX.Element>;
+declare const _default: React.MemoExoticComponent<({ mandatoryErrorMessage, question, onFeedback, feedback, forgot, themeColor, }: Props) => React.JSX.Element>;
 export default _default;
+//# sourceMappingURL=ClassicSliderDragRatingQuestion.d.ts.map

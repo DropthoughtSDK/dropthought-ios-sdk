@@ -7,8 +7,8 @@
  * When "Back" is pressed, call props.onPrevPage
  * When "Next" or "Submit" is pressed, call props.onNextPage
  */
-import * as React from 'react';
-declare type Props = {
+import React from 'react';
+type Props = {
     submitSurvey: string;
     surveyColor: string;
     isFirstPage: boolean;
@@ -17,5 +17,6 @@ declare type Props = {
     onNextPage: () => void;
     backgroundColor?: string;
 };
-declare const _default: React.MemoExoticComponent<(props: Props) => JSX.Element | null>;
+declare const _default: React.MemoExoticComponent<(props: Props) => React.JSX.Element | null>;
 export default _default;
+//# sourceMappingURL=SurveyFooter.d.ts.map

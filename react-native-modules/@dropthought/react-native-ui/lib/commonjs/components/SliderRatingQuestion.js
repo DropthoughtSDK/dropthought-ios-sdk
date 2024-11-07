@@ -4,38 +4,24 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireWildcard(require("react"));
-
 var _reactNative = require("react-native");
-
 var _MandatoryTitle = _interopRequireDefault(require("./MandatoryTitle"));
-
 var _styles = require("../styles");
-
 var _useWindowDimensions = require("../hooks/useWindowDimensions");
-
 var _theme = require("../contexts/theme");
-
 var _ramda = require("ramda");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 const MIN_VALUE = 1;
 const NPS_MIN_VALUE = 0;
-
 const getInitialSelectedValue = feedback => {
   if (feedback && feedback.answers && !(0, _ramda.isNil)(feedback.answers[0])) {
     return parseInt(feedback.answers[0], 10);
   }
-
   return undefined;
 };
-
 const getLabelText = ({
   isPhone,
   question,
@@ -43,20 +29,16 @@ const getLabelText = ({
   valueData
 }) => {
   const labelText = `${valueData + (question.type === 'nps' ? NPS_MIN_VALUE : MIN_VALUE)}`;
-
   if (isPhone) {
     if (valueData === 0) {
       return `${labelText} - ${question.options[0]}`;
     }
-
     if (valueData === maximumValue - 1) {
       return `${labelText} - ${question.options[question.options.length - 1]}`;
     }
   }
-
   return labelText;
 };
-
 const SliderRatingQuestion = ({
   survey,
   question,
@@ -90,7 +72,6 @@ const SliderRatingQuestion = ({
     color: fontColor
   };
   const [value, setValue] = (0, _react.useState)(getInitialSelectedValue(feedback));
-
   const onSelected = index => {
     onFeedback({
       questionId,
@@ -99,9 +80,7 @@ const SliderRatingQuestion = ({
     });
     setValue(index);
   };
-
   const maximumValue = parseInt(scale, 10);
-
   const getSliderIndicator = () => {
     return [...Array(maximumValue).keys()].map((valueData, index) => {
       const textStyle = value === index ? [styles.buttonText, buttonTextStyle, buttonTextSelected] : [styles.buttonText, buttonTextStyle];
@@ -118,7 +97,6 @@ const SliderRatingQuestion = ({
       })));
     });
   };
-
   return /*#__PURE__*/_react.default.createElement(_reactNative.ScrollView, {
     style: commonStyles.container
   }, /*#__PURE__*/_react.default.createElement(_MandatoryTitle.default, {
@@ -127,18 +105,13 @@ const SliderRatingQuestion = ({
     question: question
   }), getSliderIndicator());
 };
-
-var _default = /*#__PURE__*/_react.default.memo(SliderRatingQuestion);
-
-exports.default = _default;
-
+var _default = exports.default = /*#__PURE__*/_react.default.memo(SliderRatingQuestion);
 const commonStyles = _reactNative.StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 42
   }
 });
-
 const phoneStyles = _reactNative.StyleSheet.create({
   title: {
     fontSize: 26,
@@ -156,7 +129,6 @@ const phoneStyles = _reactNative.StyleSheet.create({
     borderWidth: 1
   }
 });
-
 const tabletStyles = _reactNative.StyleSheet.create({
   title: {
     fontSize: 26,

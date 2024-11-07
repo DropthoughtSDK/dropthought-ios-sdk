@@ -1,1 +1,1 @@
-export * from './CustomPropsContext';
+export { CustomPropsContextProvider } from './CustomPropsContext';

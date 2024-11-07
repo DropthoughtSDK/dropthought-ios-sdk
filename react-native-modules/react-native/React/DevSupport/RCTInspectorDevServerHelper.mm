@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,7 +7,7 @@
 
 #import <React/RCTInspectorDevServerHelper.h>
 
-#if RCT_DEV
+#if RCT_DEV || RCT_REMOTE_PROFILE
 
 #import <React/RCTLog.h>
 #import <UIKit/UIKit.h>
@@ -51,10 +51,7 @@ static NSURL *getInspectorDeviceUrl(NSURL *bundleURL)
                                                          escapedDeviceName,
                                                          escapedAppName]];
 }
-static NSURL *getOpenUrlEndpoint(NSURL *bundleURL)
-{
-  return [NSURL URLWithString:[NSString stringWithFormat:@"http://%@/open-url", getServerHost(bundleURL)]];
-}
+
 @implementation RCTInspectorDevServerHelper
 
 RCT_NOT_IMPLEMENTED(-(instancetype)init)
@@ -68,16 +65,15 @@ static void sendEventToAllConnections(NSString *event)
   }
 }
 
-+ (void)openURL:(NSString *)url withBundleURL:(NSURL *)bundleURL withErrorMessage:(NSString *)errorMessage
++ (void)openDebugger:(NSURL *)bundleURL withErrorMessage:(NSString *)errorMessage
 {
-  NSURL *endpoint = getOpenUrlEndpoint(bundleURL);
+  NSString *appId = [[[NSBundle mainBundle] bundleIdentifier]
+      stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLQueryAllowedCharacterSet];
 
-  NSDictionary *jsonBodyDict = @{@"url" : url};
-  NSData *jsonBodyData = [NSJSONSerialization dataWithJSONObject:jsonBodyDict options:kNilOptions error:nil];
-
-  NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:endpoint];
+  NSURL *url = [NSURL
+      URLWithString:[NSString stringWithFormat:@"http://%@/open-debugger?appId=%@", getServerHost(bundleURL), appId]];
+  NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
   [request setHTTPMethod:@"POST"];
-  [request setHTTPBody:jsonBodyData];
 
   [[[NSURLSession sharedSession]
       dataTaskWithRequest:request

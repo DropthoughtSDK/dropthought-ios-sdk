@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,8 +7,6 @@
 
 package com.facebook.react.views.text;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.text.TextPaint;
 import android.text.style.MetricAffectingSpan;
 
@@ -18,7 +16,6 @@ import android.text.style.MetricAffectingSpan;
  * <p>The letter spacing is specified in pixels, which are converted to ems at paint time; this span
  * must therefore be applied after any spans affecting font size.
  */
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class CustomLetterSpacingSpan extends MetricAffectingSpan implements ReactSpan {
 
   private final float mLetterSpacing;
@@ -35,6 +32,10 @@ public class CustomLetterSpacingSpan extends MetricAffectingSpan implements Reac
   @Override
   public void updateMeasureState(TextPaint paint) {
     apply(paint);
+  }
+
+  public float getSpacing() {
+    return mLetterSpacing;
   }
 
   private void apply(TextPaint paint) {

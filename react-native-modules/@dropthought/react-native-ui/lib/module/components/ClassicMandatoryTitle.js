@@ -1,59 +1,59 @@
+import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import * as React from 'react';
 import { useAddMandatoryRef } from '../contexts/survey-page';
 import GlobalStyle, { Colors } from '../styles';
 import ClassicQuestionWarningMessage from './ClassicQuestionWarningMessage';
+import HtmlText from './HtmlText';
+import { htmlMandatory, htmlTrim, toHtml, toWhite } from '../utils/htmlHelper';
 import i18n from '../translation';
-import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
-import { useTheme } from '../contexts/theme';
-
+import { COLOR_SCHEMES, useTheme } from '../contexts/theme';
 const ClassicMandatoryTitle = ({
   forgot,
   invalidMessage = '',
   mandatoryErrorMessage,
   question,
+  subTitleMessage,
   style
 }) => {
-  const rtl = i18n.dir() === 'rtl';
-  const dimensionWidthType = useDimensionWidthType();
   const {
-    fontColor
+    questionId,
+    questionTitle,
+    mandatory,
+    optional,
+    type,
+    respondentTracker = false
+  } = question;
+  const rtl = i18n.dir() === 'rtl';
+  const {
+    fontColor,
+    colorScheme
   } = useTheme();
-  const ref = React.useRef(null);
+  const ref = useRef(null);
   const addMandatoryRef = useAddMandatoryRef();
-  React.useEffect(() => {
+  useEffect(() => {
     if (ref.current) {
-      addMandatoryRef(question.questionId, ref.current);
+      addMandatoryRef(questionId, ref.current);
     }
-  }, [addMandatoryRef, question.questionId]);
-  const textStyle = [styles.questionTitle, questionTitleSize[dimensionWidthType], {
-    color: fontColor,
-    minHeight: i18n.language === 'te' ? 30 : undefined
-  }];
+  }, [addMandatoryRef, questionId]);
+  let html = mandatory || optional ? htmlMandatory(htmlTrim(toHtml(questionTitle))) : htmlTrim(toHtml(questionTitle));
+  html = colorScheme === COLOR_SCHEMES.dark && (type === 'nps' || respondentTracker) ? toWhite(html) : html;
   return /*#__PURE__*/React.createElement(View, {
     ref: ref,
     style: [styles.horizontal, style, rtl && GlobalStyle.flexRowReverse]
-  }, question.questionTitle.split(' ').map((text, index) => /*#__PURE__*/React.createElement(Text, {
-    key: index,
-    style: textStyle
-  }, text + ' ')), //optional was been used on matrix question
-  (question.mandatory || question.optional) && /*#__PURE__*/React.createElement(Text, {
-    style: styles.hint
-  }, "*"), /*#__PURE__*/React.createElement(ClassicQuestionWarningMessage // forgot message has higher priority than custom invalid message
+  }, /*#__PURE__*/React.createElement(HtmlText, {
+    html: html,
+    accessibilityLabel: `question_${fontColor}_${questionTitle}`
+  }), subTitleMessage ? /*#__PURE__*/React.createElement(View, {
+    style: rtl && GlobalStyle.flexRowReverse
+  }, /*#__PURE__*/React.createElement(Text, {
+    style: styles.subTitle
+  }, subTitleMessage)) : null, /*#__PURE__*/React.createElement(ClassicQuestionWarningMessage
+  // forgot message has higher priority than custom invalid message
   , {
     message: forgot ? mandatoryErrorMessage : invalidMessage
   }));
 };
-
 export default ClassicMandatoryTitle;
-const questionTitleSize = StyleSheet.create({
-  [DimensionWidthType.phone]: {
-    fontSize: 16
-  },
-  [DimensionWidthType.tablet]: {
-    fontSize: 18
-  }
-});
 const styles = StyleSheet.create({
   hint: {
     color: Colors.mandatoryRed,
@@ -68,6 +68,10 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     textAlignVertical: 'center',
     alignSelf: 'center'
+  },
+  subTitle: {
+    marginTop: 8,
+    color: Colors.border
   }
 });
 //# sourceMappingURL=ClassicMandatoryTitle.js.map

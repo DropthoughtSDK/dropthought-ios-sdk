@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,12 +10,14 @@ package com.facebook.react.bridge;
 import android.os.Bundle;
 import android.os.Parcelable;
 import androidx.annotation.Nullable;
+import com.facebook.proguard.annotations.DoNotStrip;
 import java.lang.reflect.Array;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@DoNotStrip
 public class Arguments {
   private static Object makeNativeObject(Object object) {
     if (object == null) {
@@ -33,6 +35,10 @@ public class Arguments {
       return makeNativeMap((Map<String, Object>) object);
     } else if (object instanceof Bundle) {
       return makeNativeMap((Bundle) object);
+    } else if (object instanceof JavaOnlyMap) {
+      return makeNativeMap(((JavaOnlyMap) object).toHashMap());
+    } else if (object instanceof JavaOnlyArray) {
+      return makeNativeArray(((JavaOnlyArray) object).toArrayList());
     } else {
       // Boolean, Integer, Double, String, WritableNativeArray, WritableNativeMap
       return object;
@@ -122,6 +128,7 @@ public class Arguments {
    * The best way to think of this is a way to generate a Java representation of a json object, from
    * Java types which have a natural representation in json.
    */
+  @DoNotStrip
   public static WritableNativeMap makeNativeMap(Map<String, Object> objects) {
     WritableNativeMap nativeMap = new WritableNativeMap();
     if (objects == null) {
@@ -134,6 +141,7 @@ public class Arguments {
   }
 
   /** Like the above, but takes a Bundle instead of a Map. */
+  @DoNotStrip
   public static WritableNativeMap makeNativeMap(Bundle bundle) {
     WritableNativeMap nativeMap = new WritableNativeMap();
     if (bundle == null) {

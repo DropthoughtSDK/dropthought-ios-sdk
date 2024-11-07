@@ -42,6 +42,7 @@ interface SwapElements {
 
 const swapElements: SwapElements = (array, index1, index2) => {
   let newArray = [...array];
+  // @ts-ignore
   newArray[index1] = newArray.splice(index2, 1, newArray[index1])[0];
   return newArray;
 };
@@ -78,6 +79,7 @@ function RankingItem({
     <>
       <View style={styles.divider} />
       <TouchableOpacity
+        testID="test:id/ranking_na"
         style={GlobalStyle.row}
         hitSlop={hitSlop}
         onPress={() => onNAPress(item)}
@@ -131,16 +133,26 @@ function RankingItem({
   return (
     <View style={[styles.renderItem, renderItemStyle]}>
       <Image style={dragIconStyle} source={require('../assets/icDrag.png')} />
-      <Text style={[styles.rankTitle, { color: fontColor }]} numberOfLines={0}>
+      <Text
+        testID="test:id/ranking_title"
+        style={[styles.rankTitle, { color: fontColor }]}
+        numberOfLines={0}
+      >
         {`${option}`}
       </Text>
       <TouchableOpacity
+        testID={`test:id/ranking_label_${isNA}`}
         style={[styles.rankingContainer, rankingContainerStyle]}
         hitSlop={hitSlop}
         disabled={isNA}
         onPress={() => onRankPress(item)}
       >
-        <Text style={[styles.rankText, { color: fontColor }]}>{rankText}</Text>
+        <Text
+          testID="test:id/ranking_selected_option"
+          style={[styles.rankText, { color: fontColor }]}
+        >
+          {rankText}
+        </Text>
         <Image source={require('../assets/ic-expand-more-24-px.png')} />
       </TouchableOpacity>
       {naComponent}
@@ -194,18 +206,7 @@ const ClassicRankingQuestion = ({
     })
   );
 
-  const [list, setList] = useState(originListRef.current);
-
-  const [normalList, setNormalList] = useState(list);
-
-  const [visible, setVisible] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<TransformedOption>();
-
-  useEffect(() => {
-    setNormalList(list.filter((current) => !current.isNA));
-  }, [list]);
-
-  useEffect(() => {
+  const [list, setList] = useState(() => {
     const { listForRankingQuestion } = feedback ?? {};
     if (
       feedback &&
@@ -222,10 +223,19 @@ const ClassicRankingQuestion = ({
           feedbackToOptions = [...feedbackToOptions, newOption];
         }
       });
-      setList(listForRankingQuestion);
+      return listForRankingQuestion;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return originListRef.current;
+  });
+
+  const [normalList, setNormalList] = useState(list);
+
+  const [visible, setVisible] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<TransformedOption>();
+
+  useEffect(() => {
+    setNormalList(list.filter((current) => !current.isNA));
+  }, [list]);
 
   useEffect(() => {
     const answers: (number | string)[] = list.map(({ isNA, index }) => {
@@ -348,7 +358,10 @@ const ClassicRankingQuestion = ({
                       }
                     }}
                   >
-                    <Text style={modalItemTitleStyle}>{`${index + 1}`}</Text>
+                    <Text
+                      testID="test:id/ranking_item"
+                      style={modalItemTitleStyle}
+                    >{`${index + 1}`}</Text>
                   </TouchableOpacity>
                 </View>
               );
@@ -363,7 +376,12 @@ const ClassicRankingQuestion = ({
                   setVisible(false);
                 }}
               >
-                <Text style={modalItemTitleStyle}>{'N/A'}</Text>
+                <Text
+                  testID="test:id/ranking_na_item"
+                  style={modalItemTitleStyle}
+                >
+                  {'N/A'}
+                </Text>
               </TouchableOpacity>
             ) : null}
             <TouchableOpacity
@@ -397,6 +415,7 @@ const ClassicRankingQuestion = ({
   const onDragEndHandler = (newList: TransformedOption[]) => {
     setList((prev) => {
       const result = newList.map((newData) => {
+        // @ts-ignore
         const { isNA } = prev.filter(
           ({ option }) => option === newData.option
         )[0];

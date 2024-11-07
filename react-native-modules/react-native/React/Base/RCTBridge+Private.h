@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,6 +7,7 @@
 
 #import <React/RCTBridge.h>
 
+@class RCTModuleRegistry;
 @class RCTModuleData;
 @protocol RCTJavaScriptExecutor;
 
@@ -62,6 +63,13 @@ RCT_EXTERN void RCTRegisterModule(Class);
  */
 @property (nonatomic, strong, readwrite) NSURL *bundleURL;
 
+/**
+ * An object that allows one to require NativeModules/TurboModules.
+ * RCTModuleRegistry is implemented in bridgeless mode and bridge mode.
+ * Used by RCTRootView.
+ */
+@property (nonatomic, strong, readonly) RCTModuleRegistry *moduleRegistry;
+
 @end
 
 @interface RCTBridge (RCTCxxBridge)
@@ -89,7 +97,7 @@ RCT_EXTERN void RCTRegisterModule(Class);
 - (void)registerModuleForFrameUpdates:(id<RCTBridgeModule>)module withModuleData:(RCTModuleData *)moduleData;
 
 /**
- * Dispatch work to a module's queue - this is also suports the fake RCTJSThread
+ * Dispatch work to a module's queue - this is also supports the fake RCTJSThread
  * queue. Exposed for the RCTProfiler
  */
 - (void)dispatchBlock:(dispatch_block_t)block queue:(dispatch_queue_t)queue;

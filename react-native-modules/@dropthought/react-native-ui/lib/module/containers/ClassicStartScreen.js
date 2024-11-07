@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { ScrollView, View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Colors } from '../styles';
 import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
 import Button from '../components/Button';
+import HtmlText from '../components/HtmlText';
 import { THEME_OPTION, useTheme } from '../contexts/theme';
 import { getLanguageBy } from '../utils/LanguageUtils';
-
+import { usePollingRecord } from '../hooks/usePollingRecord';
+import { htmlTrim } from '../utils/htmlHelper';
 const defaultIconSource = require('../assets/rating.png');
-
 const defaultIconSize = {
   [DimensionWidthType.phone]: 65,
   [DimensionWidthType.tablet]: 72
 };
-
 const ClassicStartScreen = ({
   onLanguageSelect,
   onStart,
@@ -30,6 +30,7 @@ const ClassicStartScreen = ({
   const {
     surveyProperty,
     surveyName,
+    welcomeText,
     welcomeTextPlain,
     language,
     takeSurvey
@@ -47,23 +48,33 @@ const ClassicStartScreen = ({
       if (height < defaultIconSize[dimensionWidthType]) {
         setImageHeight(height);
       }
-    }, _ => {}); // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, _ => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const {
+    resetRecord
+  } = usePollingRecord();
+  useEffect(() => {
+    resetRecord();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const iconSource = image === undefined ? defaultIconSource : {
     uri: image
   };
   const iconView = /*#__PURE__*/React.createElement(Image, {
-    resizeMode: "contain",
+    resizeMode: "contain"
+    // @ts-ignore
+    ,
     style: iconStyle,
     source: iconSource
   });
   const buttonWidth = isPhone ? 143 : 160;
-
   const languagesView = () => {
     const {
       languages
-    } = survey; // if there's only one language or no languages, no need to display
+    } = survey;
 
+    // if there's only one language or no languages, no need to display
     if (!languages || !languages.length || languages.length <= 1) return null;
     const languageView = languages.map((lang, index) => /*#__PURE__*/React.createElement(TouchableOpacity, {
       key: index,
@@ -79,25 +90,30 @@ const ClassicStartScreen = ({
       style: styles.languages
     }, languageView);
   };
-
   const containerStyle = [shareStyles.container, {
     backgroundColor: themeOption === THEME_OPTION.BIJLIRIDE ? Colors.bijlirideBackgroundColor : backgroundColor
   }];
   return /*#__PURE__*/React.createElement(ScrollView, {
-    contentContainerStyle: containerStyle
+    contentContainerStyle: containerStyle,
+    scrollEnabled: false
   }, /*#__PURE__*/React.createElement(View, {
     style: styles.main
   }, iconView, /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/take_survey_name",
     style: [styles.title, {
       color: fontColor
     }]
-  }, surveyName), !!welcomeTextPlain && /*#__PURE__*/React.createElement(Text, {
-    style: [styles.subtitle, {
-      color: fontColor
-    }]
-  }, welcomeTextPlain), /*#__PURE__*/React.createElement(View, {
+  }, surveyName), !!welcomeTextPlain && welcomeText && /*#__PURE__*/React.createElement(View, {
+    style: styles.subtitle
+  }, /*#__PURE__*/React.createElement(HtmlText, {
+    accessibilityLabel: `welcome_${welcomeText}`,
+    html: htmlTrim(welcomeText),
+    width: Dimensions.get('window').width - 76,
+    maxHeight: Dimensions.get('window').height * 0.4
+  })), /*#__PURE__*/React.createElement(View, {
     style: styles.divider
   }), /*#__PURE__*/React.createElement(Button, {
+    testID: "test:id/button_take_survey",
     width: buttonWidth,
     title: takeSurvey,
     color: hexCode,
@@ -105,7 +121,6 @@ const ClassicStartScreen = ({
     containerStyle: styles.takeSurveyButton
   })), languagesView());
 };
-
 export default ClassicStartScreen;
 const shareStyles = StyleSheet.create({
   container: {
@@ -129,11 +144,7 @@ const phoneStyles = StyleSheet.create({
     lineHeight: 27
   },
   subtitle: {
-    lineHeight: 23,
-    marginTop: 12,
-    fontSize: 16,
-    textAlign: 'center',
-    opacity: 0.72
+    marginTop: 17
   },
   divider: {
     backgroundColor: '#c3c3c3',
@@ -173,11 +184,7 @@ const tabletStyles = StyleSheet.create({
     opacity: 0.9
   },
   subtitle: {
-    lineHeight: 25,
-    marginTop: 17,
-    fontSize: 21,
-    textAlign: 'center',
-    opacity: 0.72
+    marginTop: 17
   },
   divider: {
     backgroundColor: '#c3c3c3',

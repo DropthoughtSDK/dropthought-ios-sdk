@@ -1,2 +1,3 @@
-export * from "./SurveyModal";
-export { default as SDKEntry } from "./SDKEntry";
+export * from './SurveyModal';
+export { default as SDKEntry } from './SDKEntry';
+//# sourceMappingURL=index.d.ts.map

@@ -16,11 +16,13 @@ const useDropdown = (
     let result = getOptionsFromQuestion(question);
     if (question.questionBrand === QuestionBrandType.Other) {
       const lastOption = result[result.length - 1];
-      lastOption.title = i18n.t('common:others');
-      lastOption.placeholder =
-        isNil(question.otherText) || question.otherText === ''
-          ? i18n.t('survey:other-placeholder')
-          : question.otherText;
+      if (lastOption) {
+        lastOption.title = i18n.t('common:others');
+        lastOption.placeholder =
+          isNil(question.otherText) || question.otherText === ''
+            ? i18n.t('survey:other-placeholder')
+            : question.otherText;
+      }
     }
     return result;
   }, [question]);

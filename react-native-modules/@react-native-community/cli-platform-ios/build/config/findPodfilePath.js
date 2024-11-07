@@ -4,39 +4,22 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = findPodfilePath;
-
-function _fs() {
-  const data = _interopRequireDefault(require("fs"));
-
-  _fs = function () {
+function _cliTools() {
+  const data = require("@react-native-community/cli-tools");
+  _cliTools = function () {
     return data;
   };
-
   return data;
 }
-
-function _glob() {
-  const data = _interopRequireDefault(require("glob"));
-
-  _glob = function () {
-    return data;
-  };
-
-  return data;
-}
-
 function _path() {
   const data = _interopRequireDefault(require("path"));
-
   _path = function () {
     return data;
   };
-
   return data;
 }
-
+var _findAllPodfilePaths = _interopRequireDefault(require("./findAllPodfilePaths"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -44,23 +27,51 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * LICENSE file in the root directory of this source tree.
  *
  */
-function findPodfilePath(folder, projectFolder) {
-  const podFilePath = _path().default.join(projectFolder, '..', 'Podfile');
 
-  if (_fs().default.existsSync(podFilePath)) {
-    return podFilePath;
-  }
+// Regexp matching all test projects
+const TEST_PROJECTS = /test|example|sample/i;
 
-  const podfiles = _glob().default.sync('**/Podfile', {
-    cwd: folder,
-    ignore: 'node_modules/**'
-  });
+// Base iOS folder
+const IOS_BASE = 'ios';
 
+// Podfile in the bundle package
+const BUNDLE_VENDORED_PODFILE = 'vendor/bundle/ruby';
+function findPodfilePath(cwd) {
+  const podfiles = (0, _findAllPodfilePaths.default)(cwd)
+  /**
+   * Then, we will run a simple test to rule out most example projects,
+   * unless they are located in a `ios` folder
+   */.filter(project => {
+    if (_path().default.dirname(project) === IOS_BASE) {
+      // Pick the Podfile in the default project (in the iOS folder)
+      return true;
+    }
+    if (TEST_PROJECTS.test(project)) {
+      // Ignore the Podfile in test and example projects
+      return false;
+    }
+    if (project.indexOf(BUNDLE_VENDORED_PODFILE) > -1) {
+      // Ignore the podfile shipped with Cocoapods in bundle
+      return false;
+    }
+
+    // Accept all the others
+    return true;
+  })
+  /**
+   * Podfile from `ios` folder will be picked up as a first one.
+   */.sort(project => _path().default.dirname(project) === IOS_BASE ? -1 : 1);
   if (podfiles.length > 0) {
-    return _path().default.join(folder, podfiles[0]);
+    if (podfiles.length > 1) {
+      _cliTools().logger.warn((0, _cliTools().inlineString)(`
+          Multiple Podfiles were found: ${podfiles}. Choosing ${podfiles[0]} automatically.
+          If you would like to select a different one, you can configure it via "project.ios.sourceDir".
+          You can learn more about it here: https://github.com/react-native-community/cli/blob/main/docs/configuration.md
+        `));
+    }
+    return _path().default.join(cwd, podfiles[0]);
   }
-
   return null;
 }
 
-//# sourceMappingURL=findPodfilePath.js.map
+//# sourceMappingURL=findPodfilePath.ts.map

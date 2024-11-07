@@ -1,12 +1,12 @@
-import * as React from 'react';
-import {
-  NativeSyntheticEvent,
-  StyleProp,
-  ViewProps,
-  ViewStyle,
-} from 'react-native';
+import type * as React from 'react';
+import type { NativeSyntheticEvent, ViewProps } from 'react-native';
+import NativeSafeAreaView from './specs/NativeSafeAreaView';
 
 export type Edge = 'top' | 'right' | 'bottom' | 'left';
+export type EdgeMode = 'off' | 'additive' | 'maximum';
+
+export type EdgeRecord = Partial<Record<Edge, EdgeMode>>;
+export type Edges = readonly Edge[] | Readonly<EdgeRecord>;
 
 export interface EdgeInsets {
   top: number;
@@ -31,14 +31,17 @@ export type InsetChangedEvent = NativeSyntheticEvent<Metrics>;
 
 export type InsetChangeNativeCallback = (event: InsetChangedEvent) => void;
 
-export interface NativeSafeAreaProviderProps {
+export interface NativeSafeAreaProviderProps extends ViewProps {
   children?: React.ReactNode;
-  style?: StyleProp<ViewStyle>;
   onInsetsChange: InsetChangeNativeCallback;
 }
 
-export type NativeSafeAreaViewProps = ViewProps & {
+export interface NativeSafeAreaViewProps extends ViewProps {
   children?: React.ReactNode;
   mode?: 'padding' | 'margin';
-  edges?: ReadonlyArray<Edge>;
-};
+  edges?: Edges;
+}
+
+export type NativeSafeAreaViewInstance = InstanceType<
+  typeof NativeSafeAreaView
+>;

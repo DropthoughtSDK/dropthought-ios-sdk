@@ -31,6 +31,30 @@ Object.keys(_kioskRnSdk).forEach(function (key) {
     }
   });
 });
+var _lib = require("./lib");
+Object.keys(_lib).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  if (key in exports && exports[key] === _lib[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _lib[key];
+    }
+  });
+});
+var _data = require("./data");
+Object.keys(_data).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  if (key in exports && exports[key] === _data[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _data[key];
+    }
+  });
+});
 // @ts-ignore
 
 const BASE_URL = exports.BASE_URL = 'https://api.dropthought.com/dtapp';

@@ -4,17 +4,12 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.initialWindowSafeAreaInsets = exports.initialWindowMetrics = void 0;
+var _NativeSafeAreaContext = _interopRequireDefault(require("./specs/NativeSafeAreaContext"));
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+const initialWindowMetrics = exports.initialWindowMetrics = _NativeSafeAreaContext.default?.getConstants?.()?.initialWindowMetrics ?? null;
 
-var _reactNative = require("react-native");
-
-const RNCSafeAreaProviderConfig = _reactNative.UIManager.getViewManagerConfig('RNCSafeAreaProvider');
-
-const initialWindowMetrics = RNCSafeAreaProviderConfig != null && RNCSafeAreaProviderConfig.Constants != null ? RNCSafeAreaProviderConfig.Constants.initialWindowMetrics : null;
 /**
  * @deprecated
  */
-
-exports.initialWindowMetrics = initialWindowMetrics;
-const initialWindowSafeAreaInsets = initialWindowMetrics === null || initialWindowMetrics === void 0 ? void 0 : initialWindowMetrics.insets;
-exports.initialWindowSafeAreaInsets = initialWindowSafeAreaInsets;
+const initialWindowSafeAreaInsets = exports.initialWindowSafeAreaInsets = initialWindowMetrics?.insets;
 //# sourceMappingURL=InitialWindow.native.js.map

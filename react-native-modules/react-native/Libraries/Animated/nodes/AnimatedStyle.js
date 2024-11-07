@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,70 +10,75 @@
 
 'use strict';
 
-const AnimatedNode = require('./AnimatedNode');
-const AnimatedTransform = require('./AnimatedTransform');
-const AnimatedWithChildren = require('./AnimatedWithChildren');
-const NativeAnimatedHelper = require('../NativeAnimatedHelper');
+import type {PlatformConfig} from '../AnimatedPlatformConfig';
 
-const flattenStyle = require('../../StyleSheet/flattenStyle');
+import ReactNativeFeatureFlags from '../../ReactNative/ReactNativeFeatureFlags';
+import flattenStyle from '../../StyleSheet/flattenStyle';
+import Platform from '../../Utilities/Platform';
+import NativeAnimatedHelper from '../NativeAnimatedHelper';
+import AnimatedNode from './AnimatedNode';
+import AnimatedObject, {hasAnimatedNode} from './AnimatedObject';
+import AnimatedTransform from './AnimatedTransform';
+import AnimatedWithChildren from './AnimatedWithChildren';
 
-class AnimatedStyle extends AnimatedWithChildren {
+function createAnimatedStyle(
+  inputStyle: any,
+  keepUnanimatedValues: boolean,
+): Object {
+  // $FlowFixMe[underconstrained-implicit-instantiation]
+  const style = flattenStyle(inputStyle);
+  const animatedStyles: any = {};
+  for (const key in style) {
+    const value = style[key];
+    if (value != null && key === 'transform') {
+      animatedStyles[key] =
+        ReactNativeFeatureFlags.shouldUseAnimatedObjectForTransform()
+          ? new AnimatedObject(value)
+          : new AnimatedTransform(value);
+    } else if (value instanceof AnimatedNode) {
+      animatedStyles[key] = value;
+    } else if (hasAnimatedNode(value)) {
+      animatedStyles[key] = new AnimatedObject(value);
+    } else if (keepUnanimatedValues) {
+      animatedStyles[key] = value;
+    }
+  }
+  return animatedStyles;
+}
+
+export default class AnimatedStyle extends AnimatedWithChildren {
+  _inputStyle: any;
   _style: Object;
 
   constructor(style: any) {
     super();
-    style = flattenStyle(style) || {};
-    if (style.transform) {
-      style = {
-        ...style,
-        transform: new AnimatedTransform(style.transform),
-      };
-    }
-    this._style = style;
+    this._inputStyle = style;
+    this._style = createAnimatedStyle(style, Platform.OS !== 'web');
   }
 
-  // Recursively get values for nested styles (like iOS's shadowOffset)
-  _walkStyleAndGetValues(style) {
-    const updatedStyle = {};
-    for (const key in style) {
-      const value = style[key];
+  __getValue(): Object | Array<Object> {
+    const result: {[string]: any} = {};
+    for (const key in this._style) {
+      const value = this._style[key];
       if (value instanceof AnimatedNode) {
-        if (!value.__isNative) {
-          // We cannot use value of natively driven nodes this way as the value we have access from
-          // JS may not be up to date.
-          updatedStyle[key] = value.__getValue();
-        }
-      } else if (value && !Array.isArray(value) && typeof value === 'object') {
-        // Support animating nested values (for example: shadowOffset.height)
-        updatedStyle[key] = this._walkStyleAndGetValues(value);
+        result[key] = value.__getValue();
       } else {
-        updatedStyle[key] = value;
+        result[key] = value;
       }
     }
-    return updatedStyle;
-  }
 
-  __getValue(): Object {
-    return this._walkStyleAndGetValues(this._style);
-  }
-
-  // Recursively get animated values for nested styles (like iOS's shadowOffset)
-  _walkStyleAndGetAnimatedValues(style) {
-    const updatedStyle = {};
-    for (const key in style) {
-      const value = style[key];
-      if (value instanceof AnimatedNode) {
-        updatedStyle[key] = value.__getAnimatedValue();
-      } else if (value && !Array.isArray(value) && typeof value === 'object') {
-        // Support animating nested values (for example: shadowOffset.height)
-        updatedStyle[key] = this._walkStyleAndGetAnimatedValues(value);
-      }
-    }
-    return updatedStyle;
+    return Platform.OS === 'web' ? [this._inputStyle, result] : result;
   }
 
   __getAnimatedValue(): Object {
-    return this._walkStyleAndGetAnimatedValues(this._style);
+    const result: {[string]: any} = {};
+    for (const key in this._style) {
+      const value = this._style[key];
+      if (value instanceof AnimatedNode) {
+        result[key] = value.__getAnimatedValue();
+      }
+    }
+    return result;
   }
 
   __attach(): void {
@@ -95,22 +100,22 @@ class AnimatedStyle extends AnimatedWithChildren {
     super.__detach();
   }
 
-  __makeNative() {
+  __makeNative(platformConfig: ?PlatformConfig) {
     for (const key in this._style) {
       const value = this._style[key];
       if (value instanceof AnimatedNode) {
-        value.__makeNative();
+        value.__makeNative(platformConfig);
       }
     }
-    super.__makeNative();
+    super.__makeNative(platformConfig);
   }
 
   __getNativeConfig(): Object {
-    const styleConfig = {};
+    const styleConfig: {[string]: ?number} = {};
     for (const styleKey in this._style) {
       if (this._style[styleKey] instanceof AnimatedNode) {
         const style = this._style[styleKey];
-        style.__makeNative();
+        style.__makeNative(this.__getPlatformConfig());
         styleConfig[styleKey] = style.__getNativeTag();
       }
       // Non-animated styles are set using `setNativeProps`, no need
@@ -123,5 +128,3 @@ class AnimatedStyle extends AnimatedWithChildren {
     };
   }
 }
-
-module.exports = AnimatedStyle;

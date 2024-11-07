@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -56,21 +56,18 @@ public abstract class BaseJavaModule implements NativeModule {
 
   @Override
   public boolean canOverrideExistingModule() {
-    // TODO(t11394819): Make this final and use annotation
     return false;
   }
 
   @Override
-  public void onCatalystInstanceDestroy() {
-    // do nothing
-  }
+  public void onCatalystInstanceDestroy() {}
 
-  public boolean hasConstants() {
-    return false;
-  }
-
-  // Cleanup Logic for TurboModules
+  /**
+   * The CatalystInstance is going away with Venice. Therefore, the TurboModule infra introduces the
+   * invalidate() method to allow NativeModules to clean up after themselves.
+   */
+  @Override
   public void invalidate() {
-    // Do nothing
+    onCatalystInstanceDestroy();
   }
 }

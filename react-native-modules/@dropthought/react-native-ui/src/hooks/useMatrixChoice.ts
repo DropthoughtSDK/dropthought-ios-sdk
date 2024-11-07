@@ -77,36 +77,38 @@ const useMatrixChoice = (
       const result: number[] = [];
       const newAnswer = [...previous];
       const answer = newAnswer[rowIndex];
-      if (answer[0] === -1) {
-        //not answer
-        result.push(coloumIndex);
-      } else {
-        let answerIndex = 0;
-        const isAnswered = answer.some((value, index) => {
-          if (value === coloumIndex) {
-            answerIndex = index;
-            return true;
-          }
-          return false;
-        });
-        if (isAnswered) {
-          //was answered
-          answer.splice(answerIndex, 1);
-          if (answer.length === 0) {
-            result.push(-1);
-          } else {
-            result.push(...answer);
-          }
-        } else {
-          //the answer is not include the answered
-          result.push(...answer);
+      if (answer) {
+        if (answer[0] === -1) {
+          //not answer
           result.push(coloumIndex);
+        } else {
+          let answerIndex = 0;
+          const isAnswered = answer.some((value, index) => {
+            if (value === coloumIndex) {
+              answerIndex = index;
+              return true;
+            }
+            return false;
+          });
+          if (isAnswered) {
+            //was answered
+            answer.splice(answerIndex, 1);
+            if (answer.length === 0) {
+              result.push(-1);
+            } else {
+              result.push(...answer);
+            }
+          } else {
+            //the answer is not include the answered
+            result.push(...answer);
+            result.push(coloumIndex);
+          }
         }
+        if (result.length === 0) {
+          result.push(-1);
+        }
+        newAnswer[rowIndex] = result.sort();
       }
-      if (result.length === 0) {
-        result.push(-1);
-      }
-      newAnswer[rowIndex] = result.sort();
       return newAnswer;
     });
   };

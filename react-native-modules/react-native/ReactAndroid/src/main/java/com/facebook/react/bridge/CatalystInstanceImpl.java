@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -28,7 +28,7 @@ import com.facebook.react.common.annotations.VisibleForTesting;
 import com.facebook.react.config.ReactFeatureFlags;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.turbomodule.core.CallInvokerHolderImpl;
-import com.facebook.react.turbomodule.core.interfaces.TurboModule;
+import com.facebook.react.turbomodule.core.NativeMethodCallInvokerHolderImpl;
 import com.facebook.react.turbomodule.core.interfaces.TurboModuleRegistry;
 import com.facebook.systrace.Systrace;
 import com.facebook.systrace.TraceListener;
@@ -85,8 +85,6 @@ public class CatalystInstanceImpl implements CatalystInstance {
   private final String mJsPendingCallsTitleForTrace =
       "pending_js_calls_instance" + sNextInstanceIdForTrace.getAndIncrement();
   private volatile boolean mDestroyed = false;
-  private volatile boolean mNativeModulesThreadDestructionComplete = false;
-  private volatile boolean mJSThreadDestructionComplete = false;
   private final TraceListener mTraceListener;
   private final JavaScriptModuleRegistry mJSModuleRegistry;
   private final JSBundleLoader mJSBundleLoader;
@@ -95,7 +93,7 @@ public class CatalystInstanceImpl implements CatalystInstance {
 
   private final NativeModuleRegistry mNativeModuleRegistry;
   private final JSIModuleRegistry mJSIModuleRegistry = new JSIModuleRegistry();
-  private final NativeModuleCallExceptionHandler mNativeModuleCallExceptionHandler;
+  private final JSExceptionHandler mJSExceptionHandler;
   private final MessageQueueThread mNativeModulesQueueThread;
   private boolean mInitialized = false;
   private volatile boolean mAcceptCalls = false;
@@ -114,14 +112,14 @@ public class CatalystInstanceImpl implements CatalystInstance {
 
   public native CallInvokerHolderImpl getJSCallInvokerHolder();
 
-  public native CallInvokerHolderImpl getNativeCallInvokerHolder();
+  public native NativeMethodCallInvokerHolderImpl getNativeMethodCallInvokerHolder();
 
   private CatalystInstanceImpl(
       final ReactQueueConfigurationSpec reactQueueConfigurationSpec,
       final JavaScriptExecutor jsExecutor,
       final NativeModuleRegistry nativeModuleRegistry,
       final JSBundleLoader jsBundleLoader,
-      NativeModuleCallExceptionHandler nativeModuleCallExceptionHandler) {
+      JSExceptionHandler jSExceptionHandler) {
     FLog.d(ReactConstants.TAG, "Initializing React Xplat Bridge.");
     Systrace.beginSection(TRACE_TAG_REACT_JAVA_BRIDGE, "createCatalystInstanceImpl");
 
@@ -134,13 +132,14 @@ public class CatalystInstanceImpl implements CatalystInstance {
     mNativeModuleRegistry = nativeModuleRegistry;
     mJSModuleRegistry = new JavaScriptModuleRegistry();
     mJSBundleLoader = jsBundleLoader;
-    mNativeModuleCallExceptionHandler = nativeModuleCallExceptionHandler;
+    mJSExceptionHandler = jSExceptionHandler;
     mNativeModulesQueueThread = mReactQueueConfiguration.getNativeModulesQueueThread();
     mTraceListener = new JSProfilerTraceListener(this);
     Systrace.endSection(TRACE_TAG_REACT_JAVA_BRIDGE);
 
     FLog.d(ReactConstants.TAG, "Initializing React Xplat Bridge before initializeBridge");
     Systrace.beginSection(TRACE_TAG_REACT_JAVA_BRIDGE, "initializeCxxBridge");
+
     initializeBridge(
         new BridgeCallback(this),
         jsExecutor,
@@ -478,9 +477,9 @@ public class CatalystInstanceImpl implements CatalystInstance {
   @Nullable
   public NativeModule getNativeModule(String moduleName) {
     if (getTurboModuleRegistry() != null) {
-      TurboModule turboModule = getTurboModuleRegistry().getModule(moduleName);
-      if (turboModule != null) {
-        return (NativeModule) turboModule;
+      NativeModule module = getTurboModuleRegistry().getModule(moduleName);
+      if (module != null) {
+        return module;
       }
     }
 
@@ -505,8 +504,8 @@ public class CatalystInstanceImpl implements CatalystInstance {
     nativeModules.addAll(mNativeModuleRegistry.getAllModules());
 
     if (getTurboModuleRegistry() != null) {
-      for (TurboModule turboModule : getTurboModuleRegistry().getModules()) {
-        nativeModules.add((NativeModule) turboModule);
+      for (NativeModule module : getTurboModuleRegistry().getModules()) {
+        nativeModules.add(module);
       }
     }
 
@@ -551,8 +550,9 @@ public class CatalystInstanceImpl implements CatalystInstance {
     return mJavaScriptContextHolder;
   }
 
-  @Override
   public native RuntimeExecutor getRuntimeExecutor();
+
+  public native RuntimeScheduler getRuntimeScheduler();
 
   @Override
   public void addJSIModules(List<JSIModuleSpec> jsiModules) {
@@ -611,7 +611,7 @@ public class CatalystInstanceImpl implements CatalystInstance {
   }
 
   private void onNativeException(Exception e) {
-    mNativeModuleCallExceptionHandler.handleException(e);
+    mJSExceptionHandler.handleException(e);
     mReactQueueConfiguration
         .getUIQueueThread()
         .runOnQueue(
@@ -667,7 +667,7 @@ public class CatalystInstanceImpl implements CatalystInstance {
     private @Nullable JSBundleLoader mJSBundleLoader;
     private @Nullable NativeModuleRegistry mRegistry;
     private @Nullable JavaScriptExecutor mJSExecutor;
-    private @Nullable NativeModuleCallExceptionHandler mNativeModuleCallExceptionHandler;
+    private @Nullable JSExceptionHandler mJSExceptionHandler;
 
     public Builder setReactQueueConfigurationSpec(
         ReactQueueConfigurationSpec ReactQueueConfigurationSpec) {
@@ -690,8 +690,8 @@ public class CatalystInstanceImpl implements CatalystInstance {
       return this;
     }
 
-    public Builder setNativeModuleCallExceptionHandler(NativeModuleCallExceptionHandler handler) {
-      mNativeModuleCallExceptionHandler = handler;
+    public Builder setJSExceptionHandler(JSExceptionHandler handler) {
+      mJSExceptionHandler = handler;
       return this;
     }
 
@@ -701,7 +701,7 @@ public class CatalystInstanceImpl implements CatalystInstance {
           Assertions.assertNotNull(mJSExecutor),
           Assertions.assertNotNull(mRegistry),
           Assertions.assertNotNull(mJSBundleLoader),
-          Assertions.assertNotNull(mNativeModuleCallExceptionHandler));
+          Assertions.assertNotNull(mJSExceptionHandler));
     }
   }
 }

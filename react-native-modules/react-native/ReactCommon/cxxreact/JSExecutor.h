@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -17,8 +17,7 @@
 #define RN_EXPORT __attribute__((visibility("default")))
 #endif
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 class JSBigString;
 class JSExecutor;
@@ -36,18 +35,18 @@ class ExecutorDelegate {
   virtual std::shared_ptr<ModuleRegistry> getModuleRegistry() = 0;
 
   virtual void callNativeModules(
-      JSExecutor &executor,
-      folly::dynamic &&calls,
+      JSExecutor& executor,
+      folly::dynamic&& calls,
       bool isEndOfBatch) = 0;
   virtual MethodCallResult callSerializableNativeHook(
-      JSExecutor &executor,
+      JSExecutor& executor,
       unsigned int moduleId,
       unsigned int methodId,
-      folly::dynamic &&args) = 0;
+      folly::dynamic&& args) = 0;
 };
 
 using NativeExtensionsProvider =
-    std::function<folly::dynamic(const std::string &)>;
+    std::function<folly::dynamic(const std::string&)>;
 
 class JSExecutorFactory {
  public:
@@ -82,7 +81,7 @@ class RN_EXPORT JSExecutor {
    */
   virtual void registerBundle(
       uint32_t bundleId,
-      const std::string &bundlePath) = 0;
+      const std::string& bundlePath) = 0;
 
   /**
    * Executes BatchedBridge.callFunctionReturnFlushedQueue with the module ID,
@@ -91,9 +90,9 @@ class RN_EXPORT JSExecutor {
    * native modules methods.
    */
   virtual void callFunction(
-      const std::string &moduleId,
-      const std::string &methodId,
-      const folly::dynamic &arguments) = 0;
+      const std::string& moduleId,
+      const std::string& methodId,
+      const folly::dynamic& arguments) = 0;
 
   /**
    * Executes BatchedBridge.invokeCallbackAndReturnFlushedQueue with the cbID,
@@ -103,13 +102,13 @@ class RN_EXPORT JSExecutor {
    */
   virtual void invokeCallback(
       const double callbackId,
-      const folly::dynamic &arguments) = 0;
+      const folly::dynamic& arguments) = 0;
 
   virtual void setGlobalVariable(
       std::string propName,
       std::unique_ptr<const JSBigString> jsonValue) = 0;
 
-  virtual void *getJavaScriptContext() {
+  virtual void* getJavaScriptContext() {
     return nullptr;
   }
 
@@ -128,7 +127,7 @@ class RN_EXPORT JSExecutor {
    */
   virtual std::string getDescription() = 0;
 
-  virtual void handleMemoryPressure(__unused int pressureLevel) {}
+  virtual void handleMemoryPressure([[maybe_unused]] int pressureLevel) {}
 
   virtual void destroy() {}
   virtual ~JSExecutor() {}
@@ -137,8 +136,9 @@ class RN_EXPORT JSExecutor {
 
   static std::string getSyntheticBundlePath(
       uint32_t bundleId,
-      const std::string &bundlePath);
+      const std::string& bundlePath);
+
+  static double performanceNow();
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

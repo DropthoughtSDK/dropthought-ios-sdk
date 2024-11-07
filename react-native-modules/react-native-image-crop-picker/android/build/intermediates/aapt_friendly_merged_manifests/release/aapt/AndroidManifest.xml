@@ -2,9 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.reactnative.ivpusic.imagepicker" >
 
-    <uses-sdk
-        android:minSdkVersion="26"
-        android:targetSdkVersion="30" />
+    <uses-sdk android:minSdkVersion="26" />
 
     <queries>
         <intent>
@@ -16,13 +14,13 @@
 
     <application>
         <provider
-            android:name="androidx.core.content.FileProvider"
+            android:name="com.reactnative.ivpusic.imagepicker.IvpusicImagePickerFileProvider"
             android:authorities="dollar_openBracket_applicationId_closeBracket.provider"
             android:exported="false"
             android:grantUriPermissions="true" >
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
+                android:resource="@xml/ivpusic_imagepicker_provider_paths" />
         </provider>
 
         <activity

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,10 +12,10 @@
 #import <FBReactNativeSpec/FBReactNativeSpec.h>
 #import <React/RCTAppearance.h>
 #import <React/RCTBridge.h>
+#import <React/RCTConstants.h>
 #import <React/RCTConvert.h>
 #import <React/RCTDefines.h>
 #import <React/RCTDevLoadingViewSetEnabled.h>
-#import <React/RCTModalHostViewController.h>
 #import <React/RCTUtils.h>
 
 #import "CoreModulesPlugins.h"
@@ -25,7 +25,7 @@ using namespace facebook::react;
 @interface RCTDevLoadingView () <NativeDevLoadingViewSpec>
 @end
 
-#if RCT_DEV | RCT_ENABLE_LOADING_VIEW
+#if RCT_DEV_MENU
 
 @implementation RCTDevLoadingView {
   UIWindow *_window;
@@ -35,9 +35,22 @@ using namespace facebook::react;
   dispatch_block_t _initialMessageBlock;
 }
 
-@synthesize bridge = _bridge;
-
 RCT_EXPORT_MODULE()
+
+- (instancetype)init
+{
+  if (self = [super init]) {
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(hide)
+                                                 name:RCTJavaScriptDidLoadNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(hide)
+                                                 name:RCTJavaScriptDidFailToLoadNotification
+                                               object:nil];
+  }
+  return self;
+}
 
 + (void)setEnabled:(BOOL)enabled
 {
@@ -46,38 +59,20 @@ RCT_EXPORT_MODULE()
 
 + (BOOL)requiresMainQueueSetup
 {
-  return YES;
-}
-
-- (void)setBridge:(RCTBridge *)bridge
-{
-  _bridge = bridge;
-
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(hide)
-                                               name:RCTJavaScriptDidLoadNotification
-                                             object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(hide)
-                                               name:RCTJavaScriptDidFailToLoadNotification
-                                             object:nil];
-
-  if (bridge.loading) {
-    [self showWithURL:bridge.bundleURL];
-  }
+  return NO;
 }
 
 - (void)clearInitialMessageDelay
 {
-  if (self->_initialMessageBlock != nil) {
-    dispatch_block_cancel(self->_initialMessageBlock);
-    self->_initialMessageBlock = nil;
+  if (_initialMessageBlock != nil) {
+    dispatch_block_cancel(_initialMessageBlock);
+    _initialMessageBlock = nil;
   }
 }
 
 - (void)showInitialMessageDelayed:(void (^)())initialMessage
 {
-  self->_initialMessageBlock = dispatch_block_create(static_cast<dispatch_block_flags_t>(0), initialMessage);
+  _initialMessageBlock = dispatch_block_create(static_cast<dispatch_block_flags_t>(0), initialMessage);
 
   // We delay the initial loading message to prevent flashing it
   // when loading progress starts quickly. To do that, we
@@ -88,27 +83,31 @@ RCT_EXPORT_MODULE()
       dispatch_time(DISPATCH_TIME_NOW, 0.2 * NSEC_PER_SEC), dispatch_get_main_queue(), self->_initialMessageBlock);
 }
 
-- (UIColor *)dimColor:(UIColor *)c
+- (void)hideBannerAfter:(CGFloat)delay
 {
-  // Given a color, return a slightly lighter or darker color for dim effect.
-  CGFloat h, s, b, a;
-  if ([c getHue:&h saturation:&s brightness:&b alpha:&a])
-    return [UIColor colorWithHue:h saturation:s brightness:b < 0.5 ? b * 1.25 : b * 0.75 alpha:a];
-  return nil;
-}
-
-- (NSString *)getTextForHost
-{
-  if (self->_bridge.bundleURL == nil || self->_bridge.bundleURL.fileURL) {
-    return @"React Native";
-  }
-
-  return [NSString stringWithFormat:@"%@:%@", self->_bridge.bundleURL.host, self->_bridge.bundleURL.port];
+  // Cancel previous hide call after the delay.
+  [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hide) object:nil];
+  // Set new hide call after a delay.
+  [self performSelector:@selector(hide) withObject:nil afterDelay:delay];
 }
 
 - (void)showMessage:(NSString *)message color:(UIColor *)color backgroundColor:(UIColor *)backgroundColor
 {
-  if (!RCTDevLoadingViewGetEnabled() || self->_hiding) {
+  if (!RCTDevLoadingViewGetEnabled() || _hiding) {
+    return;
+  }
+
+  // Input validation
+  if (message == nil || [message isEqualToString:@""]) {
+    NSLog(@"Error: message cannot be nil or empty");
+    return;
+  }
+  if (color == nil) {
+    NSLog(@"Error: color cannot be nil");
+    return;
+  }
+  if (backgroundColor == nil) {
+    NSLog(@"Error: backgroundColor cannot be nil");
     return;
   }
 
@@ -117,16 +116,11 @@ RCT_EXPORT_MODULE()
     if (!self->_window && !RCTRunningInTestEnvironment()) {
       CGSize screenSize = [UIScreen mainScreen].bounds.size;
 
-      if (@available(iOS 11.0, *)) {
-        UIWindow *window = RCTSharedApplication().keyWindow;
-        self->_window =
-            [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, screenSize.width, window.safeAreaInsets.top + 10)];
-        self->_label =
-            [[UILabel alloc] initWithFrame:CGRectMake(0, window.safeAreaInsets.top - 10, screenSize.width, 20)];
-      } else {
-        self->_window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, screenSize.width, 20)];
-        self->_label = [[UILabel alloc] initWithFrame:self->_window.bounds];
-      }
+      UIWindow *window = RCTSharedApplication().keyWindow;
+      self->_window =
+          [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, screenSize.width, window.safeAreaInsets.top + 10)];
+      self->_label =
+          [[UILabel alloc] initWithFrame:CGRectMake(0, window.safeAreaInsets.top - 10, screenSize.width, 20)];
       [self->_window addSubview:self->_label];
 
       self->_window.windowLevel = UIWindowLevelStatusBar + 1;
@@ -143,14 +137,11 @@ RCT_EXPORT_MODULE()
     self->_window.backgroundColor = backgroundColor;
     self->_window.hidden = NO;
 
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && defined(__IPHONE_13_0) && \
-    __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0
-    if (@available(iOS 13.0, *)) {
-      UIWindowScene *scene = (UIWindowScene *)RCTSharedApplication().connectedScenes.anyObject;
-      self->_window.windowScene = scene;
-    }
-#endif
+    UIWindowScene *scene = (UIWindowScene *)RCTSharedApplication().connectedScenes.anyObject;
+    self->_window.windowScene = scene;
   });
+
+  [self hideBannerAfter:15.0];
 }
 
 RCT_EXPORT_METHOD(showMessage
@@ -171,7 +162,7 @@ RCT_EXPORT_METHOD(hide)
   [self clearInitialMessageDelay];
 
   dispatch_async(dispatch_get_main_queue(), ^{
-    self->_hiding = true;
+    self->_hiding = YES;
     const NSTimeInterval MIN_PRESENTED_TIME = 0.6;
     NSTimeInterval presentedTime = [[NSDate date] timeIntervalSinceDate:self->_showDate];
     NSTimeInterval delay = MAX(0, MIN_PRESENTED_TIME - presentedTime);
@@ -193,11 +184,11 @@ RCT_EXPORT_METHOD(hide)
 
 - (void)showProgressMessage:(NSString *)message
 {
-  if (self->_window != nil) {
+  if (_window != nil) {
     // This is an optimization. Since the progress can come in quickly,
     // we want to do the minimum amount of work to update the UI,
     // which is to only update the label text.
-    self->_label.text = message;
+    _label.text = message;
     return;
   }
 

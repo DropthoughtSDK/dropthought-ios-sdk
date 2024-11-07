@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,15 +7,15 @@
 
 #include "JSBundleType.h"
 
-#include <folly/Bits.h>
-
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 static uint32_t constexpr RAMBundleMagicNumber = 0xFB0BD1E5;
 
-ScriptTag parseTypeFromHeader(const BundleHeader &header) {
-  switch (folly::Endian::little(header.magic)) {
+// "Hermes" in ancient Greek encoded in UTF-16BE and truncated to 8 bytes.
+static uint64_t constexpr HermesBCBundleMagicNumber = 0x1F1903C103BC1FC6;
+
+ScriptTag parseTypeFromHeader(const BundleHeader& header) {
+  switch (header.magic32.value) {
     case RAMBundleMagicNumber:
       return ScriptTag::RAMBundle;
     default:
@@ -23,7 +23,7 @@ ScriptTag parseTypeFromHeader(const BundleHeader &header) {
   }
 }
 
-const char *stringForScriptTag(const ScriptTag &tag) {
+const char* stringForScriptTag(const ScriptTag& tag) {
   switch (tag) {
     case ScriptTag::String:
       return "String";
@@ -33,5 +33,8 @@ const char *stringForScriptTag(const ScriptTag &tag) {
   return "";
 }
 
-} // namespace react
-} // namespace facebook
+bool isHermesBytecodeBundle(const BundleHeader& header) {
+  return header.magic64 == HermesBCBundleMagicNumber;
+}
+
+} // namespace facebook::react

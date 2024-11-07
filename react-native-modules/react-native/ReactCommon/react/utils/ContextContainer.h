@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,14 +9,15 @@
 
 #include <memory>
 #include <mutex>
+#include <optional>
+#include <shared_mutex>
 #include <string>
+#include <unordered_map>
 
-#include <better/map.h>
-#include <better/mutex.h>
-#include <better/optional.h>
+#include <react/debug/flags.h>
+#include <react/debug/react_native_assert.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * General purpose dependency injection container.
@@ -24,7 +25,7 @@ namespace react {
  */
 class ContextContainer final {
  public:
-  using Shared = std::shared_ptr<ContextContainer const>;
+  using Shared = std::shared_ptr<const ContextContainer>;
 
   /*
    * Registers an instance of the particular type `T` in the container
@@ -35,31 +36,23 @@ class ContextContainer final {
    * example if the type `T` is `std::shared_ptr<const ReactNativeConfig>`,
    * then one would use `"ReactNativeConfig"` for the `key`, even if the
    * instance is actually a `shared_ptr` of derived class
-   *`EmptyReactNativeConfig`.
+   *`ReactNativeConfig`.
    */
   template <typename T>
-  void insert(std::string const &key, T const &instance) const {
-    std::unique_lock<better::shared_mutex> lock(mutex_);
+  void insert(const std::string& key, T const& instance) const {
+    std::unique_lock lock(mutex_);
 
     instances_.insert({key, std::make_shared<T>(instance)});
-
-#ifndef NDEBUG
-    typeNames_.insert({key, typeid(T).name()});
-#endif
   }
 
   /*
    * Removes an instance stored for a given `key`.
    * Does nothing if the instance was not found.
    */
-  void erase(std::string const &key) const {
-    std::unique_lock<better::shared_mutex> lock(mutex_);
+  void erase(const std::string& key) const {
+    std::unique_lock lock(mutex_);
 
     instances_.erase(key);
-
-#ifndef NDEBUG
-    typeNames_.erase(key);
-#endif
   }
 
   /*
@@ -67,17 +60,12 @@ class ContextContainer final {
    * Values with keys that already exist in the container will be replaced with
    * values from the given container.
    */
-  void update(ContextContainer const &contextContainer) const {
-    std::unique_lock<better::shared_mutex> lock(mutex_);
+  void update(const ContextContainer& contextContainer) const {
+    std::unique_lock lock(mutex_);
 
-    for (auto const &pair : contextContainer.instances_) {
+    for (const auto& pair : contextContainer.instances_) {
       instances_.erase(pair.first);
       instances_.insert(pair);
-#ifndef NDEBUG
-      typeNames_.erase(pair.first);
-      typeNames_.insert(
-          {pair.first, contextContainer.typeNames_.at(pair.first)});
-#endif
     }
   }
 
@@ -87,16 +75,13 @@ class ContextContainer final {
    * Throws an exception if the instance could not be found.
    */
   template <typename T>
-  T at(std::string const &key) const {
-    std::shared_lock<better::shared_mutex> lock(mutex_);
+  T at(const std::string& key) const {
+    std::shared_lock lock(mutex_);
 
-    assert(
+    react_native_assert(
         instances_.find(key) != instances_.end() &&
         "ContextContainer doesn't have an instance for given key.");
-    assert(
-        typeNames_.at(key) == typeid(T).name() &&
-        "ContextContainer stores an instance of different type for given key.");
-    return *std::static_pointer_cast<T>(instances_.at(key));
+    return *static_cast<T*>(instances_.at(key).get());
   }
 
   /*
@@ -105,29 +90,21 @@ class ContextContainer final {
    * Returns an empty optional if the instance could not be found.
    */
   template <typename T>
-  better::optional<T> find(std::string const &key) const {
-    std::shared_lock<better::shared_mutex> lock(mutex_);
+  std::optional<T> find(const std::string& key) const {
+    std::shared_lock lock(mutex_);
 
     auto iterator = instances_.find(key);
     if (iterator == instances_.end()) {
       return {};
     }
 
-    assert(
-        typeNames_.at(key) == typeid(T).name() &&
-        "ContextContainer stores an instance of different type for given key.");
-
-    return *std::static_pointer_cast<T>(iterator->second);
+    return *static_cast<T*>(iterator->second.get());
   }
 
  private:
-  mutable better::shared_mutex mutex_;
+  mutable std::shared_mutex mutex_;
   // Protected by mutex_`.
-  mutable better::map<std::string, std::shared_ptr<void>> instances_;
-#ifndef NDEBUG
-  mutable better::map<std::string, std::string> typeNames_;
-#endif
+  mutable std::unordered_map<std::string, std::shared_ptr<void>> instances_;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

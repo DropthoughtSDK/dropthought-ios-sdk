@@ -1,26 +1,42 @@
 export interface AndroidProjectConfig {
     sourceDir: string;
-    isFlat: boolean;
-    folder: string;
-    stringsPath: string;
-    manifestPath: string;
-    buildGradlePath: string;
-    settingsGradlePath: string;
-    assetsPath: string;
-    mainFilePath: string;
-    packageName: string;
-    packageFolder: string;
     appName: string;
+    packageName: string;
+    applicationId: string;
+    mainActivity: string;
+    dependencyConfiguration?: string;
+    watchModeCommandParams?: string[];
+    unstable_reactLegacyComponentNames?: string[] | null;
 }
-export declare type AndroidProjectParams = Partial<AndroidProjectConfig>;
-export interface AndroidDependencyConfig {
+export type AndroidProjectParams = {
+    sourceDir?: string;
+    appName?: string;
+    manifestPath?: string;
+    packageName?: string;
+    dependencyConfiguration?: string;
+    watchModeCommandParams?: string[];
+    unstable_reactLegacyComponentNames?: string[] | null;
+};
+export type AndroidDependencyConfig = {
     sourceDir: string;
-    folder: string;
     packageImportPath: string;
     packageInstance: string;
-    manifestPath: string;
-    packageName: string;
+    dependencyConfiguration?: string;
     buildTypes: string[];
-}
-export declare type AndroidDependencyParams = Partial<AndroidDependencyConfig>;
+    libraryName?: string | null;
+    componentDescriptors?: string[] | null;
+    cmakeListsPath?: string | null;
+};
+export type AndroidDependencyParams = {
+    sourceDir?: string;
+    manifestPath?: string;
+    packageName?: string;
+    dependencyConfiguration?: string;
+    packageImportPath?: string;
+    packageInstance?: string;
+    buildTypes?: string[];
+    libraryName?: string | null;
+    componentDescriptors?: string[] | null;
+    cmakeListsPath?: string | null;
+};
 //# sourceMappingURL=android.d.ts.map

@@ -58,7 +58,11 @@ const SurveyHeader = (props: Props) => {
             source={require('../assets/icClose24Px.png')}
           />
         </TouchableOpacity>
-        <Text style={titleStyle} numberOfLines={1}>
+        <Text
+          testID="test:id/preview_survey_name_header"
+          style={titleStyle}
+          numberOfLines={1}
+        >
           {survey.surveyName}
         </Text>
       </View>

@@ -1,38 +1,63 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
 
 #include "ShadowNode.h"
+#include "DynamicPropsUtilities.h"
 #include "ShadowNodeFragment.h"
 
-#include <better/small_vector.h>
-
+#include <react/debug/react_native_assert.h>
 #include <react/renderer/core/ComponentDescriptor.h>
 #include <react/renderer/core/ShadowNodeFragment.h>
 #include <react/renderer/debug/DebugStringConvertible.h>
 #include <react/renderer/debug/debugStringConvertibleUtils.h>
 
-namespace facebook {
-namespace react {
+#include <utility>
 
-SharedShadowNodeSharedList ShadowNode::emptySharedShadowNodeSharedList() {
+namespace facebook::react {
+
+ShadowNode::SharedListOfShared ShadowNode::emptySharedShadowNodeSharedList() {
   static const auto emptySharedShadowNodeSharedList =
-      std::make_shared<SharedShadowNodeList>();
+      std::make_shared<ShadowNode::ListOfShared>();
   return emptySharedShadowNodeSharedList;
 }
 
-bool ShadowNode::sameFamily(const ShadowNode &first, const ShadowNode &second) {
+/*
+ * On iOS, this method returns `props` if provided, `sourceShadowNode`'s props
+ * otherwise. On Android, we forward props in case `sourceShadowNode` hasn't
+ * been mounted. `Props::rawProps` are merged from `props` to a copy of
+ * `sourceShadowNode.props_` and returned. This is necessary to enable
+ * Background Executor and should be removed once reimplementation of JNI layer
+ * is finished.
+ */
+Props::Shared ShadowNode::propsForClonedShadowNode(
+    const ShadowNode& sourceShadowNode,
+    const Props::Shared& props) {
+#ifdef ANDROID
+  bool hasBeenMounted = sourceShadowNode.hasBeenMounted_;
+  bool sourceNodeHasRawProps = !sourceShadowNode.getProps()->rawProps.empty();
+  if (!hasBeenMounted && sourceNodeHasRawProps && props) {
+    auto& castedProps = const_cast<Props&>(*props);
+    castedProps.rawProps = mergeDynamicProps(
+        sourceShadowNode.getProps()->rawProps, props->rawProps);
+    return props;
+  }
+#endif
+  return props ? props : sourceShadowNode.getProps();
+}
+
+bool ShadowNode::sameFamily(const ShadowNode& first, const ShadowNode& second) {
   return first.family_ == second.family_;
 }
 
 #pragma mark - Constructors
 
 ShadowNode::ShadowNode(
-    ShadowNodeFragment const &fragment,
-    ShadowNodeFamily::Shared const &family,
+    const ShadowNodeFragment& fragment,
+    ShadowNodeFamily::Shared family,
     ShadowNodeTraits traits)
     :
 #if RN_DEBUG_STRING_CONVERTIBLE
@@ -44,14 +69,14 @@ ShadowNode::ShadowNode(
                             : emptySharedShadowNodeSharedList()),
       state_(fragment.state),
       orderIndex_(0),
-      family_(family),
+      family_(std::move(family)),
       traits_(traits) {
-  assert(props_);
-  assert(children_);
+  react_native_assert(props_);
+  react_native_assert(children_);
 
   traits_.set(ShadowNodeTraits::Trait::ChildrenAreShared);
 
-  for (auto const &child : *children_) {
+  for (const auto& child : *children_) {
     child->family_->setParent(family_);
   }
 
@@ -60,13 +85,13 @@ ShadowNode::ShadowNode(
 }
 
 ShadowNode::ShadowNode(
-    const ShadowNode &sourceShadowNode,
-    const ShadowNodeFragment &fragment)
+    const ShadowNode& sourceShadowNode,
+    const ShadowNodeFragment& fragment)
     :
 #if RN_DEBUG_STRING_CONVERTIBLE
       revision_(sourceShadowNode.revision_ + 1),
 #endif
-      props_(fragment.props ? fragment.props : sourceShadowNode.props_),
+      props_(propsForClonedShadowNode(sourceShadowNode, fragment.props)),
       children_(
           fragment.children ? fragment.children : sourceShadowNode.children_),
       state_(
@@ -76,20 +101,49 @@ ShadowNode::ShadowNode(
       family_(sourceShadowNode.family_),
       traits_(sourceShadowNode.traits_) {
 
-  assert(props_);
-  assert(children_);
+  react_native_assert(props_);
+  react_native_assert(children_);
 
   traits_.set(ShadowNodeTraits::Trait::ChildrenAreShared);
 
   if (fragment.children) {
-    for (const auto &child : *children_) {
+    for (const auto& child : *children_) {
       child->family_->setParent(family_);
     }
   }
 }
 
-UnsharedShadowNode ShadowNode::clone(const ShadowNodeFragment &fragment) const {
-  return family_->componentDescriptor_.cloneShadowNode(*this, fragment);
+ShadowNode::Unshared ShadowNode::clone(
+    const ShadowNodeFragment& fragment) const {
+  const auto& family = *family_;
+  const auto& componentDescriptor = family.componentDescriptor_;
+  if (family.nativeProps_DEPRECATED != nullptr) {
+    auto propsParserContext = PropsParserContext{family_->getSurfaceId(), {}};
+    if (fragment.props == ShadowNodeFragment::propsPlaceholder()) {
+      // Clone existing `props_` with `family.nativeProps_DEPRECATED` to apply
+      // previously set props via `setNativeProps` API.
+      auto props = componentDescriptor.cloneProps(
+          propsParserContext, props_, RawProps(*family.nativeProps_DEPRECATED));
+      auto clonedNode = componentDescriptor.cloneShadowNode(
+          *this,
+          {
+              props,
+              fragment.children,
+              fragment.state,
+          });
+      return clonedNode;
+    } else {
+      // TODO: We might need to merge fragment.priops with
+      // `family.nativeProps_DEPRECATED`.
+      return componentDescriptor.cloneShadowNode(*this, fragment);
+    }
+  } else {
+    return componentDescriptor.cloneShadowNode(*this, fragment);
+  }
+}
+
+ContextContainer::Shared ShadowNode::getContextContainer() const {
+  return family_->componentDescriptor_.getContextContainer();
 }
 
 #pragma mark - Getters
@@ -102,7 +156,7 @@ ComponentHandle ShadowNode::getComponentHandle() const {
   return family_->getComponentHandle();
 }
 
-const SharedShadowNodeList &ShadowNode::getChildren() const {
+const ShadowNode::ListOfShared& ShadowNode::getChildren() const {
   return *children_;
 }
 
@@ -110,12 +164,21 @@ ShadowNodeTraits ShadowNode::getTraits() const {
   return traits_;
 }
 
-const SharedProps &ShadowNode::getProps() const {
+const Props::Shared& ShadowNode::getProps() const {
   return props_;
 }
 
-const SharedEventEmitter &ShadowNode::getEventEmitter() const {
+const SharedEventEmitter& ShadowNode::getEventEmitter() const {
   return family_->eventEmitter_;
+}
+
+jsi::Value ShadowNode::getInstanceHandle(jsi::Runtime& runtime) const {
+  auto instanceHandle = family_->instanceHandle_;
+  if (instanceHandle == nullptr) {
+    return jsi::Value::null();
+  }
+
+  return instanceHandle->getInstanceHandle(runtime);
 }
 
 Tag ShadowNode::getTag() const {
@@ -126,11 +189,11 @@ SurfaceId ShadowNode::getSurfaceId() const {
   return family_->surfaceId_;
 }
 
-const ComponentDescriptor &ShadowNode::getComponentDescriptor() const {
+const ComponentDescriptor& ShadowNode::getComponentDescriptor() const {
   return family_->componentDescriptor_;
 }
 
-const State::Shared &ShadowNode::getState() const {
+const State::Shared& ShadowNode::getState() const {
   return state_;
 }
 
@@ -151,36 +214,33 @@ void ShadowNode::sealRecursive() const {
 
   props_->seal();
 
-  for (auto child : *children_) {
+  for (const auto& child : *children_) {
     child->sealRecursive();
   }
 }
 
 #pragma mark - Mutating Methods
 
-void ShadowNode::appendChild(const ShadowNode::Shared &child) {
+void ShadowNode::appendChild(const ShadowNode::Shared& child) {
   ensureUnsealed();
 
   cloneChildrenIfShared();
-  auto nonConstChildren =
-      std::const_pointer_cast<SharedShadowNodeList>(children_);
-  nonConstChildren->push_back(child);
+  auto& children = const_cast<ShadowNode::ListOfShared&>(*children_);
+  children.push_back(child);
 
   child->family_->setParent(family_);
 }
 
 void ShadowNode::replaceChild(
-    ShadowNode const &oldChild,
-    ShadowNode::Shared const &newChild,
-    int suggestedIndex) {
+    const ShadowNode& oldChild,
+    const ShadowNode::Shared& newChild,
+    int32_t suggestedIndex) {
   ensureUnsealed();
 
   cloneChildrenIfShared();
-
   newChild->family_->setParent(family_);
 
-  auto &children =
-      *std::const_pointer_cast<ShadowNode::ListOfShared>(children_);
+  auto& children = const_cast<ShadowNode::ListOfShared&>(*children_);
   auto size = children.size();
 
   if (suggestedIndex != -1 && suggestedIndex < size) {
@@ -192,14 +252,14 @@ void ShadowNode::replaceChild(
     }
   }
 
-  for (auto index = 0; index < size; index++) {
+  for (size_t index = 0; index < size; index++) {
     if (children.at(index).get() == &oldChild) {
       children[index] = newChild;
       return;
     }
   }
 
-  assert(false && "Child to replace was not found.");
+  react_native_assert(false && "Child to replace was not found.");
 }
 
 void ShadowNode::cloneChildrenIfShared() {
@@ -208,24 +268,39 @@ void ShadowNode::cloneChildrenIfShared() {
   }
 
   traits_.unset(ShadowNodeTraits::Trait::ChildrenAreShared);
-  children_ = std::make_shared<SharedShadowNodeList>(*children_);
+  children_ = std::make_shared<ShadowNode::ListOfShared>(*children_);
 }
 
 void ShadowNode::setMounted(bool mounted) const {
   if (mounted) {
     family_->setMostRecentState(getState());
+    hasBeenMounted_ = mounted;
   }
 
   family_->eventEmitter_->setEnabled(mounted);
 }
 
-ShadowNodeFamily const &ShadowNode::getFamily() const {
+void ShadowNode::progressStateIfNecessary() {
+  if (!hasBeenMounted_ && state_) {
+    ensureUnsealed();
+    auto mostRecentState = family_->getMostRecentStateIfObsolete(*state_);
+    if (mostRecentState) {
+      state_ = mostRecentState;
+      const auto& componentDescriptor = family_->componentDescriptor_;
+      // Must call ComponentDescriptor::adopt to trigger any side effect
+      // state may have. E.g. adjusting padding.
+      componentDescriptor.adopt(*this);
+    }
+  }
+}
+
+const ShadowNodeFamily& ShadowNode::getFamily() const {
   return *family_;
 }
 
 ShadowNode::Unshared ShadowNode::cloneTree(
-    ShadowNodeFamily const &shadowNodeFamily,
-    std::function<ShadowNode::Unshared(ShadowNode const &oldShadowNode)>
+    const ShadowNodeFamily& shadowNodeFamily,
+    const std::function<ShadowNode::Unshared(ShadowNode const& oldShadowNode)>&
         callback) const {
   auto ancestors = shadowNodeFamily.getAncestors(*this);
 
@@ -233,28 +308,29 @@ ShadowNode::Unshared ShadowNode::cloneTree(
     return ShadowNode::Unshared{nullptr};
   }
 
-  auto &parent = ancestors.back();
-  auto &oldShadowNode = parent.first.get().getChildren().at(parent.second);
+  auto& parent = ancestors.back();
+  auto& oldShadowNode = parent.first.get().getChildren().at(parent.second);
 
   auto newShadowNode = callback(*oldShadowNode);
 
-  assert(
+  react_native_assert(
       newShadowNode &&
       "`callback` returned `nullptr` which is not allowed value.");
 
   auto childNode = newShadowNode;
 
   for (auto it = ancestors.rbegin(); it != ancestors.rend(); ++it) {
-    auto &parentNode = it->first.get();
+    auto& parentNode = it->first.get();
     auto childIndex = it->second;
 
     auto children = parentNode.getChildren();
-    assert(ShadowNode::sameFamily(*children.at(childIndex), *childNode));
+    react_native_assert(
+        ShadowNode::sameFamily(*children.at(childIndex), *childNode));
     children[childIndex] = childNode;
 
     childNode = parentNode.clone({
         ShadowNodeFragment::propsPlaceholder(),
-        std::make_shared<SharedShadowNodeList>(children),
+        std::make_shared<ShadowNode::ListOfShared>(children),
     });
   }
 
@@ -277,7 +353,7 @@ std::string ShadowNode::getDebugValue() const {
 SharedDebugStringConvertibleList ShadowNode::getDebugChildren() const {
   auto debugChildren = SharedDebugStringConvertibleList{};
 
-  for (auto child : *children_) {
+  for (const auto& child : *children_) {
     auto debugChild =
         std::dynamic_pointer_cast<const DebugStringConvertible>(child);
     if (debugChild) {
@@ -295,5 +371,4 @@ SharedDebugStringConvertibleList ShadowNode::getDebugProps() const {
 }
 #endif
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,8 +8,6 @@
 #import "RCTSourceCode.h"
 
 #import <FBReactNativeSpec/FBReactNativeSpec.h>
-
-#import <React/RCTBridge.h>
 
 #import "CoreModulesPlugins.h"
 
@@ -22,7 +20,7 @@ using namespace facebook::react;
 
 RCT_EXPORT_MODULE()
 
-@synthesize bridge = _bridge;
+@synthesize bundleManager = _bundleManager;
 
 + (BOOL)requiresMainQueueSetup
 {
@@ -37,7 +35,7 @@ RCT_EXPORT_MODULE()
 - (NSDictionary<NSString *, id> *)getConstants
 {
   return @{
-    @"scriptURL" : self.bridge.bundleURL.absoluteString ?: @"",
+    @"scriptURL" : self.bundleManager.bundleURL.absoluteString ?: @"",
   };
 }
 

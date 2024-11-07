@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -11,8 +11,7 @@
 
 #include <react/renderer/debug/DebugStringConvertible.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 #if RN_DEBUG_STRING_CONVERTIBLE
 
@@ -21,13 +20,13 @@ namespace react {
 // in custom implementations of `getDebugChildren` and `getDebugProps`.
 class DebugStringConvertibleItem : public DebugStringConvertible {
  public:
-  DebugStringConvertibleItem(const DebugStringConvertibleItem &item) = default;
+  DebugStringConvertibleItem(const DebugStringConvertibleItem& item) = default;
 
   DebugStringConvertibleItem(
-      const std::string &name = "",
-      const std::string &value = "",
-      const SharedDebugStringConvertibleList &props = {},
-      const SharedDebugStringConvertibleList &children = {});
+      std::string name = "",
+      std::string value = "",
+      SharedDebugStringConvertibleList props = {},
+      SharedDebugStringConvertibleList children = {});
 
   std::string getDebugName() const override;
   std::string getDebugValue() const override;
@@ -43,5 +42,4 @@ class DebugStringConvertibleItem : public DebugStringConvertible {
 
 #endif
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

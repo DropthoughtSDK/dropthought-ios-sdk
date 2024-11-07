@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -20,9 +20,11 @@
 #import <React/RCTBridge+Private.h>
 #import <React/RCTBridge.h>
 #import <React/RCTFPSGraph.h>
+#import <React/RCTInitializing.h>
 #import <React/RCTInvalidating.h>
 #import <React/RCTJavaScriptExecutor.h>
 #import <React/RCTPerformanceLogger.h>
+#import <React/RCTPerformanceLoggerLabels.h>
 #import <React/RCTRootView.h>
 #import <React/RCTUIManager.h>
 #import <React/RCTUtils.h>
@@ -34,42 +36,16 @@
 
 static NSString *const RCTPerfMonitorCellIdentifier = @"RCTPerfMonitorCellIdentifier";
 
-static CGFloat const RCTPerfMonitorBarHeight = 50;
-static CGFloat const RCTPerfMonitorExpandHeight = 250;
+static const CGFloat RCTPerfMonitorBarHeight = 50;
+static const CGFloat RCTPerfMonitorExpandHeight = 250;
 
 typedef BOOL (*RCTJSCSetOptionType)(const char *);
 
+NSArray<NSString *> *LabelsForRCTPerformanceLoggerTags();
+
 static BOOL RCTJSCSetOption(const char *option)
 {
-  static RCTJSCSetOptionType setOption;
-  static dispatch_once_t onceToken;
-
-  // As of iOS 13.4, it is no longer possible to change the JavaScriptCore
-  // options at runtime. The options are protected and will cause an
-  // exception when you try to change them after the VM has been initialized.
-  // https://github.com/facebook/react-native/issues/28414
-  if (@available(iOS 13.4, *)) {
-    return NO;
-  }
-
-  dispatch_once(&onceToken, ^{
-    /**
-     * JSC private C++ static method to toggle options at runtime
-     *
-     * JSC::Options::setOptions - JavaScriptCore/runtime/Options.h
-     */
-    setOption = reinterpret_cast<RCTJSCSetOptionType>(dlsym(RTLD_DEFAULT, "_ZN3JSC7Options9setOptionEPKc"));
-
-    if (RCT_DEBUG && setOption == NULL) {
-      RCTLogWarn(@"The symbol used to enable JSC runtime options is not available in this iOS version");
-    }
-  });
-
-  if (setOption) {
-    return setOption(option);
-  } else {
-    return NO;
-  }
+  return NO;
 }
 
 static vm_size_t RCTGetResidentMemorySize(void)
@@ -84,8 +60,13 @@ static vm_size_t RCTGetResidentMemorySize(void)
   return memoryUsageInByte;
 }
 
-@interface RCTPerfMonitor
-    : NSObject <RCTBridgeModule, RCTTurboModule, RCTInvalidating, UITableViewDataSource, UITableViewDelegate>
+@interface RCTPerfMonitor : NSObject <
+                                RCTBridgeModule,
+                                RCTTurboModule,
+                                RCTInitializing,
+                                RCTInvalidating,
+                                UITableViewDataSource,
+                                UITableViewDelegate>
 
 #if __has_include(<React/RCTDevMenu.h>)
 @property (nonatomic, strong, readonly) RCTDevMenuItem *devMenuItem;
@@ -136,6 +117,7 @@ static vm_size_t RCTGetResidentMemorySize(void)
 }
 
 @synthesize bridge = _bridge;
+@synthesize moduleRegistry = _moduleRegistry;
 
 RCT_EXPORT_MODULE()
 
@@ -149,12 +131,10 @@ RCT_EXPORT_MODULE()
   return dispatch_get_main_queue();
 }
 
-- (void)setBridge:(RCTBridge *)bridge
+- (void)initialize
 {
-  _bridge = bridge;
-
 #if __has_include(<React/RCTDevMenu.h>)
-  [_bridge.devMenu addItem:self.devMenuItem];
+  [(RCTDevMenu *)[_moduleRegistry moduleForName:"DevMenu"] addItem:self.devMenuItem];
 #endif
 }
 
@@ -168,7 +148,7 @@ RCT_EXPORT_MODULE()
 {
   if (!_devMenuItem) {
     __weak __typeof__(self) weakSelf = self;
-    __weak RCTDevSettings *devSettings = self.bridge.devSettings;
+    __weak RCTDevSettings *devSettings = [self->_moduleRegistry moduleForName:"DevSettings"];
     if (devSettings.isPerfMonitorShown) {
       [weakSelf show];
     }
@@ -203,19 +183,17 @@ RCT_EXPORT_MODULE()
 - (UIView *)container
 {
   if (!_container) {
-    _container = [[UIView alloc] initWithFrame:CGRectMake(10, 25, 180, RCTPerfMonitorBarHeight)];
+    CGSize statusBarSize = RCTSharedApplication().statusBarFrame.size;
+    CGFloat statusBarHeight = statusBarSize.height;
+    _container = [[UIView alloc] initWithFrame:CGRectMake(10, statusBarHeight, 180, RCTPerfMonitorBarHeight)];
     _container.layer.borderWidth = 2;
     _container.layer.borderColor = [UIColor lightGrayColor].CGColor;
     [_container addGestureRecognizer:self.gestureRecognizer];
     [_container addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap)]];
 
     _container.backgroundColor = [UIColor whiteColor];
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && defined(__IPHONE_13_0) && \
-    __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0
-    if (@available(iOS 13.0, *)) {
-      _container.backgroundColor = [UIColor systemBackgroundColor];
-    }
-#endif
+
+    _container.backgroundColor = [UIColor systemBackgroundColor];
   }
 
   return _container;
@@ -510,7 +488,7 @@ RCT_EXPORT_MODULE()
   NSMutableArray<NSString *> *data = [NSMutableArray new];
   RCTPerformanceLogger *performanceLogger = [_bridge performanceLogger];
   NSArray<NSNumber *> *values = [performanceLogger valuesForTags];
-  for (NSString *label in [performanceLogger labelsForTags]) {
+  for (NSString *label in LabelsForRCTPerformanceLoggerTags()) {
     long long value = values[i + 1].longLongValue - values[i].longLongValue;
     NSString *unit = @"ms";
     if ([label hasSuffix:@"Size"]) {
@@ -559,7 +537,22 @@ RCT_EXPORT_MODULE()
   return 20;
 }
 
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params
+{
+  return nullptr;
+}
+
 @end
+
+NSArray<NSString *> *LabelsForRCTPerformanceLoggerTags()
+{
+  NSMutableArray<NSString *> *labels = [NSMutableArray new];
+  for (int i = 0; i < RCTPLSize; i++) {
+    [labels addObject:RCTPLLabelForTag((RCTPLTag)i)];
+  }
+  return labels;
+}
 
 #endif
 

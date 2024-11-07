@@ -4,34 +4,23 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _reactNative = require("react-native");
-
 var React = _interopRequireWildcard(require("react"));
-
 var _surveyPage = require("../contexts/survey-page");
-
 var _styles = _interopRequireWildcard(require("../styles"));
-
 var _QuestionWarningMessage = _interopRequireDefault(require("./QuestionWarningMessage"));
-
 var _translation = _interopRequireDefault(require("../translation"));
-
 var _useWindowDimensions = require("../hooks/useWindowDimensions");
-
 var _theme = require("../contexts/theme");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 const MandatoryTitle = ({
   forgot,
   invalidMessage = '',
   mandatoryErrorMessage,
   question,
+  subTitleMessage,
   style
 }) => {
   const rtl = _translation.default.dir() === 'rtl';
@@ -43,7 +32,7 @@ const MandatoryTitle = ({
   } = (0, _theme.useTheme)();
   const {
     questionId,
-    questionTitle,
+    questionTitlePlain,
     mandatory,
     type,
     subType,
@@ -58,11 +47,9 @@ const MandatoryTitle = ({
   }, [addMandatoryRef, questionId]);
   let color = fontColor;
   const isOption6Smiley = themeOption === _theme.THEME_OPTION.OPTION6 && type === 'rating' && subType === 'smiley';
-
   if ((customFontColor === undefined || customFontColor === '') && isOption6Smiley) {
     color = _styles.Colors.white;
   }
-
   const textStyle = [styles.questionTitle, questionTitleSize[dimensionWidthType], {
     color,
     lineHeight: _translation.default.language === 'te' ? 42 : undefined
@@ -71,19 +58,23 @@ const MandatoryTitle = ({
     ref: ref,
     style: [styles.horizontal, style, rtl && _styles.default.flexRowReverse]
   }, /*#__PURE__*/React.createElement(_reactNative.Text, {
+    testID: "test:id/mandatory_title",
     style: textStyle
-  }, questionTitle, //optional was been used on matrix question
+  }, questionTitlePlain,
+  //optional was been used on matrix question
   (mandatory || optional) && /*#__PURE__*/React.createElement(_reactNative.Text, {
     style: styles.hint
-  }, "*")), /*#__PURE__*/React.createElement(_QuestionWarningMessage.default // forgot message has higher priority than custom invalid message
+  }, "*")), subTitleMessage ? /*#__PURE__*/React.createElement(_reactNative.View, {
+    style: rtl && _styles.default.flexRowReverse
+  }, /*#__PURE__*/React.createElement(_reactNative.Text, {
+    style: styles.subTitle
+  }, subTitleMessage)) : null, /*#__PURE__*/React.createElement(_QuestionWarningMessage.default
+  // forgot message has higher priority than custom invalid message
   , {
     message: forgot ? mandatoryErrorMessage : invalidMessage
   }));
 };
-
-var _default = MandatoryTitle;
-exports.default = _default;
-
+var _default = exports.default = MandatoryTitle;
 const questionTitleSize = _reactNative.StyleSheet.create({
   [_useWindowDimensions.DimensionWidthType.phone]: {
     fontSize: 26
@@ -92,7 +83,6 @@ const questionTitleSize = _reactNative.StyleSheet.create({
     fontSize: 26
   }
 });
-
 const styles = _reactNative.StyleSheet.create({
   hint: {
     color: _styles.Colors.mandatoryRed,
@@ -108,6 +98,10 @@ const styles = _reactNative.StyleSheet.create({
     fontSize: 26,
     fontWeight: '600',
     textAlign: 'center'
+  },
+  subTitle: {
+    marginTop: 8,
+    color: _styles.Colors.border
   }
 });
 //# sourceMappingURL=MandatoryTitle.js.map

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
  * for given `componentHandle` and with given `tag`.
  * #RefuseSingleUse
  */
-- (RCTComponentViewDescriptor const &)dequeueComponentViewWithComponentHandle:
+- (const RCTComponentViewDescriptor &)dequeueComponentViewWithComponentHandle:
                                           (facebook::react::ComponentHandle)componentHandle
                                                                           tag:(facebook::react::Tag)tag;
 
@@ -42,18 +42,13 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Returns a component view descriptor by given `tag`.
  */
-- (RCTComponentViewDescriptor const &)componentViewDescriptorWithTag:(facebook::react::Tag)tag;
+- (const RCTComponentViewDescriptor &)componentViewDescriptorWithTag:(facebook::react::Tag)tag;
 
 /**
  * Finds a native component view by given `tag`.
  * Returns `nil` if there is no registered component with the `tag`.
  */
 - (nullable UIView<RCTComponentViewProtocol> *)findComponentViewWithTag:(facebook::react::Tag)tag;
-
-/**
- * Creates a component view with a given type and puts it to the recycle pool.
- */
-- (void)optimisticallyCreateComponentViewWithComponentHandle:(facebook::react::ComponentHandle)componentHandle;
 
 @end
 

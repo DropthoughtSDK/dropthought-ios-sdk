@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,11 +10,10 @@
 
 'use strict';
 
-const Blob = require('./Blob');
-
-const invariant = require('invariant');
-
 import type {BlobOptions} from './BlobTypes';
+
+const Blob = require('./Blob');
+const invariant = require('invariant');
 
 /**
  * The File interface provides information about files.
@@ -24,7 +23,7 @@ class File extends Blob {
    * Constructor for JS consumers.
    */
   constructor(
-    parts: Array<Blob | string>,
+    parts: Array<$ArrayBufferView | ArrayBuffer | Blob | string>,
     name: string,
     options?: BlobOptions,
   ) {

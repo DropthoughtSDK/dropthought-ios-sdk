@@ -3,9 +3,7 @@ import { StyleSheet, Image, View, Text, TouchableOpacity } from 'react-native';
 import { Colors, addOpacityToColor } from '../styles';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import i18n from '../translation';
-
 const noop = _id => undefined;
-
 const Icon = ({
   type,
   checked,
@@ -33,7 +31,6 @@ const Icon = ({
     opacity: checked ? 1 : 0
   }];
   let content;
-
   if (type === 'checkbox') {
     content = checked ? /*#__PURE__*/React.createElement(View, {
       style: checkboxContentStyle
@@ -49,10 +46,8 @@ const Icon = ({
       style: radioContentStyle
     }) : null);
   }
-
   return /*#__PURE__*/React.createElement(View, null, content);
 };
-
 function NewOptionWithHighlight({
   type = 'radio',
   id: value,
@@ -85,7 +80,6 @@ function NewOptionWithHighlight({
     lineHeight: i18n.language === 'te' ? 22 : undefined
   };
   let content;
-
   if (typeof title === 'string') {
     content = /*#__PURE__*/React.createElement(Text, {
       style: textStyle
@@ -93,7 +87,6 @@ function NewOptionWithHighlight({
   } else {
     content = title;
   }
-
   return /*#__PURE__*/React.createElement(TouchableOpacity, {
     onPress: () => onPress(value)
   }, /*#__PURE__*/React.createElement(View, {
@@ -106,7 +99,6 @@ function NewOptionWithHighlight({
     style: styles.dummyComponent
   })));
 }
-
 const styles = StyleSheet.create({
   buttonContainer: {
     marginBottom: 10,

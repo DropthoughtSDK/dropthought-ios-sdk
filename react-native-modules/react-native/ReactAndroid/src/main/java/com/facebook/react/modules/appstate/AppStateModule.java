@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -16,17 +16,13 @@ import com.facebook.react.bridge.WindowFocusChangeListener;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.module.annotations.ReactModule;
-import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 
-@ReactModule(name = AppStateModule.NAME)
+@ReactModule(name = NativeAppStateSpec.NAME)
 public class AppStateModule extends NativeAppStateSpec
     implements LifecycleEventListener, WindowFocusChangeListener {
-  public static final String TAG = AppStateModule.class.getSimpleName();
-
-  public static final String NAME = "AppState";
 
   public static final String APP_STATE_ACTIVE = "active";
   public static final String APP_STATE_BACKGROUND = "background";
@@ -43,11 +39,6 @@ public class AppStateModule extends NativeAppStateSpec
         (reactContext.getLifecycleState() == LifecycleState.RESUMED
             ? APP_STATE_ACTIVE
             : APP_STATE_BACKGROUND);
-  }
-
-  @Override
-  public String getName() {
-    return NAME;
   }
 
   @Override
@@ -100,10 +91,10 @@ public class AppStateModule extends NativeAppStateSpec
     // We don't gain anything interesting from logging here, and it's an extremely common
     // race condition for an AppState event to be triggered as the Catalyst instance is being
     // set up or torn down. So, just fail silently here.
-    if (!reactApplicationContext.hasActiveCatalystInstance()) {
+    if (!reactApplicationContext.hasActiveReactInstance()) {
       return;
     }
-    reactApplicationContext.getJSModule(RCTDeviceEventEmitter.class).emit(eventName, data);
+    reactApplicationContext.emitDeviceEvent(eventName, data);
   }
 
   private void sendAppStateChangeEvent() {
@@ -118,5 +109,12 @@ public class AppStateModule extends NativeAppStateSpec
   @Override
   public void removeListeners(double count) {
     // iOS only
+  }
+
+  @Override
+  public void invalidate() {
+    super.invalidate();
+
+    getReactApplicationContext().removeLifecycleEventListener(this);
   }
 }

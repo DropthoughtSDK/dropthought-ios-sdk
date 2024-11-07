@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,12 +10,10 @@
 
 'use strict';
 
+import type {ColorValue, NativeColorValue} from './StyleSheet';
+
 const Platform = require('../Utilities/Platform');
-
 const normalizeColor = require('./normalizeColor');
-
-import type {ColorValue} from './StyleSheet';
-import type {NativeColorValue} from './PlatformColorValueTypes';
 
 export type ProcessedColorValue = number | NativeColorValue;
 
@@ -31,8 +29,8 @@ function processColor(color?: ?(number | ColorValue)): ?ProcessedColorValue {
   }
 
   if (typeof normalizedColor === 'object') {
-    const processColorObject = require('./PlatformColorValueTypes')
-      .processColorObject;
+    const processColorObject =
+      require('./PlatformColorValueTypes').processColorObject;
 
     const processedColorObj = processColorObject(normalizedColor);
 
@@ -58,4 +56,4 @@ function processColor(color?: ?(number | ColorValue)): ?ProcessedColorValue {
   return normalizedColor;
 }
 
-module.exports = processColor;
+export default processColor;

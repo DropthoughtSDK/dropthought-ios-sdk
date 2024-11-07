@@ -20,9 +20,15 @@ import ClassicMatrixRatingQuestion from '../components/ClassicMatrixRatingQuesti
 import ClassicMatrixChoiceQuestion from '../components/ClassicMatrixChoiceQuestion';
 import ClassicMultipleOpenEndedQuestion from '../components/ClassicMultipleOpenEndedQuestion';
 import ClassicPictureChoiceQuestion from '../components/ClassicPictureChoiceQuestion';
+import ClassicPollingQuestion from '../components/ClassicPollingQuestion';
+import ClassicFileQuestion from '../components/ClassicFileQuestion';
+import ClassicStatementQuestion from '../components/ClassicStatementQuestion';
 import ClassicMandatoryTitle from '../components/ClassicMandatoryTitle';
 import GlobalStyle from '../styles';
-import type { Question, Feedback, ImageFileProps } from '../data';
+import type { Question, Feedback, Survey } from '../data';
+// @ts-ignore
+import type { onUploadType } from '../dt-common';
+import type { onPostPollChoiceType } from '../containers/SurveyScreenLayout';
 
 const TempComponent = ({
   mandatoryErrorMessage,
@@ -47,12 +53,15 @@ const TempComponent = ({
 type Props = {
   mandatoryErrorMessage: string;
   anonymous: boolean;
+  survey: Survey;
   question: Question;
   validationStarted: boolean;
   themeColor: string;
   onFeedback?: (feedback: Feedback) => void;
-  onUpload?: (file: ImageFileProps) => void;
+  onUpload?: onUploadType;
   isUploading?: boolean;
+  onPostPollChoice?: onPostPollChoiceType;
+  isPostingPollChoice?: boolean;
   onDragGrant: () => void;
   onDragEnd: () => void;
   preview: boolean;
@@ -141,6 +150,18 @@ const ClassicQuestionContainer = (props: Props) => {
     case 'pictureChoice':
       // @ts-ignore
       QuestionComponent = ClassicPictureChoiceQuestion;
+      break;
+    case 'poll':
+      // @ts-ignore
+      QuestionComponent = ClassicPollingQuestion;
+      break;
+    case 'file':
+      // @ts-ignore
+      QuestionComponent = ClassicFileQuestion;
+      break;
+    case 'statement':
+      // @ts-ignore
+      QuestionComponent = ClassicStatementQuestion;
       break;
     default:
       QuestionComponent = TempComponent;

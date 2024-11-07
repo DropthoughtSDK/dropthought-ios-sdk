@@ -3,47 +3,41 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.detachedCommands = exports.projectCommands = void 0;
-
-var _start = _interopRequireDefault(require("./start/start"));
-
-var _bundle = _interopRequireDefault(require("./bundle/bundle"));
-
-var _ramBundle = _interopRequireDefault(require("./bundle/ramBundle"));
-
-var _link = _interopRequireDefault(require("./link/link"));
-
-var _unlink = _interopRequireDefault(require("./link/unlink"));
-
-var _install = _interopRequireDefault(require("./install/install"));
-
-var _uninstall = _interopRequireDefault(require("./install/uninstall"));
-
-var _upgrade = _interopRequireDefault(require("./upgrade/upgrade"));
-
-var _info = _interopRequireDefault(require("./info/info"));
-
-var _config = _interopRequireDefault(require("./config/config"));
-
-var _init = _interopRequireDefault(require("./init"));
-
-var _doctor = _interopRequireDefault(require("./doctor"));
-
+exports.projectCommands = exports.detachedCommands = void 0;
+function _cliClean() {
+  const data = require("@react-native-community/cli-clean");
+  _cliClean = function () {
+    return data;
+  };
+  return data;
+}
+function _cliDoctor() {
+  const data = require("@react-native-community/cli-doctor");
+  _cliDoctor = function () {
+    return data;
+  };
+  return data;
+}
+function _cliConfig() {
+  const data = require("@react-native-community/cli-config");
+  _cliConfig = function () {
+    return data;
+  };
+  return data;
+}
 function _cliHermes() {
   const data = _interopRequireDefault(require("@react-native-community/cli-hermes"));
-
   _cliHermes = function () {
     return data;
   };
-
   return data;
 }
-
+var _upgrade = _interopRequireDefault(require("./upgrade/upgrade"));
+var _init = _interopRequireDefault(require("./init"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const projectCommands = [_start.default, _bundle.default, _ramBundle.default, _link.default, _unlink.default, _install.default, _uninstall.default, _upgrade.default, _info.default, _config.default, _cliHermes().default];
+const projectCommands = [..._cliConfig().commands, _cliClean().commands.clean, _cliDoctor().commands.info, _upgrade.default, _cliHermes().default];
 exports.projectCommands = projectCommands;
-const detachedCommands = [_init.default, _doctor.default];
+const detachedCommands = [_init.default, _cliDoctor().commands.doctor];
 exports.detachedCommands = detachedCommands;
 
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=index.ts.map

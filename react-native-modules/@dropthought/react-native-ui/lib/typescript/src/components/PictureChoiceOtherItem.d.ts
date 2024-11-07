@@ -1,5 +1,6 @@
+import React from 'react';
 import type { ImageFileProps } from '../data';
-declare type Props = {
+type Props = {
     otherPicture: {
         image: string;
         value: string;
@@ -16,5 +17,6 @@ declare type Props = {
     themeColor: string;
     preview: boolean;
 };
-declare const PictureChoiceOtherItem: ({ otherPicture, isMultipleChoice, selected, placeholder, columnGap, onChooseImage, onSelect, onUpload, onError, onChangeText, themeColor, preview, }: Props) => JSX.Element;
+declare const PictureChoiceOtherItem: ({ otherPicture, isMultipleChoice, selected, placeholder, columnGap, onChooseImage, onSelect, onUpload, onError, onChangeText, themeColor, preview, }: Props) => React.JSX.Element;
 export default PictureChoiceOtherItem;
+//# sourceMappingURL=PictureChoiceOtherItem.d.ts.map

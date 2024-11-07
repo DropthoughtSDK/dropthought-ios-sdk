@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,12 +8,11 @@
  * @format
  */
 
-'use strict';
-
-const Blob = require('./Blob');
-const EventTarget = require('event-target-shim');
+import type Blob from './Blob';
 
 import NativeFileReaderModule from './NativeFileReaderModule';
+import {toByteArray} from 'base64-js';
+import EventTarget from 'event-target-shim';
 
 type ReadyState =
   | 0 // EMPTY
@@ -48,7 +47,6 @@ class FileReader extends (EventTarget(...READER_EVENTS): any) {
   _error: ?Error;
   _result: ?ReaderResult;
   _aborted: boolean = false;
-  _subscriptions: Array<*> = [];
 
   constructor() {
     super();
@@ -59,11 +57,6 @@ class FileReader extends (EventTarget(...READER_EVENTS): any) {
     this._readyState = EMPTY;
     this._error = null;
     this._result = null;
-  }
-
-  _clearSubscriptions(): void {
-    this._subscriptions.forEach(sub => sub.remove());
-    this._subscriptions = [];
   }
 
   _setReadyState(newState: ReadyState) {
@@ -81,11 +74,38 @@ class FileReader extends (EventTarget(...READER_EVENTS): any) {
     }
   }
 
-  readAsArrayBuffer() {
-    throw new Error('FileReader.readAsArrayBuffer is not implemented');
+  readAsArrayBuffer(blob: ?Blob): void {
+    this._aborted = false;
+
+    if (blob == null) {
+      throw new TypeError(
+        "Failed to execute 'readAsArrayBuffer' on 'FileReader': parameter 1 is not of type 'Blob'",
+      );
+    }
+
+    NativeFileReaderModule.readAsDataURL(blob.data).then(
+      (text: string) => {
+        if (this._aborted) {
+          return;
+        }
+
+        const base64 = text.split(',')[1];
+        const typedArray = toByteArray(base64);
+
+        this._result = typedArray.buffer;
+        this._setReadyState(DONE);
+      },
+      error => {
+        if (this._aborted) {
+          return;
+        }
+        this._error = error;
+        this._setReadyState(DONE);
+      },
+    );
   }
 
-  readAsDataURL(blob: ?Blob) {
+  readAsDataURL(blob: ?Blob): void {
     this._aborted = false;
 
     if (blob == null) {
@@ -112,7 +132,7 @@ class FileReader extends (EventTarget(...READER_EVENTS): any) {
     );
   }
 
-  readAsText(blob: ?Blob, encoding: string = 'UTF-8') {
+  readAsText(blob: ?Blob, encoding: string = 'UTF-8'): void {
     this._aborted = false;
 
     if (blob == null) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -44,7 +44,14 @@ public class SampleTurboModule extends NativeSampleTurboModuleSpec {
   @SuppressWarnings("unused")
   @Override
   public boolean getBool(boolean arg) {
-    log("getBool", arg, arg);
+    throw new RuntimeException("getBool is not implemented");
+  }
+
+  @DoNotStrip
+  @SuppressWarnings("unused")
+  @Override
+  public double getEnum(double arg) {
+    log("getEnum", arg, arg);
     return arg;
   }
 
@@ -110,6 +117,16 @@ public class SampleTurboModule extends NativeSampleTurboModuleSpec {
   }
 
   @DoNotStrip
+  @Override
+  @SuppressWarnings("unused")
+  public WritableMap getUnsafeObject(ReadableMap arg) {
+    WritableNativeMap map = new WritableNativeMap();
+    map.merge(arg);
+    log("getUnsafeObject", arg, map);
+    return map;
+  }
+
+  @DoNotStrip
   @SuppressWarnings("unused")
   @Override
   public WritableMap getValue(double numberArg, String stringArg, ReadableMap mapArg) {
@@ -161,6 +178,50 @@ public class SampleTurboModule extends NativeSampleTurboModuleSpec {
       promise.resolve("result");
     }
   }
+
+  @Override
+  @DoNotStrip
+  @SuppressWarnings("unused")
+  public void voidFuncThrows() {
+    throw new RuntimeException("Intentional exception from JVM voidFuncThrows");
+  };
+
+  @Override
+  @DoNotStrip
+  @SuppressWarnings("unused")
+  public WritableMap getObjectThrows(ReadableMap arg) {
+    throw new RuntimeException(
+        "Intentional exception from JVM getObjectThrows with " + arg.toString());
+  };
+
+  @Override
+  @DoNotStrip
+  @SuppressWarnings("unused")
+  public void promiseThrows(Promise promise) {
+    throw new RuntimeException("Intentional exception from JVM promiseThrows");
+  };
+
+  @Override
+  @DoNotStrip
+  @SuppressWarnings("unused")
+  public void voidFuncAssert() {
+    assert false : "Intentional assert from JVM voidFuncAssert";
+  };
+
+  @Override
+  @DoNotStrip
+  @SuppressWarnings("unused")
+  public WritableMap getObjectAssert(ReadableMap arg) {
+    assert false : "Intentional assert from JVM getObjectAssert with " + arg.toString();
+    return null;
+  };
+
+  @Override
+  @DoNotStrip
+  @SuppressWarnings("unused")
+  public void promiseAssert(Promise promise) {
+    assert false : "Intentional assert from JVM promiseAssert";
+  };
 
   private void log(String method, Object input, Object output) {
     if (mToast != null) {

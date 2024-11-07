@@ -27,7 +27,9 @@ const ClassicQuestionWarningMessage = ({ message }: Props) => {
     <View style={[styles.container, rtl && GlobalStyle.horizontalFlip]}>
       <View style={[styles.tip, isDarkMode && styles.darkModeTip]} />
       <View style={[styles.bubble, isDarkMode && styles.darkModeBubble]}>
-        <Text style={textStyle}>{message}</Text>
+        <Text testID="test:id/preview_warning_msg" style={textStyle}>
+          {message}
+        </Text>
       </View>
     </View>
   );

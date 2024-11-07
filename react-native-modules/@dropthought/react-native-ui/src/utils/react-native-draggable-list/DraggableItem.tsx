@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, PanResponder, LayoutChangeEvent } from 'react-native';
+import { Animated, PanResponder } from 'react-native';
+import type { LayoutChangeEvent } from 'react-native';
 
 type DraggableItemProps = {
   children: React.ReactNode;

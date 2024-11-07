@@ -2,5 +2,6 @@
 
 Object.defineProperty(exports, '__esModule', {
   value: true
-}); // export default IRule;
+});
+// export default IRule;
 //# sourceMappingURL=IfcRule.js.map

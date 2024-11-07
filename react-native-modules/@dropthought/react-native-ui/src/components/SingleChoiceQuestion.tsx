@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Platform, ScrollView as RNScrollView } from 'react-native';
+// @ts-ignore
 import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import MandatoryTitle from './MandatoryTitle';
 import type {

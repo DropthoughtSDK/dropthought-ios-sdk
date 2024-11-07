@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -17,8 +17,7 @@
 #import "RCTCxxModule.h"
 #import "RCTNativeModule.h"
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 using facebook::jsi::JSError;
 
@@ -101,5 +100,4 @@ NSString *deriveSourceURL(NSURL *url)
   return sourceUrl ?: @"";
 }
 
-}
-}
+} // namespace facebook::react

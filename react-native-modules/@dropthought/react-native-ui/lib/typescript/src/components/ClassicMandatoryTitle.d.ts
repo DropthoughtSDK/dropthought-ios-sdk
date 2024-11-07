@@ -1,11 +1,14 @@
-import { ViewStyle } from 'react-native';
+import React from 'react';
+import type { ViewStyle } from 'react-native';
 import type { Question } from '../data';
-declare type Props = {
+type Props = {
     forgot?: boolean;
     invalidMessage?: string;
     mandatoryErrorMessage: string;
     question: Question;
+    subTitleMessage?: string;
     style?: ViewStyle;
 };
-declare const ClassicMandatoryTitle: ({ forgot, invalidMessage, mandatoryErrorMessage, question, style, }: Props) => JSX.Element;
+declare const ClassicMandatoryTitle: ({ forgot, invalidMessage, mandatoryErrorMessage, question, subTitleMessage, style, }: Props) => React.JSX.Element;
 export default ClassicMandatoryTitle;
+//# sourceMappingURL=ClassicMandatoryTitle.d.ts.map

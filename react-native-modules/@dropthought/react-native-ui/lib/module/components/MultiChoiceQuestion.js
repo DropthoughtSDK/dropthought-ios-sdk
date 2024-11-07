@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Platform, ScrollView as RNScrollView } from 'react-native';
+// @ts-ignore
 import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import { last } from 'ramda';
 import { getOptionsFromQuestion } from '../utils/data';
@@ -7,12 +8,12 @@ import NewOptionWithHighlight from './NewOptionWithHighlight';
 import NewOtherOptionWithHighlight from './NewOtherOptionWithHighlight';
 import MandatoryTitle from './MandatoryTitle';
 const ScrollView = Platform.OS === 'ios' ? KeyboardAvoidingScrollView : RNScrollView;
-
 const getInitialSelectedValuesFromFeedbackProps = (options, feedback) => {
-  let otherText = ''; // default: selected false for each options
+  let otherText = '';
+  // default: selected false for each options
+  let values = options.map(() => false);
 
-  let values = options.map(() => false); // if feedback has answers, turn the checked to true
-
+  // if feedback has answers, turn the checked to true
   if (feedback && feedback.answers) {
     feedback.answers.forEach(answer => {
       // if the answer is a number type, turn the corresponding value's checked to true
@@ -21,19 +22,17 @@ const getInitialSelectedValuesFromFeedbackProps = (options, feedback) => {
       } else {
         // if the strValue is not a number type,
         // it is for other label, always the last of the values
-        values[values.length - 1] = true; // @ts-ignore
-
+        values[values.length - 1] = true;
+        // @ts-ignore
         otherText = answer;
       }
     });
   }
-
   return {
     values,
     otherText
   };
 };
-
 const MultiChoiceQuestion = ({
   survey,
   anonymous,
@@ -50,24 +49,21 @@ const MultiChoiceQuestion = ({
   const options = getOptionsFromQuestion(question);
   const initialSelected = getInitialSelectedValuesFromFeedbackProps(options, feedback);
   const [selected, setSelected] = React.useState(initialSelected);
-
   const handleFeedback = (values, otherText) => {
     var _last;
-
     onFeedback({
       questionId: questionId,
       // @ts-ignore
       answers: values.map((value, index) => {
         // only return the answer if checked
         if (value) {
+          var _options$index;
           // for 'other option', return the text
-          if (options[index].isOther) {
+          if ((_options$index = options[index]) !== null && _options$index !== void 0 && _options$index.isOther) {
             return otherText;
           }
-
           return index;
         }
-
         return undefined;
       }).filter(value => value !== undefined),
       type: 'multiChoice',
@@ -79,21 +75,18 @@ const MultiChoiceQuestion = ({
       otherText
     });
   };
-
   const onOptionPressHandler = index => {
     // copy the values, and toggle the checked value
     let values = [...selected.values];
     values[index] = !selected.values[index];
     handleFeedback(values, selected.otherText);
   };
-
   const onChangeValueHandler = (index, newValue) => {
     // copy the values, and set the value
     let values = [...selected.values];
     values[index] = newValue.checked;
     handleFeedback(values, newValue.value);
   };
-
   const buttonList = options.map(({
     title,
     isOther
@@ -102,7 +95,7 @@ const MultiChoiceQuestion = ({
     id: index,
     type: 'checkbox',
     title: title,
-    checked: selected.values[index],
+    checked: selected.values[index] ?? false,
     themeColor: themeColor,
     onPress: onOptionPressHandler,
     onChangeValue: onChangeValueHandler,
@@ -115,7 +108,7 @@ const MultiChoiceQuestion = ({
     id: index,
     type: 'checkbox',
     title: title,
-    checked: selected.values[index],
+    checked: selected.values[index] ?? false,
     themeColor: themeColor,
     onPress: onOptionPressHandler
   }));
@@ -132,7 +125,6 @@ const MultiChoiceQuestion = ({
     }), buttonList)
   );
 };
-
 export default /*#__PURE__*/React.memo(MultiChoiceQuestion);
 const commonStyles = StyleSheet.create({
   container: {

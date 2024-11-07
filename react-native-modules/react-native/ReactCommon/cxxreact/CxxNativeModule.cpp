@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -16,13 +16,14 @@
 #include "MessageQueueThread.h"
 #include "SystraceSection.h"
 
+#include <logger/react_native_log.h>
+
 using facebook::xplat::module::CxxModule;
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 std::function<void(folly::dynamic)> makeCallback(
     std::weak_ptr<Instance> instance,
-    const folly::dynamic &callbackId) {
+    const folly::dynamic& callbackId) {
   if (!callbackId.isNumber()) {
     throw std::invalid_argument("Expected callback(s) as final argument");
   }
@@ -54,6 +55,26 @@ CxxModule::Callback convertCallback(
 
 } // namespace
 
+bool CxxNativeModule::shouldWarnOnUse_ = false;
+
+void CxxNativeModule::setShouldWarnOnUse(bool value) {
+  shouldWarnOnUse_ = value;
+}
+
+void CxxNativeModule::emitWarnIfWarnOnUsage(
+    const std::string& method_name,
+    const std::string& module_name) {
+  if (shouldWarnOnUse_) {
+    std::string message = folly::to<std::string>(
+        "Calling ",
+        method_name,
+        " on Cxx NativeModule (name = \"",
+        module_name,
+        "\").");
+    react_native_log_warn(message.c_str());
+  }
+}
+
 std::string CxxNativeModule::getName() {
   return name_;
 }
@@ -74,7 +95,7 @@ std::vector<MethodDescriptor> CxxNativeModule::getMethods() {
   lazyInit();
 
   std::vector<MethodDescriptor> descs;
-  for (auto &method : methods_) {
+  for (auto& method : methods_) {
     descs.emplace_back(method.name, method.getType());
   }
   return descs;
@@ -87,8 +108,10 @@ folly::dynamic CxxNativeModule::getConstants() {
     return nullptr;
   }
 
+  emitWarnIfWarnOnUsage("getConstants()", getName());
+
   folly::dynamic constants = folly::dynamic::object();
-  for (auto &pair : module_->getConstants()) {
+  for (auto& pair : module_->getConstants()) {
     constants.insert(std::move(pair.first), std::move(pair.second));
   }
   return constants;
@@ -96,7 +119,7 @@ folly::dynamic CxxNativeModule::getConstants() {
 
 void CxxNativeModule::invoke(
     unsigned int reactMethodId,
-    folly::dynamic &&params,
+    folly::dynamic&& params,
     int callId) {
   if (reactMethodId >= methods_.size()) {
     throw std::invalid_argument(folly::to<std::string>(
@@ -114,12 +137,14 @@ void CxxNativeModule::invoke(
   CxxModule::Callback first;
   CxxModule::Callback second;
 
-  const auto &method = methods_[reactMethodId];
+  const auto& method = methods_[reactMethodId];
 
   if (!method.func) {
     throw std::runtime_error(folly::to<std::string>(
         "Method ", method.name, " is synchronous but invoked asynchronously"));
   }
+
+  emitWarnIfWarnOnUsage(method.name, getName());
 
   if (params.size() < method.callbacks) {
     throw std::invalid_argument(folly::to<std::string>(
@@ -159,50 +184,60 @@ void CxxNativeModule::invoke(
   // stack.  I'm told that will be possible in the future.  TODO
   // mhorowitz #7128529: convert C++ exceptions to Java
 
-  messageQueueThread_->runOnQueue(
-      [method, params = std::move(params), first, second, callId]() {
+  const auto& moduleName = name_;
+  SystraceSection s(
+      "CxxMethodCallQueue", "module", moduleName, "method", method.name);
+  messageQueueThread_->runOnQueue([method,
+                                   moduleName,
+                                   params = std::move(params),
+                                   first,
+                                   second,
+                                   callId]() {
 #ifdef WITH_FBSYSTRACE
-        if (callId != -1) {
-          fbsystrace_end_async_flow(TRACE_TAG_REACT_APPS, "native", callId);
-        }
+    if (callId != -1) {
+      fbsystrace_end_async_flow(TRACE_TAG_REACT_APPS, "native", callId);
+    }
 #else
-        (void)(callId);
+    (void)(callId);
 #endif
-        SystraceSection s(method.name.c_str());
-        try {
-          method.func(std::move(params), first, second);
-        } catch (const facebook::xplat::JsArgumentException &ex) {
-          throw;
-        } catch (std::exception &e) {
-          LOG(ERROR) << "std::exception. Method call " << method.name.c_str()
-                     << " failed: " << e.what();
-          std::terminate();
-        } catch (std::string &error) {
-          LOG(ERROR) << "std::string. Method call " << method.name.c_str()
-                     << " failed: " << error.c_str();
-          std::terminate();
-        } catch (...) {
-          LOG(ERROR) << "Method call " << method.name.c_str()
-                     << " failed. unknown error";
-          std::terminate();
-        }
-      });
+    SystraceSection s(
+        "CxxMethodCallDispatch", "module", moduleName, "method", method.name);
+    try {
+      method.func(std::move(params), first, second);
+    } catch (const facebook::xplat::JsArgumentException& ex) {
+      throw;
+    } catch (std::exception& e) {
+      LOG(ERROR) << "std::exception. Method call " << method.name.c_str()
+                 << " failed: " << e.what();
+      std::terminate();
+    } catch (std::string& error) {
+      LOG(ERROR) << "std::string. Method call " << method.name.c_str()
+                 << " failed: " << error.c_str();
+      std::terminate();
+    } catch (...) {
+      LOG(ERROR) << "Method call " << method.name.c_str()
+                 << " failed. unknown error";
+      std::terminate();
+    }
+  });
 }
 
 MethodCallResult CxxNativeModule::callSerializableNativeHook(
     unsigned int hookId,
-    folly::dynamic &&args) {
+    folly::dynamic&& args) {
   if (hookId >= methods_.size()) {
     throw std::invalid_argument(folly::to<std::string>(
         "methodId ", hookId, " out of range [0..", methods_.size(), "]"));
   }
 
-  const auto &method = methods_[hookId];
+  const auto& method = methods_[hookId];
 
   if (!method.syncFunc) {
     throw std::runtime_error(folly::to<std::string>(
         "Method ", method.name, " is asynchronous but invoked synchronously"));
   }
+
+  emitWarnIfWarnOnUsage(method.name, getName());
 
   return method.syncFunc(std::move(args));
 }
@@ -216,10 +251,9 @@ void CxxNativeModule::lazyInit() {
   module_ = provider_();
   provider_ = nullptr;
   if (module_) {
-    methods_ = module_->getMethods();
     module_->setInstance(instance_);
+    methods_ = module_->getMethods();
   }
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

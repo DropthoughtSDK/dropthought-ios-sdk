@@ -53,7 +53,7 @@ const MatrixColoum = ({
   onColoumPress,
 }: ColoumProps) => {
   const { colorScheme, fontColor } = useTheme();
-  const isSelected = selectedAnswer[rowIndex].some(
+  const isSelected = selectedAnswer[rowIndex]?.some(
     (value) => value === coloumIndex
   );
   const isDark = colorScheme === COLOR_SCHEMES.dark;
@@ -102,6 +102,8 @@ const MatrixColoum = ({
   return (
     <View style={optionContainerStyle}>
       <TouchableOpacity
+        accessible={false}
+        testID={`test:id/option_selected_${isSelected}`}
         style={styles.coloumButton}
         onPress={() => onColoumPress(rowIndex, coloumIndex)}
       >
@@ -115,7 +117,11 @@ const MatrixColoum = ({
           <View style={unCheckBoxStyle} />
         )}
         <View style={GlobalStyle.flex1}>
-          <Text numberOfLines={2} style={[styles.optionText, textStyle]}>
+          <Text
+            testID="test:id/matrix_choice_option"
+            numberOfLines={2}
+            style={[styles.optionText, textStyle]}
+          >
             {title}
           </Text>
         </View>
@@ -159,7 +165,7 @@ const MatrixRow = ({
   };
 
   const optionsList = !isCollapse
-    ? optionsMatrix.map((value, index) => (
+    ? optionsMatrix?.map((value, index) => (
         <MatrixColoum
           title={value}
           rowIndex={rowIndex}
@@ -174,8 +180,8 @@ const MatrixRow = ({
 
   let optionSelectedText = '';
   let optionOtherText = '';
-  if (rowSelectedAnswer[0] !== -1) {
-    if (rowSelectedAnswer.length > 1) {
+  if (rowSelectedAnswer && rowSelectedAnswer[0] !== -1 && optionsMatrix) {
+    if (rowSelectedAnswer.length > 1 && rowSelectedAnswer[0] !== undefined) {
       optionSelectedText = `${optionsMatrix[rowSelectedAnswer[0]]}`;
       optionOtherText = ` +${rowSelectedAnswer.length - 1} Other`;
     } else {
@@ -194,14 +200,23 @@ const MatrixRow = ({
   return (
     <View style={containerStyle}>
       <TouchableOpacity
+        accessible={false}
         style={styles.titleButton}
         onPress={() => onRowPress(rowIndex)}
       >
         <View style={styles.titleButtonText}>
-          <Text style={[styles.optionText, textStyle]}>{title}</Text>
+          <Text
+            testID={`test:id/matrix_choice_title_${fontColor}`}
+            style={[styles.optionText, textStyle]}
+          >
+            {title}
+          </Text>
         </View>
         <View style={styles.titleButtonContent}>
-          <Text style={selectedTextStyle}>
+          <Text
+            testID="test:id/matrix_choice_selected_options"
+            style={selectedTextStyle}
+          >
             <Text>{optionSelectedText}</Text>
             <Text style={styles.selectedOtherText}>{optionOtherText}</Text>
           </Text>

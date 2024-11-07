@@ -1,0 +1,1 @@
+{"version":3,"file":"ScreenWrapper.d.ts","sourceRoot":"","sources":["../../../../../src/kiosk-rn-sdk/navigation/ScreenWrapper.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,KAAK,MAAM,OAAO,CAAC;AAI/B,KAAK,KAAK,GAAG;IACX,QAAQ,EAAE,KAAK,CAAC,SAAS,CAAC;IAC1B,OAAO,EAAE,OAAO,CAAC;IACjB,OAAO,EAAE,OAAO,CAAC;IACjB,GAAG,EAAE,OAAO,CAAC;CACd,CAAC;;AAwGF,wBAGG"}

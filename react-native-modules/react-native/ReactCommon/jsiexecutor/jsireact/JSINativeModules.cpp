@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -18,14 +18,13 @@
 
 using namespace facebook::jsi;
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 JSINativeModules::JSINativeModules(
     std::shared_ptr<ModuleRegistry> moduleRegistry)
     : m_moduleRegistry(std::move(moduleRegistry)) {}
 
-Value JSINativeModules::getModule(Runtime &rt, const PropNameID &name) {
+Value JSINativeModules::getModule(Runtime& rt, const PropNameID& name) {
   if (!m_moduleRegistry) {
     return nullptr;
   }
@@ -45,7 +44,7 @@ Value JSINativeModules::getModule(Runtime &rt, const PropNameID &name) {
   }
 
   auto module = createModule(rt, moduleName);
-  if (!module.hasValue()) {
+  if (!module.has_value()) {
     BridgeNativeModulePerfLogger::moduleJSRequireEndingFail(moduleName.c_str());
     // Allow lookup to continue in the objects own properties, which allows for
     // overrides of NativeModules
@@ -61,14 +60,14 @@ Value JSINativeModules::getModule(Runtime &rt, const PropNameID &name) {
 }
 
 void JSINativeModules::reset() {
-  m_genNativeModuleJS = folly::none;
+  m_genNativeModuleJS = std::nullopt;
   m_objects.clear();
 }
 
-folly::Optional<Object> JSINativeModules::createModule(
-    Runtime &rt,
-    const std::string &name) {
-  bool hasLogger(ReactMarker::logTaggedMarker);
+std::optional<Object> JSINativeModules::createModule(
+    Runtime& rt,
+    const std::string& name) {
+  bool hasLogger(ReactMarker::logTaggedMarkerImpl);
   if (hasLogger) {
     ReactMarker::logTaggedMarker(
         ReactMarker::NATIVE_MODULE_SETUP_START, name.c_str());
@@ -80,8 +79,8 @@ folly::Optional<Object> JSINativeModules::createModule(
   }
 
   auto result = m_moduleRegistry->getConfig(name);
-  if (!result.hasValue()) {
-    return folly::none;
+  if (!result.has_value()) {
+    return std::nullopt;
   }
 
   Value moduleInfo = m_genNativeModuleJS->call(
@@ -89,8 +88,10 @@ folly::Optional<Object> JSINativeModules::createModule(
       valueFromDynamic(rt, result->config),
       static_cast<double>(result->index));
   CHECK(!moduleInfo.isNull()) << "Module returned from genNativeModule is null";
+  CHECK(moduleInfo.isObject())
+      << "Module returned from genNativeModule isn't an Object";
 
-  folly::Optional<Object> module(
+  std::optional<Object> module(
       moduleInfo.asObject(rt).getPropertyAsObject(rt, "module"));
 
   if (hasLogger) {
@@ -101,5 +102,4 @@ folly::Optional<Object> JSINativeModules::createModule(
   return module;
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

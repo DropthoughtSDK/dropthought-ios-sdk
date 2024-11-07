@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,33 +10,26 @@
 #include <react/renderer/core/ReactPrimitives.h>
 #include <react/utils/Telemetry.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * Represents telemetry data associated with a image request
+ * where the willRequestUrlTime is the time at ImageTelemetry's creation.
  */
 class ImageTelemetry final {
  public:
-  ImageTelemetry(SurfaceId const surfaceId) : surfaceId_(surfaceId) {}
+  ImageTelemetry(const SurfaceId surfaceId) : surfaceId_(surfaceId) {
+    willRequestUrlTime_ = telemetryTimePointNow();
+  }
 
-  /*
-   * Signaling
-   */
-  void willRequestUrl();
-
-  /*
-   * Reading
-   */
   TelemetryTimePoint getWillRequestUrlTime() const;
 
   SurfaceId getSurfaceId() const;
 
  private:
-  TelemetryTimePoint willRequestUrlTime_{kTelemetryUndefinedTimePoint};
+  TelemetryTimePoint willRequestUrlTime_;
 
   const SurfaceId surfaceId_;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

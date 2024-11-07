@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -34,7 +34,11 @@ public class Inspector {
 
   public static LocalConnection connect(int pageId, RemoteConnection remote) {
     try {
-      return instance().connectNative(pageId, remote);
+      final LocalConnection local = instance().connectNative(pageId, remote);
+      if (local == null) {
+        throw new IllegalStateException("Can't open failed connection");
+      }
+      return local;
     } catch (UnsatisfiedLinkError e) {
       FLog.e(ReactConstants.TAG, "Inspector doesn't work in open source yet", e);
       throw new RuntimeException(e);

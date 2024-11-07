@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,44 +7,20 @@
 
 package com.facebook.react.fabric;
 
-import android.annotation.SuppressLint;
 import androidx.annotation.NonNull;
-import com.facebook.jni.HybridData;
-import com.facebook.proguard.annotations.DoNotStrip;
 import com.facebook.react.bridge.NativeMap;
+import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.bridge.RuntimeExecutor;
-import com.facebook.react.bridge.queue.MessageQueueThread;
+import com.facebook.react.bridge.RuntimeScheduler;
 import com.facebook.react.fabric.events.EventBeatManager;
-import com.facebook.react.uimanager.PixelUtil;
+import com.facebook.react.fabric.events.EventEmitterWrapper;
 
-@DoNotStrip
-@SuppressLint("MissingNativeLoadLibrary")
-public class Binding {
+public interface Binding {
 
-  static {
-    FabricSoLoader.staticInit();
-  }
-
-  @DoNotStrip private final HybridData mHybridData;
-
-  private static native HybridData initHybrid();
-
-  public Binding() {
-    mHybridData = initHybrid();
-  }
-
-  private native void installFabricUIManager(
-      RuntimeExecutor runtimeExecutor,
-      Object uiManager,
-      EventBeatManager eventBeatManager,
-      MessageQueueThread jsMessageQueueThread,
-      ComponentFactory componentsRegistry,
-      Object reactNativeConfig);
-
-  public native void startSurface(
+  public void startSurface(
       int surfaceId, @NonNull String moduleName, @NonNull NativeMap initialProps);
 
-  public native void startSurfaceWithConstraints(
+  public void startSurfaceWithConstraints(
       int surfaceId,
       String moduleName,
       NativeMap initialProps,
@@ -57,13 +33,13 @@ public class Binding {
       boolean isRTL,
       boolean doLeftAndRightSwapInRTL);
 
-  public native void renderTemplateToSurface(int surfaceId, String uiTemplate);
+  public void renderTemplateToSurface(int surfaceId, String uiTemplate);
 
-  public native void stopSurface(int surfaceId);
+  public void stopSurface(int surfaceId);
 
-  public native void setPixelDensity(float pointScaleFactor);
+  public void setPixelDensity(float pointScaleFactor);
 
-  public native void setConstraints(
+  public void setConstraints(
       int surfaceId,
       float minWidth,
       float maxWidth,
@@ -74,30 +50,23 @@ public class Binding {
       boolean isRTL,
       boolean doLeftAndRightSwapInRTL);
 
-  public native void driveCxxAnimations();
+  public void driveCxxAnimations();
 
-  // TODO (T67721598) Remove the jsContext param once we've migrated to using RuntimeExecutor
+  public void reportMount(int surfaceId);
+
+  public ReadableNativeMap getInspectorDataForInstance(EventEmitterWrapper eventEmitterWrapper);
+
   public void register(
       @NonNull RuntimeExecutor runtimeExecutor,
+      @NonNull RuntimeScheduler runtimeScheduler,
       @NonNull FabricUIManager fabricUIManager,
       @NonNull EventBeatManager eventBeatManager,
-      @NonNull MessageQueueThread jsMessageQueueThread,
       @NonNull ComponentFactory componentFactory,
-      @NonNull ReactNativeConfig reactNativeConfig) {
-    fabricUIManager.setBinding(this);
-    installFabricUIManager(
-        runtimeExecutor,
-        fabricUIManager,
-        eventBeatManager,
-        jsMessageQueueThread,
-        componentFactory,
-        reactNativeConfig);
-    setPixelDensity(PixelUtil.getDisplayMetricDensity());
-  }
+      @NonNull ReactNativeConfig reactNativeConfig);
 
-  private native void uninstallFabricUIManager();
+  public void unregister();
 
-  public void unregister() {
-    uninstallFabricUIManager();
-  }
+  public void registerSurface(SurfaceHandlerBinding surfaceHandler);
+
+  public void unregisterSurface(SurfaceHandlerBinding surfaceHandler);
 }

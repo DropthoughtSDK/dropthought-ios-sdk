@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,8 +12,7 @@
 #import <React/RCTJavaScriptExecutor.h>
 #import <cxxreact/JSExecutor.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 class RCTObjcExecutorFactory : public JSExecutorFactory {
  public:
@@ -29,5 +28,4 @@ class RCTObjcExecutorFactory : public JSExecutorFactory {
   RCTJavaScriptCompleteBlock m_errorBlock;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

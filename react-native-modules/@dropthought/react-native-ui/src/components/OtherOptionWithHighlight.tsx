@@ -13,9 +13,8 @@ import {
 
 import GlobalStyles, { Colors, QuestionContentTextSize } from '../styles';
 import i18n from '../translation';
-import OptionWithHighlight, {
-  Props as OptionWithHighlightProps,
-} from './OptionWithHighlight';
+import OptionWithHighlight from './OptionWithHighlight';
+import type { Props as OptionWithHighlightProps } from './OptionWithHighlight';
 import { useDimensionWidthType } from '../hooks/useWindowDimensions';
 import { useTheme } from '../contexts/theme';
 import type { Question } from '../data';
@@ -132,6 +131,7 @@ function OtherOptionWithHighlightProps(props: Props) {
       style={[styles.textInputContainer, rtl && GlobalStyles.flexRowReverse]}
     >
       <Text
+        testID="test:id/choice_option_other"
         style={[
           styles.otherText,
           { color: fontColor },
@@ -142,6 +142,7 @@ function OtherOptionWithHighlightProps(props: Props) {
         {otherTextLabel}
       </Text>
       <TextInput
+        testID="test:id/field_choice_option_other"
         ref={inputRef}
         style={inputStyle}
         placeholder={

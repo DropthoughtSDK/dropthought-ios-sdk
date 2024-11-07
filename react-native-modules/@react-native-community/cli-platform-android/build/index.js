@@ -3,10 +3,10 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-Object.defineProperty(exports, "linkConfig", {
+Object.defineProperty(exports, "adb", {
   enumerable: true,
   get: function () {
-    return _link.default;
+    return _runAndroid.adb;
   }
 });
 Object.defineProperty(exports, "commands", {
@@ -15,16 +15,16 @@ Object.defineProperty(exports, "commands", {
     return _commands.default;
   }
 });
-Object.defineProperty(exports, "projectConfig", {
-  enumerable: true,
-  get: function () {
-    return _config.projectConfig;
-  }
-});
 Object.defineProperty(exports, "dependencyConfig", {
   enumerable: true,
   get: function () {
     return _config.dependencyConfig;
+  }
+});
+Object.defineProperty(exports, "getAdbPath", {
+  enumerable: true,
+  get: function () {
+    return _runAndroid.getAdbPath;
   }
 });
 Object.defineProperty(exports, "getAndroidProject", {
@@ -39,15 +39,28 @@ Object.defineProperty(exports, "getPackageName", {
     return _getAndroidProject.getPackageName;
   }
 });
-
-var _link = _interopRequireDefault(require("./link"));
-
+Object.defineProperty(exports, "listAndroidDevices", {
+  enumerable: true,
+  get: function () {
+    return _runAndroid.listAndroidDevices;
+  }
+});
+Object.defineProperty(exports, "projectConfig", {
+  enumerable: true,
+  get: function () {
+    return _config.projectConfig;
+  }
+});
+Object.defineProperty(exports, "tryRunAdbReverse", {
+  enumerable: true,
+  get: function () {
+    return _runAndroid.tryRunAdbReverse;
+  }
+});
 var _commands = _interopRequireDefault(require("./commands"));
-
+var _runAndroid = require("./commands/runAndroid");
 var _config = require("./config");
-
-var _getAndroidProject = require("./utils/getAndroidProject");
-
+var _getAndroidProject = require("./config/getAndroidProject");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=index.ts.map

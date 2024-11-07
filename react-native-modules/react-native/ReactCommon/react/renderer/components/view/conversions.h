@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,23 +7,24 @@
 
 #pragma once
 
-#include <better/map.h>
-#include <better/optional.h>
 #include <folly/Conv.h>
 #include <folly/dynamic.h>
 #include <glog/logging.h>
+#include <react/debug/react_native_expect.h>
 #include <react/renderer/components/view/primitives.h>
 #include <react/renderer/core/LayoutMetrics.h>
-#include <react/renderer/graphics/Geometry.h>
+#include <react/renderer/core/PropsParserContext.h>
 #include <react/renderer/graphics/Transform.h>
+#include <react/renderer/graphics/ValueUnit.h>
 #include <stdlib.h>
 #include <yoga/YGEnums.h>
-#include <yoga/YGNode.h>
-#include <yoga/Yoga.h>
+#include <yoga/node/Node.h>
+#include <algorithm>
 #include <cmath>
+#include <optional>
+#include <unordered_map>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * Yoga's `float` <-> React Native's `Float` (can be `double` or `float`)
@@ -47,7 +48,7 @@ inline Float floatFromYogaFloat(float value) {
 }
 
 inline float yogaFloatFromFloat(Float value) {
-  if (std::isinf(value)) {
+  if (!std::isfinite(value)) {
     return YGUndefined;
   }
 
@@ -55,16 +56,16 @@ inline float yogaFloatFromFloat(Float value) {
 }
 
 /*
- * `YGFloatOptional` <-> React Native's `Float`
+ * `yoga::FloatOptional` <-> React Native's `Float`
  *
- * `YGFloatOptional` represents optional dimensionless float values in Yoga
+ * `yoga::FloatOptional` represents optional dimensionless float values in Yoga
  * Style object (e.g. `flex`). The most suitable analogy to empty
- * `YGFloatOptional` is `NaN` value.
- * `YGFloatOptional` values are usually parsed from some outside data source
+ * `yoga::FloatOptional` is `NaN` value.
+ * `yoga::FloatOptional` values are usually parsed from some outside data source
  * which usually has some special corresponding representation for an empty
  * value.
  */
-inline Float floatFromYogaOptionalFloat(YGFloatOptional value) {
+inline Float floatFromYogaOptionalFloat(yoga::FloatOptional value) {
   if (value.isUndefined()) {
     return std::numeric_limits<Float>::quiet_NaN();
   }
@@ -72,33 +73,17 @@ inline Float floatFromYogaOptionalFloat(YGFloatOptional value) {
   return floatFromYogaFloat(value.unwrap());
 }
 
-inline YGFloatOptional yogaOptionalFloatFromFloat(Float value) {
+inline yoga::FloatOptional yogaOptionalFloatFromFloat(Float value) {
   if (std::isnan(value)) {
-    return YGFloatOptional();
+    return yoga::FloatOptional();
   }
 
-  return YGFloatOptional((float)value);
+  return yoga::FloatOptional((float)value);
 }
 
-/*
- * `YGValue` <-> `React Native's `Float`
- *
- * `YGValue` represents optional dimensionful (a real number and some unit, e.g.
- * pixels).
- */
-inline YGValue yogaStyleValueFromFloat(
-    const Float &value,
-    YGUnit unit = YGUnitPoint) {
-  if (std::isnan(value)) {
-    return YGValueUndefined;
-  }
-
-  return {(float)value, unit};
-}
-
-inline better::optional<Float> optionalFloatFromYogaValue(
+inline std::optional<Float> optionalFloatFromYogaValue(
     const YGValue value,
-    better::optional<Float> base = {}) {
+    std::optional<Float> base = {}) {
   switch (value.unit) {
     case YGUnitUndefined:
       return {};
@@ -106,22 +91,23 @@ inline better::optional<Float> optionalFloatFromYogaValue(
       return floatFromYogaFloat(value.value);
     case YGUnitPercent:
       return base.has_value()
-          ? better::optional<Float>(
-                base.value() * floatFromYogaFloat(value.value))
-          : better::optional<Float>();
+          ? std::optional<Float>(base.value() * floatFromYogaFloat(value.value))
+          : std::optional<Float>();
     case YGUnitAuto:
       return {};
   }
 }
 
-inline LayoutMetrics layoutMetricsFromYogaNode(YGNode &yogaNode) {
+inline LayoutMetrics layoutMetricsFromYogaNode(yoga::Node& yogaNode) {
   auto layoutMetrics = LayoutMetrics{};
 
-  layoutMetrics.frame =
-      Rect{Point{floatFromYogaFloat(YGNodeLayoutGetLeft(&yogaNode)),
-                 floatFromYogaFloat(YGNodeLayoutGetTop(&yogaNode))},
-           Size{floatFromYogaFloat(YGNodeLayoutGetWidth(&yogaNode)),
-                floatFromYogaFloat(YGNodeLayoutGetHeight(&yogaNode))}};
+  layoutMetrics.frame = Rect{
+      Point{
+          floatFromYogaFloat(YGNodeLayoutGetLeft(&yogaNode)),
+          floatFromYogaFloat(YGNodeLayoutGetTop(&yogaNode))},
+      Size{
+          floatFromYogaFloat(YGNodeLayoutGetWidth(&yogaNode)),
+          floatFromYogaFloat(YGNodeLayoutGetHeight(&yogaNode))}};
 
   layoutMetrics.borderWidth = EdgeInsets{
       floatFromYogaFloat(YGNodeLayoutGetBorder(&yogaNode, YGEdgeLeft)),
@@ -139,9 +125,9 @@ inline LayoutMetrics layoutMetricsFromYogaNode(YGNode &yogaNode) {
       layoutMetrics.borderWidth.bottom +
           floatFromYogaFloat(YGNodeLayoutGetPadding(&yogaNode, YGEdgeBottom))};
 
-  layoutMetrics.displayType = yogaNode.getStyle().display() == YGDisplayNone
-      ? DisplayType::None
-      : DisplayType::Flex;
+  layoutMetrics.displayType =
+      yogaNode.getStyle().display() == yoga::Display::None ? DisplayType::None
+                                                           : DisplayType::Flex;
 
   layoutMetrics.layoutDirection =
       YGNodeLayoutGetDirection(&yogaNode) == YGDirectionRTL
@@ -162,267 +148,346 @@ inline YGDirection yogaDirectionFromLayoutDirection(LayoutDirection direction) {
   }
 }
 
-inline void fromRawValue(const RawValue &value, YGDirection &result) {
-  assert(value.hasType<std::string>());
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    yoga::Direction& result) {
+  result = yoga::Direction::Inherit;
+  react_native_expect(value.hasType<std::string>());
+  if (!value.hasType<std::string>()) {
+    return;
+  }
   auto stringValue = (std::string)value;
   if (stringValue == "inherit") {
-    result = YGDirectionInherit;
+    result = yoga::Direction::Inherit;
     return;
   }
   if (stringValue == "ltr") {
-    result = YGDirectionLTR;
+    result = yoga::Direction::LTR;
     return;
   }
   if (stringValue == "rtl") {
-    result = YGDirectionRTL;
+    result = yoga::Direction::RTL;
     return;
   }
-  LOG(FATAL) << "Could not parse YGDirection:" << stringValue;
-  assert(false);
+  LOG(ERROR) << "Could not parse Direction:" << stringValue;
+  react_native_expect(false);
 }
 
-inline void fromRawValue(const RawValue &value, YGFlexDirection &result) {
-  assert(value.hasType<std::string>());
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    yoga::FlexDirection& result) {
+  result = yoga::FlexDirection::Column;
+  react_native_expect(value.hasType<std::string>());
+  if (!value.hasType<std::string>()) {
+    return;
+  }
   auto stringValue = (std::string)value;
   if (stringValue == "row") {
-    result = YGFlexDirectionRow;
+    result = yoga::FlexDirection::Row;
     return;
   }
   if (stringValue == "column") {
-    result = YGFlexDirectionColumn;
+    result = yoga::FlexDirection::Column;
     return;
   }
   if (stringValue == "column-reverse") {
-    result = YGFlexDirectionColumnReverse;
+    result = yoga::FlexDirection::ColumnReverse;
     return;
   }
   if (stringValue == "row-reverse") {
-    result = YGFlexDirectionRowReverse;
+    result = yoga::FlexDirection::RowReverse;
     return;
   }
-  LOG(FATAL) << "Could not parse YGFlexDirection:" << stringValue;
-  assert(false);
+  LOG(ERROR) << "Could not parse yoga::FlexDirection:" << stringValue;
+  react_native_expect(false);
 }
 
-inline void fromRawValue(const RawValue &value, YGJustify &result) {
-  assert(value.hasType<std::string>());
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    yoga::Justify& result) {
+  result = yoga::Justify::FlexStart;
+  react_native_expect(value.hasType<std::string>());
+  if (!value.hasType<std::string>()) {
+    return;
+  }
   auto stringValue = (std::string)value;
   if (stringValue == "flex-start") {
-    result = YGJustifyFlexStart;
+    result = yoga::Justify::FlexStart;
     return;
   }
   if (stringValue == "center") {
-    result = YGJustifyCenter;
+    result = yoga::Justify::Center;
     return;
   }
   if (stringValue == "flex-end") {
-    result = YGJustifyFlexEnd;
+    result = yoga::Justify::FlexEnd;
     return;
   }
   if (stringValue == "space-between") {
-    result = YGJustifySpaceBetween;
+    result = yoga::Justify::SpaceBetween;
     return;
   }
   if (stringValue == "space-around") {
-    result = YGJustifySpaceAround;
+    result = yoga::Justify::SpaceAround;
     return;
   }
   if (stringValue == "space-evenly") {
-    result = YGJustifySpaceEvenly;
+    result = yoga::Justify::SpaceEvenly;
     return;
   }
-  LOG(FATAL) << "Could not parse YGJustify:" << stringValue;
-  assert(false);
+  LOG(ERROR) << "Could not parse yoga::Justify:" << stringValue;
+  react_native_expect(false);
 }
 
-inline void fromRawValue(const RawValue &value, YGAlign &result) {
-  assert(value.hasType<std::string>());
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    yoga::Align& result) {
+  result = yoga::Align::Stretch;
+  react_native_expect(value.hasType<std::string>());
+  if (!value.hasType<std::string>()) {
+    return;
+  }
   auto stringValue = (std::string)value;
   if (stringValue == "auto") {
-    result = YGAlignAuto;
+    result = yoga::Align::Auto;
     return;
   }
   if (stringValue == "flex-start") {
-    result = YGAlignFlexStart;
+    result = yoga::Align::FlexStart;
     return;
   }
   if (stringValue == "center") {
-    result = YGAlignCenter;
+    result = yoga::Align::Center;
     return;
   }
   if (stringValue == "flex-end") {
-    result = YGAlignFlexEnd;
+    result = yoga::Align::FlexEnd;
     return;
   }
   if (stringValue == "stretch") {
-    result = YGAlignStretch;
+    result = yoga::Align::Stretch;
     return;
   }
   if (stringValue == "baseline") {
-    result = YGAlignBaseline;
+    result = yoga::Align::Baseline;
     return;
   }
   if (stringValue == "space-between") {
-    result = YGAlignSpaceBetween;
+    result = yoga::Align::SpaceBetween;
     return;
   }
   if (stringValue == "space-around") {
-    result = YGAlignSpaceAround;
+    result = yoga::Align::SpaceAround;
     return;
   }
-  LOG(FATAL) << "Could not parse YGAlign:" << stringValue;
-  assert(false);
+  LOG(ERROR) << "Could not parse yoga::Align:" << stringValue;
+  react_native_expect(false);
 }
 
-inline void fromRawValue(const RawValue &value, YGPositionType &result) {
-  assert(value.hasType<std::string>());
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    yoga::PositionType& result) {
+  result = yoga::PositionType::Relative;
+  react_native_expect(value.hasType<std::string>());
+  if (!value.hasType<std::string>()) {
+    return;
+  }
   auto stringValue = (std::string)value;
   if (stringValue == "static") {
-    result = YGPositionTypeStatic;
+    result = yoga::PositionType::Static;
     return;
   }
   if (stringValue == "relative") {
-    result = YGPositionTypeRelative;
+    result = yoga::PositionType::Relative;
     return;
   }
   if (stringValue == "absolute") {
-    result = YGPositionTypeAbsolute;
+    result = yoga::PositionType::Absolute;
     return;
   }
-  LOG(FATAL) << "Could not parse YGPositionType:" << stringValue;
-  assert(false);
+  LOG(ERROR) << "Could not parse yoga::PositionType:" << stringValue;
+  react_native_expect(false);
 }
 
-inline void fromRawValue(const RawValue &value, YGWrap &result) {
-  assert(value.hasType<std::string>());
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    yoga::Wrap& result) {
+  result = yoga::Wrap::NoWrap;
+  react_native_expect(value.hasType<std::string>());
+  if (!value.hasType<std::string>()) {
+    return;
+  }
   auto stringValue = (std::string)value;
   if (stringValue == "nowrap") {
-    result = YGWrapNoWrap;
+    result = yoga::Wrap::NoWrap;
     return;
   }
   if (stringValue == "wrap") {
-    result = YGWrapWrap;
+    result = yoga::Wrap::Wrap;
     return;
   }
   if (stringValue == "wrap-reverse") {
-    result = YGWrapWrapReverse;
+    result = yoga::Wrap::WrapReverse;
     return;
   }
-  LOG(FATAL) << "Could not parse YGWrap:" << stringValue;
-  assert(false);
+  LOG(ERROR) << "Could not parse yoga::Wrap:" << stringValue;
+  react_native_expect(false);
 }
 
-inline void fromRawValue(const RawValue &value, YGOverflow &result) {
-  assert(value.hasType<std::string>());
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    yoga::Overflow& result) {
+  result = yoga::Overflow::Visible;
+  react_native_expect(value.hasType<std::string>());
+  if (!value.hasType<std::string>()) {
+    return;
+  }
   auto stringValue = (std::string)value;
   if (stringValue == "visible") {
-    result = YGOverflowVisible;
+    result = yoga::Overflow::Visible;
     return;
   }
   if (stringValue == "hidden") {
-    result = YGOverflowHidden;
+    result = yoga::Overflow::Hidden;
     return;
   }
   if (stringValue == "scroll") {
-    result = YGOverflowScroll;
+    result = yoga::Overflow::Scroll;
     return;
   }
-  LOG(FATAL) << "Could not parse YGOverflow:" << stringValue;
-  assert(false);
+  LOG(ERROR) << "Could not parse yoga::Overflow:" << stringValue;
+  react_native_expect(false);
 }
 
-inline void fromRawValue(const RawValue &value, YGDisplay &result) {
-  assert(value.hasType<std::string>());
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    yoga::Display& result) {
+  result = yoga::Display::Flex;
+  react_native_expect(value.hasType<std::string>());
+  if (!value.hasType<std::string>()) {
+    return;
+  }
   auto stringValue = (std::string)value;
   if (stringValue == "flex") {
-    result = YGDisplayFlex;
+    result = yoga::Display::Flex;
     return;
   }
   if (stringValue == "none") {
-    result = YGDisplayNone;
+    result = yoga::Display::None;
     return;
   }
-  LOG(FATAL) << "Could not parse YGDisplay:" << stringValue;
-  assert(false);
+  LOG(ERROR) << "Could not parse yoga::Display:" << stringValue;
+  react_native_expect(false);
 }
 
-inline void fromRawValue(const RawValue &value, YGStyle::ValueRepr &result) {
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    yoga::Style::ValueRepr& result) {
   if (value.hasType<Float>()) {
-    result = yogaStyleValueFromFloat((Float)value);
+    result = yoga::CompactValue::ofMaybe<YGUnitPoint>((float)value);
     return;
   } else if (value.hasType<std::string>()) {
     const auto stringValue = (std::string)value;
     if (stringValue == "auto") {
-      result = YGValueUndefined;
+      result = context.treatAutoAsYGValueUndefined() ? YGValueUndefined
+                                                     : YGValueAuto;
       return;
     } else {
       if (stringValue.back() == '%') {
-        result = YGValue{
-            folly::to<float>(stringValue.substr(0, stringValue.length() - 1)),
-            YGUnitPercent};
-        return;
+        auto tryValue = folly::tryTo<float>(
+            std::string_view(stringValue).substr(0, stringValue.length() - 1));
+        if (tryValue.hasValue()) {
+          result = YGValue{tryValue.value(), YGUnitPercent};
+          return;
+        }
       } else {
-        result = YGValue{folly::to<float>(stringValue), YGUnitPoint};
-        return;
+        auto tryValue = folly::tryTo<float>(stringValue);
+        if (tryValue.hasValue()) {
+          result = YGValue{tryValue.value(), YGUnitPoint};
+          return;
+        }
       }
     }
   }
   result = YGValueUndefined;
 }
 
-inline void fromRawValue(const RawValue &value, YGFloatOptional &result) {
-  if (value.hasType<float>()) {
-    result = YGFloatOptional((float)value);
-    return;
-  } else if (value.hasType<std::string>()) {
-    const auto stringValue = (std::string)value;
-    if (stringValue == "auto") {
-      result = YGFloatOptional();
-      return;
-    }
-  }
-  LOG(FATAL) << "Could not parse YGFloatOptional";
-  assert(false);
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    YGValue& result) {
+  yoga::Style::ValueRepr ygValue{};
+  fromRawValue(context, value, ygValue);
+  result = ygValue;
 }
 
-inline Float toRadians(const RawValue &value) {
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    yoga::FloatOptional& result) {
+  result = value.hasType<float>() ? yoga::FloatOptional((float)value)
+                                  : yoga::FloatOptional();
+}
+
+inline Float toRadians(
+    const RawValue& value,
+    std::optional<Float> defaultValue) {
   if (value.hasType<Float>()) {
     return (Float)value;
   }
-  assert(value.hasType<std::string>());
+  react_native_expect(value.hasType<std::string>());
+  if (!value.hasType<std::string>() && defaultValue.has_value()) {
+    return *defaultValue;
+  }
   auto stringValue = (std::string)value;
-  char *suffixStart;
+  char* suffixStart;
   double num = strtod(
       stringValue.c_str(), &suffixStart); // can't use std::stod, probably
                                           // because of old Android NDKs
   if (0 == strncmp(suffixStart, "deg", 3)) {
-    return num * M_PI / 180;
+    return static_cast<Float>(num * M_PI / 180.0f);
   }
-  return num; // assume suffix is "rad"
+  return static_cast<Float>(num); // assume suffix is "rad"
 }
 
-inline void fromRawValue(const RawValue &value, Transform &result) {
-  assert(value.hasType<std::vector<RawValue>>());
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    Transform& result) {
   auto transformMatrix = Transform{};
-  auto configurations = static_cast<std::vector<RawValue>>(value);
+  react_native_expect(value.hasType<std::vector<RawValue>>());
+  if (!value.hasType<std::vector<RawValue>>()) {
+    result = transformMatrix;
+    return;
+  }
 
-  for (const auto &configuration : configurations) {
-    if (!configuration.hasType<better::map<std::string, RawValue>>()) {
+  auto configurations = static_cast<std::vector<RawValue>>(value);
+  for (const auto& configuration : configurations) {
+    if (!configuration.hasType<std::unordered_map<std::string, RawValue>>()) {
       // TODO: The following checks have to be removed after codegen is shipped.
       // See T45151459.
       continue;
     }
 
     auto configurationPair =
-        static_cast<better::map<std::string, RawValue>>(configuration);
+        static_cast<std::unordered_map<std::string, RawValue>>(configuration);
     auto pair = configurationPair.begin();
     auto operation = pair->first;
-    auto &parameters = pair->second;
+    auto& parameters = pair->second;
 
     if (operation == "matrix") {
-      assert(parameters.hasType<std::vector<Float>>());
+      react_native_expect(parameters.hasType<std::vector<Float>>());
       auto numbers = (std::vector<Float>)parameters;
-      assert(numbers.size() == transformMatrix.matrix.size());
+      react_native_expect(numbers.size() == transformMatrix.matrix.size());
       auto i = 0;
       for (auto number : numbers) {
         transformMatrix.matrix[i++] = number;
@@ -433,14 +498,14 @@ inline void fromRawValue(const RawValue &value, Transform &result) {
       transformMatrix =
           transformMatrix * Transform::Perspective((Float)parameters);
     } else if (operation == "rotateX") {
-      transformMatrix =
-          transformMatrix * Transform::Rotate(toRadians(parameters), 0, 0);
+      transformMatrix = transformMatrix *
+          Transform::Rotate(toRadians(parameters, 0.0f), 0, 0);
     } else if (operation == "rotateY") {
-      transformMatrix =
-          transformMatrix * Transform::Rotate(0, toRadians(parameters), 0);
+      transformMatrix = transformMatrix *
+          Transform::Rotate(0, toRadians(parameters, 0.0f), 0);
     } else if (operation == "rotateZ" || operation == "rotate") {
-      transformMatrix =
-          transformMatrix * Transform::Rotate(0, 0, toRadians(parameters));
+      transformMatrix = transformMatrix *
+          Transform::Rotate(0, 0, toRadians(parameters, 0.0f));
     } else if (operation == "scale") {
       auto number = (Float)parameters;
       transformMatrix =
@@ -466,18 +531,66 @@ inline void fromRawValue(const RawValue &value, Transform &result) {
           transformMatrix * Transform::Translate(0, (Float)parameters, 0);
     } else if (operation == "skewX") {
       transformMatrix =
-          transformMatrix * Transform::Skew(toRadians(parameters), 0);
+          transformMatrix * Transform::Skew(toRadians(parameters, 0.0f), 0);
     } else if (operation == "skewY") {
       transformMatrix =
-          transformMatrix * Transform::Skew(0, toRadians(parameters));
+          transformMatrix * Transform::Skew(0, toRadians(parameters, 0.0f));
     }
   }
 
   result = transformMatrix;
 }
 
-inline void fromRawValue(const RawValue &value, PointerEventsMode &result) {
-  assert(value.hasType<std::string>());
+inline void fromRawValue(
+    const PropsParserContext& /*context*/,
+    const RawValue& value,
+    TransformOrigin& result) {
+  react_native_expect(value.hasType<std::vector<RawValue>>());
+  auto origins = (std::vector<RawValue>)value;
+
+  TransformOrigin transformOrigin;
+
+  const size_t maxIndex = 2;
+
+  for (size_t i = 0; i < std::min(origins.size(), maxIndex); i++) {
+    const auto& origin = origins[i];
+    if (origin.hasType<Float>()) {
+      auto originFloat = (float)origin;
+      if (std::isfinite(originFloat)) {
+        transformOrigin.xy[i] = ValueUnit(originFloat, UnitType::Point);
+      } else {
+        transformOrigin.xy[i] = ValueUnit(0.0f, UnitType::Undefined);
+      }
+    } else if (origin.hasType<std::string>()) {
+      const auto stringValue = (std::string)origin;
+
+      if (stringValue.back() == '%') {
+        auto tryValue = folly::tryTo<float>(
+            std::string_view(stringValue).substr(0, stringValue.length() - 1));
+        if (tryValue.hasValue()) {
+          transformOrigin.xy[i] =
+              ValueUnit(tryValue.value(), UnitType::Percent);
+        }
+      }
+    }
+  }
+
+  if (origins.size() >= 3 && origins[2].hasType<Float>()) {
+    transformOrigin.z = (Float)origins[2];
+  }
+
+  result = transformOrigin;
+}
+
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    PointerEventsMode& result) {
+  result = PointerEventsMode::Auto;
+  react_native_expect(value.hasType<std::string>());
+  if (!value.hasType<std::string>()) {
+    return;
+  }
   auto stringValue = (std::string)value;
   if (stringValue == "auto") {
     result = PointerEventsMode::Auto;
@@ -495,12 +608,19 @@ inline void fromRawValue(const RawValue &value, PointerEventsMode &result) {
     result = PointerEventsMode::BoxOnly;
     return;
   }
-  LOG(FATAL) << "Could not parse PointerEventsMode:" << stringValue;
-  assert(false);
+  LOG(ERROR) << "Could not parse PointerEventsMode:" << stringValue;
+  react_native_expect(false);
 }
 
-inline void fromRawValue(const RawValue &value, BackfaceVisibility &result) {
-  assert(value.hasType<std::string>());
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    BackfaceVisibility& result) {
+  result = BackfaceVisibility::Auto;
+  react_native_expect(value.hasType<std::string>());
+  if (!value.hasType<std::string>()) {
+    return;
+  }
   auto stringValue = (std::string)value;
   if (stringValue == "auto") {
     result = BackfaceVisibility::Auto;
@@ -514,12 +634,41 @@ inline void fromRawValue(const RawValue &value, BackfaceVisibility &result) {
     result = BackfaceVisibility::Hidden;
     return;
   }
-  LOG(FATAL) << "Could not parse BackfaceVisibility:" << stringValue;
-  assert(false);
+  LOG(ERROR) << "Could not parse BackfaceVisibility:" << stringValue;
+  react_native_expect(false);
 }
 
-inline void fromRawValue(const RawValue &value, BorderStyle &result) {
-  assert(value.hasType<std::string>());
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    BorderCurve& result) {
+  result = BorderCurve::Circular;
+  react_native_expect(value.hasType<std::string>());
+  if (!value.hasType<std::string>()) {
+    return;
+  }
+  auto stringValue = (std::string)value;
+  if (stringValue == "circular") {
+    result = BorderCurve::Circular;
+    return;
+  }
+  if (stringValue == "continuous") {
+    result = BorderCurve::Continuous;
+    return;
+  }
+  LOG(ERROR) << "Could not parse BorderCurve:" << stringValue;
+  react_native_expect(false);
+}
+
+inline void fromRawValue(
+    const PropsParserContext& context,
+    const RawValue& value,
+    BorderStyle& result) {
+  result = BorderStyle::Solid;
+  react_native_expect(value.hasType<std::string>());
+  if (!value.hasType<std::string>()) {
+    return;
+  }
   auto stringValue = (std::string)value;
   if (stringValue == "solid") {
     result = BorderStyle::Solid;
@@ -533,134 +682,151 @@ inline void fromRawValue(const RawValue &value, BorderStyle &result) {
     result = BorderStyle::Dashed;
     return;
   }
-  LOG(FATAL) << "Could not parse BorderStyle:" << stringValue;
-  assert(false);
+  LOG(ERROR) << "Could not parse BorderStyle:" << stringValue;
+  react_native_expect(false);
 }
 
-inline std::string toString(
-    const std::array<float, yoga::enums::count<YGDimension>()> &dimensions) {
-  return "{" + folly::to<std::string>(dimensions[0]) + ", " +
-      folly::to<std::string>(dimensions[1]) + "}";
+inline void fromRawValue(
+    const PropsParserContext& /*context*/,
+    const RawValue& value,
+    LayoutConformance& result) {
+  result = LayoutConformance::Classic;
+  react_native_expect(value.hasType<std::string>());
+  if (!value.hasType<std::string>()) {
+    return;
+  }
+  auto stringValue = (std::string)value;
+  if (stringValue == "classic") {
+    result = LayoutConformance::Classic;
+    return;
+  }
+  if (stringValue == "strict") {
+    result = LayoutConformance::Strict;
+    return;
+  }
+  LOG(ERROR) << "Could not parse LayoutConformance:" << stringValue;
+  react_native_expect(false);
 }
 
-inline std::string toString(const std::array<float, 4> &position) {
-  return "{" + folly::to<std::string>(position[0]) + ", " +
-      folly::to<std::string>(position[1]) + "}";
+template <size_t N>
+inline std::string toString(const std::array<float, N> vec) {
+  std::string s;
+
+  s.append("{");
+  for (size_t i = 0; i < N - 1; i++) {
+    s.append(std::to_string(vec[i]) + ", ");
+  }
+  s.append(std::to_string(vec[N - 1]));
+  s.append("}");
+
+  return s;
 }
 
-inline std::string toString(
-    const std::array<float, yoga::enums::count<YGEdge>()> &edges) {
-  return "{" + folly::to<std::string>(edges[0]) + ", " +
-      folly::to<std::string>(edges[1]) + ", " +
-      folly::to<std::string>(edges[2]) + ", " +
-      folly::to<std::string>(edges[3]) + "}";
-}
-
-inline std::string toString(const YGDirection &value) {
+inline std::string toString(const yoga::Direction& value) {
   switch (value) {
-    case YGDirectionInherit:
+    case yoga::Direction::Inherit:
       return "inherit";
-    case YGDirectionLTR:
+    case yoga::Direction::LTR:
       return "ltr";
-    case YGDirectionRTL:
+    case yoga::Direction::RTL:
       return "rtl";
   }
 }
 
-inline std::string toString(const YGFlexDirection &value) {
+inline std::string toString(const yoga::FlexDirection& value) {
   switch (value) {
-    case YGFlexDirectionColumn:
+    case yoga::FlexDirection::Column:
       return "column";
-    case YGFlexDirectionColumnReverse:
+    case yoga::FlexDirection::ColumnReverse:
       return "column-reverse";
-    case YGFlexDirectionRow:
+    case yoga::FlexDirection::Row:
       return "row";
-    case YGFlexDirectionRowReverse:
+    case yoga::FlexDirection::RowReverse:
       return "row-reverse";
   }
 }
 
-inline std::string toString(const YGJustify &value) {
+inline std::string toString(const yoga::Justify& value) {
   switch (value) {
-    case YGJustifyFlexStart:
+    case yoga::Justify::FlexStart:
       return "flex-start";
-    case YGJustifyCenter:
+    case yoga::Justify::Center:
       return "center";
-    case YGJustifyFlexEnd:
+    case yoga::Justify::FlexEnd:
       return "flex-end";
-    case YGJustifySpaceBetween:
+    case yoga::Justify::SpaceBetween:
       return "space-between";
-    case YGJustifySpaceAround:
+    case yoga::Justify::SpaceAround:
       return "space-around";
-    case YGJustifySpaceEvenly:
+    case yoga::Justify::SpaceEvenly:
       return "space-evenly";
   }
 }
 
-inline std::string toString(const YGAlign &value) {
+inline std::string toString(const yoga::Align& value) {
   switch (value) {
-    case YGAlignAuto:
+    case yoga::Align::Auto:
       return "auto";
-    case YGAlignFlexStart:
+    case yoga::Align::FlexStart:
       return "flex-start";
-    case YGAlignCenter:
+    case yoga::Align::Center:
       return "center";
-    case YGAlignFlexEnd:
+    case yoga::Align::FlexEnd:
       return "flex-end";
-    case YGAlignStretch:
+    case yoga::Align::Stretch:
       return "stretch";
-    case YGAlignBaseline:
+    case yoga::Align::Baseline:
       return "baseline";
-    case YGAlignSpaceBetween:
+    case yoga::Align::SpaceBetween:
       return "space-between";
-    case YGAlignSpaceAround:
+    case yoga::Align::SpaceAround:
       return "space-around";
   }
 }
 
-inline std::string toString(const YGPositionType &value) {
+inline std::string toString(const yoga::PositionType& value) {
   switch (value) {
-    case YGPositionTypeStatic:
+    case yoga::PositionType::Static:
       return "static";
-    case YGPositionTypeRelative:
+    case yoga::PositionType::Relative:
       return "relative";
-    case YGPositionTypeAbsolute:
+    case yoga::PositionType::Absolute:
       return "absolute";
   }
 }
 
-inline std::string toString(const YGWrap &value) {
+inline std::string toString(const yoga::Wrap& value) {
   switch (value) {
-    case YGWrapNoWrap:
+    case yoga::Wrap::NoWrap:
       return "no-wrap";
-    case YGWrapWrap:
+    case yoga::Wrap::Wrap:
       return "wrap";
-    case YGWrapWrapReverse:
+    case yoga::Wrap::WrapReverse:
       return "wrap-reverse";
   }
 }
 
-inline std::string toString(const YGOverflow &value) {
+inline std::string toString(const yoga::Overflow& value) {
   switch (value) {
-    case YGOverflowVisible:
+    case yoga::Overflow::Visible:
       return "visible";
-    case YGOverflowScroll:
+    case yoga::Overflow::Scroll:
       return "scroll";
-    case YGOverflowHidden:
+    case yoga::Overflow::Hidden:
       return "hidden";
   }
 }
 
-inline std::string toString(const YGDisplay &value) {
+inline std::string toString(const yoga::Display& value) {
   switch (value) {
-    case YGDisplayFlex:
+    case yoga::Display::Flex:
       return "flex";
-    case YGDisplayNone:
+    case yoga::Display::None:
       return "none";
   }
 }
 
-inline std::string toString(const YGValue &value) {
+inline std::string toString(const YGValue& value) {
   switch (value.unit) {
     case YGUnitUndefined:
       return "undefined";
@@ -673,7 +839,7 @@ inline std::string toString(const YGValue &value) {
   }
 }
 
-inline std::string toString(const YGFloatOptional &value) {
+inline std::string toString(const yoga::FloatOptional& value) {
   if (value.isUndefined()) {
     return "undefined";
   }
@@ -681,12 +847,12 @@ inline std::string toString(const YGFloatOptional &value) {
   return folly::to<std::string>(floatFromYogaFloat(value.unwrap()));
 }
 
-inline std::string toString(const YGStyle::Dimensions &value) {
+inline std::string toString(const yoga::Style::Dimensions& value) {
   return "{" + toString(value[0]) + ", " + toString(value[1]) + "}";
 }
 
-inline std::string toString(const YGStyle::Edges &value) {
-  static std::array<std::string, yoga::enums::count<YGEdge>()> names = {
+inline std::string toString(const yoga::Style::Edges& value) {
+  static std::array<std::string, 9> names = {
       {"left",
        "top",
        "right",
@@ -700,7 +866,7 @@ inline std::string toString(const YGStyle::Edges &value) {
   auto result = std::string{};
   auto separator = std::string{", "};
 
-  for (auto i = 0; i < yoga::enums::count<YGEdge>(); i++) {
+  for (auto i = 0; i < names.size(); i++) {
     YGValue v = value[i];
     if (v.unit == YGUnitUndefined) {
       continue;
@@ -715,5 +881,15 @@ inline std::string toString(const YGStyle::Edges &value) {
   return "{" + result + "}";
 }
 
-} // namespace react
-} // namespace facebook
+inline std::string toString(const LayoutConformance& value) {
+  switch (value) {
+    case LayoutConformance::Undefined:
+      return "undefined";
+    case LayoutConformance::Classic:
+      return "classic";
+    case LayoutConformance::Strict:
+      return "strict";
+  }
+}
+
+} // namespace facebook::react

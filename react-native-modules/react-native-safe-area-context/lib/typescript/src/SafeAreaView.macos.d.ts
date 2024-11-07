@@ -1,2 +1,3 @@
-import { View } from 'react-native';
-export declare const SafeAreaView: typeof View;
+import type { NativeSafeAreaViewInstance } from './SafeArea.types';
+export declare const SafeAreaView: NativeSafeAreaViewInstance;
+//# sourceMappingURL=SafeAreaView.macos.d.ts.map

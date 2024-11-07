@@ -1,4 +1,3 @@
-/// <reference types="node" />
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -6,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import http from 'http';
-declare type LaunchDevToolsOptions = {
+type LaunchDevToolsOptions = {
     host?: string;
     port: number;
     watchFolders: ReadonlyArray<string>;

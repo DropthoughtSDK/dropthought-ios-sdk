@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -17,8 +17,7 @@
 #endif
 #endif
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 // JSExecutor functions sometimes take large strings, on the order of
 // megabytes.  Copying these can be expensive.  Introducing a
@@ -32,15 +31,15 @@ class JSBigString {
   JSBigString() = default;
 
   // Not copyable
-  JSBigString(const JSBigString &) = delete;
-  JSBigString &operator=(const JSBigString &) = delete;
+  JSBigString(const JSBigString&) = delete;
+  JSBigString& operator=(const JSBigString&) = delete;
 
   virtual ~JSBigString() {}
 
   virtual bool isAscii() const = 0;
 
   // This needs to be a \0 terminated string
-  virtual const char *c_str() const = 0;
+  virtual const char* c_str() const = 0;
 
   // Length of the c_str without the NULL byte.
   virtual size_t size() const = 0;
@@ -57,7 +56,7 @@ class JSBigStdString : public JSBigString {
     return m_isAscii;
   }
 
-  const char *c_str() const override {
+  const char* c_str() const override {
     return m_str.c_str();
   }
 
@@ -82,7 +81,7 @@ class RN_EXPORT JSBigBufferString : public JSBigString {
     m_data[m_size] = '\0';
   }
 
-  ~JSBigBufferString() {
+  ~JSBigBufferString() override {
     delete[] m_data;
   }
 
@@ -90,7 +89,7 @@ class RN_EXPORT JSBigBufferString : public JSBigString {
     return true;
   }
 
-  const char *c_str() const override {
+  const char* c_str() const override {
     return m_data;
   }
 
@@ -98,12 +97,12 @@ class RN_EXPORT JSBigBufferString : public JSBigString {
     return m_size;
   }
 
-  char *data() {
+  char* data() {
     return m_data;
   }
 
  private:
-  char *m_data;
+  char* m_data;
   size_t m_size;
 };
 
@@ -111,27 +110,26 @@ class RN_EXPORT JSBigBufferString : public JSBigString {
 class RN_EXPORT JSBigFileString : public JSBigString {
  public:
   JSBigFileString(int fd, size_t size, off_t offset = 0);
-  ~JSBigFileString();
+  ~JSBigFileString() override;
 
   bool isAscii() const override {
     return true;
   }
 
-  const char *c_str() const override;
+  const char* c_str() const override;
 
   size_t size() const override;
   int fd() const;
 
   static std::unique_ptr<const JSBigFileString> fromPath(
-      const std::string &sourceURL);
+      const std::string& sourceURL);
 
  private:
-  int m_fd; // The file descriptor being mmaped
-  size_t m_size; // The size of the mmaped region
-  mutable off_t m_pageOff; // The offset in the mmaped region to the data.
-  off_t m_mapOff; // The offset in the file to the mmaped region.
-  mutable const char *m_data; // Pointer to the mmaped region.
+  int m_fd; // The file descriptor being mmapped
+  size_t m_size; // The size of the mmapped region
+  mutable off_t m_pageOff; // The offset in the mmapped region to the data.
+  off_t m_mapOff; // The offset in the file to the mmapped region.
+  mutable const char* m_data; // Pointer to the mmapped region.
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

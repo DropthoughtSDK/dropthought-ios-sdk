@@ -1,24 +1,22 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @flow strict-local
+ * @flow strict
  * @format
  */
 
-'use strict';
-
-import * as LogBoxSymbolication from './LogBoxSymbolication';
-
+import type {Stack} from './LogBoxSymbolication';
 import type {
   Category,
-  Message,
-  ComponentStack,
   CodeFrame,
+  ComponentStack,
+  Message,
 } from './parseLogBoxLog';
-import type {Stack} from './LogBoxSymbolication';
+
+import * as LogBoxSymbolication from './LogBoxSymbolication';
 
 type SymbolicationStatus = 'NONE' | 'PENDING' | 'COMPLETE' | 'FAILED';
 
@@ -33,6 +31,7 @@ export type LogBoxLogData = $ReadOnly<{|
   componentStack: ComponentStack,
   codeFrame?: ?CodeFrame,
   isComponentError: boolean,
+  extraData?: mixed,
 |}>;
 
 class LogBoxLog {
@@ -45,6 +44,7 @@ class LogBoxLog {
   level: LogLevel;
   codeFrame: ?CodeFrame;
   isComponentError: boolean;
+  extraData: mixed | void;
   symbolicated:
     | $ReadOnly<{|error: null, stack: null, status: 'NONE'|}>
     | $ReadOnly<{|error: null, stack: null, status: 'PENDING'|}>
@@ -64,6 +64,7 @@ class LogBoxLog {
     this.componentStack = data.componentStack;
     this.codeFrame = data.codeFrame;
     this.isComponentError = data.isComponentError;
+    this.extraData = data.extraData;
     this.count = 1;
   }
 
@@ -93,7 +94,7 @@ class LogBoxLog {
   handleSymbolicate(callback?: (status: SymbolicationStatus) => void): void {
     if (this.symbolicated.status !== 'PENDING') {
       this.updateStatus(null, null, null, callback);
-      LogBoxSymbolication.symbolicate(this.stack).then(
+      LogBoxSymbolication.symbolicate(this.stack, this.extraData).then(
         data => {
           this.updateStatus(null, data?.stack, data?.codeFrame, callback);
         },

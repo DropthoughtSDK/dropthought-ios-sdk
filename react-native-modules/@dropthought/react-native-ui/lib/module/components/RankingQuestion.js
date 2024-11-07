@@ -5,13 +5,12 @@ import MandatoryTitle from './MandatoryTitle';
 import GlobalStyle, { Colors, addOpacityToColor } from '../styles';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import DraggableList from '../utils/react-native-draggable-list/DraggableList';
-
 const swapElements = (array, index1, index2) => {
   let newArray = [...array];
+  // @ts-ignore
   newArray[index1] = newArray.splice(index2, 1, newArray[index1])[0];
   return newArray;
 };
-
 function RankingItem({
   item,
   index,
@@ -53,7 +52,7 @@ function RankingItem({
     source: require('../assets/icCheckBoxRounded.png')
   }) : /*#__PURE__*/React.createElement(View, {
     style: [styles.unCheckBox, {
-      borderColor: isDarkMode ? Colors.rankingCheckBoxBorder : themeColor !== null && themeColor !== void 0 ? themeColor : Colors.rankingCheckBoxBorder
+      borderColor: isDarkMode ? Colors.rankingCheckBoxBorder : themeColor ?? Colors.rankingCheckBoxBorder
     }]
   }), /*#__PURE__*/React.createElement(Text, {
     style: [styles.naText, {
@@ -97,7 +96,6 @@ function RankingItem({
     source: require('../assets/ic-expand-more-24-px.png')
   })), naComponent);
 }
-
 const RankingQuestion = ({
   survey,
   question,
@@ -124,18 +122,10 @@ const RankingQuestion = ({
       isNA: false
     };
   }));
-  const [list, setList] = useState(originListRef.current);
-  const [normalList, setNormalList] = useState(list);
-  const [visible, setVisible] = useState(false);
-  const [selectedOption, setSelectedOption] = useState();
-  useEffect(() => {
-    setNormalList(list.filter(current => !current.isNA));
-  }, [list]);
-  useEffect(() => {
+  const [list, setList] = useState(() => {
     const {
       listForRankingQuestion
-    } = feedback !== null && feedback !== void 0 ? feedback : {};
-
+    } = feedback ?? {};
     if (feedback && listForRankingQuestion && listForRankingQuestion.length > 0) {
       let feedbackToOptions = [];
       let feedbackToNAOptions = [];
@@ -148,17 +138,22 @@ const RankingQuestion = ({
           index,
           isNA
         };
-
         if (isNA) {
           feedbackToNAOptions = [...feedbackToNAOptions, newOption];
         } else {
           feedbackToOptions = [...feedbackToOptions, newOption];
         }
       });
-      setList(listForRankingQuestion);
-    } // eslint-disable-next-line react-hooks/exhaustive-deps
-
-  }, []);
+      return listForRankingQuestion;
+    }
+    return originListRef.current;
+  });
+  const [normalList, setNormalList] = useState(list);
+  const [visible, setVisible] = useState(false);
+  const [selectedOption, setSelectedOption] = useState();
+  useEffect(() => {
+    setNormalList(list.filter(current => !current.isNA));
+  }, [list]);
   useEffect(() => {
     const answers = list.map(({
       isNA,
@@ -171,17 +166,14 @@ const RankingQuestion = ({
       answers,
       type: 'ranking',
       listForRankingQuestion: list // for render usage after page navigations
-
-    }; // @ts-ignore
-
+    };
+    // @ts-ignore
     onFeedback(result);
   }, [list, onFeedback, questionId]);
-
   const onRankPressHandler = item => {
     setSelectedOption(item);
     isIPhone ? oniOSModal(item) : setVisible(true);
   };
-
   const onNAPressHandler = item => {
     if (list) {
       item.isNA = !item.isNA;
@@ -195,14 +187,11 @@ const RankingQuestion = ({
       });
     }
   };
-
   const oniOSModal = selectedItem => {
     let actionSheetOptions = ['Cancel', ...normalList.map((_, index) => (index + 1).toString())];
-
     if (allowNAForRanking) {
       actionSheetOptions = [...actionSheetOptions, 'N/A'];
     }
-
     ActionSheetIOS.showActionSheetWithOptions({
       title: 'Select your rating',
       options: actionSheetOptions,
@@ -228,7 +217,6 @@ const RankingQuestion = ({
       }
     });
   };
-
   const modalContainerStyle = [styles.modalContainer, {
     backgroundColor: isDarkMode ? 'rgb(55,55,55)' : Colors.white
   }];
@@ -280,7 +268,6 @@ const RankingQuestion = ({
       if (selectedOption) {
         onNAPressHandler(selectedOption);
       }
-
       setVisible(false);
     }
   }, /*#__PURE__*/React.createElement(Text, {
@@ -291,7 +278,6 @@ const RankingQuestion = ({
   }, /*#__PURE__*/React.createElement(Text, {
     style: modalItemTitleStyle
   }, 'Cancel'))))));
-
   const renderItem = ({
     item,
     index
@@ -305,23 +291,23 @@ const RankingQuestion = ({
       onNAPress: onNAPressHandler
     });
   };
-
   const onDragEndHandler = newList => {
     setList(prev => {
       const result = newList.map(newData => {
+        // @ts-ignore
         const {
           isNA
         } = prev.filter(({
           option
         }) => option === newData.option)[0];
-        return { ...newData,
+        return {
+          ...newData,
           isNA
         };
       });
       return result;
     });
   };
-
   const [scrollEnabled, setScrollEnabled] = useState(true);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ScrollView, {
     style: styles.container,
@@ -346,7 +332,6 @@ const RankingQuestion = ({
     onDragEnd: onDragEndHandler
   }))), rankingModal);
 };
-
 export default /*#__PURE__*/React.memo(RankingQuestion);
 const styles = StyleSheet.create({
   container: {
@@ -355,7 +340,8 @@ const styles = StyleSheet.create({
   title: {
     marginHorizontal: 16
   },
-  renderItem: { ...GlobalStyle.row,
+  renderItem: {
+    ...GlobalStyle.row,
     minHeight: 50,
     marginVertical: 4,
     borderWidth: 1,
@@ -370,7 +356,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
     fontSize: 15
   },
-  rankingContainer: { ...GlobalStyle.row,
+  rankingContainer: {
+    ...GlobalStyle.row,
     width: 53,
     height: 24,
     borderRadius: 4,
@@ -403,7 +390,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     margin: 3
   },
-  modalBG: { ...GlobalStyle.row,
+  modalBG: {
+    ...GlobalStyle.row,
     justifyContent: 'center',
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.24)'

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,8 +9,9 @@
 
 #include <atomic>
 
-namespace facebook {
-namespace react {
+#include <react/debug/flags.h>
+
+namespace facebook::react {
 
 /*
  * Represents an object which can be *sealed* (imperatively marked as
@@ -24,7 +25,7 @@ namespace react {
  * even if they are explicitly marked as `const`. It means that in some special
  * cases those objects can be const-casted-away and then mutated. That comes
  * from the fact that we share some object's life-cycle responsibilities with
- * React and the immutability is guaranteed by some logic splitted between
+ * React and the immutability is guaranteed by some logic split between
  * native and JavaScript worlds (which makes it impossible to fully use
  * immutability enforcement at a language level). To detect possible errors as
  * early as possible we additionally mark objects as *sealed* after some stages
@@ -42,8 +43,9 @@ namespace react {
  *      must be prevented.
  */
 
-#ifdef NDEBUG
+#ifndef REACT_NATIVE_DEBUG
 
+// Release-mode, production version
 class Sealable {
  public:
   inline void seal() const {}
@@ -55,18 +57,19 @@ class Sealable {
 
 #else
 
+// Debug version
 class Sealable {
  public:
   Sealable();
-  Sealable(const Sealable &other);
-  Sealable(Sealable &&other) noexcept;
+  Sealable(const Sealable& other);
+  Sealable(Sealable&& other) noexcept;
   ~Sealable() noexcept;
-  Sealable &operator=(const Sealable &other);
-  Sealable &operator=(Sealable &&other) noexcept;
+  Sealable& operator=(const Sealable& other);
+  Sealable& operator=(Sealable&& other) noexcept;
 
   /*
    * Seals the object. This operation is irreversible;
-   * the object cannot be "unsealed" after being sealing.
+   * the object cannot be "unsealed" after being sealed.
    */
   void seal() const;
 
@@ -87,5 +90,4 @@ class Sealable {
 
 #endif
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

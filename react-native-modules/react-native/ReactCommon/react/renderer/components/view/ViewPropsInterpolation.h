@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "ViewProps.h"
+#include <react/renderer/components/view/ViewProps.h>
+#include <react/renderer/graphics/Transform.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /**
  * Given animation progress, old props, new props, and an "interpolated" shared
@@ -19,19 +19,15 @@ namespace react {
  */
 static inline void interpolateViewProps(
     Float animationProgress,
-    const SharedProps &oldPropsShared,
-    const SharedProps &newPropsShared,
-    SharedProps &interpolatedPropsShared) {
-  ViewProps const *oldViewProps =
-      dynamic_cast<ViewProps const *>(oldPropsShared.get());
-  ViewProps const *newViewProps =
-      dynamic_cast<ViewProps const *>(newPropsShared.get());
-  ViewProps *interpolatedProps = const_cast<ViewProps *>(
-      dynamic_cast<ViewProps const *>(interpolatedPropsShared.get()));
-
-  assert(
-      oldViewProps != nullptr && newViewProps != nullptr &&
-      interpolatedProps != nullptr);
+    const Props::Shared& oldPropsShared,
+    const Props::Shared& newPropsShared,
+    Props::Shared& interpolatedPropsShared) {
+  const ViewProps* oldViewProps =
+      static_cast<const ViewProps*>(oldPropsShared.get());
+  const ViewProps* newViewProps =
+      static_cast<const ViewProps*>(newPropsShared.get());
+  ViewProps* interpolatedProps = const_cast<ViewProps*>(
+      static_cast<const ViewProps*>(interpolatedPropsShared.get()));
 
   interpolatedProps->opacity = oldViewProps->opacity +
       (newViewProps->opacity - oldViewProps->opacity) * animationProgress;
@@ -47,12 +43,13 @@ static inline void interpolateViewProps(
   // mounting layer. Once we can remove this, we should change `rawProps` to
   // be const again.
 #ifdef ANDROID
-  interpolatedProps->rawProps["opacity"] = interpolatedProps->opacity;
+  if (!interpolatedProps->rawProps.isNull()) {
+    interpolatedProps->rawProps["opacity"] = interpolatedProps->opacity;
 
-  interpolatedProps->rawProps["transform"] =
-      (folly::dynamic)interpolatedProps->transform;
+    interpolatedProps->rawProps["transform"] =
+        (folly::dynamic)interpolatedProps->transform;
+  }
 #endif
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

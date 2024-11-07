@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,13 +9,12 @@
 
 #include <limits>
 
-#include <folly/Hash.h>
 #include <react/renderer/attributedstring/primitives.h>
 #include <react/renderer/debug/DebugStringConvertible.h>
-#include <react/renderer/graphics/Geometry.h>
+#include <react/renderer/graphics/Float.h>
+#include <react/utils/hash_combine.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 class ParagraphAttributes;
 
@@ -42,7 +41,10 @@ class ParagraphAttributes : public DebugStringConvertible {
    */
   EllipsizeMode ellipsizeMode{};
 
-  TextBreakStrategy textBreakStrategy{};
+  /*
+   * (Android only) Break strategy for breaking paragraphs into lines.
+   */
+  TextBreakStrategy textBreakStrategy{TextBreakStrategy::HighQuality};
 
   /*
    * Enables font size adjustment to fit constrained boundaries.
@@ -56,14 +58,20 @@ class ParagraphAttributes : public DebugStringConvertible {
   bool includeFontPadding{true};
 
   /*
+   * (Android only) Frequency of automatic hyphenation to use when determining
+   * word breaks.
+   */
+  HyphenationFrequency android_hyphenationFrequency{};
+
+  /*
    * In case of font size adjustment enabled, defines minimum and maximum
    * font sizes.
    */
   Float minimumFontSize{std::numeric_limits<Float>::quiet_NaN()};
   Float maximumFontSize{std::numeric_limits<Float>::quiet_NaN()};
 
-  bool operator==(const ParagraphAttributes &) const;
-  bool operator!=(const ParagraphAttributes &) const;
+  bool operator==(const ParagraphAttributes&) const;
+  bool operator!=(const ParagraphAttributes&) const;
 
 #pragma mark - DebugStringConvertible
 
@@ -72,24 +80,23 @@ class ParagraphAttributes : public DebugStringConvertible {
 #endif
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react
 
 namespace std {
 
 template <>
 struct hash<facebook::react::ParagraphAttributes> {
   size_t operator()(
-      const facebook::react::ParagraphAttributes &attributes) const {
-    return folly::hash::hash_combine(
-        0,
+      const facebook::react::ParagraphAttributes& attributes) const {
+    return facebook::react::hash_combine(
         attributes.maximumNumberOfLines,
         attributes.ellipsizeMode,
         attributes.textBreakStrategy,
         attributes.adjustsFontSizeToFit,
         attributes.minimumFontSize,
         attributes.maximumFontSize,
-        attributes.includeFontPadding);
+        attributes.includeFontPadding,
+        attributes.android_hyphenationFrequency);
   }
 };
 } // namespace std

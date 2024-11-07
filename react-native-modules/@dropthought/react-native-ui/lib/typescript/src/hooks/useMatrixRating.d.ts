@@ -8,3 +8,4 @@ declare const useMatrixRating: (question: Question, feedback: Feedback, onFeedba
     onColoumPress: (rowIndex: number, coloumIndex: number) => void;
 };
 export default useMatrixRating;
+//# sourceMappingURL=useMatrixRating.d.ts.map

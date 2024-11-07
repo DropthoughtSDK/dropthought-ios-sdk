@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -25,7 +25,7 @@ using namespace facebook::react;
 
 @implementation RCTPullToRefreshViewComponentView {
   UIRefreshControl *_refreshControl;
-  RCTScrollViewComponentView *_scrollViewComponentView;
+  RCTScrollViewComponentView *__weak _scrollViewComponentView;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -36,10 +36,10 @@ using namespace facebook::react;
     // The pull-to-refresh view is not a subview of this view.
     self.hidden = YES;
 
-    static auto const defaultProps = std::make_shared<PullToRefreshViewProps const>();
+    static const auto defaultProps = std::make_shared<const PullToRefreshViewProps>();
     _props = defaultProps;
 
-    _refreshControl = [[UIRefreshControl alloc] init];
+    _refreshControl = [UIRefreshControl new];
     [_refreshControl addTarget:self
                         action:@selector(handleUIControlEventValueChanged)
               forControlEvents:UIControlEventValueChanged];
@@ -55,10 +55,10 @@ using namespace facebook::react;
   return concreteComponentDescriptorProvider<PullToRefreshViewComponentDescriptor>();
 }
 
-- (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
+- (void)updateProps:(const Props::Shared &)props oldProps:(const Props::Shared &)oldProps
 {
-  auto const &oldConcreteProps = *std::static_pointer_cast<PullToRefreshViewProps const>(_props);
-  auto const &newConcreteProps = *std::static_pointer_cast<PullToRefreshViewProps const>(props);
+  const auto &oldConcreteProps = static_cast<const PullToRefreshViewProps &>(*_props);
+  const auto &newConcreteProps = static_cast<const PullToRefreshViewProps &>(*props);
 
   if (newConcreteProps.refreshing != oldConcreteProps.refreshing) {
     if (newConcreteProps.refreshing) {
@@ -89,12 +89,12 @@ using namespace facebook::react;
 
 - (void)handleUIControlEventValueChanged
 {
-  std::static_pointer_cast<PullToRefreshViewEventEmitter const>(_eventEmitter)->onRefresh({});
+  static_cast<const PullToRefreshViewEventEmitter &>(*_eventEmitter).onRefresh({});
 }
 
 - (void)_updateTitle
 {
-  auto const &concreteProps = *std::static_pointer_cast<PullToRefreshViewProps const>(_props);
+  const auto &concreteProps = static_cast<const PullToRefreshViewProps &>(*_props);
 
   if (concreteProps.title.empty()) {
     _refreshControl.attributedTitle = nil;
@@ -132,7 +132,7 @@ using namespace facebook::react;
     return;
   }
 
-  if (@available(macOS 13.0, *)) {
+  if (@available(macCatalyst 13.1, *)) {
     _scrollViewComponentView.scrollView.refreshControl = _refreshControl;
   }
 }
@@ -146,7 +146,7 @@ using namespace facebook::react;
   // iOS requires to end refreshing before unmounting.
   [_refreshControl endRefreshing];
 
-  if (@available(macOS 13.0, *)) {
+  if (@available(macCatalyst 13.1, *)) {
     _scrollViewComponentView.scrollView.refreshControl = nil;
   }
   _scrollViewComponentView = nil;

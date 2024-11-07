@@ -9,11 +9,13 @@
  */
 import * as React from 'react';
 import type { Survey } from '../data';
-declare type Props = {
+type Props = {
     survey: Survey;
     pageIndex: number;
+    isLast: boolean;
     onPrevPage: () => void;
     onNextPage: () => void;
 };
-declare const _default: React.MemoExoticComponent<(props: Props) => JSX.Element>;
+declare const _default: React.MemoExoticComponent<(props: Props) => React.JSX.Element>;
 export default _default;
+//# sourceMappingURL=ClassicSurveyFooter.d.ts.map

@@ -14,7 +14,6 @@ import Button from '../components/Button';
 import { GlobalStyle } from '../styles';
 import i18n from '../translation';
 import { useTheme } from '../contexts/theme';
-
 const DummyButton = ({
   width
 }) => /*#__PURE__*/React.createElement(View, {
@@ -22,7 +21,6 @@ const DummyButton = ({
     width
   }
 });
-
 const ClassicSurveyFooter = props => {
   const {
     hexCode
@@ -32,31 +30,33 @@ const ClassicSurveyFooter = props => {
   const {
     survey,
     pageIndex = 0,
+    isLast,
     onPrevPage,
     onNextPage
   } = props;
-  const lastPage = pageIndex === survey.pageOrder.length - 1; // why use a dummy button here? we use 'space-between' to layout the buttons
 
+  // why use a dummy button here? we use 'space-between' to layout the buttons
   let LeftButtonComponent = Button;
-
   if (!pageIndex || pageIndex <= 0) {
     // @ts-ignore
     LeftButtonComponent = DummyButton;
   }
-
   const themeColor = hexCode;
   const btnWidth = dimensionWidthType === DimensionWidthType.phone ? 76 : 100;
   const [submitDisabled, setSubmitDisabled] = React.useState(false);
   return /*#__PURE__*/React.createElement(View, {
     style: [styles.container, rtl && GlobalStyle.flexRowReverse]
   }, /*#__PURE__*/React.createElement(LeftButtonComponent, {
+    testID: "test:id/button_back_preview",
     width: btnWidth,
     title: survey.backPage,
     color: themeColor,
-    onPress: onPrevPage // @ts-ignore
+    onPress: onPrevPage
+    // @ts-ignore
     ,
     containerStyle: styles.leftBtnContainer
-  }), lastPage ? /*#__PURE__*/React.createElement(Button, {
+  }), isLast ? /*#__PURE__*/React.createElement(Button, {
+    testID: "test:id/button_submit_preview",
     disabled: submitDisabled,
     width: btnWidth,
     title: survey.submitSurvey,
@@ -65,19 +65,21 @@ const ClassicSurveyFooter = props => {
       setSubmitDisabled(true);
       setTimeout(() => setSubmitDisabled(false), 1000);
       onNextPage();
-    } // @ts-ignore
+    }
+    // @ts-ignore
     ,
     containerStyle: styles.rightBtnContainer
   }) : /*#__PURE__*/React.createElement(Button, {
+    testID: "test:id/button_next_preview",
     width: btnWidth,
     title: survey.nextPage,
     color: themeColor,
-    onPress: onNextPage // @ts-ignore
+    onPress: onNextPage
+    // @ts-ignore
     ,
     containerStyle: styles.rightBtnContainer
   }));
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

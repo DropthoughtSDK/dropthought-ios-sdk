@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,17 +8,15 @@
  * @format
  */
 
-'use strict';
-import Colors from './Colors';
 import type {Node} from 'react';
-import openURLInBrowser from 'react-native/Libraries/Core/Devtools/openURLInBrowser';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  useColorScheme,
-  View,
-} from 'react-native';
+
+import TouchableOpacity from '../../Components/Touchable/TouchableOpacity';
+import View from '../../Components/View/View';
+import openURLInBrowser from '../../Core/Devtools/openURLInBrowser';
+import StyleSheet from '../../StyleSheet/StyleSheet';
+import Text from '../../Text/Text';
+import useColorScheme from '../../Utilities/useColorScheme';
+import Colors from './Colors';
 import React, {Fragment} from 'react';
 
 const links = [
@@ -62,13 +60,20 @@ const links = [
   },
   {
     id: 7,
+    title: 'Debugging',
+    link: 'https://facebook.github.io/react-native/docs/debugging',
+    description:
+      'Learn about the tools available to debug and inspect your app.',
+  },
+  {
+    id: 8,
     title: 'Help',
-    link: 'https://reactnative.dev/help',
+    link: 'https://facebook.github.io/react-native/help',
     description:
       'Need more help? There are many other React Native developers who may have the answer.',
   },
   {
-    id: 8,
+    id: 9,
     title: 'Follow us on Twitter',
     link: 'https://twitter.com/reactnative',
     description:

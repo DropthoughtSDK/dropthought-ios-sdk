@@ -22,7 +22,7 @@ export default function EndScreenLayout({
   switch (themeOption) {
     case THEME_OPTION.CLASSIC:
     case THEME_OPTION.BIJLIRIDE:
-      return <ClassicEndScreen survey={survey} />;
+      return <ClassicEndScreen survey={survey} onClose={onClose} />;
     default:
       return <EndScreen survey={survey} onClose={onClose} />;
   }

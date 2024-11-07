@@ -3,12 +3,8 @@ import { useColorScheme } from 'react-native';
 import { Colors } from '../../styles';
 import { ThemeContext } from './ThemeContext';
 import { APPEARANCE, COLOR_SCHEMES, THEME_OPTION } from './theme.const';
-
 function getColorScheme(appearance, systemColorScheme) {
-  var _colorScheme;
-
   let colorScheme;
-
   if (appearance === APPEARANCE.SYSTEM) {
     if (systemColorScheme) {
       colorScheme = COLOR_SCHEMES[systemColorScheme];
@@ -16,40 +12,34 @@ function getColorScheme(appearance, systemColorScheme) {
   } else if ([APPEARANCE.LIGHT, APPEARANCE.DARK].includes(appearance)) {
     colorScheme = COLOR_SCHEMES[appearance];
   }
-
-  return (_colorScheme = colorScheme) !== null && _colorScheme !== void 0 ? _colorScheme : COLOR_SCHEMES.light;
+  return colorScheme ?? COLOR_SCHEMES.light;
 }
-
 function getFontColor(customFontColor, colorScheme) {
   if (customFontColor) {
     return customFontColor;
   }
-
   if (colorScheme === COLOR_SCHEMES.dark) {
     return Colors.fontColorDark;
   }
-
   return Colors.fontColorLight;
 }
-
 function getBackgroundColor(customBackgroundColor, colorScheme) {
   if (customBackgroundColor) {
     return customBackgroundColor;
   }
-
   if (colorScheme === COLOR_SCHEMES.dark) {
     return Colors.backgroundColorDark;
   }
-
   return Colors.backgroundColorLight;
 }
-
 function useTheme({
   themeOption,
   appearance,
   hexCode,
   fontColor: customFontColor,
-  backgroundColor: customBackgroundColor
+  backgroundColor: customBackgroundColor,
+  autoClose,
+  autoCloseCountdown
 }) {
   const systemColorScheme = useColorScheme();
   const colorScheme = getColorScheme(appearance, systemColorScheme);
@@ -63,31 +53,34 @@ function useTheme({
       fontColor,
       backgroundColor,
       customFontColor,
-      customBackgroundColor
+      customBackgroundColor,
+      autoClose,
+      autoCloseCountdown
     };
-  }, [themeOption, hexCode, colorScheme, fontColor, backgroundColor, customFontColor, customBackgroundColor]);
+  }, [themeOption, hexCode, colorScheme, fontColor, backgroundColor, customFontColor, customBackgroundColor, autoClose, autoCloseCountdown]);
 }
-
 export function ThemeProvider({
   children,
   themeOption,
   appearance,
   hexCode,
   fontColor,
-  backgroundColor
+  backgroundColor,
+  autoClose,
+  autoCloseCountdown
 }) {
   let transformedHexCode = hexCode;
-
   if (themeOption === THEME_OPTION.BIJLIRIDE) {
     transformedHexCode = Colors.bijlirideHexCode;
   }
-
   const themeValue = useTheme({
     themeOption,
     appearance,
     hexCode: transformedHexCode,
     fontColor,
-    backgroundColor
+    backgroundColor,
+    autoClose,
+    autoCloseCountdown
   });
   return /*#__PURE__*/React.createElement(ThemeContext.Provider, {
     value: themeValue

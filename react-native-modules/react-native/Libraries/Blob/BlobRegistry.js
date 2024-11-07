@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,27 +8,32 @@
  * @format
  */
 
-const registry: {[key: string]: number, ...} = {};
+const registry: Map<string, number> = new Map();
 
 const register = (id: string) => {
-  if (registry[id]) {
-    registry[id]++;
+  const used = registry.get(id);
+
+  if (used != null) {
+    registry.set(id, used + 1);
   } else {
-    registry[id] = 1;
+    registry.set(id, 1);
   }
 };
 
 const unregister = (id: string) => {
-  if (registry[id]) {
-    registry[id]--;
-    if (registry[id] <= 0) {
-      delete registry[id];
+  const used = registry.get(id);
+
+  if (used != null) {
+    if (used <= 1) {
+      registry.delete(id);
+    } else {
+      registry.set(id, used - 1);
     }
   }
 };
 
 const has = (id: string): number | boolean => {
-  return registry[id] && registry[id] > 0;
+  return registry.get(id) || false;
 };
 
 module.exports = {

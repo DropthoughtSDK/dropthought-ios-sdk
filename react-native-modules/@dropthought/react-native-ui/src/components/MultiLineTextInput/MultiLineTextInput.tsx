@@ -1,12 +1,6 @@
 import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  KeyboardTypeOptions,
-  Platform,
-  Keyboard,
-} from 'react-native';
+import { View, Text, TextInput, Platform, Keyboard } from 'react-native';
+import type { KeyboardTypeOptions } from 'react-native';
 import styles from './MultiLineTextInput.styles';
 import { QuestionMetaDataType } from '../../utils/data';
 import i18n from '../../translation';

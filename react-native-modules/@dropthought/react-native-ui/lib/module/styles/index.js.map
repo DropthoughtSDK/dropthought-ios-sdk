@@ -1,1 +1,1 @@
-{"version":3,"sources":["index.ts"],"names":["GlobalStyle"],"mappings":"AAAA,cAAc,UAAd;AAEA,SAASA,WAAT,QAA4B,eAA5B;AACA,eAAeA,WAAf;AAEA,cAAc,eAAd","sourcesContent":["export * from './Colors';\n\nimport { GlobalStyle } from './GlobalStyle';\nexport default GlobalStyle;\n\nexport * from './GlobalStyle';\n"]}
+{"version":3,"names":["GlobalStyle"],"sourceRoot":"../../../src","sources":["styles/index.ts"],"mappings":"AAAA,cAAc,UAAU;AAExB,SAASA,WAAW,QAAQ,eAAe;AAC3C,eAAeA,WAAW;AAE1B,cAAc,eAAe"}

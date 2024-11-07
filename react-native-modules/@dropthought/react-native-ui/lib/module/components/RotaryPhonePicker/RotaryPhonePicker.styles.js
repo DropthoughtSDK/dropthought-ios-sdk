@@ -1,23 +1,19 @@
 import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   container: {
-    alignItems: 'center',
     backgroundColor: '#071B43',
     width: 400,
     height: 400,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 200
   },
   content: {
     width: 250,
     height: 250,
-    position: 'relative',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    top: 75,
     backgroundColor: '#FCF268',
-    borderRadius: 125,
-    margin: 'auto'
+    borderRadius: 125
   },
   item: {
     position: 'absolute',
@@ -28,6 +24,10 @@ export default StyleSheet.create({
   cursor: {
     position: 'absolute',
     top: 100
+  },
+  lottieContent: {
+    width: '100%',
+    height: '100%'
   }
 });
 //# sourceMappingURL=RotaryPhonePicker.styles.js.map

@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Dimensions, ScaledSize } from 'react-native';
+import { Dimensions } from 'react-native';
+import type { ScaledSize } from 'react-native';
 
 type DimensionsType = {
   height: number;

@@ -1,14 +1,14 @@
 import type * as React from 'react';
 import type { Animated, ImageSourcePropType, ViewStyle } from 'react-native';
-export declare type Dimensions = {
+export type Dimensions = {
     height: number;
     width: number;
 };
 /**
  * Callback for slider change events. The second number value will be only if provided an array with two values in `value` prop
  */
-export declare type SliderOnChangeCallback = (value: number | Array<number>) => void;
-export declare type SliderProps = {
+export type SliderOnChangeCallback = (value: number | Array<number>) => void;
+export type SliderProps = {
     animateTransitions?: boolean;
     animationConfig?: {
         spring?: Animated.AnimatedProps<ViewStyle>;
@@ -47,14 +47,14 @@ export declare type SliderProps = {
     startFromZero?: boolean;
     vertical?: boolean;
 };
-export declare type SliderState = {
+export type SliderState = {
     allMeasured: boolean;
     containerSize: Dimensions;
     thumbSize: Dimensions;
     trackMarksValues?: Array<Animated.Value>;
     values: Array<Animated.Value>;
 };
-export declare type SliderContainerProps = {
+export type SliderContainerProps = {
     children?: React.ReactElement;
     value: number;
     setValue: React.Dispatch<React.SetStateAction<number[]>>;
@@ -66,4 +66,5 @@ export declare type SliderContainerProps = {
     containerStyle?: ViewStyle;
     onCustomValueChange: () => void;
 };
-export declare type CustomSliderProps = SliderProps & SliderContainerProps;
+export type CustomSliderProps = SliderProps & SliderContainerProps;
+//# sourceMappingURL=types.d.ts.map

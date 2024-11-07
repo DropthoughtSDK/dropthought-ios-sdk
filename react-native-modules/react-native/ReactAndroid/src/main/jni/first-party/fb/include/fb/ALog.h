@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -21,42 +21,42 @@ namespace alog {
 
 template <typename... ARGS>
 inline void
-log(int level, const char *tag, const char *msg, ARGS... args) noexcept {
+log(int level, const char* tag, const char* msg, ARGS... args) noexcept {
   __android_log_print(level, tag, msg, args...);
 }
 
 template <typename... ARGS>
-inline void log(int level, const char *tag, const char *msg) noexcept {
+inline void log(int level, const char* tag, const char* msg) noexcept {
   __android_log_write(level, tag, msg);
 }
 
 template <typename... ARGS>
-inline void logv(const char *tag, const char *msg, ARGS... args) noexcept {
+inline void logv(const char* tag, const char* msg, ARGS... args) noexcept {
   log(ANDROID_LOG_VERBOSE, tag, msg, args...);
 }
 
 template <typename... ARGS>
-inline void logd(const char *tag, const char *msg, ARGS... args) noexcept {
+inline void logd(const char* tag, const char* msg, ARGS... args) noexcept {
   log(ANDROID_LOG_DEBUG, tag, msg, args...);
 }
 
 template <typename... ARGS>
-inline void logi(const char *tag, const char *msg, ARGS... args) noexcept {
+inline void logi(const char* tag, const char* msg, ARGS... args) noexcept {
   log(ANDROID_LOG_INFO, tag, msg, args...);
 }
 
 template <typename... ARGS>
-inline void logw(const char *tag, const char *msg, ARGS... args) noexcept {
+inline void logw(const char* tag, const char* msg, ARGS... args) noexcept {
   log(ANDROID_LOG_WARN, tag, msg, args...);
 }
 
 template <typename... ARGS>
-inline void loge(const char *tag, const char *msg, ARGS... args) noexcept {
+inline void loge(const char* tag, const char* msg, ARGS... args) noexcept {
   log(ANDROID_LOG_ERROR, tag, msg, args...);
 }
 
 template <typename... ARGS>
-inline void logf(const char *tag, const char *msg, ARGS... args) noexcept {
+inline void logf(const char* tag, const char* msg, ARGS... args) noexcept {
   log(ANDROID_LOG_FATAL, tag, msg, args...);
 }
 

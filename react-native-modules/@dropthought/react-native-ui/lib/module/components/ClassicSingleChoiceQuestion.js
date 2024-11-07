@@ -6,16 +6,13 @@ import ClassicMandatoryTitle from './ClassicMandatoryTitle';
 import OptionWithHighlight from './OptionWithHighlight';
 import OtherOptionWithHighlight from './OtherOptionWithHighlight';
 import { getOptionsFromQuestion } from '../utils/data';
-
 class ClassicSingleChoiceQuestion extends PureComponent {
   constructor(props) {
     super(props);
     let otherText = '';
-
     function getInitialValueFromFeedbackProps() {
       if (props.feedback && props.feedback.answers && !isNil(props.feedback.answers[0])) {
         const answer = props.feedback.answers[0];
-
         if (Number.isInteger(answer)) {
           return answer;
         } else {
@@ -26,10 +23,8 @@ class ClassicSingleChoiceQuestion extends PureComponent {
           return props.question.options.length;
         }
       }
-
       return undefined;
     }
-
     this.onFeedback = this.onFeedback.bind(this);
     this.onChangeValueHandler = this.onChangeValueHandler.bind(this);
     this.state = {
@@ -38,9 +33,9 @@ class ClassicSingleChoiceQuestion extends PureComponent {
       options: getOptionsFromQuestion(props.question),
       otherText
     };
-  } // when normal option is pressed, set the id(index) as answer
+  }
 
-
+  // when normal option is pressed, set the id(index) as answer
   onFeedback(id) {
     this.setState({
       value: id,
@@ -52,9 +47,9 @@ class ClassicSingleChoiceQuestion extends PureComponent {
       answers: [id],
       type: 'singleChoice'
     });
-  } // when other option's value is changed, newValues is {checked: boolean, value: string}
+  }
 
-
+  // when other option's value is changed, newValues is {checked: boolean, value: string}
   onChangeValueHandler(index, newValue) {
     this.setState({
       // if newValues is checked, set value to this index
@@ -71,14 +66,12 @@ class ClassicSingleChoiceQuestion extends PureComponent {
       otherFlag: newValue.checked
     });
   }
-
   renderRadios() {
     return this.state.options.map(({
       title: option,
       isOther
     }, index) => {
       const isActive = this.state.value === index;
-
       if (isOther) {
         return /*#__PURE__*/React.createElement(OtherOptionWithHighlight, {
           id: index,
@@ -92,7 +85,6 @@ class ClassicSingleChoiceQuestion extends PureComponent {
           question: this.props.question
         });
       }
-
       return /*#__PURE__*/React.createElement(OptionWithHighlight, {
         id: index,
         key: index,
@@ -103,7 +95,6 @@ class ClassicSingleChoiceQuestion extends PureComponent {
       });
     });
   }
-
   render() {
     return /*#__PURE__*/React.createElement(View, {
       style: GlobalStyle.questionContainer
@@ -115,9 +106,7 @@ class ClassicSingleChoiceQuestion extends PureComponent {
       style: styles.radioForm
     }, this.renderRadios()));
   }
-
 }
-
 const styles = StyleSheet.create({
   radioForm: {
     marginTop: 20

@@ -1,5 +1,5 @@
 import { isEmpty } from 'ramda';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { apiPostEvent } from './API';
 import QueueStorage from './QueueStorage';
 const KEY_FEEDBACKS = 'KEY_FEEDBACKS';

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,11 +10,11 @@
 #include <folly/dynamic.h>
 #include <jsi/jsi.h>
 #include <react/renderer/core/RawValue.h>
+#include <react/renderer/uimanager/PointerEventsProcessor.h>
 #include <react/renderer/uimanager/UIManager.h>
 #include <react/renderer/uimanager/primitives.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * Exposes UIManager to JavaScript realm.
@@ -24,47 +24,36 @@ class UIManagerBinding : public jsi::HostObject {
   /*
    * Installs UIManagerBinding into JavaScript runtime if needed.
    * Creates and sets `UIManagerBinding` into the global namespace.
-   * In case if the global namespace already has a `UIManagerBinding` installed,
-   * returns that.
    * Thread synchronization must be enforced externally.
    */
-  static std::shared_ptr<UIManagerBinding> createAndInstallIfNeeded(
-      jsi::Runtime &runtime);
-
-  ~UIManagerBinding();
-
-  /*
-   * Establish a relationship between `UIManager` and `UIManagerBinding` by
-   * setting internal pointers to each other.
-   * Must be called on JavaScript thread or during VM destruction.
-   */
-  void attach(std::shared_ptr<UIManager> const &uiManager);
+  static void createAndInstallIfNeeded(
+      jsi::Runtime& runtime,
+      const std::shared_ptr<UIManager>& uiManager);
 
   /*
-   * Starts React Native Surface with given id, moduleName, and props.
+   * Returns a pointer to UIManagerBinding previously installed into a runtime.
    * Thread synchronization must be enforced externally.
    */
-  void startSurface(
-      jsi::Runtime &runtime,
-      SurfaceId surfaceId,
-      std::string const &moduleName,
-      folly::dynamic const &initalProps) const;
+  static std::shared_ptr<UIManagerBinding> getBinding(jsi::Runtime& runtime);
 
-  /*
-   * Stops React Native Surface with given id.
-   * Thread synchronization must be enforced externally.
-   */
-  void stopSurface(jsi::Runtime &runtime, SurfaceId surfaceId) const;
+  UIManagerBinding(std::shared_ptr<UIManager> uiManager);
+
+  ~UIManagerBinding() override;
+
+  jsi::Value getInspectorDataForInstance(
+      jsi::Runtime& runtime,
+      const EventEmitter& eventEmitter) const;
 
   /*
    * Delivers raw event data to JavaScript.
    * Thread synchronization must be enforced externally.
    */
   void dispatchEvent(
-      jsi::Runtime &runtime,
-      EventTarget const *eventTarget,
-      std::string const &type,
-      ValueFactory const &payloadFactory) const;
+      jsi::Runtime& runtime,
+      const EventTarget* eventTarget,
+      const std::string& type,
+      ReactEventPriority priority,
+      const EventPayload& payload) const;
 
   /*
    * Invalidates the binding and underlying UIManager.
@@ -78,12 +67,26 @@ class UIManagerBinding : public jsi::HostObject {
   /*
    * `jsi::HostObject` specific overloads.
    */
-  jsi::Value get(jsi::Runtime &runtime, jsi::PropNameID const &name) override;
+  jsi::Value get(jsi::Runtime& runtime, const jsi::PropNameID& name) override;
+
+  UIManager& getUIManager();
 
  private:
+  /*
+   * Internal method that sends the event to JS. Should only be called from
+   * UIManagerBinding::dispatchEvent.
+   */
+  void dispatchEventToJS(
+      jsi::Runtime& runtime,
+      const EventTarget* eventTarget,
+      const std::string& type,
+      ReactEventPriority priority,
+      const EventPayload& payload) const;
+
   std::shared_ptr<UIManager> uiManager_;
-  std::unique_ptr<EventHandler const> eventHandler_;
+  std::unique_ptr<const EventHandler> eventHandler_;
+  mutable PointerEventsProcessor pointerEventsProcessor_;
+  mutable ReactEventPriority currentEventPriority_;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

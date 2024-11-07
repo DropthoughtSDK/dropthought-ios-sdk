@@ -4,15 +4,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireDefault(require("react"));
-
 var _reactNative = require("react-native");
-
 var _styles = require("../styles");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 const ActivityIndicatorMask = ({
   loading = false,
   style
@@ -23,7 +18,5 @@ const ActivityIndicatorMask = ({
     color: "gray"
   })) : null;
 };
-
-var _default = ActivityIndicatorMask;
-exports.default = _default;
+var _default = exports.default = ActivityIndicatorMask;
 //# sourceMappingURL=ActivityIndicatorMask.js.map

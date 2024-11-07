@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -18,12 +18,17 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
+import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.TintContextWrapper;
+import androidx.core.view.AccessibilityDelegateCompat;
+import androidx.core.view.ViewCompat;
+import androidx.customview.widget.ExploreByTouchHelper;
 import com.facebook.common.logging.FLog;
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.Arguments;
@@ -48,24 +53,103 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
       new ViewGroup.LayoutParams(0, 0);
 
   private boolean mContainsImages;
-  private int mDefaultGravityHorizontal;
-  private int mDefaultGravityVertical;
-  private int mTextAlign = Gravity.NO_GRAVITY;
-  private int mNumberOfLines = ViewDefaults.NUMBER_OF_LINES;
-  private TextUtils.TruncateAt mEllipsizeLocation = TextUtils.TruncateAt.END;
-  private boolean mAdjustsFontSizeToFit = false;
-  private int mLinkifyMaskType = 0;
+  private final int mDefaultGravityHorizontal;
+  private final int mDefaultGravityVertical;
+  private int mNumberOfLines;
+  private TextUtils.TruncateAt mEllipsizeLocation;
+  private boolean mAdjustsFontSizeToFit;
+  private float mFontSize = Float.NaN;
+  private float mLetterSpacing = Float.NaN;
+  private int mLinkifyMaskType;
   private boolean mNotifyOnInlineViewLayout;
+  private boolean mTextIsSelectable;
 
   private ReactViewBackgroundManager mReactBackgroundManager;
   private Spannable mSpanned;
 
   public ReactTextView(Context context) {
     super(context);
-    mReactBackgroundManager = new ReactViewBackgroundManager(this);
-    mDefaultGravityHorizontal =
-        getGravity() & (Gravity.HORIZONTAL_GRAVITY_MASK | Gravity.RELATIVE_HORIZONTAL_GRAVITY_MASK);
+
+    // Get these defaults only during the constructor - these should never be set otherwise
+    mDefaultGravityHorizontal = getGravityHorizontal();
     mDefaultGravityVertical = getGravity() & Gravity.VERTICAL_GRAVITY_MASK;
+
+    initView();
+  }
+
+  /**
+   * Set all default values here as opposed to in the constructor or field defaults. It is important
+   * that these properties are set during the constructor, but also on-demand whenever an existing
+   * ReactTextView is recycled.
+   */
+  private void initView() {
+    if (mReactBackgroundManager != null) {
+      // make sure old background manager doesn't have any references back to this View
+      mReactBackgroundManager.cleanup();
+    }
+
+    mReactBackgroundManager = new ReactViewBackgroundManager(this);
+
+    mNumberOfLines = ViewDefaults.NUMBER_OF_LINES;
+    mAdjustsFontSizeToFit = false;
+    mLinkifyMaskType = 0;
+    mNotifyOnInlineViewLayout = false;
+    mTextIsSelectable = false;
+    mEllipsizeLocation = TextUtils.TruncateAt.END;
+
+    mSpanned = null;
+  }
+
+  /* package */ void recycleView() {
+    // Set default field values
+    initView();
+
+    // Defaults for these fields:
+    // https://github.com/aosp-mirror/platform_frameworks_base/blob/master/core/java/android/widget/TextView.java#L1061
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      setBreakStrategy(Layout.BREAK_STRATEGY_SIMPLE);
+    }
+    setMovementMethod(getDefaultMovementMethod());
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      setJustificationMode(Layout.JUSTIFICATION_MODE_NONE);
+    }
+
+    // reset text
+    setLayoutParams(EMPTY_LAYOUT_PARAMS);
+    super.setText(null);
+
+    // Call setters to ensure that any super setters are called
+    setGravityHorizontal(mDefaultGravityHorizontal);
+    setGravityVertical(mDefaultGravityVertical);
+    setNumberOfLines(mNumberOfLines);
+    setAdjustFontSizeToFit(mAdjustsFontSizeToFit);
+    setLinkifyMask(mLinkifyMaskType);
+    setTextIsSelectable(mTextIsSelectable);
+
+    // Default true:
+    // https://github.com/aosp-mirror/platform_frameworks_base/blob/master/core/java/android/widget/TextView.java#L9347
+    setIncludeFontPadding(true);
+    setEnabled(true);
+
+    // reset data detectors
+    setLinkifyMask(0);
+
+    setEllipsizeLocation(mEllipsizeLocation);
+
+    // View flags - defaults are here:
+    // https://android.googlesource.com/platform/frameworks/base/+/98e54bb941cb6feb07127b75da37833281951d52/core/java/android/view/View.java#5311
+    //         mViewFlags = SOUND_EFFECTS_ENABLED | HAPTIC_FEEDBACK_ENABLED |
+    // LAYOUT_DIRECTION_INHERIT;
+    setEnabled(true);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      setFocusable(View.FOCUSABLE_AUTO);
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NONE);
+    }
+
+    updateView(); // call after changing ellipsizeLocation in particular
   }
 
   private static WritableMap inlineViewJson(
@@ -124,6 +208,17 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
 
     Spanned text = (Spanned) getText();
     Layout layout = getLayout();
+    if (layout == null) {
+      // Text layout is calculated during pre-draw phase, so in some cases it can be empty during
+      // layout phase, which usually happens before drawing.
+      // The text layout is created by private {@link assumeLayout} method, which we can try to
+      // invoke directly through reflection or indirectly through some methods that compute it
+      // (e.g. {@link getExtendedPaddingTop}).
+      // It is safer, however, to just early return here, as next measure/layout passes are way more
+      // likely to have the text layout computed.
+      return;
+    }
+
     TextInlineViewPlaceholderSpan[] placeholders =
         text.getSpans(0, text.length(), TextInlineViewPlaceholderSpan.class);
     ArrayList inlineViewInfoArray =
@@ -172,11 +267,14 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
         // the last offset in the layout will result in an endless loop. Work around
         // this bug by avoiding getPrimaryHorizontal in that case.
         if (start == text.length() - 1) {
+          boolean endsWithNewLine =
+              text.length() > 0 && text.charAt(layout.getLineEnd(line) - 1) == '\n';
+          float lineWidth = endsWithNewLine ? layout.getLineMax(line) : layout.getLineWidth(line);
           placeholderHorizontalPosition =
               isRtlParagraph
                   // Equivalent to `layout.getLineLeft(line)` but `getLineLeft` returns incorrect
                   // values when the paragraph is RTL and `setSingleLine(true)`.
-                  ? textViewWidth - (int) layout.getLineWidth(line)
+                  ? textViewWidth - (int) lineWidth
                   : (int) layout.getLineRight(line) - width;
         } else {
           // The direction of the paragraph may not be exactly the direction the string is heading
@@ -286,7 +384,7 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
     // operation
     // TODO T56559197: remove this condition when we migrate 100% to Fabric
     if (paddingLeft != UNSET
-        && paddingBottom != UNSET
+        && paddingTop != UNSET
         && paddingRight != UNSET
         && paddingBottom != UNSET) {
 
@@ -298,10 +396,9 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
     }
 
     int nextTextAlign = update.getTextAlign();
-    if (mTextAlign != nextTextAlign) {
-      mTextAlign = nextTextAlign;
+    if (nextTextAlign != getGravityHorizontal()) {
+      setGravityHorizontal(nextTextAlign);
     }
-    setGravityHorizontal(mTextAlign);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       if (getBreakStrategy() != update.getTextBreakStrategy()) {
         setBreakStrategy(update.getTextBreakStrategy());
@@ -359,7 +456,7 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
         for (int i = 0; i < spans.length; i++) {
           int spanStart = spannedText.getSpanStart(spans[i]);
           int spanEnd = spannedText.getSpanEnd(spans[i]);
-          if (spanEnd > index && (spanEnd - spanStart) <= targetSpanTextLength) {
+          if (spanEnd >= index && (spanEnd - spanStart) <= targetSpanTextLength) {
             target = spans[i].getReactTag();
             targetSpanTextLength = (spanEnd - spanStart);
           }
@@ -423,8 +520,15 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
   }
 
   @Override
+  public void setTextIsSelectable(boolean selectable) {
+    mTextIsSelectable = selectable;
+    super.setTextIsSelectable(selectable);
+  }
+
+  @Override
   public void onAttachedToWindow() {
     super.onAttachedToWindow();
+    setTextIsSelectable(mTextIsSelectable);
     if (mContainsImages && getText() instanceof Spanned) {
       Spanned text = (Spanned) getText();
       TextInlineImageSpan[] spans = text.getSpans(0, text.length(), TextInlineImageSpan.class);
@@ -451,6 +555,11 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
     return false;
   }
 
+  /* package */ int getGravityHorizontal() {
+    return getGravity()
+        & (Gravity.HORIZONTAL_GRAVITY_MASK | Gravity.RELATIVE_HORIZONTAL_GRAVITY_MASK);
+  }
+
   /* package */ void setGravityHorizontal(int gravityHorizontal) {
     if (gravityHorizontal == 0) {
       gravityHorizontal = mDefaultGravityHorizontal;
@@ -471,12 +580,34 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
 
   public void setNumberOfLines(int numberOfLines) {
     mNumberOfLines = numberOfLines == 0 ? ViewDefaults.NUMBER_OF_LINES : numberOfLines;
-    setSingleLine(mNumberOfLines == 1);
     setMaxLines(mNumberOfLines);
   }
 
   public void setAdjustFontSizeToFit(boolean adjustsFontSizeToFit) {
     mAdjustsFontSizeToFit = adjustsFontSizeToFit;
+  }
+
+  public void setFontSize(float fontSize) {
+    mFontSize =
+        mAdjustsFontSizeToFit
+            ? (float) Math.ceil(PixelUtil.toPixelFromSP(fontSize))
+            : (float) Math.ceil(PixelUtil.toPixelFromDIP(fontSize));
+
+    applyTextAttributes();
+  }
+
+  public void setLetterSpacing(float letterSpacing) {
+    if (Float.isNaN(letterSpacing)) {
+      return;
+    }
+
+    float letterSpacingPixels = PixelUtil.toPixelFromDIP(letterSpacing);
+
+    // `letterSpacingPixels` and `getEffectiveFontSize` are both in pixels,
+    // yielding an accurate em value.
+    mLetterSpacing = letterSpacingPixels / mFontSize;
+
+    applyTextAttributes();
   }
 
   public void setEllipsizeLocation(TextUtils.TruncateAt ellipsizeLocation) {
@@ -531,5 +662,34 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
 
   public void setLinkifyMask(int mask) {
     mLinkifyMaskType = mask;
+  }
+
+  @Override
+  protected boolean dispatchHoverEvent(MotionEvent event) {
+    // if this view has an accessibility delegate set, and that delegate supports virtual view
+    // children (used for links), pass the hover event along to it so that touching and holding on
+    // this text will properly move focus to the virtual children.
+    if (ViewCompat.hasAccessibilityDelegate(this)) {
+      AccessibilityDelegateCompat delegate = ViewCompat.getAccessibilityDelegate(this);
+      if (delegate instanceof ExploreByTouchHelper) {
+        return ((ExploreByTouchHelper) delegate).dispatchHoverEvent(event)
+            || super.dispatchHoverEvent(event);
+      }
+    }
+
+    return super.dispatchHoverEvent(event);
+  }
+
+  private void applyTextAttributes() {
+    // Workaround for an issue where text can be cut off with an ellipsis when
+    // using certain font sizes and padding. Sets the provided text size and
+    // letter spacing to ensure consistent rendering and prevent cut-off.
+    if (!Float.isNaN(mFontSize)) {
+      setTextSize(TypedValue.COMPLEX_UNIT_PX, mFontSize);
+    }
+
+    if (!Float.isNaN(mLetterSpacing)) {
+      super.setLetterSpacing(mLetterSpacing);
+    }
   }
 }

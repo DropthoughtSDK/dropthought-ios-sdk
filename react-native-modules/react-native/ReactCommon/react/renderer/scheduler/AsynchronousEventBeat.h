@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,8 +9,7 @@
 #include <react/renderer/core/EventBeat.h>
 #include <react/utils/RunLoopObserver.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * Event beat associated with JavaScript runtime.
@@ -29,13 +28,14 @@ class AsynchronousEventBeat : public EventBeat,
 #pragma mark - RunLoopObserver::Delegate
 
   void activityDidChange(
-      RunLoopObserver::Delegate const *delegate,
+      const RunLoopObserver::Delegate* delegate,
       RunLoopObserver::Activity activity) const noexcept override;
 
  private:
   RunLoopObserver::Unique uiRunLoopObserver_;
   RuntimeExecutor runtimeExecutor_;
+
+  mutable std::atomic<bool> isBeatCallbackScheduled_{false};
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

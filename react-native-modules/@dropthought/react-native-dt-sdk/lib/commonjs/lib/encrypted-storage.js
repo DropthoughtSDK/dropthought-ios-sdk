@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 exports.initialize = initialize;
-var _dtRnEncryptedStorage = require("@bct-taipei/dt-rn-encrypted-storage");
+var _dtRnEncryptedStorage = require("@dropthought/dt-rn-encrypted-storage");
 const SDK_ACCOUNT = 'DT_ENC_V1';
 let encryptedStorageClient;
 async function initialize(apiKey, AsyncStorage) {

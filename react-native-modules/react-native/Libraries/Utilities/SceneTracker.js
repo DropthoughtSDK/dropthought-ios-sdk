@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,7 +10,7 @@
 
 'use strict';
 
-export type Scene = {name: string, ...};
+export type Scene = {name: string, [string]: mixed, ...};
 
 let _listeners: Array<(scene: Scene) => void> = [];
 
@@ -26,9 +26,10 @@ const SceneTracker = {
     return _activeScene;
   },
 
-  addActiveSceneChangedListener(
-    callback: (scene: Scene) => void,
-  ): {remove: () => void, ...} {
+  addActiveSceneChangedListener(callback: (scene: Scene) => void): {
+    remove: () => void,
+    ...
+  } {
     _listeners.push(callback);
     return {
       remove: () => {

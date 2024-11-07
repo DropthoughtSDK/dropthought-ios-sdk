@@ -1,12 +1,14 @@
+import React from 'react';
 import type { Survey as OriginSurvey } from '../data';
-declare type Survey = OriginSurvey & {
+type Survey = OriginSurvey & {
     languages: string[];
 };
-declare type Props = {
+type Props = {
     onLanguageSelect: (language: string) => void;
     onClose: () => void;
     onStart: () => void;
     survey: Survey;
 };
-declare const StartScreen: ({ onLanguageSelect, onClose, onStart, survey }: Props) => JSX.Element;
+declare const StartScreen: ({ onLanguageSelect, onClose, onStart, survey }: Props) => React.JSX.Element;
 export default StartScreen;
+//# sourceMappingURL=StartScreen.d.ts.map

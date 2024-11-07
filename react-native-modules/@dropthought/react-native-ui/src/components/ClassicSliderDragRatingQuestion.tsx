@@ -16,6 +16,7 @@ import type {
   Feedback as OriginFeedback,
   Question as OriginQuestion,
 } from '../data';
+// @ts-ignore
 import { sliderRatingAboveThumbFace } from '../constants/SliderDragQuestionConstants';
 import CustomSlider from '../components/Slider';
 import { isNil } from 'ramda';
@@ -95,6 +96,7 @@ const AboveThumbComponent = ({
   const { scale: stringScale, minScale: stringMinScale } = question;
   const maxScale = Number(stringScale);
   const minScale = Number(stringMinScale);
+  // @ts-ignore
   const face = sliderRatingAboveThumbFace(minScale, value[0], maxScale);
 
   const containerStyle = {
@@ -175,9 +177,11 @@ const ClassicSliderDragRatingQuestion = ({
       const { answers } = feedback;
       const prevAnswer =
         typeof answers[0] === 'string' ? parseInt(answers[0], 10) : answers[0];
-      setValue([prevAnswer + 1]);
-      setInputValue(prevAnswer + 1);
-      setHasEdited(true);
+      if (prevAnswer !== undefined) {
+        setValue([prevAnswer + 1]);
+        setInputValue(prevAnswer + 1);
+        setHasEdited(true);
+      }
     }
   };
   React.useEffect(() => {
@@ -218,6 +222,7 @@ const ClassicSliderDragRatingQuestion = ({
   };
   const textField = (
     <TextInput
+      testID="test:id/field_slider_rating_value"
       ref={inputRef}
       style={[styles.input, inputStyle]}
       onChangeText={(text) => {
@@ -235,6 +240,7 @@ const ClassicSliderDragRatingQuestion = ({
   );
   const slider = (
     <CustomSlider
+      // @ts-ignore
       value={value[0]}
       setValue={setValue}
       trackMarks={total % 2 === 0 ? [middle - 0.5] : [middle]}
@@ -266,13 +272,15 @@ const ClassicSliderDragRatingQuestion = ({
       }}
       onSlidingComplete={(input) => {
         const inputNumber = typeof input !== 'number' ? input[0] : 0;
-        setInputValue(inputNumber);
-        setFocus(false);
-        onFeedback({
-          questionId: questionId,
-          answers: [inputNumber - 1],
-          type: 'ratingSlider',
-        });
+        if (inputNumber) {
+          setInputValue(inputNumber);
+          setFocus(false);
+          onFeedback({
+            questionId: questionId,
+            answers: [inputNumber - 1],
+            type: 'ratingSlider',
+          });
+        }
       }}
       animationType="timing"
     />

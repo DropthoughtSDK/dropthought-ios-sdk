@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,22 +10,22 @@
 #include <vector>
 
 #include <ReactCommon/TurboModuleUtils.h>
+#include <glog/logging.h>
 #include <jsi/JSIDynamic.h>
 
 using namespace facebook;
 using namespace facebook::xplat::module;
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 namespace {
 CxxModule::Callback makeTurboCxxModuleCallback(
-    jsi::Runtime &runtime,
+    jsi::Runtime& runtime,
     std::weak_ptr<CallbackWrapper> weakWrapper) {
   return [weakWrapper,
           wrapperWasCalled = false](std::vector<folly::dynamic> args) mutable {
     if (wrapperWasCalled) {
-      throw std::runtime_error("callback arg cannot be called more than once");
+      LOG(FATAL) << "callback arg cannot be called more than once";
     }
 
     auto strongWrapper = weakWrapper.lock();
@@ -40,13 +40,13 @@ CxxModule::Callback makeTurboCxxModuleCallback(
       }
 
       std::vector<jsi::Value> innerArgs;
-      for (auto &a : args) {
+      for (auto& a : args) {
         innerArgs.push_back(
             jsi::valueFromDynamic(strongWrapper2->runtime(), a));
       }
       strongWrapper2->callback().call(
           strongWrapper2->runtime(),
-          (const jsi::Value *)innerArgs.data(),
+          (const jsi::Value*)innerArgs.data(),
           innerArgs.size());
 
       strongWrapper2->destroy();
@@ -60,61 +60,83 @@ CxxModule::Callback makeTurboCxxModuleCallback(
 TurboCxxModule::TurboCxxModule(
     std::unique_ptr<CxxModule> cxxModule,
     std::shared_ptr<CallInvoker> jsInvoker)
-    : TurboModule(cxxModule->getName(), jsInvoker),
+    : TurboModule(cxxModule->getName(), std::move(jsInvoker)),
       cxxMethods_(cxxModule->getMethods()),
       cxxModule_(std::move(cxxModule)) {}
 
 jsi::Value TurboCxxModule::get(
-    jsi::Runtime &runtime,
-    const jsi::PropNameID &propName) {
+    jsi::Runtime& runtime,
+    const jsi::PropNameID& propName) {
   std::string propNameUtf8 = propName.utf8(runtime);
+
+  auto result = jsi::Value::undefined();
 
   if (propNameUtf8 == "getConstants") {
     // This is special cased because `getConstants()` is already a part of
     // CxxModule.
-    return jsi::Function::createFromHostFunction(
+    result = jsi::Function::createFromHostFunction(
         runtime,
         propName,
         0,
         [this](
-            jsi::Runtime &rt,
-            const jsi::Value &thisVal,
-            const jsi::Value *args,
+            jsi::Runtime& rt,
+            const jsi::Value& thisVal,
+            const jsi::Value* args,
             size_t count) {
           jsi::Object result(rt);
           auto constants = cxxModule_->getConstants();
-          for (auto &pair : constants) {
+          for (auto& pair : constants) {
             result.setProperty(
                 rt, pair.first.c_str(), jsi::valueFromDynamic(rt, pair.second));
           }
           return result;
         });
-  }
-
-  for (auto &method : cxxMethods_) {
-    if (method.name == propNameUtf8) {
-      return jsi::Function::createFromHostFunction(
-          runtime,
-          propName,
-          0,
-          [this, propNameUtf8](
-              jsi::Runtime &rt,
-              const jsi::Value &thisVal,
-              const jsi::Value *args,
-              size_t count) {
-            return invokeMethod(rt, VoidKind, propNameUtf8, args, count);
-          });
+  } else {
+    for (auto& method : cxxMethods_) {
+      if (method.name == propNameUtf8) {
+        result = jsi::Function::createFromHostFunction(
+            runtime,
+            propName,
+            0,
+            [this, propNameUtf8](
+                jsi::Runtime& rt,
+                const jsi::Value& thisVal,
+                const jsi::Value* args,
+                size_t count) {
+              return invokeMethod(rt, propNameUtf8, args, count);
+            });
+      }
     }
   }
 
-  return jsi::Value::undefined();
+  // If we have a JS wrapper, cache the result of this lookup
+  if (jsRepresentation_) {
+    auto jsRepresentation = jsRepresentation_->lock(runtime);
+    if (!jsRepresentation.isUndefined()) {
+      std::move(jsRepresentation)
+          .asObject(runtime)
+          .setProperty(runtime, propName, result);
+    }
+  }
+
+  return result;
+}
+
+std::vector<jsi::PropNameID> TurboCxxModule::getPropertyNames(
+    jsi::Runtime& runtime) {
+  std::vector<jsi::PropNameID> result;
+  result.reserve(cxxMethods_.size() + 1);
+  result.push_back(jsi::PropNameID::forUtf8(runtime, "getConstants"));
+  for (auto it = cxxMethods_.begin(); it != cxxMethods_.end(); it++) {
+    result.push_back(jsi::PropNameID::forUtf8(runtime, it->name));
+  }
+  return result;
 }
 
 jsi::Value TurboCxxModule::invokeMethod(
-    jsi::Runtime &runtime,
-    TurboModuleMethodValueKind valueKind,
-    const std::string &methodName,
-    const jsi::Value *args,
+    jsi::Runtime& runtime,
+    const std::string& methodName,
+    const jsi::Value* args,
     size_t count) {
   auto it = cxxMethods_.begin();
   for (; it != cxxMethods_.end(); it++) {
@@ -181,7 +203,7 @@ jsi::Value TurboCxxModule::invokeMethod(
     return createPromiseAsJSIValue(
         runtime,
         [method, args, count, this](
-            jsi::Runtime &rt, std::shared_ptr<Promise> promise) {
+            jsi::Runtime& rt, std::shared_ptr<Promise> promise) {
           auto resolveWrapper = CallbackWrapper::createWeak(
               promise->resolve_.getFunction(rt), rt, jsInvoker_);
           auto rejectWrapper = CallbackWrapper::createWeak(
@@ -203,5 +225,4 @@ jsi::Value TurboCxxModule::invokeMethod(
   return jsi::Value::undefined();
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

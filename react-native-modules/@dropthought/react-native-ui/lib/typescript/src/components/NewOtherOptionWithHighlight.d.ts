@@ -1,7 +1,7 @@
 import * as React from 'react';
 import type { Props as NewOptionWithHighlightProps } from './NewOptionWithHighlight';
 import type { Question, Feedback } from '../data';
-declare type Props = NewOptionWithHighlightProps & {
+type Props = NewOptionWithHighlightProps & {
     textValue: string | undefined;
     onChangeValue: (id: any, value: {
         checked: boolean;
@@ -11,6 +11,7 @@ declare type Props = NewOptionWithHighlightProps & {
     question: Question;
     anonymous: boolean;
 };
-declare function NewOtherOptionWithHighlight(props: Props): JSX.Element;
+declare function NewOtherOptionWithHighlight(props: Props): React.JSX.Element;
 declare const _default: React.MemoExoticComponent<typeof NewOtherOptionWithHighlight>;
 export default _default;
+//# sourceMappingURL=NewOtherOptionWithHighlight.d.ts.map

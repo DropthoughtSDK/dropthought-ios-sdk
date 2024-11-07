@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,15 +7,18 @@
 
 #pragma once
 
+#include <memory>
+
 #include <ReactCommon/RuntimeExecutor.h>
 #include <react/renderer/componentregistry/ComponentDescriptorFactory.h>
 #include <react/renderer/core/EventBeat.h>
+#include <react/renderer/leakchecker/LeakChecker.h>
+#include <react/renderer/uimanager/UIManagerCommitHook.h>
 #include <react/renderer/uimanager/primitives.h>
 #include <react/utils/ContextContainer.h>
 #include <react/utils/RunLoopObserver.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * Contains all external dependencies of Scheduler.
@@ -35,6 +38,13 @@ struct SchedulerToolbox final {
 
   /*
    * Represents running JavaScript VM and associated execution queue.
+   * Can execute lambdas before main bundle has loaded.
+   */
+  std::optional<RuntimeExecutor> bridgelessBindingsExecutor;
+
+  /*
+   * Represents running JavaScript VM and associated execution queue.
+   * Executes lambdas after main bundle has loaded.
    */
   RuntimeExecutor runtimeExecutor;
 
@@ -60,7 +70,11 @@ struct SchedulerToolbox final {
    * the call back synchronously if the executor is invoked on the main thread.
    */
   BackgroundExecutor backgroundExecutor;
+
+  /*
+   * A list of `UIManagerCommitHook`s that should be registered in `UIManager`.
+   */
+  std::vector<std::shared_ptr<UIManagerCommitHook>> commitHooks;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

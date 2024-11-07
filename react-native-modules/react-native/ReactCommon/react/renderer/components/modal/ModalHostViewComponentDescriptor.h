@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -11,11 +11,10 @@
 #include <react/renderer/components/modal/ModalHostViewShadowNode.h>
 #include <react/renderer/core/ConcreteComponentDescriptor.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
- * Descriptor for <BottomSheet> component.
+ * Descriptor for <ModalHostView> component.
  */
 
 class ModalHostViewComponentDescriptor final
@@ -23,28 +22,20 @@ class ModalHostViewComponentDescriptor final
  public:
   using ConcreteComponentDescriptor::ConcreteComponentDescriptor;
 
-  void adopt(UnsharedShadowNode shadowNode) const override {
-    assert(std::dynamic_pointer_cast<ModalHostViewShadowNode>(shadowNode));
-    auto modalShadowNode =
-        std::static_pointer_cast<ModalHostViewShadowNode>(shadowNode);
+  void adopt(ShadowNode& shadowNode) const override {
+    auto& layoutableShadowNode =
+        static_cast<YogaLayoutableShadowNode&>(shadowNode);
+    auto& stateData =
+        static_cast<const ModalHostViewShadowNode::ConcreteState&>(
+            *shadowNode.getState())
+            .getData();
 
-    assert(
-        std::dynamic_pointer_cast<YogaLayoutableShadowNode>(modalShadowNode));
-    auto layoutableShadowNode =
-        std::static_pointer_cast<YogaLayoutableShadowNode>(modalShadowNode);
-
-    auto state =
-        std::static_pointer_cast<const ModalHostViewShadowNode::ConcreteState>(
-            shadowNode->getState());
-    auto stateData = state->getData();
-
-    layoutableShadowNode->setSize(
+    layoutableShadowNode.setSize(
         Size{stateData.screenSize.width, stateData.screenSize.height});
-    layoutableShadowNode->setPositionType(YGPositionTypeAbsolute);
+    layoutableShadowNode.setPositionType(YGPositionTypeAbsolute);
 
     ConcreteComponentDescriptor::adopt(shadowNode);
   }
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

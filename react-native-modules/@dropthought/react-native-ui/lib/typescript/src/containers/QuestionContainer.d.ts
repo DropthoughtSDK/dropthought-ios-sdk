@@ -1,7 +1,12 @@
-import type { Question, Feedback, Survey, ImageFileProps } from '../data';
-import type { THEME_OPTION } from '../contexts/theme';
-declare type Props = {
+import * as React from 'react';
+import type { onPostPollChoiceType } from '../containers/SurveyScreenLayout';
+import type { Question, Feedback, Survey } from '../data';
+import type { IThemeOptionType } from '../contexts/theme';
+import type { onUploadType } from '../dt-common';
+type Props = {
+    key: string;
     anonymous: boolean;
+    mandatoryErrorMessage: string;
     question: Question;
     validationStarted: boolean;
     themeColor: string;
@@ -9,12 +14,16 @@ declare type Props = {
     onPrevPage: () => void;
     onNextPage: () => void;
     onFeedback?: (feedback: Feedback) => void;
-    onUpload?: (file: ImageFileProps) => void;
+    onUpload?: onUploadType;
     isUploading?: boolean;
+    onPostPollChoice?: onPostPollChoiceType;
+    isPostingPollChoice?: boolean;
     survey: Survey;
     pageIndex: number;
-    themeOption: THEME_OPTION;
+    themeOption: IThemeOptionType;
     preview: boolean;
+    isLastPage: boolean;
 };
-declare const QuestionContainer: (props: Props) => JSX.Element;
+declare const QuestionContainer: (props: Props) => React.JSX.Element;
 export default QuestionContainer;
+//# sourceMappingURL=QuestionContainer.d.ts.map

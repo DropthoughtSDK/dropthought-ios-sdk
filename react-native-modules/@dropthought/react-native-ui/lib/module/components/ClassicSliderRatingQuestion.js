@@ -8,15 +8,12 @@ import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDim
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 const MIN_VALUE = 1;
 const NPS_MIN_VALUE = 0;
-
 const getInitialSelectedValue = feedback => {
   if (feedback && feedback.answers && !isNil(feedback.answers[0])) {
     return parseInt(feedback.answers[0], 10);
   }
-
   return undefined;
 };
-
 const getLabelText = ({
   isPhone,
   question,
@@ -24,20 +21,16 @@ const getLabelText = ({
   valueData
 }) => {
   const labelText = `${valueData + (question.type === 'nps' ? NPS_MIN_VALUE : MIN_VALUE)}`;
-
   if (isPhone) {
     if (valueData === 0) {
       return `${labelText} - ${question.options[0]}`;
     }
-
     if (valueData === maximumValue - 1) {
       return `${labelText} - ${question.options[question.options.length - 1]}`;
     }
   }
-
   return labelText;
 };
-
 const ClassicSliderRatingQuestion = ({
   mandatoryErrorMessage,
   question,
@@ -55,7 +48,6 @@ const ClassicSliderRatingQuestion = ({
   const maximumValue = parseInt(question.scale, 10);
   const dimensionWidthType = useDimensionWidthType();
   const isPhone = dimensionWidthType === DimensionWidthType.phone;
-
   const getBackgroundColorStyle = ({
     selected,
     darkMode
@@ -66,16 +58,13 @@ const ClassicSliderRatingQuestion = ({
         resizeMode: 'contain'
       };
     }
-
     if (darkMode) {
       return styles.backgroundDark;
     }
-
     return {
       backgroundColor: themeBackgroundColor
     };
   };
-
   const getSliderIndicator = () => {
     const textStyle = [styles.label, {
       color: fontColor,
@@ -84,6 +73,8 @@ const ClassicSliderRatingQuestion = ({
       marginBottom: i18n.language === 'te' ? 2 : 0
     }];
     return [...Array(maximumValue).keys()].map((valueData, index) => /*#__PURE__*/React.createElement(TouchableHighlight, {
+      accessible: false,
+      testID: `test:id/scale_option_${index === value}`,
       underlayColor: themeBackgroundColor,
       key: index.toString(),
       onPress: () => {
@@ -100,6 +91,7 @@ const ClassicSliderRatingQuestion = ({
         darkMode: colorScheme === COLOR_SCHEMES.dark
       })]
     }, /*#__PURE__*/React.createElement(Text, {
+      testID: `test:id/scale_label_${fontColor}`,
       style: [textStyle, index === value ? styles.selectedLabel : {}]
     }, getLabelText({
       isPhone,
@@ -108,7 +100,6 @@ const ClassicSliderRatingQuestion = ({
       valueData
     })))));
   };
-
   const getWidthStyle = () => {
     let width = maximumValue / 10.0 * 100 > 100 ? 100 : maximumValue / 10.0 * 100;
     return {
@@ -117,7 +108,6 @@ const ClassicSliderRatingQuestion = ({
       paddingHorizontal: 10
     };
   };
-
   const rtl = i18n.dir() === 'rtl';
   return /*#__PURE__*/React.createElement(View, {
     style: GlobalStyle.questionContainer
@@ -130,7 +120,9 @@ const ClassicSliderRatingQuestion = ({
     style: [styles.vertical]
   }, getSliderIndicator()) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(View, {
     style: rtl && GlobalStyle.flexRowReverse
-  }, /*#__PURE__*/React.createElement(View, {
+  }, /*#__PURE__*/React.createElement(View
+  // @ts-ignore
+  , {
     style: getWidthStyle()
   }, /*#__PURE__*/React.createElement(View, {
     style: styles.line
@@ -146,7 +138,6 @@ const ClassicSliderRatingQuestion = ({
     style: styles.options
   }, question.options[question.options.length - 1])))));
 };
-
 export default /*#__PURE__*/React.memo(ClassicSliderRatingQuestion);
 const styles = StyleSheet.create({
   backgroundPhone: {

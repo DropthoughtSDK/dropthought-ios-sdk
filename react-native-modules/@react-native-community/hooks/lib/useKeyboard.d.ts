@@ -1,9 +1,9 @@
-import { ScreenRect } from 'react-native';
+import { KeyboardMetrics } from 'react-native';
 export declare function useKeyboard(): {
     keyboardShown: boolean;
     coordinates: {
-        start: undefined | ScreenRect;
-        end: ScreenRect;
+        start: undefined | KeyboardMetrics;
+        end: KeyboardMetrics;
     };
     keyboardHeight: number;
 };

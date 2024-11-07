@@ -1,6 +1,7 @@
 import React from 'react';
-import { Animated, LayoutChangeEvent } from 'react-native';
-declare type DraggableItemProps = {
+import { Animated } from 'react-native';
+import type { LayoutChangeEvent } from 'react-native';
+type DraggableItemProps = {
     children: React.ReactNode;
     index: number;
     onDragStart: () => void;
@@ -13,6 +14,7 @@ declare type DraggableItemProps = {
     movements: number;
     draggable: boolean;
 };
-declare function DraggableItem({ children, index, onDragStart, onDragGrant, onDrag, onDragRelease, onDragEnd, onLayout, forceReset, movements, draggable, }: DraggableItemProps): JSX.Element;
+declare function DraggableItem({ children, index, onDragStart, onDragGrant, onDrag, onDragRelease, onDragEnd, onLayout, forceReset, movements, draggable, }: DraggableItemProps): React.JSX.Element;
 declare const _default: React.MemoExoticComponent<typeof DraggableItem>;
 export default _default;
+//# sourceMappingURL=DraggableItem.d.ts.map

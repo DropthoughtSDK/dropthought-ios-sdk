@@ -5,10 +5,12 @@ import PictureChoiceItem from './PictureChoiceItem';
 import PictureChoiceOtherItem from './PictureChoiceOtherItem';
 import { usePictureChoice } from '../hooks/usePictureChoice';
 import MandatoryTitle from './MandatoryTitle';
+// @ts-ignore
 import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import i18n from '../translation';
-const ScrollView = Platform.OS === 'ios' ? KeyboardAvoidingScrollView : RNScrollView;
+// @ts-ignore
 
+const ScrollView = Platform.OS === 'ios' ? KeyboardAvoidingScrollView : RNScrollView;
 const PictureChoiceQuestion = ({
   survey,
   question,
@@ -44,10 +46,8 @@ const PictureChoiceQuestion = ({
     option
   }, index) => {
     const selected = selectIndex.includes(index);
-
     const onPress = () => {
       setInvalidMessage(undefined);
-
       if (isMultipleChoice) {
         onSelectIndex(index);
       } else {
@@ -55,7 +55,6 @@ const PictureChoiceQuestion = ({
         resetOtherPicture();
       }
     };
-
     return /*#__PURE__*/React.createElement(PictureChoiceItem, {
       title: option,
       uri: uri,
@@ -78,7 +77,6 @@ const PictureChoiceQuestion = ({
       if (!isMultipleChoice) {
         replaceSelectIndex([]);
       }
-
       setOtherPictureSelected(true);
     },
     onSelect: () => {
@@ -89,14 +87,12 @@ const PictureChoiceQuestion = ({
         if (!isMultipleChoice) {
           replaceSelectIndex([]);
         }
-
         setOtherPictureSelected(true);
       }
     },
     onUpload: async file => {
       setInvalidMessage(undefined);
-      const url = await onUpload(file);
-
+      const url = await onUpload(file, 'pictureChoice');
       if (typeof url !== 'string') {
         setInvalidMessage(`${i18n.t('picture-choice:uploadFailed')}`);
       } else if (url) {
@@ -125,7 +121,6 @@ const PictureChoiceQuestion = ({
     style: [styles.pictureGridContainer, rtl && GlobalStyle.flexRowReverse]
   }, imageItems, otherImageItem));
 };
-
 export default /*#__PURE__*/React.memo(PictureChoiceQuestion);
 const styles = StyleSheet.create({
   container: {

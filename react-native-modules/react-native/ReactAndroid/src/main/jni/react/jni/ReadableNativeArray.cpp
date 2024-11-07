@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -11,19 +11,14 @@
 
 using namespace facebook::jni;
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
-// This attribute exports the ctor symbol, so ReadableNativeArray to be
-// constructed from other DSOs.
-__attribute__((visibility("default")))
-ReadableNativeArray::ReadableNativeArray(folly::dynamic array)
-    : HybridBase(std::move(array)) {}
-
-void ReadableNativeArray::mapException(const std::exception &ex) {
-  if (dynamic_cast<const folly::TypeError *>(&ex) != nullptr) {
+void ReadableNativeArray::mapException(std::exception_ptr ex) {
+  try {
+    std::rethrow_exception(ex);
+  } catch (const folly::TypeError& err) {
     throwNewJavaException(
-        exceptions::gUnexpectedNativeTypeExceptionClass, ex.what());
+        exceptions::gUnexpectedNativeTypeExceptionClass, err.what());
   }
 }
 
@@ -52,5 +47,4 @@ void ReadableNativeArray::registerNatives() {
   });
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

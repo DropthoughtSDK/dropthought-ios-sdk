@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,12 +8,11 @@
  * @format
  */
 
-'use strict';
-
 import type {TurboModule} from '../TurboModule/RCTExport';
+
 import * as TurboModuleRegistry from '../TurboModule/TurboModuleRegistry';
 
-type DisplayMetricsAndroid = {|
+export type DisplayMetricsAndroid = {|
   width: number,
   height: number,
   scale: number,
@@ -35,21 +34,20 @@ export type DimensionsPayload = {|
   screenPhysicalPixels?: DisplayMetricsAndroid,
 |};
 
+export type DeviceInfoConstants = {|
+  +Dimensions: DimensionsPayload,
+  +isIPhoneX_deprecated?: boolean,
+|};
+
 export interface Spec extends TurboModule {
-  +getConstants: () => {|
-    +Dimensions: DimensionsPayload,
-    +isIPhoneX_deprecated?: boolean,
-  |};
+  +getConstants: () => DeviceInfoConstants;
 }
 
 const NativeModule: Spec = TurboModuleRegistry.getEnforcing<Spec>('DeviceInfo');
-let constants = null;
+let constants: ?DeviceInfoConstants = null;
 
 const NativeDeviceInfo = {
-  getConstants(): {|
-    +Dimensions: DimensionsPayload,
-    +isIPhoneX_deprecated?: boolean,
-  |} {
+  getConstants(): DeviceInfoConstants {
     if (constants == null) {
       constants = NativeModule.getConstants();
     }

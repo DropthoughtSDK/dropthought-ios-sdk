@@ -1,61 +1,68 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
 
 #include "EventDispatcher.h"
-
+#include <cxxreact/JSExecutor.h>
 #include <react/renderer/core/StateUpdate.h>
+#include "EventLogger.h"
 
 #include "BatchedEventQueue.h"
 #include "RawEvent.h"
 #include "UnbatchedEventQueue.h"
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 EventDispatcher::EventDispatcher(
-    EventPipe const &eventPipe,
-    StatePipe const &statePipe,
-    EventBeat::Factory const &synchonousEventBeatFactory,
-    EventBeat::Factory const &asynchonousEventBeatFactory,
-    EventBeat::SharedOwnerBox const &ownerBox)
+    const EventQueueProcessor& eventProcessor,
+    const EventBeat::Factory& synchonousEventBeatFactory,
+    const EventBeat::Factory& asynchronousEventBeatFactory,
+    const EventBeat::SharedOwnerBox& ownerBox)
     : synchronousUnbatchedQueue_(std::make_unique<UnbatchedEventQueue>(
-          eventPipe,
-          statePipe,
+          eventProcessor,
           synchonousEventBeatFactory(ownerBox))),
       synchronousBatchedQueue_(std::make_unique<BatchedEventQueue>(
-          eventPipe,
-          statePipe,
+          eventProcessor,
           synchonousEventBeatFactory(ownerBox))),
       asynchronousUnbatchedQueue_(std::make_unique<UnbatchedEventQueue>(
-          eventPipe,
-          statePipe,
-          asynchonousEventBeatFactory(ownerBox))),
+          eventProcessor,
+          asynchronousEventBeatFactory(ownerBox))),
       asynchronousBatchedQueue_(std::make_unique<BatchedEventQueue>(
-          eventPipe,
-          statePipe,
-          asynchonousEventBeatFactory(ownerBox))) {}
+          eventProcessor,
+          asynchronousEventBeatFactory(ownerBox))) {}
 
-void EventDispatcher::dispatchEvent(
-    RawEvent const &rawEvent,
-    EventPriority priority) const {
+void EventDispatcher::dispatchEvent(RawEvent&& rawEvent, EventPriority priority)
+    const {
+  // Allows the event listener to interrupt default event dispatch
+  if (eventListeners_.willDispatchEvent(rawEvent)) {
+    return;
+  }
+
+  auto eventLogger = getEventLogger();
+  if (eventLogger != nullptr) {
+    rawEvent.loggingTag = eventLogger->onEventStart(rawEvent.type);
+  }
   getEventQueue(priority).enqueueEvent(std::move(rawEvent));
 }
 
 void EventDispatcher::dispatchStateUpdate(
-    StateUpdate &&stateUpdate,
+    StateUpdate&& stateUpdate,
     EventPriority priority) const {
   getEventQueue(priority).enqueueStateUpdate(std::move(stateUpdate));
 }
 
-void EventDispatcher::dispatchUniqueEvent(RawEvent const &rawEvent) const {
-  asynchronousBatchedQueue_->enqueueUniqueEvent(rawEvent);
+void EventDispatcher::dispatchUniqueEvent(RawEvent&& rawEvent) const {
+  // Allows the event listener to interrupt default event dispatch
+  if (eventListeners_.willDispatchEvent(rawEvent)) {
+    return;
+  }
+  asynchronousBatchedQueue_->enqueueUniqueEvent(std::move(rawEvent));
 }
 
-const EventQueue &EventDispatcher::getEventQueue(EventPriority priority) const {
+const EventQueue& EventDispatcher::getEventQueue(EventPriority priority) const {
   switch (priority) {
     case EventPriority::SynchronousUnbatched:
       return *synchronousUnbatchedQueue_;
@@ -68,5 +75,17 @@ const EventQueue &EventDispatcher::getEventQueue(EventPriority priority) const {
   }
 }
 
-} // namespace react
-} // namespace facebook
+void EventDispatcher::addListener(
+    const std::shared_ptr<const EventListener>& listener) const {
+  eventListeners_.addListener(listener);
+}
+
+/*
+ * Removes provided event listener to the event dispatcher.
+ */
+void EventDispatcher::removeListener(
+    const std::shared_ptr<const EventListener>& listener) const {
+  eventListeners_.removeListener(listener);
+}
+
+} // namespace facebook::react

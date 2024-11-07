@@ -3,17 +3,15 @@ import { View, Image, StyleSheet, Text } from 'react-native';
 import { Colors, GlobalStyle } from '../styles';
 import i18n from '../translation';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
-export let PlaceholderImageTypes;
-
-(function (PlaceholderImageTypes) {
+export let PlaceholderImageTypes = /*#__PURE__*/function (PlaceholderImageTypes) {
   PlaceholderImageTypes["NoInternet"] = "NoInternet";
   PlaceholderImageTypes["ProgramScheduled"] = "ProgramScheduled";
   PlaceholderImageTypes["ProgramExpired"] = "ProgramExpired";
   PlaceholderImageTypes["ProgramDeleted"] = "ProgramDeleted";
   PlaceholderImageTypes["ProgramDeactivated"] = "ProgramDeactivated";
   PlaceholderImageTypes["ProgramUnavailable"] = "ProgramUnavailable";
-})(PlaceholderImageTypes || (PlaceholderImageTypes = {}));
-
+  return PlaceholderImageTypes;
+}({});
 const imageTypeSources = {
   [COLOR_SCHEMES.light]: {
     [PlaceholderImageTypes.NoInternet]: require('../assets/placeholder-no-internet.png'),
@@ -32,7 +30,6 @@ const imageTypeSources = {
     [PlaceholderImageTypes.ProgramUnavailable]: require('../assets/placeholder-program-unavailable_dark.png')
   }
 };
-
 const PlaceholderScreen = ({
   message,
   imageSource,
@@ -49,7 +46,8 @@ const PlaceholderScreen = ({
     style: [styles.container, {
       backgroundColor
     }]
-  }, /*#__PURE__*/React.createElement(Image // @ts-ignore
+  }, /*#__PURE__*/React.createElement(Image
+  // @ts-ignore
   , {
     source: imageTypeSources[colorScheme][imageType] || imageSource,
     style: styles.image
@@ -65,9 +63,9 @@ const PlaceholderScreen = ({
     }, colorScheme === COLOR_SCHEMES.dark ? styles.messageDark : styles.messageLight]
   }, message), children));
 };
-
 const styles = StyleSheet.create({
-  container: { ...GlobalStyle.flex1,
+  container: {
+    ...GlobalStyle.flex1,
     backgroundColor: Colors.white,
     justifyContent: 'center'
   },

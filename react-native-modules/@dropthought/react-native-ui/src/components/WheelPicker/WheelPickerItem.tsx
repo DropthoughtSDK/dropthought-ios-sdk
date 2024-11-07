@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleProp, TextStyle, Animated, Text, ViewStyle } from 'react-native';
+import { Animated, Text } from 'react-native';
+import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
 import styles from './WheelPicker.styles';
 
 interface ItemProps {
@@ -8,7 +9,7 @@ interface ItemProps {
   option: string | null;
   height: number;
   index: number;
-  currentScrollIndex: Animated.AnimatedAddition;
+  currentScrollIndex: Animated.AnimatedAddition<number>;
   visibleRest: number;
   rotationFunction: (x: number) => number;
   opacityFunction: (x: number) => number;
@@ -99,7 +100,11 @@ const WheelPickerItem: React.FC<ItemProps> = ({
         { height, opacity, transform: [{ translateY }, { rotateX }] },
       ]}
     >
-      <Text style={textStyle} numberOfLines={1}>
+      <Text
+        testID="test:id/smilely2_picker_item"
+        style={textStyle}
+        numberOfLines={1}
+      >
         {option}
       </Text>
     </Animated.View>

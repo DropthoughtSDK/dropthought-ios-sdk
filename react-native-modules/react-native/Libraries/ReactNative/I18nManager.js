@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,22 +8,27 @@
  * @format
  */
 
-'use strict';
+import type {I18nManagerConstants} from './NativeI18nManager';
 
 import NativeI18nManager from './NativeI18nManager';
 
-const i18nConstants: {|
-  doLeftAndRightSwapInRTL: boolean,
-  isRTL: boolean,
-|} = NativeI18nManager
-  ? NativeI18nManager.getConstants()
-  : {
-      isRTL: false,
-      doLeftAndRightSwapInRTL: true,
-    };
+const i18nConstants: I18nManagerConstants = getI18nManagerConstants();
+
+function getI18nManagerConstants(): I18nManagerConstants {
+  if (NativeI18nManager) {
+    const {isRTL, doLeftAndRightSwapInRTL, localeIdentifier} =
+      NativeI18nManager.getConstants();
+    return {isRTL, doLeftAndRightSwapInRTL, localeIdentifier};
+  }
+
+  return {
+    isRTL: false,
+    doLeftAndRightSwapInRTL: true,
+  };
+}
 
 module.exports = {
-  getConstants: (): {|doLeftAndRightSwapInRTL: boolean, isRTL: boolean|} => {
+  getConstants: (): I18nManagerConstants => {
     return i18nConstants;
   },
 

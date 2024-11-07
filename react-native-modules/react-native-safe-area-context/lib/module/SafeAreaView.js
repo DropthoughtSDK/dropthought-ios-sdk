@@ -1,75 +1,40 @@
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
+function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 import * as React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from './SafeAreaContext';
-// prettier-ignore
-const TOP = 0b1000,
-      RIGHT = 0b0100,
-      BOTTOM = 0b0010,
-      LEFT = 0b0001,
-      ALL = 0b1111;
-/* eslint-disable no-bitwise */
-
-const edgeBitmaskMap = {
-  top: TOP,
-  right: RIGHT,
-  bottom: BOTTOM,
-  left: LEFT
+import NativeSafeAreaView from './specs/NativeSafeAreaView';
+import { useMemo } from 'react';
+const defaultEdges = {
+  top: 'additive',
+  left: 'additive',
+  bottom: 'additive',
+  right: 'additive'
 };
-export function SafeAreaView({
-  style = {},
-  mode,
+export const SafeAreaView = /*#__PURE__*/React.forwardRef(({
   edges,
-  ...rest
-}) {
-  const insets = useSafeAreaInsets();
-  const edgeBitmask = edges != null ? edges.reduce((accum, edge) => accum | edgeBitmaskMap[edge], 0) : ALL;
-  const appliedStyle = React.useMemo(() => {
-    const insetTop = edgeBitmask & TOP ? insets.top : 0;
-    const insetRight = edgeBitmask & RIGHT ? insets.right : 0;
-    const insetBottom = edgeBitmask & BOTTOM ? insets.bottom : 0;
-    const insetLeft = edgeBitmask & LEFT ? insets.left : 0;
-    const flatStyle = StyleSheet.flatten(style);
-
-    if (mode === 'margin') {
-      const {
-        margin = 0,
-        marginVertical = margin,
-        marginHorizontal = margin,
-        marginTop = marginVertical,
-        marginRight = marginHorizontal,
-        marginBottom = marginVertical,
-        marginLeft = marginHorizontal
-      } = flatStyle;
-      const marginStyle = {
-        marginTop: marginTop + insetTop,
-        marginRight: marginRight + insetRight,
-        marginBottom: marginBottom + insetBottom,
-        marginLeft: marginLeft + insetLeft
-      };
-      return [style, marginStyle];
-    } else {
-      const {
-        padding = 0,
-        paddingVertical = padding,
-        paddingHorizontal = padding,
-        paddingTop = paddingVertical,
-        paddingRight = paddingHorizontal,
-        paddingBottom = paddingVertical,
-        paddingLeft = paddingHorizontal
-      } = flatStyle;
-      const paddingStyle = {
-        paddingTop: paddingTop + insetTop,
-        paddingRight: paddingRight + insetRight,
-        paddingBottom: paddingBottom + insetBottom,
-        paddingLeft: paddingLeft + insetLeft
-      };
-      return [style, paddingStyle];
+  ...props
+}, ref) => {
+  const nativeEdges = useMemo(() => {
+    if (edges == null) {
+      return defaultEdges;
     }
-  }, [style, insets, mode, edgeBitmask]);
-  return /*#__PURE__*/React.createElement(View, _extends({
-    style: appliedStyle
-  }, rest));
-}
+    const edgesObj = Array.isArray(edges) ? edges.reduce((acc, edge) => {
+      acc[edge] = 'additive';
+      return acc;
+    }, {}) :
+    // ts has trouble with refining readonly arrays.
+    edges;
+
+    // make sure that we always pass all edges, required for fabric
+    const requiredEdges = {
+      top: edgesObj.top ?? 'off',
+      right: edgesObj.right ?? 'off',
+      bottom: edgesObj.bottom ?? 'off',
+      left: edgesObj.left ?? 'off'
+    };
+    return requiredEdges;
+  }, [edges]);
+  return /*#__PURE__*/React.createElement(NativeSafeAreaView, _extends({}, props, {
+    edges: nativeEdges,
+    ref: ref
+  }));
+});
 //# sourceMappingURL=SafeAreaView.js.map

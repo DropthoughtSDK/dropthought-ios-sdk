@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (c) Facebook, Inc. and its affiliates.
+# Copyright (c) Meta Platforms, Inc. and affiliates.
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
@@ -9,11 +9,11 @@
 # and relies on environment variables (including PWD) set by Xcode
 
 # Print commands before executing them (useful for troubleshooting)
-set -x
+set -x -e
 DEST=$CONFIGURATION_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH
 
 # Enables iOS devices to get the IP address of the machine running Metro
-if [[ "$CONFIGURATION" = *Debug* && ! "$PLATFORM_NAME" == *simulator ]]; then
+if [[ ! "$SKIP_BUNDLING_METRO_IP" && "$CONFIGURATION" = *Debug* && ! "$PLATFORM_NAME" == *simulator ]]; then
   for num in 0 1 2 3 4 5 6 7 8; do
     IP=$(ipconfig getifaddr en${num})
     if [ ! -z "$IP" ]; then
@@ -58,9 +58,8 @@ esac
 
 # Path to react-native folder inside node_modules
 REACT_NATIVE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-# The project should be located next to where react-native is installed
-# in node_modules.
-PROJECT_ROOT=${PROJECT_ROOT:-"$REACT_NATIVE_DIR/../.."}
+# Most projects have their project root, one level up from their Xcode project dir (the "ios" directory)
+PROJECT_ROOT=${PROJECT_ROOT:-"$PROJECT_DIR/.."}
 
 cd "$PROJECT_ROOT" || exit
 
@@ -74,28 +73,17 @@ else
   ENTRY_FILE=${1:-index.js}
 fi
 
-if [[ $DEV != true && ! -f "$ENTRY_FILE" ]]; then
-  echo "error: Entry file $ENTRY_FILE does not exist. If you use another file as your entry point, pass ENTRY_FILE=myindex.js" >&2
-  exit 2
-fi
-
-# find node path
-source "$REACT_NATIVE_DIR/scripts/find-node.sh"
-
 # check and assign NODE_BINARY env
 # shellcheck source=/dev/null
 source "$REACT_NATIVE_DIR/scripts/node-binary.sh"
 
-[ -z "$HERMES_CLI_PATH" ] && HERMES_CLI_PATH="$PODS_ROOT/hermes-engine/destroot/bin/hermesc"
+HERMES_ENGINE_PATH="$PODS_ROOT/hermes-engine"
+[ -z "$HERMES_CLI_PATH" ] && HERMES_CLI_PATH="$HERMES_ENGINE_PATH/destroot/bin/hermesc"
 
-if [[ -z "$USE_HERMES" && -f "$HERMES_CLI_PATH" ]]; then
-  echo "Enabling Hermes byte-code compilation. Disable with USE_HERMES=false if needed."
-  USE_HERMES=true
-fi
-
-if [[ $USE_HERMES == true && ! -f "$HERMES_CLI_PATH" ]]; then
-  echo "error: USE_HERMES is set to true but the hermesc binary could not be " \
-       "found at ${HERMES_CLI_PATH}. Perhaps you need to run pod install or otherwise " \
+# If hermesc is not available and USE_HERMES is not set to false, show error.
+if [[ $USE_HERMES != false && -f "$HERMES_ENGINE_PATH" && ! -f "$HERMES_CLI_PATH" ]]; then
+  echo "error: Hermes is enabled but the hermesc binary could not be found at ${HERMES_CLI_PATH}." \
+       "Perhaps you need to run 'bundle exec pod install' or otherwise " \
        "point the HERMES_CLI_PATH variable to your custom location." >&2
   exit 2
 fi
@@ -127,6 +115,10 @@ case "$PLATFORM_NAME" in
     ;;
 esac
 
+if [ "${IS_MACCATALYST}" = "YES" ]; then
+  BUNDLE_PLATFORM="ios"
+fi
+
 EMIT_SOURCEMAP=
 if [[ ! -z "$SOURCEMAP_FILE" ]]; then
   EMIT_SOURCEMAP=true
@@ -134,12 +126,17 @@ fi
 
 PACKAGER_SOURCEMAP_FILE=
 if [[ $EMIT_SOURCEMAP == true ]]; then
-  if [[ $USE_HERMES == true ]]; then
+  if [[ $USE_HERMES != false ]]; then
     PACKAGER_SOURCEMAP_FILE="$CONFIGURATION_BUILD_DIR/$(basename $SOURCEMAP_FILE)"
   else
     PACKAGER_SOURCEMAP_FILE="$SOURCEMAP_FILE"
   fi
   EXTRA_ARGS="$EXTRA_ARGS --sourcemap-output $PACKAGER_SOURCEMAP_FILE"
+fi
+
+# Hermes doesn't require JS minification.
+if [[ $USE_HERMES != false && $DEV == false ]]; then
+  EXTRA_ARGS="$EXTRA_ARGS --minify false"
 fi
 
 "$NODE_BINARY" $NODE_ARGS "$CLI_PATH" $BUNDLE_COMMAND \
@@ -153,7 +150,7 @@ fi
   $EXTRA_ARGS \
   $EXTRA_PACKAGER_ARGS
 
-if [[ $USE_HERMES != true ]]; then
+if [[ $USE_HERMES == false ]]; then
   cp "$BUNDLE_FILE" "$DEST/"
   BUNDLE_FILE="$DEST/main.jsbundle"
 else
@@ -166,16 +163,17 @@ else
   if [[ $EMIT_SOURCEMAP == true ]]; then
     EXTRA_COMPILER_ARGS="$EXTRA_COMPILER_ARGS -output-source-map"
   fi
-  "$HERMES_CLI_PATH" -emit-binary $EXTRA_COMPILER_ARGS -out "$DEST/main.jsbundle" "$BUNDLE_FILE" 
+  "$HERMES_CLI_PATH" -emit-binary -max-diagnostic-width=80 $EXTRA_COMPILER_ARGS -out "$DEST/main.jsbundle" "$BUNDLE_FILE"
   if [[ $EMIT_SOURCEMAP == true ]]; then
-    HBC_SOURCEMAP_FILE="$BUNDLE_FILE.map"
+    HBC_SOURCEMAP_FILE="$DEST/main.jsbundle.map"
     "$NODE_BINARY" "$COMPOSE_SOURCEMAP_PATH" "$PACKAGER_SOURCEMAP_FILE" "$HBC_SOURCEMAP_FILE" -o "$SOURCEMAP_FILE"
+    rm "$HBC_SOURCEMAP_FILE"
+    rm "$PACKAGER_SOURCEMAP_FILE"
   fi
   BUNDLE_FILE="$DEST/main.jsbundle"
 fi
 
 if [[ $DEV != true && ! -f "$BUNDLE_FILE" ]]; then
-  echo "error: File $BUNDLE_FILE does not exist. This must be a bug with" >&2
-  echo "React Native, please report it here: https://github.com/facebook/react-native/issues"
+  echo "error: File $BUNDLE_FILE does not exist. Your environment is misconfigured as Metro was not able to produce the bundle so your release application won't work!" >&2
   exit 2
 fi

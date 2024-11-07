@@ -1,5 +1,4 @@
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 import * as React from 'react';
 import { View } from 'react-native';
 import { mandatoryQuestionValidator } from '../utils/data';
@@ -17,8 +16,13 @@ import ClassicMatrixRatingQuestion from '../components/ClassicMatrixRatingQuesti
 import ClassicMatrixChoiceQuestion from '../components/ClassicMatrixChoiceQuestion';
 import ClassicMultipleOpenEndedQuestion from '../components/ClassicMultipleOpenEndedQuestion';
 import ClassicPictureChoiceQuestion from '../components/ClassicPictureChoiceQuestion';
+import ClassicPollingQuestion from '../components/ClassicPollingQuestion';
+import ClassicFileQuestion from '../components/ClassicFileQuestion';
+import ClassicStatementQuestion from '../components/ClassicStatementQuestion';
 import ClassicMandatoryTitle from '../components/ClassicMandatoryTitle';
 import GlobalStyle from '../styles';
+
+// @ts-ignore
 
 const TempComponent = ({
   mandatoryErrorMessage,
@@ -33,7 +37,6 @@ const TempComponent = ({
     forgot: forgot
   }));
 };
-
 const ClassicQuestionContainer = props => {
   const {
     question,
@@ -42,29 +45,28 @@ const ClassicQuestionContainer = props => {
     onDragGrant,
     onDragEnd
   } = props;
-  let QuestionComponent = TempComponent; // get/update feedback to context
+  let QuestionComponent = TempComponent;
 
+  // get/update feedback to context
   const feedback = useFeedbackByQid(question.questionId);
   const feedbackDispatch = useFeedbackDispatch();
   const onFeedbackHandler = React.useCallback(updatedFeedback => {
-    updateFeedback(feedbackDispatch, updatedFeedback); // @ts-ignore
-
+    updateFeedback(feedbackDispatch, updatedFeedback);
+    // @ts-ignore
     propsOnFeedback && propsOnFeedback(updateFeedback);
-  }, [feedbackDispatch, propsOnFeedback]); // whether to display the forgot warning message
+  }, [feedbackDispatch, propsOnFeedback]);
 
+  // whether to display the forgot warning message
   const forgot = validationStarted && !mandatoryQuestionValidator(question, feedback);
-
   switch (question.type) {
     case 'singleChoice':
       // @ts-ignore
       QuestionComponent = ClassicSingleChoiceQuestion;
       break;
-
     case 'multiChoice':
       // @ts-ignore
       QuestionComponent = ClassicMultiChoiceQuestion;
       break;
-
     case 'rating':
       if (question.subType === 'smiley') {
         // @ts-ignore
@@ -76,58 +78,58 @@ const ClassicQuestionContainer = props => {
         // @ts-ignore
         QuestionComponent = ClassicIconRatingQuestion;
       }
-
       break;
-
     case 'nps':
       // @ts-ignore
       QuestionComponent = ClassicSliderRatingQuestion;
       break;
-
     case 'open':
       // @ts-ignore
       QuestionComponent = ClassicOpenQuestion;
       break;
-
     case 'ranking':
       // @ts-ignore
       QuestionComponent = ClassicRankingQuestion;
       break;
-
     case 'ratingSlider':
       // @ts-ignore
       QuestionComponent = ClassicSliderDragRatingQuestion;
       break;
-
     case 'dropdown':
       // @ts-ignore
       QuestionComponent = ClassicDropdownQuestion;
       break;
-
     case 'matrixRating':
       // @ts-ignore
       QuestionComponent = ClassicMatrixRatingQuestion;
       break;
-
     case 'matrixChoice':
       // @ts-ignore
       QuestionComponent = ClassicMatrixChoiceQuestion;
       break;
-
     case 'multipleOpenEnded':
       // @ts-ignore
       QuestionComponent = ClassicMultipleOpenEndedQuestion;
       break;
-
     case 'pictureChoice':
       // @ts-ignore
       QuestionComponent = ClassicPictureChoiceQuestion;
       break;
-
+    case 'poll':
+      // @ts-ignore
+      QuestionComponent = ClassicPollingQuestion;
+      break;
+    case 'file':
+      // @ts-ignore
+      QuestionComponent = ClassicFileQuestion;
+      break;
+    case 'statement':
+      // @ts-ignore
+      QuestionComponent = ClassicStatementQuestion;
+      break;
     default:
       QuestionComponent = TempComponent;
   }
-
   return /*#__PURE__*/React.createElement(QuestionComponent, _extends({}, props, {
     // @ts-ignore
     feedback: feedback,
@@ -137,6 +139,5 @@ const ClassicQuestionContainer = props => {
     onDragEnd: onDragEnd
   }));
 };
-
 export default ClassicQuestionContainer;
 //# sourceMappingURL=ClassicQuestionContainer.js.map

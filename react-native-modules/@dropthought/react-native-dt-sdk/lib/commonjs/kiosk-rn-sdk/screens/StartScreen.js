@@ -5,9 +5,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _react = _interopRequireDefault(require("react"));
-var _src = require("@dropthought/react-native-ui/src");
+var _reactNativeUi = require("@dropthought/react-native-ui");
 var _ErrorHintScreen = _interopRequireDefault(require("./ErrorHintScreen"));
-var _survey = require("../contexts/survey");
+var _SurveyContext = require("../contexts/survey/SurveyContext");
 var _DateTimerParser = require("../../lib/DateTimerParser");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 /**
@@ -23,25 +23,25 @@ const checkSurveyStatus = (surveyState, surveyStartDate, surveyEndDate) => {
       imageType = null;
       break;
     case 'expired':
-      imageType = _src.PlaceholderImageTypes.ProgramExpired;
+      imageType = _reactNativeUi.PlaceholderImageTypes.ProgramExpired;
       break;
     case 'scheduled':
-      imageType = _src.PlaceholderImageTypes.ProgramScheduled;
+      imageType = _reactNativeUi.PlaceholderImageTypes.ProgramScheduled;
       break;
     case 'inactive':
-      imageType = _src.PlaceholderImageTypes.ProgramDeactivated;
+      imageType = _reactNativeUi.PlaceholderImageTypes.ProgramDeactivated;
       break;
     case 'drafts':
     default:
-      imageType = _src.PlaceholderImageTypes.ProgramUnavailable;
+      imageType = _reactNativeUi.PlaceholderImageTypes.ProgramUnavailable;
   }
   // still need to check the start-end time
   if (!imageType) {
     const now = new Date();
     if (now < surveyStartDate) {
-      imageType = _src.PlaceholderImageTypes.ProgramScheduled;
+      imageType = _reactNativeUi.PlaceholderImageTypes.ProgramScheduled;
     } else if (now > surveyEndDate) {
-      imageType = _src.PlaceholderImageTypes.ProgramExpired;
+      imageType = _reactNativeUi.PlaceholderImageTypes.ProgramExpired;
     }
   }
   return imageType;
@@ -59,7 +59,7 @@ const StartScreen = props => {
   const {
     survey,
     changeLanguage
-  } = (0, _survey.useSurveyContext)();
+  } = (0, _SurveyContext.useSurveyContext)();
   const {
     state: surveyState,
     surveyEndDate: surveyEndDateStr,
@@ -77,12 +77,12 @@ const StartScreen = props => {
     // need to render placeholder
     return /*#__PURE__*/_react.default.createElement(_ErrorHintScreen.default, {
       onClose: onClose
-    }, /*#__PURE__*/_react.default.createElement(_src.PlaceholderScreen, {
+    }, /*#__PURE__*/_react.default.createElement(_reactNativeUi.PlaceholderScreen, {
       imageType: imageType,
-      message: _src.i18n.t('start-survey:placeholder-message')
+      message: _reactNativeUi.i18n.t('start-survey:placeholder-message')
     }));
   }
-  return /*#__PURE__*/_react.default.createElement(_src.StartScreenLayout, {
+  return /*#__PURE__*/_react.default.createElement(_reactNativeUi.StartScreenLayout, {
     survey: survey,
     onClose: onClose,
     onStart: onStart,

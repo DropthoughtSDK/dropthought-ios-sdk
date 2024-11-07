@@ -1,8 +1,6 @@
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, PanResponder } from 'react-native';
-
 function DraggableItem({
   children,
   index,
@@ -21,22 +19,18 @@ function DraggableItem({
   const isDraggingRef = useRef(false);
   const longPressTimeout = useRef();
   const pan = useState(new Animated.ValueXY())[0];
-
   const onClear = () => {
     setIsPressed(false);
-
     if (longPressTimeout.current) {
       clearTimeout(longPressTimeout.current);
       onDragRelease && onDragRelease();
     }
-
     if (isDraggingRef.current) {
       setIsDragging(false);
       isDraggingRef.current = false;
       onDragEnd && onDragEnd(pan);
     }
   };
-
   const panResponder = useRef(PanResponder.create({
     onStartShouldSetPanResponder: () => {
       return draggable;
@@ -49,8 +43,8 @@ function DraggableItem({
       longPressTimeout.current = setTimeout(() => {
         onDragGrant && onDragGrant();
         setIsDragging(true);
-        isDraggingRef.current = true; //@ts-ignore
-
+        isDraggingRef.current = true;
+        //@ts-ignore
         pan.setOffset({
           x: pan.x._value,
           y: pan.y._value
@@ -69,11 +63,9 @@ function DraggableItem({
     onPanResponderRelease: (_e, _gesture) => {
       onClear();
     },
-
     onPanResponderTerminate(_e, _gestureState) {
       onClear();
     }
-
   }));
   const shouldMoveRef = useRef(movements);
   useEffect(() => {
@@ -121,6 +113,5 @@ function DraggableItem({
     onLayout: onLayout
   }), children);
 }
-
 export default /*#__PURE__*/React.memo(DraggableItem);
 //# sourceMappingURL=DraggableItem.js.map

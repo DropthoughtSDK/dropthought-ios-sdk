@@ -9,14 +9,13 @@ export default function EndScreenLayout({
   const {
     themeOption
   } = useTheme();
-
   switch (themeOption) {
     case THEME_OPTION.CLASSIC:
     case THEME_OPTION.BIJLIRIDE:
       return /*#__PURE__*/React.createElement(ClassicEndScreen, {
-        survey: survey
+        survey: survey,
+        onClose: onClose
       });
-
     default:
       return /*#__PURE__*/React.createElement(EndScreen, {
         survey: survey,

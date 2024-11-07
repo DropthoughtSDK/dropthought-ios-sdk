@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -17,7 +17,7 @@ void setLogHandler(LogHandler logHandler) {
   gLogHandler = logHandler;
 }
 
-int fb_printLog(int prio, const char *tag, const char *fmt, ...) {
+int fb_printLog(int prio, const char* tag, const char* fmt, ...) {
   char logBuffer[LOG_BUFFER_SIZE];
 
   va_list va_args;
@@ -33,14 +33,14 @@ int fb_printLog(int prio, const char *tag, const char *fmt, ...) {
 
 void logPrintByDelims(
     int priority,
-    const char *tag,
-    const char *delims,
-    const char *msg,
+    const char* tag,
+    const char* delims,
+    const char* msg,
     ...) {
   va_list ap;
   char buf[32768];
-  char *context;
-  char *tok;
+  char* context;
+  char* tok;
 
   va_start(ap, msg);
   vsnprintf(buf, sizeof(buf), msg, ap);
@@ -84,11 +84,11 @@ static char logTagChar(int prio) {
   }
 }
 
-int __android_log_write(int prio, const char *tag, const char *text) {
+int __android_log_write(int prio, const char* tag, const char* text) {
   return fprintf(stderr, "[%c/%.16s] %s\n", logTagChar(prio), tag, text);
 }
 
-int __android_log_print(int prio, const char *tag, const char *fmt, ...) {
+int __android_log_print(int prio, const char* tag, const char* fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
 

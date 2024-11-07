@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -28,29 +28,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RCTSurfaceHostingView : UIView <RCTSurfaceDelegate>
 
 /**
- * Create an instance of RCTSurface to be hosted.
- */
-+ (RCTSurface *)createSurfaceWithBridge:(RCTBridge *)bridge
-                             moduleName:(NSString *)moduleName
-                      initialProperties:(NSDictionary *)initialProperties;
-
-/**
  * Designated initializer.
- * Instanciates a view with given Surface object.
+ * Instantiates a view with given Surface object.
  * Note: The view retains the surface object.
  */
 - (instancetype)initWithSurface:(id<RCTSurfaceProtocol>)surface
                 sizeMeasureMode:(RCTSurfaceSizeMeasureMode)sizeMeasureMode NS_DESIGNATED_INITIALIZER;
-
-/**
- * Convenience initializer.
- * Instanciates a Surface object with given `bridge`, `moduleName`, and
- * `initialProperties`, and then use it to instanciate a view.
- */
-- (instancetype)initWithBridge:(RCTBridge *)bridge
-                    moduleName:(NSString *)moduleName
-             initialProperties:(NSDictionary *)initialProperties
-               sizeMeasureMode:(RCTSurfaceSizeMeasureMode)sizeMeasureMode;
 
 /**
  * Surface object which is currently using to power the view.

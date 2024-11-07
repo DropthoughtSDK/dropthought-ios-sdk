@@ -3,10 +3,9 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GlobalStyle, Colors } from '../styles';
 import i18n from '../translation';
 import ProgressBar from '../components/ProgressBar';
-import { useTheme, THEME_OPTION } from '../contexts/theme'; // @ts-ignore
-
+import { useTheme, THEME_OPTION } from '../contexts/theme';
+// @ts-ignore
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 const SurveyHeader = props => {
   const rtl = i18n.dir() === 'rtl';
   const insets = useSafeAreaInsets();
@@ -25,11 +24,9 @@ const SurveyHeader = props => {
   } = useTheme();
   let color = fontColor;
   const isOption6Smiley = themeOption === THEME_OPTION.OPTION6 && (question === null || question === void 0 ? void 0 : question.type) === 'rating' && (question === null || question === void 0 ? void 0 : question.subType) === 'smiley';
-
   if ((customFontColor === undefined || customFontColor === '') && isOption6Smiley) {
     color = Colors.white;
   }
-
   const containerStyle = [styles.container, {
     paddingTop: insets.top
   }, {
@@ -52,6 +49,7 @@ const SurveyHeader = props => {
     style: iconStyle,
     source: require('../assets/icClose24Px.png')
   })), /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/preview_survey_name_header",
     style: titleStyle,
     numberOfLines: 1
   }, survey.surveyName)), /*#__PURE__*/React.createElement(ProgressBar, {
@@ -62,7 +60,6 @@ const SurveyHeader = props => {
     rtl: rtl
   }));
 };
-
 const styles = StyleSheet.create({
   container: {
     width: '100%',

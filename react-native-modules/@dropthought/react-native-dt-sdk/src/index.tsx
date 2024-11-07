@@ -24,3 +24,5 @@ export const feedbackUploader = {
 export { initializeWithAPIKey };
 
 export * from './kiosk-rn-sdk';
+export * from './lib';
+export * from './data';

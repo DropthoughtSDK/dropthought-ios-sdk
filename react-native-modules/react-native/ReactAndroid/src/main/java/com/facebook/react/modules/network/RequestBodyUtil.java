@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,10 +8,15 @@
 package com.facebook.react.modules.network;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
+import android.util.Base64;
 import androidx.annotation.Nullable;
 import com.facebook.common.logging.FLog;
 import com.facebook.react.common.ReactConstants;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,7 +30,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.zip.GZIPOutputStream;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import okhttp3.internal.Util;
 import okio.BufferedSink;
 import okio.ByteString;
 import okio.Okio;
@@ -58,6 +62,16 @@ import okio.Source;
       if (fileContentUri.getScheme().startsWith("http")) {
         return getDownloadFileInputStream(context, fileContentUri);
       }
+
+      if (fileContentUriStr.startsWith("data:")) {
+        byte[] decodedDataUrString = Base64.decode(fileContentUriStr.split(",")[1], Base64.DEFAULT);
+        Bitmap bitMap =
+            BitmapFactory.decodeByteArray(decodedDataUrString, 0, decodedDataUrString.length);
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bitMap.compress(Bitmap.CompressFormat.PNG, 0, bytes);
+        return new ByteArrayInputStream(bytes.toByteArray());
+      }
+
       return context.getContentResolver().openInputStream(fileContentUri);
     } catch (Exception e) {
       FLog.e(ReactConstants.TAG, "Could not retrieve file for contentUri " + fileContentUriStr, e);
@@ -82,7 +96,12 @@ import okio.Source;
       try {
         final FileOutputStream stream = new FileOutputStream(file);
         try {
-          stream.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
+          long maxBytes = Long.MAX_VALUE;
+          if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+            // Old version of Android internally cast value to integer
+            maxBytes = (long) Integer.MAX_VALUE;
+          }
+          stream.getChannel().transferFrom(channel, 0, maxBytes);
           return new FileInputStream(file);
         } finally {
           stream.close();
@@ -106,6 +125,21 @@ import okio.Source;
       return null;
     }
     return RequestBody.create(mediaType, gzipByteArrayOutputStream.toByteArray());
+  }
+
+  /**
+   * Reference:
+   * https://github.com/square/okhttp/blob/8c8c3dbcfa91e28de2e13975ec414e07f153fde4/okhttp/src/commonMain/kotlin/okhttp3/internal/-UtilCommon.kt#L281-L288
+   * Checked exceptions will be ignored
+   */
+  private static void closeQuietly(Source source) {
+    try {
+      source.close();
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      // noop.
+    }
   }
 
   /** Creates a RequestBody from a mediaType and inputStream given. */
@@ -132,7 +166,7 @@ import okio.Source;
           source = Okio.source(inputStream);
           sink.writeAll(source);
         } finally {
-          Util.closeQuietly(source);
+          closeQuietly(source);
         }
       }
     };

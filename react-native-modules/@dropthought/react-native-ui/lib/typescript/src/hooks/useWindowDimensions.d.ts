@@ -1,8 +1,7 @@
-/** @enum {'phone' | 'tablet'} */
-export declare const DimensionWidthType: {
-    phone: string;
-    tablet: string;
-};
+export declare const DimensionWidthType: Readonly<{
+    phone: "phone";
+    tablet: "tablet";
+}>;
 /** @enum {'portrait' | 'landscape'} */
 export declare const OrientationType: {
     portrait: string;
@@ -12,7 +11,7 @@ export declare const OrientationType: {
  * @returns {WindowDimensions}
  */
 export declare const useWindowDimensions: () => {
-    widthType: string;
+    widthType: "phone" | "tablet";
     width: number;
     height: number;
     scale: number;
@@ -21,8 +20,9 @@ export declare const useWindowDimensions: () => {
 /**
  * @returns {DimensionWidthType}
  */
-export declare const useDimensionWidthType: () => string;
+export declare const useDimensionWidthType: () => "phone" | "tablet";
 /**
  * @returns {OrientationType}
  */
 export declare const useOrientationType: () => string;
+//# sourceMappingURL=useWindowDimensions.d.ts.map

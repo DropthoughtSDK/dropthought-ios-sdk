@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,7 +7,6 @@
 
 package com.facebook.react.views.view;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -31,7 +30,6 @@ public class ReactDrawableHelper {
 
   private static final TypedValue sResolveOutValue = new TypedValue();
 
-  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   public static Drawable createDrawableFromJSDescription(
       Context context, ReadableMap drawableDescriptionDict) {
     String type = drawableDescriptionDict.getString("type");
@@ -52,7 +50,6 @@ public class ReactDrawableHelper {
     }
   }
 
-  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   private static int getAttrId(Context context, String attr) {
     SoftAssertions.assertNotNull(attr);
     if ("selectableItemBackground".equals(attr)) {
@@ -65,11 +62,7 @@ public class ReactDrawableHelper {
   }
 
   private static Drawable getDefaultThemeDrawable(Context context) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      return context.getResources().getDrawable(sResolveOutValue.resourceId, context.getTheme());
-    } else {
-      return context.getResources().getDrawable(sResolveOutValue.resourceId);
-    }
+    return context.getResources().getDrawable(sResolveOutValue.resourceId, context.getTheme());
   }
 
   private static RippleDrawable getRippleDrawable(

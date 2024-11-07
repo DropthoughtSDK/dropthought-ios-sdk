@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,8 +9,7 @@
 
 #include <react/renderer/graphics/Float.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * Convenience functions for rounding float values to be aligned with a device
@@ -30,20 +29,23 @@ Float roundToPixel(Float value, Float scaleFactor) {
 
 template <Float (*RoundingFunction)(Float)>
 Point roundToPixel(Point value, Float scaleFactor) {
-  return Point{roundToPixel<RoundingFunction>(value.x, scaleFactor),
-               roundToPixel<RoundingFunction>(value.y, scaleFactor)};
+  return Point{
+      roundToPixel<RoundingFunction>(value.x, scaleFactor),
+      roundToPixel<RoundingFunction>(value.y, scaleFactor)};
 }
 
 template <Float (*RoundingFunction)(Float)>
 Size roundToPixel(Size value, Float scaleFactor) {
-  return Size{roundToPixel<RoundingFunction>(value.width, scaleFactor),
-              roundToPixel<RoundingFunction>(value.height, scaleFactor)};
+  return Size{
+      roundToPixel<RoundingFunction>(value.width, scaleFactor),
+      roundToPixel<RoundingFunction>(value.height, scaleFactor)};
 }
 
 template <Float (*RoundingFunction)(Float)>
 Rect roundToPixel(Rect value, Float scaleFactor) {
-  return Rect{roundToPixel<RoundingFunction>(value.origin),
-              roundToPixel<RoundingFunction>(value.size)};
+  return Rect{
+      roundToPixel<RoundingFunction>(value.origin),
+      roundToPixel<RoundingFunction>(value.size)};
 }
 
 /*
@@ -78,5 +80,4 @@ inline long double floor(long double value) noexcept {
   return ::floorl(value);
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Question } from '../data';
-declare type Props = {
+type Props = {
     visible: boolean;
     question: Question;
     placeholder: string;
@@ -10,3 +10,4 @@ declare type Props = {
 };
 declare const ClassicDropdownOtherOptionInput: React.FC<Props>;
 export default ClassicDropdownOtherOptionInput;
+//# sourceMappingURL=ClassicDropdownOtherOptionInput.d.ts.map

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,14 +8,15 @@
 package com.facebook.react.fabric;
 
 import android.annotation.SuppressLint;
-import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.facebook.common.logging.FLog;
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;
 import com.facebook.react.bridge.NativeMap;
 import com.facebook.react.bridge.ReadableNativeMap;
-import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.common.mapbuffer.ReadableMapBuffer;
 import com.facebook.react.uimanager.StateWrapper;
 
 /**
@@ -23,50 +24,63 @@ import com.facebook.react.uimanager.StateWrapper;
  * the Bindings.cpp, where the pointer to the C++ event emitter is set.
  */
 @SuppressLint("MissingNativeLoadLibrary")
+@DoNotStrip
 public class StateWrapperImpl implements StateWrapper {
   static {
     FabricSoLoader.staticInit();
   }
 
+  private static final String TAG = "StateWrapperImpl";
+
   @DoNotStrip private final HybridData mHybridData;
-
-  private Runnable mFailureCallback = null;
-  private int mUpdateStateId = 0;
-
-  private static native HybridData initHybrid();
+  private volatile boolean mDestroyed = false;
 
   private StateWrapperImpl() {
     mHybridData = initHybrid();
   }
 
-  @Override
-  public native ReadableNativeMap getState();
+  private static native HybridData initHybrid();
+
+  private native ReadableNativeMap getStateDataImpl();
+
+  private native ReadableMapBuffer getStateMapBufferDataImpl();
 
   public native void updateStateImpl(@NonNull NativeMap map);
 
-  public native void updateStateWithFailureCallbackImpl(
-      @NonNull NativeMap map, Object self, int updateStateId);
-
   @Override
-  public void updateState(@NonNull WritableMap map, Runnable failureCallback) {
-    mUpdateStateId++;
-    mFailureCallback = failureCallback;
-    updateStateWithFailureCallbackImpl((NativeMap) map, this, mUpdateStateId);
+  @Nullable
+  public ReadableMapBuffer getStateDataMapBuffer() {
+    if (mDestroyed) {
+      FLog.e(TAG, "Race between StateWrapperImpl destruction and getState");
+      return null;
+    }
+    return getStateMapBufferDataImpl();
   }
 
-  @DoNotStrip
-  @AnyThread
-  public void updateStateFailed(int callbackRefId) {
-    // If the callback ref ID doesn't match the ID of the most-recent updateState call,
-    // then it's an outdated failure callback and we ignore it.
-    if (callbackRefId != mUpdateStateId) {
+  @Override
+  @Nullable
+  public ReadableNativeMap getStateData() {
+    if (mDestroyed) {
+      FLog.e(TAG, "Race between StateWrapperImpl destruction and getState");
+      return null;
+    }
+    return getStateDataImpl();
+  }
+
+  @Override
+  public void updateState(@NonNull WritableMap map) {
+    if (mDestroyed) {
+      FLog.e(TAG, "Race between StateWrapperImpl destruction and updateState");
       return;
     }
+    updateStateImpl((NativeMap) map);
+  }
 
-    final Runnable failureCallback = mFailureCallback;
-    mFailureCallback = null;
-    if (failureCallback != null) {
-      UiThreadUtil.runOnUiThread(failureCallback);
+  @Override
+  public void destroyState() {
+    if (!mDestroyed) {
+      mDestroyed = true;
+      mHybridData.resetNative();
     }
   }
 }

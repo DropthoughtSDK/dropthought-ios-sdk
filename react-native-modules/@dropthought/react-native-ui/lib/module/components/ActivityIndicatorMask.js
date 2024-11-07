@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { GlobalStyle } from '../styles';
-
 const ActivityIndicatorMask = ({
   loading = false,
   style
@@ -12,6 +11,5 @@ const ActivityIndicatorMask = ({
     color: "gray"
   })) : null;
 };
-
 export default ActivityIndicatorMask;
 //# sourceMappingURL=ActivityIndicatorMask.js.map

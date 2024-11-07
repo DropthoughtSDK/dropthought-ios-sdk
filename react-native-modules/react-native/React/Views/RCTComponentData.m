@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,7 +12,10 @@
 #import "RCTBridge.h"
 #import "RCTBridgeModule.h"
 #import "RCTComponentEvent.h"
+#import "RCTConstants.h"
 #import "RCTConvert.h"
+#import "RCTEventDispatcherProtocol.h"
+#import "RCTModuleMethod.h"
 #import "RCTParserUtils.h"
 #import "RCTShadowView.h"
 #import "RCTUtils.h"
@@ -36,29 +39,39 @@ static SEL selectorForType(NSString *type)
   RCTPropBlockDictionary *_viewPropBlocks;
   RCTPropBlockDictionary *_shadowPropBlocks;
   __weak RCTBridge *_bridge;
+  __weak id<RCTEventDispatcherProtocol> _eventDispatcher;
 }
 
 @synthesize manager = _manager;
+@synthesize bridgelessViewManager = _bridgelessViewManager;
 
-- (instancetype)initWithManagerClass:(Class)managerClass bridge:(RCTBridge *)bridge
+- (instancetype)initWithManagerClass:(Class)managerClass
+                              bridge:(RCTBridge *)bridge
+                     eventDispatcher:(id<RCTEventDispatcherProtocol>)eventDispatcher
 {
   if ((self = [super init])) {
     _bridge = bridge;
+    _eventDispatcher = eventDispatcher;
     _managerClass = managerClass;
     _viewPropBlocks = [NSMutableDictionary new];
     _shadowPropBlocks = [NSMutableDictionary new];
 
-    _name = moduleNameForClass(managerClass);
+    _name = RCTViewManagerModuleNameForClass(managerClass);
   }
   return self;
 }
 
 - (RCTViewManager *)manager
 {
-  if (!_manager) {
+  if (!_manager && _bridge) {
     _manager = [_bridge moduleForClass:_managerClass];
+  } else if (!_manager && !_bridgelessViewManager) {
+    _bridgelessViewManager = [_managerClass new];
+    [[NSNotificationCenter defaultCenter] postNotificationName:RCTDidInitializeModuleNotification
+                                                        object:nil
+                                                      userInfo:@{@"module" : _bridgelessViewManager}];
   }
-  return _manager;
+  return _manager ? _manager : _bridgelessViewManager;
 }
 
 RCT_NOT_IMPLEMENTED(-(instancetype)init)
@@ -98,10 +111,13 @@ RCT_NOT_IMPLEMENTED(-(instancetype)init)
   }
 }
 
-static RCTPropBlock
-createEventSetter(NSString *propName, SEL setter, InterceptorBlock eventInterceptor, RCTBridge *bridge)
+static RCTPropBlock createEventSetter(
+    NSString *propName,
+    SEL setter,
+    InterceptorBlock eventInterceptor,
+    id<RCTEventDispatcherProtocol> eventDispatcher)
 {
-  __weak RCTBridge *weakBridge = bridge;
+  __weak id<RCTEventDispatcherProtocol> weakEventDispatcher = eventDispatcher;
   return ^(id target, id json) {
     void (^eventHandler)(NSDictionary *event) = nil;
     if ([RCTConvert BOOL:json]) {
@@ -119,7 +135,7 @@ createEventSetter(NSString *propName, SEL setter, InterceptorBlock eventIntercep
           RCTComponentEvent *componentEvent = [[RCTComponentEvent alloc] initWithName:propName
                                                                               viewTag:strongTarget.reactTag
                                                                                  body:event];
-          [weakBridge.eventDispatcher sendEvent:componentEvent];
+          [weakEventDispatcher sendEvent:componentEvent];
         }
       };
     }
@@ -246,9 +262,11 @@ static RCTPropBlock createNSInvocationSetter(NSMethodSignature *typeSignature, S
     // Build setter block
     void (^setterBlock)(id target, id json) = nil;
     if (type == NSSelectorFromString(@"RCTBubblingEventBlock:") ||
-        type == NSSelectorFromString(@"RCTDirectEventBlock:")) {
+        type == NSSelectorFromString(@"RCTDirectEventBlock:") ||
+        type == NSSelectorFromString(@"RCTCapturingEventBlock:")) {
       // Special case for event handlers
-      setterBlock = createEventSetter(name, setter, self.eventInterceptor, _bridge);
+      setterBlock =
+          createEventSetter(name, setter, self.eventInterceptor, _bridge ? _bridge.eventDispatcher : _eventDispatcher);
     } else {
       // Ordinary property handlers
       NSMethodSignature *typeSignature = [[RCTConvert class] methodSignatureForSelector:type];
@@ -368,15 +386,52 @@ static RCTPropBlock createNSInvocationSetter(NSMethodSignature *typeSignature, S
   }];
 }
 
-- (NSDictionary<NSString *, id> *)viewConfig
++ (NSDictionary<NSString *, NSNumber *> *)commandsForViewMangerClass:(Class)managerClass
+                                                             methods:(Method *)methods
+                                                         methodCount:(unsigned int)methodCount
+{
+  NSMutableDictionary<NSString *, NSNumber *> *commands = [NSMutableDictionary new];
+  static const char *prefix = "__rct_export__";
+  const unsigned int prefixLength = strlen(prefix);
+  int commandCount = 0;
+  for (int i = 0; i < methodCount; i++) {
+    SEL selector = method_getName(methods[i]);
+    const char *selectorName = sel_getName(selector);
+    if (strncmp(selectorName, prefix, prefixLength) != 0) {
+      continue;
+    }
+    RCTMethodInfo *methodInfo = ((RCTMethodInfo * (*)(id, SEL)) objc_msgSend)(managerClass, selector);
+    RCTModuleMethod *moduleMethod = [[RCTModuleMethod alloc] initWithExportedMethod:methodInfo
+                                                                        moduleClass:managerClass];
+    NSString *methodName = @(moduleMethod.JSMethodName);
+    commands[methodName] = @(commandCount);
+    commandCount += 1;
+  }
+  // View manager do not export getConstants with RCT_EXPORT_METHOD, so we inject it into "Commands" manually.
+  if (commandCount > 0) {
+    commands[@"getConstants"] = @(commandCount);
+  }
+  return commands;
+}
+
++ (NSDictionary<NSString *, id> *)constantsForViewMangerClass:(Class)managerClass
+{
+  if ([managerClass instancesRespondToSelector:@selector(constantsToExport)]) {
+    return [[managerClass new] constantsToExport];
+  }
+  return @{};
+}
+
++ (NSDictionary<NSString *, id> *)viewConfigForViewMangerClass:(Class)managerClass
 {
   NSMutableArray<NSString *> *bubblingEvents = [NSMutableArray new];
+  NSMutableArray<NSString *> *capturingEvents = [NSMutableArray new];
   NSMutableArray<NSString *> *directEvents = [NSMutableArray new];
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  if (RCTClassOverridesInstanceMethod(_managerClass, @selector(customBubblingEventTypes))) {
-    NSArray<NSString *> *events = [self.manager customBubblingEventTypes];
+  if (RCTClassOverridesInstanceMethod(managerClass, @selector(customBubblingEventTypes))) {
+    NSArray<NSString *> *events = [[managerClass new] customBubblingEventTypes];
     for (NSString *event in events) {
       [bubblingEvents addObject:RCTNormalizeInputEventName(event)];
     }
@@ -385,7 +440,7 @@ static RCTPropBlock createNSInvocationSetter(NSMethodSignature *typeSignature, S
 
   unsigned int count = 0;
   NSMutableDictionary *propTypes = [NSMutableDictionary new];
-  Method *methods = class_copyMethodList(object_getClass(_managerClass), &count);
+  Method *methods = class_copyMethodList(object_getClass(managerClass), &count);
   for (unsigned int i = 0; i < count; i++) {
     SEL selector = method_getName(methods[i]);
     const char *selectorName = sel_getName(selector);
@@ -400,19 +455,22 @@ static RCTPropBlock createNSInvocationSetter(NSMethodSignature *typeSignature, S
     }
 
     NSString *name = @(underscorePos + 1);
-    NSString *type = ((NSArray<NSString *> * (*)(id, SEL)) objc_msgSend)(_managerClass, selector)[0];
+    NSString *type = ((NSArray<NSString *> * (*)(id, SEL)) objc_msgSend)(managerClass, selector)[0];
     if (RCT_DEBUG && propTypes[name] && ![propTypes[name] isEqualToString:type]) {
       RCTLogError(
           @"Property '%@' of component '%@' redefined from '%@' "
            "to '%@'",
           name,
-          _name,
+          RCTViewManagerModuleNameForClass(managerClass),
           propTypes[name],
           type);
     }
 
     if ([type isEqualToString:@"RCTBubblingEventBlock"]) {
       [bubblingEvents addObject:RCTNormalizeInputEventName(name)];
+      propTypes[name] = @"BOOL";
+    } else if ([type isEqualToString:@"RCTCapturingEventBlock"]) {
+      [capturingEvents addObject:RCTNormalizeInputEventName(name)];
       propTypes[name] = @"BOOL";
     } else if ([type isEqualToString:@"RCTDirectEventBlock"]) {
       [directEvents addObject:RCTNormalizeInputEventName(name)];
@@ -421,7 +479,6 @@ static RCTPropBlock createNSInvocationSetter(NSMethodSignature *typeSignature, S
       propTypes[name] = type;
     }
   }
-  free(methods);
 
 #if RCT_DEBUG
   for (NSString *event in bubblingEvents) {
@@ -429,23 +486,40 @@ static RCTPropBlock createNSInvocationSetter(NSMethodSignature *typeSignature, S
       RCTLogError(
           @"Component '%@' registered '%@' as both a bubbling event "
            "and a direct event",
-          _name,
+          RCTViewManagerModuleNameForClass(managerClass),
           event);
     }
   }
 #endif
 
-  Class superClass = [_managerClass superclass];
+  Class superClass = [managerClass superclass];
 
-  return @{
+  NSMutableDictionary *result = [[NSMutableDictionary alloc] initWithDictionary:@{
     @"propTypes" : propTypes,
     @"directEvents" : directEvents,
     @"bubblingEvents" : bubblingEvents,
-    @"baseModuleName" : superClass == [NSObject class] ? (id)kCFNull : moduleNameForClass(superClass),
-  };
+    @"capturingEvents" : capturingEvents,
+    @"baseModuleName" : superClass == [NSObject class] ? (id)kCFNull : RCTViewManagerModuleNameForClass(superClass),
+  }];
+
+  if (RCTGetUseNativeViewConfigsInBridgelessMode()) {
+    result[@"Commands"] = [self commandsForViewMangerClass:managerClass methods:methods methodCount:count];
+    result[@"Constants"] = [self constantsForViewMangerClass:managerClass];
+  }
+
+  free(methods);
+
+  return result;
 }
 
-static NSString *moduleNameForClass(Class managerClass)
+- (NSDictionary<NSString *, id> *)viewConfig
+{
+  // Make sure the manager is initialized before accessing view config.
+  [self manager];
+  return [RCTComponentData viewConfigForViewMangerClass:_managerClass];
+}
+
+NSString *RCTViewManagerModuleNameForClass(Class managerClass)
 {
   // Hackety hack, this partially re-implements RCTBridgeModuleNameForClass
   // We want to get rid of RCT and RK prefixes, but a lot of JS code still references

@@ -1,0 +1,1 @@
+{"version":3,"file":"FileIcon.d.ts","sourceRoot":"","sources":["../../../../src/components/FileIcon.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,MAAM,OAAO,CAAC;AAE1B,OAAO,KAAK,EAAE,UAAU,EAAE,MAAM,cAAc,CAAC;AAG/C,KAAK,aAAa,GAAG;IACnB,KAAK,CAAC,EAAE,UAAU,CAAC;IACnB,QAAQ,EAAE,MAAM,GAAG,IAAI,CAAC;CACzB,CAAC;AAGF,QAAA,MAAM,QAAQ,wBAAyB,aAAa,sBA+CnD,CAAC;AAEF,eAAe,QAAQ,CAAC"}

@@ -1,5 +1,5 @@
-import type { Feedback } from 'src/data';
-export declare type FeedbackReducerState = {
+import type { Feedback } from '../../data';
+export type FeedbackReducerState = {
     answeredQuestionIds: string[];
     feedbacksMap: {
         [questionId: string]: Feedback;
@@ -7,20 +7,28 @@ export declare type FeedbackReducerState = {
 };
 export declare enum FeedbackReducerActionType {
     Clear = "clear-feedbacks",
-    Update = "update-feedback"
+    Update = "update-feedback",
+    RemoveSingle = "remove-single-feedback"
 }
-export declare type IFeedbackReducerActionType = FeedbackReducerActionType.Clear | FeedbackReducerActionType.Update;
-export declare type ClearFeedbacksAction = {
+export type IFeedbackReducerActionType = FeedbackReducerActionType.Clear | FeedbackReducerActionType.Update | FeedbackReducerActionType.RemoveSingle;
+export type ClearFeedbacksAction = {
     type: FeedbackReducerActionType.Clear;
 };
-export declare type UpdateFeedbackAction = {
+export type UpdateFeedbackAction = {
     type: FeedbackReducerActionType.Update;
     payload: {
         feedback: Feedback;
     };
 };
-export declare type FeedbackReducerAction = ClearFeedbacksAction | UpdateFeedbackAction;
-export declare type FeedbackReducerDispatch = (action: FeedbackReducerAction) => void;
+export type RemoveSingleFeedbackAction = {
+    type: FeedbackReducerActionType.RemoveSingle;
+    payload: {
+        questionId: string;
+    };
+};
+export type FeedbackReducerAction = ClearFeedbacksAction | UpdateFeedbackAction | RemoveSingleFeedbackAction;
+export type FeedbackReducerDispatch = (action: FeedbackReducerAction) => void;
 export declare const initialState: FeedbackReducerState;
 export declare const feedbackReducer: (state: FeedbackReducerState, action: FeedbackReducerAction) => FeedbackReducerState;
 export declare const reducer: (state: FeedbackReducerState, action: FeedbackReducerAction) => FeedbackReducerState;
+//# sourceMappingURL=FeedbackReducer.d.ts.map

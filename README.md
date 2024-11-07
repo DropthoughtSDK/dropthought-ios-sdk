@@ -4,10 +4,14 @@ This repository contains all Dropthought iOS SDK sources.
 
 ## Latest Version
 
--   5.6.0
+-   5.12.0
 
 ## Features
 
+-   Statement
+-   File upload
+-   Poll
+-   Auto Close on End Page
 -   Bijliride Theme
 -   Picture Choice
 -   Matrix choice
@@ -77,6 +81,23 @@ use_frameworks!
 target '{your_project_target}' do
 
 +  use_dropthought_sdk
+
+post_install do |installer|
++   react_native_post_install(installer)
+
++   targets_to_skip_verification = [
++     'lottie-ios',
++     'lottie-react-native'
++   ]
+    
++   installer.pods_project.targets.each do |target|
++     if targets_to_skip_verification.include?(target.name)
++       target.build_configurations.each do |config|
++         puts "Updating OTHER_SWIFT_FLAGS for target #{target.name} to include -no-verify-emitted-module-interface"
++         config.build_settings['OTHER_SWIFT_FLAGS'] = '$(inherited) -no-verify-emitted-module-interface'
++       end
++     end
++   end
 
    {...}
 

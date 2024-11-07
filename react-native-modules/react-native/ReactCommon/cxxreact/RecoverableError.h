@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -11,8 +11,7 @@
 #include <functional>
 #include <string>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /**
  * RecoverableError
@@ -20,10 +19,10 @@ namespace react {
  * An exception that it is expected we should be able to recover from.
  */
 struct RecoverableError : public std::exception {
-  explicit RecoverableError(const std::string &what_)
+  explicit RecoverableError(const std::string& what_)
       : m_what{"facebook::react::Recoverable: " + what_} {}
 
-  virtual const char *what() const noexcept override {
+  virtual const char* what() const noexcept override {
     return m_what.c_str();
   }
 
@@ -37,7 +36,7 @@ struct RecoverableError : public std::exception {
   inline static void runRethrowingAsRecoverable(std::function<void()> act) {
     try {
       act();
-    } catch (const E &err) {
+    } catch (const E& err) {
       throw RecoverableError(err.what());
     }
   }
@@ -46,5 +45,4 @@ struct RecoverableError : public std::exception {
   std::string m_what;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

@@ -3,10 +3,10 @@ import { View, StyleSheet, Text, ImageBackground, Keyboard, TextInput, Image } f
 import ClassicMandatoryTitle from './ClassicMandatoryTitle';
 import GlobalStyle, { Colors } from '../styles';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
+// @ts-ignore
 import { sliderRatingAboveThumbFace } from '../constants/SliderDragQuestionConstants';
 import CustomSlider from '../components/Slider';
 import { isNil } from 'ramda';
-
 const ThumbComponent = ({
   isDark
 }) => {
@@ -27,7 +27,6 @@ const ThumbComponent = ({
     style: thumbContentStyle
   }));
 };
-
 const AboveThumbComponent = ({
   value,
   question,
@@ -36,13 +35,13 @@ const AboveThumbComponent = ({
   if (!hasEdited) {
     return null;
   }
-
   const {
     scale: stringScale,
     minScale: stringMinScale
   } = question;
   const maxScale = Number(stringScale);
   const minScale = Number(stringMinScale);
+  // @ts-ignore
   const face = sliderRatingAboveThumbFace(minScale, value[0], maxScale);
   const containerStyle = {
     transform: [{
@@ -55,7 +54,8 @@ const AboveThumbComponent = ({
     style: containerStyle
   }, /*#__PURE__*/React.createElement(ImageBackground, {
     style: styles.aboveThumbContainer,
-    source: require( // @ts-ignore
+    source: require(
+    // @ts-ignore
     '../assets/ic_slider_above_thumb.png')
   }, /*#__PURE__*/React.createElement(View, {
     style: styles.aboveThumbContent
@@ -65,7 +65,6 @@ const AboveThumbComponent = ({
     style: styles.aboveThumbText
   }, value))));
 };
-
 const ClassicSliderDragRatingQuestion = ({
   mandatoryErrorMessage,
   question,
@@ -99,7 +98,6 @@ const ClassicSliderDragRatingQuestion = ({
     setHasEdited(true);
     setFocus(false);
     let submitValue = valueInput || 0;
-
     if (submitValue > maxScale) {
       setValue([maxScale]);
       setInputValue(maxScale);
@@ -111,36 +109,35 @@ const ClassicSliderDragRatingQuestion = ({
     } else {
       setValue([submitValue]);
     }
-
     onFeedback({
       questionId: questionId,
       answers: [submitValue - 1],
       type: 'ratingSlider'
     });
   }, [valueInput, maxScale, minScale, onFeedback, questionId]);
-
   const getInitialSelectedValueFromFeedbackProps = () => {
     if (feedback && feedback.answers && !isNil(feedback.answers[0])) {
       const {
         answers
       } = feedback;
       const prevAnswer = typeof answers[0] === 'string' ? parseInt(answers[0], 10) : answers[0];
-      setValue([prevAnswer + 1]);
-      setInputValue(prevAnswer + 1);
-      setHasEdited(true);
+      if (prevAnswer !== undefined) {
+        setValue([prevAnswer + 1]);
+        setInputValue(prevAnswer + 1);
+        setHasEdited(true);
+      }
     }
   };
-
   React.useEffect(() => {
-    getInitialSelectedValueFromFeedbackProps(); // eslint-disable-next-line react-hooks/exhaustive-deps
+    getInitialSelectedValueFromFeedbackProps();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const inputRef = React.useRef(null);
   React.useEffect(() => {
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
       if (focus) {
         var _inputRef$current;
-
-        (_inputRef$current = inputRef.current) === null || _inputRef$current === void 0 ? void 0 : _inputRef$current.blur();
+        (_inputRef$current = inputRef.current) === null || _inputRef$current === void 0 || _inputRef$current.blur();
         onFeedbackHandler();
       }
     });
@@ -152,13 +149,16 @@ const ClassicSliderDragRatingQuestion = ({
     color: fontColor,
     borderColor: isDark ? Colors.rankingContainerBgDark : Colors.rankingContainerBorder
   };
-  const trackStyle = { ...styles.track,
+  const trackStyle = {
+    ...styles.track,
     backgroundColor: isDark ? Colors.rankingContainerBgDark : Colors.rankingBorder
   };
-  const activeMarkStyle = { ...styles.activeMark,
+  const activeMarkStyle = {
+    ...styles.activeMark,
     opacity: isDark ? 0.3 : 1
   };
   const textField = /*#__PURE__*/React.createElement(TextInput, {
+    testID: "test:id/field_slider_rating_value",
     ref: inputRef,
     style: [styles.input, inputStyle],
     onChangeText: text => {
@@ -173,7 +173,9 @@ const ClassicSliderDragRatingQuestion = ({
     placeholderTextColor: fontColor,
     keyboardType: "numeric"
   });
-  const slider = /*#__PURE__*/React.createElement(CustomSlider, {
+  const slider = /*#__PURE__*/React.createElement(CustomSlider
+  // @ts-ignore
+  , {
     value: value[0],
     setValue: setValue,
     trackMarks: total % 2 === 0 ? [middle - 0.5] : [middle],
@@ -205,13 +207,15 @@ const ClassicSliderDragRatingQuestion = ({
     },
     onSlidingComplete: input => {
       const inputNumber = typeof input !== 'number' ? input[0] : 0;
-      setInputValue(inputNumber);
-      setFocus(false);
-      onFeedback({
-        questionId: questionId,
-        answers: [inputNumber - 1],
-        type: 'ratingSlider'
-      });
+      if (inputNumber) {
+        setInputValue(inputNumber);
+        setFocus(false);
+        onFeedback({
+          questionId: questionId,
+          answers: [inputNumber - 1],
+          type: 'ratingSlider'
+        });
+      }
     },
     animationType: "timing"
   });
@@ -246,7 +250,6 @@ const ClassicSliderDragRatingQuestion = ({
     style: GlobalStyle.flex1
   }, slider), textField)));
 };
-
 export default /*#__PURE__*/React.memo(ClassicSliderDragRatingQuestion);
 const styles = StyleSheet.create({
   questionContainer: {

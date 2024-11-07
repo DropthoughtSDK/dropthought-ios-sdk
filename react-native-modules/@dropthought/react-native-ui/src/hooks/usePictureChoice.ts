@@ -65,7 +65,6 @@ export const usePictureChoice = (
     const { answers } = feedback ?? {};
     if (answers && answers.length > 0) {
       if (otherPictureSelected) {
-        answers.splice(-1);
         return answers.filter((answer) => typeof answer === 'number');
       } else {
         return answers.filter((answer) => typeof answer === 'number');

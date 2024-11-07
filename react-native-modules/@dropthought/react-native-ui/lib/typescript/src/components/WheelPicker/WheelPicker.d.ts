@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleProp, TextStyle, ViewStyle, ViewProps } from 'react-native';
+import type { StyleProp, TextStyle, ViewStyle, ViewProps } from 'react-native';
 interface Props {
     selectedIndex: number;
     options: string[];
@@ -17,3 +17,4 @@ interface Props {
 }
 declare const WheelPicker: React.FC<Props>;
 export default WheelPicker;
+//# sourceMappingURL=WheelPicker.d.ts.map

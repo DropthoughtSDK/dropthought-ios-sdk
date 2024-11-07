@@ -4,10 +4,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _reactNative = require("react-native");
-
-var _default = _reactNative.StyleSheet.create({
+var _default = exports.default = _reactNative.StyleSheet.create({
   container: {
     position: 'relative'
   },
@@ -29,6 +27,4 @@ var _default = _reactNative.StyleSheet.create({
     zIndex: 100
   }
 });
-
-exports.default = _default;
 //# sourceMappingURL=WheelPicker.styles.js.map

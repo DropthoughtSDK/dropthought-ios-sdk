@@ -8,16 +8,17 @@
  * }
  */
 import * as React from 'react';
-declare type SurveyPageContextValue = {
+type SurveyPageContextValue = {
     mandatoryQuestionTitleRefs: {
         [questionId: string]: any;
     };
     addMandatoryQuestionTitleRef: (questionId: string, ref: any) => void;
 };
-declare type Props = {
+type Props = {
     children: React.ReactNode;
 };
-export declare function SurveyPageProvider({ children }: Props): JSX.Element;
+export declare function SurveyPageProvider({ children }: Props): React.JSX.Element;
 export declare const useSurveyPageContext: () => SurveyPageContextValue;
 export declare const useAddMandatoryRef: () => (questionId: string, ref: any) => void;
 export {};
+//# sourceMappingURL=SurveyPageContext.d.ts.map

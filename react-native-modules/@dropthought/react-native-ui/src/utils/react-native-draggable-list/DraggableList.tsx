@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, Animated, LayoutChangeEvent } from 'react-native';
+import { StyleSheet, View, Animated } from 'react-native';
+import type { LayoutChangeEvent } from 'react-native';
 import DraggableItem from './DraggableItem';
 
 export type TransformedOption = {
@@ -17,6 +18,7 @@ function moveElement<ItemT>(
   const result = [...array];
   if (from !== to) {
     const element = result.splice(from, 1)[0];
+    // @ts-ignore
     result.splice(to, 0, element);
   }
   return result;
@@ -83,7 +85,7 @@ function DraggableList({
       return result;
     } else {
       const movements =
-        tempListRef.current[draggingIndexRef.current].rowHeight ?? 0;
+        tempListRef.current[draggingIndexRef.current]?.rowHeight ?? 0;
       if (newIndexRef.current > draggingIndexRef.current) {
         result =
           index > draggingIndexRef.current && index <= newIndexRef.current
@@ -103,13 +105,13 @@ function DraggableList({
     if (!heightLevelRef.current) {
       let localHeightLevel: number[] = [Number.MIN_SAFE_INTEGER];
       for (let i = 0; i < tempListRef.current.length; i++) {
-        const iRowHeight = tempListRef.current[i].rowHeight;
+        const iRowHeight = tempListRef.current[i]?.rowHeight;
         if (iRowHeight) {
           let level = 0;
           if (i < draggingIndexRef.current) {
             level = Math.floor(iRowHeight / 2);
             for (let j = i + 1; j < draggingIndexRef.current; j++) {
-              const jRowHeight = tempListRef.current[j].rowHeight;
+              const jRowHeight = tempListRef.current[j]?.rowHeight;
               if (jRowHeight) {
                 level = level + jRowHeight;
               }
@@ -117,7 +119,7 @@ function DraggableList({
             localHeightLevel = [...localHeightLevel, -level];
           } else if (i > draggingIndexRef.current) {
             for (let j = draggingIndexRef.current + 1; j < i; j++) {
-              const jRowHeight = tempListRef.current[j].rowHeight;
+              const jRowHeight = tempListRef.current[j]?.rowHeight;
               if (jRowHeight) {
                 level = level + jRowHeight;
               }
@@ -162,7 +164,9 @@ function DraggableList({
       if (heightLevelRef.current) {
         for (let i = 0; i < heightLevelRef.current.length; i++) {
           if (
+            // @ts-ignore
             currentY >= heightLevelRef.current[i] &&
+            // @ts-ignore
             currentY < heightLevelRef.current[i + 1]
           ) {
             if (newIndexRef.current !== i) {
@@ -186,16 +190,18 @@ function DraggableList({
     minRef.current = 0;
     maxRef.current = 0;
     for (let i = 0; i < index; i++) {
-      minRef.current = minRef.current - (tempListRef.current[i].rowHeight ?? 0);
+      minRef.current =
+        minRef.current - (tempListRef.current[i]?.rowHeight ?? 0);
     }
 
     for (let i = index; i < nonNACount - 1; i++) {
       const origin = data.filter(
-        ({ option }) => option === tempListRef.current[index].option
+        ({ option }) => option === tempListRef.current[index]?.option
       );
+      // @ts-ignore
       if (origin.length > 0 && !origin[0].isNA) {
         maxRef.current =
-          maxRef.current + (tempListRef.current[i].rowHeight ?? 0);
+          maxRef.current + (tempListRef.current[i]?.rowHeight ?? 0);
       }
     }
   };
@@ -256,11 +262,13 @@ function DraggableList({
 
   const onLayoutHandler = (event: LayoutChangeEvent, listIndex: number) => {
     var { height } = event.nativeEvent.layout;
+    // @ts-ignore
     tempListRef.current[listIndex] = {
       ...tempListRef.current[listIndex],
       rowHeight: parseInt(`${height}`, 10),
     };
-    if (!backupListRef.current[listIndex].rowHeight) {
+    if (!backupListRef.current[listIndex]?.rowHeight) {
+      // @ts-ignore
       backupListRef.current[listIndex] = {
         ...tempListRef.current[listIndex],
         rowHeight: parseInt(`${height}`, 10),

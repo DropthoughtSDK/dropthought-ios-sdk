@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -23,8 +23,8 @@ class Sample {
  public:
   std::string hello();
   double add(double a, double b);
-  std::string concat(const std::string &a, const std::string &b);
-  std::string repeat(int count, const std::string &str);
+  std::string concat(const std::string& a, const std::string& b);
+  std::string repeat(int count, const std::string& str);
   void save(std::map<std::string, std::string> dict);
   std::map<std::string, std::string> load();
   void call_later(int msec, std::function<void()> f);
@@ -56,4 +56,4 @@ class SampleCxxModule : public module::CxxModule {
 } // namespace xplat
 } // namespace facebook
 
-extern "C" facebook::xplat::module::CxxModule *SampleCxxModule();
+extern "C" facebook::xplat::module::CxxModule* SampleCxxModule();

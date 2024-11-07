@@ -1,0 +1,1 @@
+{"version":3,"file":"StatementQuestion.d.ts","sourceRoot":"","sources":["../../../../src/components/StatementQuestion.tsx"],"names":[],"mappings":"AAAA,OAAO,KAA2C,MAAM,OAAO,CAAC;AAchE,OAAO,KAAK,EAAE,QAAQ,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAOlD,KAAK,KAAK,GAAG;IACX,QAAQ,EAAE,QAAQ,CAAC;IACnB,UAAU,EAAE,CAAC,QAAQ,EAAE,QAAQ,KAAK,IAAI,CAAC;CAC1C,CAAC;;AA2KF,wBAA6C"}

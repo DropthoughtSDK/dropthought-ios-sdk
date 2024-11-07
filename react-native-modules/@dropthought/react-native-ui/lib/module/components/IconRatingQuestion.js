@@ -5,18 +5,19 @@ import { isNil } from 'ramda';
 import MandatoryTitle from './MandatoryTitle';
 import GlobalStyle from '../styles';
 import i18n from '../translation';
-import { defaultIcon, getIcons, getSelectedIcons, RatingIconType } from '../constants/RatingQuestionConstants';
+import { defaultIcon, getIcons, getSelectedIcons, RatingIconType
+// @ts-ignore
+} from '../constants/RatingQuestionConstants';
 import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
 import { useTheme } from '../contexts/theme';
-
 const FakeSmiley = () => {
   return /*#__PURE__*/React.createElement(SmileyIcon, {
+    testID: "test:id/smiley_icon_fake",
     selected: false,
     onPress: () => {},
     label: ""
   });
 };
-
 const ClassicIconRatingQuestion = ({
   survey,
   question,
@@ -43,18 +44,16 @@ const ClassicIconRatingQuestion = ({
   const icons = useMemo(() => getIcons(subType, optionAmount), [subType, optionAmount]);
   const selectedIcons = useMemo(() => getSelectedIcons(subType, optionAmount), [subType, optionAmount]);
   useEffect(() => {
-    getInitialSelectedValueFromFeedbackProps(); // eslint-disable-next-line react-hooks/exhaustive-deps
+    getInitialSelectedValueFromFeedbackProps();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   const getInitialSelectedValueFromFeedbackProps = () => {
     let prevAnswer;
-
     if (feedback && feedback.answers && !isNil(feedback.answers[0])) {
       prevAnswer = parseInt(feedback.answers[0], 10);
       setSelectedIndex(prevAnswer);
     }
   };
-
   const setSelectedAndFeedback = index => {
     setSelectedIndex(index);
     const result = {
@@ -64,13 +63,11 @@ const ClassicIconRatingQuestion = ({
     };
     onFeedback(result);
   };
-
   const iconRow = /*#__PURE__*/React.createElement(View, {
     style: [styles.horizontal, rtl && GlobalStyle.flexRowReverse]
   }, options.map((option, index) => {
     const isSelected = selectedIndex === index;
     let source;
-
     if (subType === RatingIconType.star || subType === RatingIconType.heart) {
       if (selectedIndex !== undefined) {
         source = selectedIndex >= index ? icons[selectedIndex] : baseIcon;
@@ -80,8 +77,8 @@ const ClassicIconRatingQuestion = ({
     } else {
       source = isSelected ? selectedIcons[index] : icons[index];
     }
-
     return /*#__PURE__*/React.createElement(SmileyIcon, {
+      testID: `test:id/smiley_icon_${index}`,
       selected: isSelected,
       source: source,
       label: option,
@@ -101,7 +98,6 @@ const ClassicIconRatingQuestion = ({
     style: [styles.smileyRowContainer, rtl && GlobalStyle.flexEnd]
   }, iconRow));
 };
-
 export default /*#__PURE__*/React.memo(ClassicIconRatingQuestion);
 const commonStyles = StyleSheet.create({
   container: {

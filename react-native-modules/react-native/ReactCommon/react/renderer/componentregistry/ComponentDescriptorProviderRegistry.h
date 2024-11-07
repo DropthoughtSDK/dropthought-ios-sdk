@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,14 +7,14 @@
 
 #pragma once
 
-#include <better/mutex.h>
+#include <shared_mutex>
+#include <unordered_map>
 
 #include <react/renderer/componentregistry/ComponentDescriptorProvider.h>
 #include <react/renderer/componentregistry/ComponentDescriptorRegistry.h>
 #include <react/renderer/core/ComponentDescriptor.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 using ComponentDescriptorProviderRequest =
     std::function<void(ComponentName componentName)>;
@@ -32,12 +32,12 @@ class ComponentDescriptorProviderRegistry final {
    * `ComponentDescriptorRegistry`s accordingly.
    * The methods can be called on any thread.
    */
-  void add(ComponentDescriptorProvider provider) const;
+  void add(const ComponentDescriptorProvider& provider) const;
 
   /*
    * ComponenDescriptorRegistry will call the `request` in case if a component
    * with given name wasn't registered yet.
-   * The request handler must register a ComponentDescripor with requested name
+   * The request handler must register a ComponentDescriptor with requested name
    * synchronously during handling the request.
    * The request can be called on any thread.
    * The methods can be called on any thread.
@@ -51,21 +51,20 @@ class ComponentDescriptorProviderRegistry final {
    * The methods can be called on any thread.
    */
   ComponentDescriptorRegistry::Shared createComponentDescriptorRegistry(
-      ComponentDescriptorParameters const &parameters) const;
+      const ComponentDescriptorParameters& parameters) const;
 
  private:
   friend class ComponentDescriptorRegistry;
 
   void request(ComponentName componentName) const;
 
-  mutable better::shared_mutex mutex_;
-  mutable std::vector<std::weak_ptr<ComponentDescriptorRegistry const>>
+  mutable std::shared_mutex mutex_;
+  mutable std::vector<std::weak_ptr<const ComponentDescriptorRegistry>>
       componentDescriptorRegistries_;
-  mutable better::map<ComponentHandle, ComponentDescriptorProvider const>
+  mutable std::unordered_map<ComponentHandle, ComponentDescriptorProvider const>
       componentDescriptorProviders_;
   mutable ComponentDescriptorProviderRequest
-      componentDescriptorProviderRequest_;
+      componentDescriptorProviderRequest_{};
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

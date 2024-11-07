@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
 import GlobalStyle, { Colors } from '../styles';
-import i18n from '../translation';
 import type { Question } from '../data';
 
 const MetadataDesc = ({
@@ -14,13 +13,14 @@ const MetadataDesc = ({
   if (!question.metaDataType) return null;
 
   // if translation is not found, do not print anything
-  const desc =
-    question.exampleMetadataText ??
-    i18n.t(`metadata-question-desc:${question.metaDataType}`, '');
+  const desc = question.exampleMetadataText;
   if (!desc) return null;
 
   return (
-    <Text style={[styles.descText, rtl && GlobalStyle.textAlignRight]}>
+    <Text
+      testID="test:id/dropdown_other_question"
+      style={[styles.descText, rtl && GlobalStyle.textAlignRight]}
+    >
       {desc}
     </Text>
   );

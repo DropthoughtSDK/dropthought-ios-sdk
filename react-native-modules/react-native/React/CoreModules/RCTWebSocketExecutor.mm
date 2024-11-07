@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,10 +12,10 @@
 #import <React/RCTConvert.h>
 #import <React/RCTDefines.h>
 #import <React/RCTLog.h>
-#import <React/RCTSRWebSocket.h>
 #import <React/RCTUtils.h>
 
 #import <ReactCommon/RCTTurboModule.h>
+#import <SocketRocket/SRWebSocket.h>
 
 #import "CoreModulesPlugins.h"
 
@@ -23,12 +23,12 @@
 
 typedef void (^RCTWSMessageCallback)(NSError *error, NSDictionary<NSString *, id> *reply);
 
-@interface RCTWebSocketExecutor () <RCTSRWebSocketDelegate, RCTTurboModule>
+@interface RCTWebSocketExecutor () <SRWebSocketDelegate, RCTTurboModule>
 
 @end
 
 @implementation RCTWebSocketExecutor {
-  RCTSRWebSocket *_socket;
+  SRWebSocket *_socket;
   dispatch_queue_t _jsQueue;
   NSMutableDictionary<NSNumber *, RCTWSMessageCallback> *_callbacks;
   dispatch_semaphore_t _socketOpenSemaphore;
@@ -62,7 +62,7 @@ RCT_EXPORT_MODULE()
   }
 
   _jsQueue = dispatch_queue_create("com.facebook.react.WebSocketExecutor", DISPATCH_QUEUE_SERIAL);
-  _socket = [[RCTSRWebSocket alloc] initWithURL:_url];
+  _socket = [[SRWebSocket alloc] initWithURL:_url];
   _socket.delegate = self;
   _callbacks = [NSMutableDictionary new];
   _injectedObjects = [NSMutableDictionary new];
@@ -112,7 +112,7 @@ RCT_EXPORT_MODULE()
   _socketOpenSemaphore = dispatch_semaphore_create(0);
   [_socket open];
   long connected = dispatch_semaphore_wait(_socketOpenSemaphore, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 15));
-  return connected == 0 && _socket.readyState == RCTSR_OPEN;
+  return connected == 0 && _socket.readyState == SR_OPEN;
 }
 
 - (BOOL)prepareJSRuntime
@@ -131,7 +131,7 @@ RCT_EXPORT_MODULE()
   return runtimeIsReady == 0 && initError == nil;
 }
 
-- (void)webSocket:(RCTSRWebSocket *)webSocket didReceiveMessage:(id)message
+- (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)message
 {
   NSError *error = nil;
   NSDictionary<NSString *, id> *reply = RCTJSONParse(message, &error);
@@ -143,12 +143,12 @@ RCT_EXPORT_MODULE()
   }
 }
 
-- (void)webSocketDidOpen:(RCTSRWebSocket *)webSocket
+- (void)webSocketDidOpen:(SRWebSocket *)webSocket
 {
   dispatch_semaphore_signal(_socketOpenSemaphore);
 }
 
-- (void)webSocket:(RCTSRWebSocket *)webSocket didFailWithError:(NSError *)error
+- (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error
 {
   dispatch_semaphore_signal(_socketOpenSemaphore);
   RCTLogInfo(@"WebSocket connection failed with error %@", error);
@@ -165,7 +165,10 @@ RCT_EXPORT_MODULE()
 
   dispatch_async(_jsQueue, ^{
     if (!self.valid) {
-      callback(RCTErrorWithMessage(@"Runtime is not ready for debugging. Make sure Metro is running."), nil);
+      callback(
+          RCTErrorWithMessage(
+              @"Runtime is not ready for debugging. Make sure Metro is running and the Remote Debugging browser window is open."),
+          nil);
       return;
     }
 
@@ -173,7 +176,7 @@ RCT_EXPORT_MODULE()
     self->_callbacks[expectedID] = [callback copy];
     NSMutableDictionary<NSString *, id> *messageWithID = [message mutableCopy];
     messageWithID[@"id"] = expectedID;
-    [self->_socket send:RCTJSONStringify(messageWithID, NULL)];
+    [self->_socket sendString:RCTJSONStringify(messageWithID, NULL) error:nil];
   });
 }
 
@@ -270,12 +273,18 @@ RCT_EXPORT_MODULE()
 
 - (BOOL)isValid
 {
-  return _socket != nil && _socket.readyState == RCTSR_OPEN;
+  return _socket != nil && _socket.readyState == SR_OPEN;
 }
 
 - (void)dealloc
 {
   RCTAssert(!self.valid, @"-invalidate must be called before -dealloc");
+}
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params
+{
+  return nullptr;
 }
 
 @end

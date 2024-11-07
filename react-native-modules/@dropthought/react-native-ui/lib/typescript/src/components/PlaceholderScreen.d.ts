@@ -7,12 +7,13 @@ export declare enum PlaceholderImageTypes {
     ProgramDeactivated = "ProgramDeactivated",
     ProgramUnavailable = "ProgramUnavailable"
 }
-export declare type IPlaceholderImageTypesType = PlaceholderImageTypes.NoInternet | PlaceholderImageTypes.ProgramScheduled | PlaceholderImageTypes.ProgramExpired | PlaceholderImageTypes.ProgramDeleted | PlaceholderImageTypes.ProgramDeactivated | PlaceholderImageTypes.ProgramUnavailable;
-declare type Props = {
+export type IPlaceholderImageTypesType = PlaceholderImageTypes.NoInternet | PlaceholderImageTypes.ProgramScheduled | PlaceholderImageTypes.ProgramExpired | PlaceholderImageTypes.ProgramDeleted | PlaceholderImageTypes.ProgramDeactivated | PlaceholderImageTypes.ProgramUnavailable;
+type Props = {
     message?: string;
     imageSource?: string;
     imageType: IPlaceholderImageTypesType;
     children?: React.ReactNode;
 };
-declare const PlaceholderScreen: ({ message, imageSource, imageType, children, }: Props) => JSX.Element;
+declare const PlaceholderScreen: ({ message, imageSource, imageType, children, }: Props) => React.JSX.Element;
 export default PlaceholderScreen;
+//# sourceMappingURL=PlaceholderScreen.d.ts.map

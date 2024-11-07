@@ -1,14 +1,11 @@
 import * as React from 'react';
-import {
-  useWindowDimensions as useRNDimensions,
-  ScaledSize,
-} from 'react-native';
+import { useWindowDimensions as useRNDimensions } from 'react-native';
+import type { ScaledSize } from 'react-native';
 
-/** @enum {'phone' | 'tablet'} */
-export const DimensionWidthType = {
+export const DimensionWidthType = Object.freeze({
   phone: 'phone',
   tablet: 'tablet',
-};
+});
 
 /** @enum {'portrait' | 'landscape'} */
 export const OrientationType = {

@@ -1,4 +1,4 @@
-import { EncryptedStorage } from '@bct-taipei/dt-rn-encrypted-storage';
+import { EncryptedStorage } from '@dropthought/dt-rn-encrypted-storage';
 
 const SDK_ACCOUNT = 'DT_ENC_V1';
 let encryptedStorageClient;

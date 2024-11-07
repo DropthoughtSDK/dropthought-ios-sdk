@@ -8,7 +8,7 @@ const TRACK_SIZE = 4;
 const THUMB_SIZE = 20;
 const GREEN = 'green';
 const TRANSPARENT = 'transparent';
-const defaultStyles = {
+const defaultStyles = exports.defaultStyles = {
   aboveThumbComponentsContainer: {
     flexDirection: 'row'
   },
@@ -46,5 +46,4 @@ const defaultStyles = {
     height: TRACK_SIZE
   }
 };
-exports.defaultStyles = defaultStyles;
 //# sourceMappingURL=styles.js.map

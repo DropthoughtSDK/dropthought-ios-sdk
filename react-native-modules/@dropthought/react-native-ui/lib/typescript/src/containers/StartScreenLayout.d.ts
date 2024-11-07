@@ -1,8 +1,8 @@
 import type { Survey as OriginSurvey } from '../data';
-declare type Survey = OriginSurvey & {
+type Survey = OriginSurvey & {
     languages: string[];
 };
-declare type Props = {
+type Props = {
     onLanguageSelect: (language: string) => void;
     onClose: () => void;
     onStart: () => void;
@@ -10,3 +10,4 @@ declare type Props = {
 };
 export default function StartScreenLayout({ onLanguageSelect, onClose, onStart, survey, }: Props): JSX.Element;
 export {};
+//# sourceMappingURL=StartScreenLayout.d.ts.map

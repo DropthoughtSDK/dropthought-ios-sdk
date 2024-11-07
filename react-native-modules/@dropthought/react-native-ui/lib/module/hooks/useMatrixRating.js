@@ -6,19 +6,15 @@ export const matrixRatingValidator = (question, feedback) => {
     answers = []
   } = feedback;
   const matrixRequiredType = getRequiredType(question);
-
   switch (matrixRequiredType) {
     case 'all':
       return answers.length > 1 && answers.every(value => value !== -1);
-
     case 'one':
       return answers.some(value => value !== -1);
-
     default:
       return true;
   }
 };
-
 const useMatrixRating = (question, feedback, onFeedback) => {
   const {
     questionId,
@@ -37,7 +33,6 @@ const useMatrixRating = (question, feedback, onFeedback) => {
       });
     }
   }, [hasEdited, matrixRequiredType, onFeedback, questionId, selectedAnswer]);
-
   const onRowPress = rowIndex => {
     setCollapseList(previous => {
       const list = previous.map((collapse, index) => {
@@ -50,7 +45,6 @@ const useMatrixRating = (question, feedback, onFeedback) => {
       return list;
     });
   };
-
   const onColoumPress = (rowIndex, coloumIndex) => {
     setSelectedAnswer(previous => {
       const answers = previous.map((answer, index) => index === rowIndex ? coloumIndex : answer);
@@ -63,22 +57,17 @@ const useMatrixRating = (question, feedback, onFeedback) => {
       return list;
     });
   };
-
   const handleMatrixRatingErrorHint = forgot => {
     if (!forgot) return undefined;
-
     switch (matrixRequiredType) {
       case 'all':
         return i18n.t('survey:error-hint-required-all');
-
       case 'one':
         return i18n.t('survey:error-hint-least-one');
-
       default:
         return undefined;
     }
   };
-
   return {
     collapseList,
     selectedAnswer,
@@ -87,6 +76,5 @@ const useMatrixRating = (question, feedback, onFeedback) => {
     onColoumPress
   };
 };
-
 export default useMatrixRating;
 //# sourceMappingURL=useMatrixRating.js.map

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,14 +7,13 @@
 
 #pragma once
 
-#include <better/map.h>
-#include <better/mutex.h>
+#include <shared_mutex>
+#include <unordered_map>
 
 #include <react/renderer/core/ReactPrimitives.h>
 #include <react/renderer/mounting/ShadowTree.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * Owning registry of `ShadowTree`s.
@@ -29,7 +28,7 @@ class ShadowTreeRegistry final {
    * The ownership of the instance is also transferred to the registry.
    * Can be called from any thread.
    */
-  void add(std::unique_ptr<ShadowTree> &&shadowTree) const;
+  void add(std::unique_ptr<ShadowTree>&& shadowTree) const;
 
   /*
    * Removes a `ShadowTree` instance with given `surfaceId` from the registry
@@ -50,21 +49,21 @@ class ShadowTreeRegistry final {
    */
   bool visit(
       SurfaceId surfaceId,
-      std::function<void(const ShadowTree &shadowTree)> callback) const;
+      const std::function<void(const ShadowTree& shadowTree)>& callback) const;
 
   /*
    * Enumerates all stored shadow trees.
    * Set `stop` to `true` to interrupt the enumeration.
    * Can be called from any thread.
    */
-  void enumerate(std::function<void(const ShadowTree &shadowTree, bool &stop)>
-                     callback) const;
+  void enumerate(
+      const std::function<void(const ShadowTree& shadowTree, bool& stop)>&
+          callback) const;
 
  private:
-  mutable better::shared_mutex mutex_;
-  mutable better::map<SurfaceId, std::unique_ptr<ShadowTree>>
+  mutable std::shared_mutex mutex_;
+  mutable std::unordered_map<SurfaceId, std::unique_ptr<ShadowTree>>
       registry_; // Protected by `mutex_`.
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

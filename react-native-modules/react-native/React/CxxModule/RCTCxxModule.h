@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -11,13 +11,9 @@
 
 #import <React/RCTBridgeModule.h>
 
-namespace facebook {
-namespace xplat {
-namespace module {
+namespace facebook::xplat::module {
 class CxxModule;
-}
-}
-}
+} // namespace facebook::react::module
 
 /**
  * Subclass RCTCxxModule to use cross-platform CxxModule on iOS.

@@ -190,8 +190,8 @@ export const useKeyboardAvoidingFocusedInputView = (
 };
 
 /**
- * @type {React.FunctionComponent<KeyboardAvoidingProps & ViewProps>}
- * @param {KeyboardAvoidingProps & ViewProps} param0
+ * @type {React.FunctionComponent<KeyboardAvoidingViewProps>}
+ * @param {KeyboardAvoidingViewProps} param0
  */
 const KeyboardAvoidingView = ({
   children,
@@ -220,7 +220,7 @@ const KeyboardAvoidingView = ({
 };
 
 /**
- * @param {KeyboardAvoidingProps & ScrollViewProps} param0
+ * @param {KeyboardAvoidingScrollViewProps} param0
  * @param {*} ref
  */
 const KeyboardAvoidingScrollViewForwardRef = (
@@ -281,7 +281,11 @@ const KeyboardAvoidingScrollViewForwardRef = (
   );
 };
 
-/** @type {React.FunctionComponent<KeyboardAvoidingProps & ScrollViewProps>} */
+// /** @type {React.FunctionComponent<KeyboardAvoidingScrollViewProps>} */
+
+/**
+ * @type {KeyboardAvoidingScrollViewProps}
+ */
 export const KeyboardAvoidingScrollView = React.forwardRef(
   KeyboardAvoidingScrollViewForwardRef
 );
@@ -295,14 +299,6 @@ const styles = StyleSheet.create({
 export default KeyboardAvoidingView;
 
 /**
- * @typedef {object} KeyboardAvoidingProps
- * @property {ViewStyle=} contentContainerStyle
- * @property {ViewStyle} style
- * @property {number=} extraAvoidingSpace - optional, the default behavior of this keyboard avoiding is to avoid the whole input box, but if you wish to have extra space to avoid
- */
-
-/**
- * @typedef {import('react-native').StyleProp<import('react-native').ViewStyle>} ViewStyle
- * @typedef {import('react-native').ViewProps} ViewProps
- * @typedef {import('react-native').ScrollViewProps} ScrollViewProps
+ * @typedef {import('./KeyboardAvoidingView').KeyboardAvoidingViewProps} KeyboardAvoidingViewProps
+ * @typedef {import('./KeyboardAvoidingView').KeyboardAvoidingScrollViewProps} KeyboardAvoidingScrollViewProps
  */

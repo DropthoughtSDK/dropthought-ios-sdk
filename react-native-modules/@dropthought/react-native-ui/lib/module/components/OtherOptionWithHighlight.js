@@ -1,5 +1,4 @@
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 /**
  * @description Option with a TextInput, this is for other option in multi-choice/single-choice question
  */
@@ -10,7 +9,6 @@ import i18n from '../translation';
 import OptionWithHighlight from './OptionWithHighlight';
 import { useDimensionWidthType } from '../hooks/useWindowDimensions';
 import { useTheme } from '../contexts/theme';
-
 const useFocus = (onBlur, onFocus) => {
   const [isFocused, setIsFocused] = React.useState(false);
   const onFocusHandler = React.useCallback(() => {
@@ -27,7 +25,6 @@ const useFocus = (onBlur, onFocus) => {
     onBlur: onBlurHandler
   };
 };
-
 function OtherOptionWithHighlightProps(props) {
   const {
     id,
@@ -46,16 +43,17 @@ function OtherOptionWithHighlightProps(props) {
     fontColor
   } = useTheme();
   const dimensionWidthType = useDimensionWidthType();
-  const inputRef = React.useRef(null); // return checked as true when focus
+  const inputRef = React.useRef(null);
 
+  // return checked as true when focus
   const onFocusHandler = () => {
     onChangeValue(id, {
       value: textValue,
       checked: true
     });
-  }; // return checked as false, if the textValue is empty
+  };
 
-
+  // return checked as false, if the textValue is empty
   const onBlurHandler = () => {
     if (!textValue || textValue.trim().length <= 0) {
       onChangeValue(id, {
@@ -64,12 +62,12 @@ function OtherOptionWithHighlightProps(props) {
       });
     }
   };
-
   const {
     isFocused,
     ...focusProps
-  } = useFocus(onBlurHandler, onFocusHandler); // when the option is pressed, call focus if current checked is false
+  } = useFocus(onBlurHandler, onFocusHandler);
 
+  // when the option is pressed, call focus if current checked is false
   const onPressHandler = () => {
     if (inputRef.current && !checked) {
       inputRef.current.focus();
@@ -80,20 +78,18 @@ function OtherOptionWithHighlightProps(props) {
         checked: !checked
       });
     }
-  }; // when text input is changed, return the text
+  };
 
-
+  // when text input is changed, return the text
   const onChangeTextHandler = text => onChangeValue && onChangeValue(id, {
     checked: true,
     value: text
   });
-
   const rtl = i18n.dir() === 'rtl';
   React.useEffect(() => {
     const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
       var _inputRef$current;
-
-      (_inputRef$current = inputRef.current) === null || _inputRef$current === void 0 ? void 0 : _inputRef$current.blur();
+      (_inputRef$current = inputRef.current) === null || _inputRef$current === void 0 || _inputRef$current.blur();
     });
     return () => {
       hideSubscription.remove();
@@ -113,10 +109,12 @@ function OtherOptionWithHighlightProps(props) {
   const textInput = /*#__PURE__*/React.createElement(View, {
     style: [styles.textInputContainer, rtl && GlobalStyles.flexRowReverse]
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/choice_option_other",
     style: [styles.otherText, {
       color: fontColor
     }, checked ? styles.checkedOtherText : {}, QuestionContentTextSize[dimensionWidthType]]
   }, otherTextLabel), /*#__PURE__*/React.createElement(TextInput, _extends({
+    testID: "test:id/field_choice_option_other",
     ref: inputRef,
     style: inputStyle,
     placeholder: otherText.length > 0 ? otherText : questionBrand.length > 0 ? questionBrand : otherText,
@@ -133,7 +131,6 @@ function OtherOptionWithHighlightProps(props) {
     containerStyle: styles.container
   }));
 }
-
 const styles = StyleSheet.create({
   container: {
     paddingBottom: 0,

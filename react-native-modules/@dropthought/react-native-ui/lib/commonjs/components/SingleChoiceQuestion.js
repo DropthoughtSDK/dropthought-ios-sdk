@@ -4,27 +4,18 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireDefault(require("react"));
-
 var _reactNative = require("react-native");
-
 var _KeyboardAvoidingView = require("./KeyboardAvoidingView");
-
 var _MandatoryTitle = _interopRequireDefault(require("./MandatoryTitle"));
-
 var _data = require("../utils/data");
-
 var _ramda = require("ramda");
-
 var _NewOtherOptionWithHighlight = _interopRequireDefault(require("./NewOtherOptionWithHighlight"));
-
 var _NewOptionWithHighlight = _interopRequireDefault(require("./NewOptionWithHighlight"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+// @ts-ignore
 
 const ScrollView = _reactNative.Platform.OS === 'ios' ? _KeyboardAvoidingView.KeyboardAvoidingScrollView : _reactNative.ScrollView;
-
 const SingleChoiceQuestion = ({
   survey,
   anonymous,
@@ -39,14 +30,11 @@ const SingleChoiceQuestion = ({
     questionId
   } = question;
   const options = (0, _data.getOptionsFromQuestion)(question);
-
   function getInitialValueFromFeedbackProps() {
     let value;
     let otherText;
-
     if (feedback && feedback.answers && !(0, _ramda.isNil)(feedback.answers[0])) {
       const answer = feedback.answers[0];
-
       if (Number.isInteger(answer)) {
         value = answer;
       } else {
@@ -57,17 +45,13 @@ const SingleChoiceQuestion = ({
         value = question.options.length;
       }
     }
-
     return {
       value: value,
       otherText
     };
   }
-
   const initialSelected = getInitialValueFromFeedbackProps();
-
   const [selected, setSelected] = _react.default.useState(initialSelected);
-
   const handleFeedback = id => {
     setSelected({
       value: id,
@@ -78,9 +62,9 @@ const SingleChoiceQuestion = ({
       answers: [id],
       type: 'singleChoice'
     });
-  }; // when other option's value is changed, newValues is {checked: boolean, value: string}
+  };
 
-
+  // when other option's value is changed, newValues is {checked: boolean, value: string}
   const onChangeValueHandler = (index, newValue) => {
     setSelected({
       // if newValues is checked, set value to this index
@@ -97,13 +81,11 @@ const SingleChoiceQuestion = ({
       otherFlag: newValue.checked
     });
   };
-
   const buttonList = options.map(({
     title,
     isOther
   }, index) => {
     var _selected$otherText;
-
     const isActive = selected.value === index;
     return isOther ? /*#__PURE__*/_react.default.createElement(_NewOtherOptionWithHighlight.default, {
       key: index,
@@ -141,11 +123,7 @@ const SingleChoiceQuestion = ({
     }), buttonList)
   );
 };
-
-var _default = /*#__PURE__*/_react.default.memo(SingleChoiceQuestion);
-
-exports.default = _default;
-
+var _default = exports.default = /*#__PURE__*/_react.default.memo(SingleChoiceQuestion);
 const commonStyles = _reactNative.StyleSheet.create({
   container: {
     flex: 1,

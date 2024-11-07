@@ -5,7 +5,7 @@ declare const _default: {
         flex: number;
     };
     inputContainer: {
-        width: string;
+        width: "100%";
         height: number;
         paddingVertical: number;
         paddingHorizontal: number;
@@ -27,3 +27,4 @@ declare const _default: {
     };
 };
 export default _default;
+//# sourceMappingURL=MultiLineTextInput.styles.d.ts.map

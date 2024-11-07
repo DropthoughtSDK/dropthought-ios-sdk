@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -11,31 +11,28 @@
 
 const ios = require('@react-native-community/cli-platform-ios');
 const android = require('@react-native-community/cli-platform-android');
+const {
+  bundleCommand,
+  ramBundleCommand,
+  startCommand,
+} = require('@react-native/community-cli-plugin');
 
 module.exports = {
-  commands: [...ios.commands, ...android.commands],
+  commands: [
+    ...ios.commands,
+    ...android.commands,
+    bundleCommand,
+    ramBundleCommand,
+    startCommand,
+  ],
   platforms: {
     ios: {
-      linkConfig: ios.linkConfig,
       projectConfig: ios.projectConfig,
       dependencyConfig: ios.dependencyConfig,
     },
     android: {
-      linkConfig: android.linkConfig,
       projectConfig: android.projectConfig,
       dependencyConfig: android.dependencyConfig,
-    },
-  },
-  /**
-   * Used when running RNTester (with React Native from source)
-   */
-  reactNativePath: '.',
-  project: {
-    ios: {
-      project: './packages/rn-tester/RNTesterPods.xcworkspace',
-    },
-    android: {
-      sourceDir: './packages/rn-tester',
     },
   },
 };

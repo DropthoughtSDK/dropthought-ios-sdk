@@ -1,6 +1,7 @@
 import { NativeModule } from 'react-native';
 import jwtDecode from 'jwt-decode';
 import { isNil, pick } from 'ramda';
+import axios from 'axios';
 
 const RENEW_ENDPOINT = '/api/token/renew';
 const DT_API_KEY_HEADER = 'X-DT-API-KEY';
@@ -189,6 +190,16 @@ export class Fetcher {
       (requestConfig.baseURL || this.defaultRequestConfig.baseURL) +
       url +
       `?${params}`;
+
+    if (url === '/api/event/storage/file') {
+      return await axios.post(fetchURL, requestConfig.body, {
+        headers: {
+          ...this.defaultRequestConfig.headers,
+          ...requestConfig.headers,
+        },
+        ...requestConfig,
+      });
+    }
 
     return await fetch(fetchURL, {
       method: requestConfig.method || 'GET',

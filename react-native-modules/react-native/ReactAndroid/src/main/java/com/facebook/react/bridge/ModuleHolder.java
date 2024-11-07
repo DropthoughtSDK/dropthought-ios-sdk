@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -46,7 +46,7 @@ public class ModuleHolder {
   private final ReactModuleInfo mReactModuleInfo;
 
   private @Nullable Provider<? extends NativeModule> mProvider;
-  // Outside of the constructur, these should only be checked or set when synchronized on this
+  // Outside of the constructor, these should only be checked or set when synchronized on this
   private @Nullable @GuardedBy("this") NativeModule mModule;
 
   // These are used to communicate phases of creation and initialization across threads
@@ -70,7 +70,6 @@ public class ModuleHolder {
             nativeModule.getName(),
             nativeModule.getClass().getSimpleName(),
             nativeModule.canOverrideExistingModule(),
-            true,
             true,
             CxxModuleWrapper.class.isAssignableFrom(nativeModule.getClass()),
             TurboModule.class.isAssignableFrom(nativeModule.getClass()));
@@ -107,7 +106,7 @@ public class ModuleHolder {
 
   public synchronized void destroy() {
     if (mModule != null) {
-      mModule.onCatalystInstanceDestroy();
+      mModule.invalidate();
     }
   }
 
@@ -118,10 +117,6 @@ public class ModuleHolder {
 
   public boolean getCanOverrideExistingModule() {
     return mReactModuleInfo.canOverrideExistingModule();
-  }
-
-  public boolean getHasConstants() {
-    return mReactModuleInfo.hasConstants();
   }
 
   public boolean isTurboModule() {

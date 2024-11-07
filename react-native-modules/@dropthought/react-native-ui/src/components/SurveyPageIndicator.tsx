@@ -48,7 +48,9 @@ const SurveyPageIndicator = (props: Props) => {
         rtl ? styles.rtl : {},
       ]}
     >
-      <Text style={textStyle}>{currentPage.pageTitle}</Text>
+      <Text testID="test:id/preview_page_indicator" style={textStyle}>
+        {currentPage?.pageTitle}
+      </Text>
     </View>
   );
 };

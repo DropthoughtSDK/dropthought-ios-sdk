@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -20,8 +20,7 @@
 #import <cxxreact/RAMBundleRegistry.h>
 #import <folly/json.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 namespace {
 
@@ -144,5 +143,4 @@ std::unique_ptr<JSExecutor> RCTObjcExecutorFactory::createJSExecutor(
   return std::unique_ptr<JSExecutor>(new RCTObjcExecutor(m_jse, m_errorBlock, jsQueue, delegate));
 }
 
-}
-}
+} // namespace facebook::react

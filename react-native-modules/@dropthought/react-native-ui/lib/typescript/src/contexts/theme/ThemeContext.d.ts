@@ -1,11 +1,15 @@
 /// <reference types="react" />
-import { THEME_OPTION } from './theme.const';
-export declare const ThemeContext: import("react").Context<{
-    themeOption: THEME_OPTION;
+import type { BackgroundColor, FontColor, IColorSchemesType, IThemeOptionType } from './theme.const';
+export interface ThemeContextProps {
+    themeOption: IThemeOptionType;
     hexCode: string;
-    colorScheme: string;
-    fontColor: string;
-    backgroundColor: string;
-    customFontColor: string;
-    customBackgroundColor: string;
-}>;
+    colorScheme: IColorSchemesType;
+    fontColor: FontColor;
+    backgroundColor: BackgroundColor;
+    customFontColor: FontColor;
+    customBackgroundColor: BackgroundColor;
+    autoClose: boolean;
+    autoCloseCountdown: number;
+}
+export declare const ThemeContext: import("react").Context<ThemeContextProps>;
+//# sourceMappingURL=ThemeContext.d.ts.map

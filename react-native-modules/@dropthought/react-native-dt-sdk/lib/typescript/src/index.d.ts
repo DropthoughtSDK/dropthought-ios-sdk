@@ -11,3 +11,6 @@ export declare const feedbackUploader: {
 };
 export { initializeWithAPIKey };
 export * from './kiosk-rn-sdk';
+export * from './lib';
+export * from './data';
+//# sourceMappingURL=index.d.ts.map

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,15 +12,14 @@
 #include <vector>
 
 #include <cxxreact/JSExecutor.h>
-#include <folly/Optional.h>
 #include <folly/dynamic.h>
+#include <optional>
 
 #ifndef RN_EXPORT
 #define RN_EXPORT __attribute__((visibility("default")))
 #endif
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 class NativeModule;
 
@@ -38,7 +37,7 @@ class RN_EXPORT ModuleRegistry {
   // notifyCatalystInstanceInitialized: this is really only used by view-related
   // code notifyCatalystInstanceDestroy: use RAII instead
 
-  using ModuleNotFoundCallback = std::function<bool(const std::string &name)>;
+  using ModuleNotFoundCallback = std::function<bool(const std::string& name)>;
 
   ModuleRegistry(
       std::vector<std::unique_ptr<NativeModule>> modules,
@@ -47,17 +46,17 @@ class RN_EXPORT ModuleRegistry {
 
   std::vector<std::string> moduleNames();
 
-  folly::Optional<ModuleConfig> getConfig(const std::string &name);
+  std::optional<ModuleConfig> getConfig(const std::string& name);
 
   void callNativeMethod(
       unsigned int moduleId,
       unsigned int methodId,
-      folly::dynamic &&params,
+      folly::dynamic&& params,
       int callId);
   MethodCallResult callSerializableNativeHook(
       unsigned int moduleId,
       unsigned int methodId,
-      folly::dynamic &&args);
+      folly::dynamic&& args);
 
   std::string getModuleName(unsigned int moduleId);
   std::string getModuleSyncMethodName(
@@ -83,10 +82,9 @@ class RN_EXPORT ModuleRegistry {
 
   // Function will be called if a module was requested but was not found.
   // If the function returns true, ModuleRegistry will try to find the module
-  // again (assuming it's registered) If the functon returns false,
+  // again (assuming it's registered) If the function returns false,
   // ModuleRegistry will not try to find the module and return nullptr instead.
   ModuleNotFoundCallback moduleNotFoundCallback_;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

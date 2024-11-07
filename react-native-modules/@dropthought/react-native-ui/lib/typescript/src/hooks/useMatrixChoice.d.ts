@@ -14,3 +14,4 @@ declare const useMatrixChoice: (question: Question, feedback: MatrixChoiceFeedba
     onColoumPress: (rowIndex: number, coloumIndex: number) => void;
 };
 export default useMatrixChoice;
+//# sourceMappingURL=useMatrixChoice.d.ts.map

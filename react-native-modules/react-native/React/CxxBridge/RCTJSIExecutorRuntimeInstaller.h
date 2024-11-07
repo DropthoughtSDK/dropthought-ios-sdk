@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,8 +9,7 @@
 
 #include <jsireact/JSIExecutor.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /**
  * Creates a lambda used to bind a JSIRuntime in the context of
@@ -19,5 +18,4 @@ namespace react {
 JSIExecutor::RuntimeInstaller RCTJSIExecutorRuntimeInstaller(
     JSIExecutor::RuntimeInstaller runtimeInstallerToWrap);
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

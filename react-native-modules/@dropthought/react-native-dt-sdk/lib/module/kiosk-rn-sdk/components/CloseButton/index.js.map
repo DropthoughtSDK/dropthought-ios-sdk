@@ -1,1 +1,1 @@
-{"version":3,"names":["default"],"sources":["index.js"],"sourcesContent":["export { default } from './CloseButton';\nexport * from './CloseButton';\n"],"mappings":"AAAA,SAASA,OAAO,QAAQ,eAAe;AACvC,cAAc,eAAe"}
+{"version":3,"names":["default"],"sourceRoot":"../../../../../src","sources":["kiosk-rn-sdk/components/CloseButton/index.js"],"mappings":"AAAA,SAASA,OAAO,QAAQ,eAAe;AACvC,cAAc,eAAe"}

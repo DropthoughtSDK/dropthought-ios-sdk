@@ -6,6 +6,7 @@ import PictureChoiceOtherItem from './PictureChoiceOtherItem';
 import { usePictureChoice } from '../hooks/usePictureChoice';
 import ClassicMandatoryTitle from './ClassicMandatoryTitle';
 import i18n from '../translation';
+// @ts-ignore
 
 const ClassicPictureChoiceQuestion = ({
   mandatoryErrorMessage,
@@ -42,10 +43,8 @@ const ClassicPictureChoiceQuestion = ({
     option
   }, index) => {
     const selected = selectIndex.includes(index);
-
     const onPress = () => {
       setInvalidMessage(undefined);
-
       if (isMultipleChoice) {
         onSelectIndex(index);
       } else {
@@ -53,7 +52,6 @@ const ClassicPictureChoiceQuestion = ({
         resetOtherPicture();
       }
     };
-
     return /*#__PURE__*/React.createElement(PictureChoiceItem, {
       title: option,
       uri: uri,
@@ -76,7 +74,6 @@ const ClassicPictureChoiceQuestion = ({
       if (!isMultipleChoice) {
         replaceSelectIndex([]);
       }
-
       setOtherPictureSelected(true);
     },
     onSelect: () => {
@@ -87,14 +84,12 @@ const ClassicPictureChoiceQuestion = ({
         if (!isMultipleChoice) {
           replaceSelectIndex([]);
         }
-
         setOtherPictureSelected(true);
       }
     },
     onUpload: async file => {
       setInvalidMessage(undefined);
-      const url = await onUpload(file);
-
+      const url = await onUpload(file, 'pictureChoice');
       if (typeof url !== 'string') {
         setInvalidMessage(`${i18n.t('picture-choice:uploadFailed')}`);
       } else if (url) {
@@ -122,7 +117,6 @@ const ClassicPictureChoiceQuestion = ({
     style: [styles.pictureGridContainer, rtl && GlobalStyle.flexRowReverse]
   }, imageItems, otherImageItem));
 };
-
 export default /*#__PURE__*/React.memo(ClassicPictureChoiceQuestion);
 const styles = StyleSheet.create({
   mandatoryTitle: {

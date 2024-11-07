@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,40 +7,42 @@
 
 #pragma once
 
-#include <folly/Optional.h>
+#include <react/renderer/components/text/BaseTextShadowNode.h>
 #include <react/renderer/components/text/ParagraphEventEmitter.h>
 #include <react/renderer/components/text/ParagraphProps.h>
 #include <react/renderer/components/text/ParagraphState.h>
-#include <react/renderer/components/text/TextShadowNode.h>
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
-#include <react/renderer/core/ConcreteShadowNode.h>
 #include <react/renderer/core/LayoutContext.h>
 #include <react/renderer/core/ShadowNode.h>
 #include <react/renderer/textlayoutmanager/TextLayoutManager.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
-extern char const ParagraphComponentName[];
+extern const char ParagraphComponentName[];
 
 /*
  * `ShadowNode` for <Paragraph> component, represents <View>-like component
  * containing and displaying text. Text content is represented as nested <Text>
  * and <RawText> components.
  */
-class ParagraphShadowNode : public ConcreteViewShadowNode<
-                                ParagraphComponentName,
-                                ParagraphProps,
-                                ParagraphEventEmitter,
-                                ParagraphState>,
-                            public BaseTextShadowNode {
+class ParagraphShadowNode final : public ConcreteViewShadowNode<
+                                      ParagraphComponentName,
+                                      ParagraphProps,
+                                      ParagraphEventEmitter,
+                                      ParagraphState>,
+                                  public BaseTextShadowNode {
  public:
   using ConcreteViewShadowNode::ConcreteViewShadowNode;
+
+  ParagraphShadowNode(
+      const ShadowNode& sourceShadowNode,
+      const ShadowNodeFragment& fragment);
 
   static ShadowNodeTraits BaseTraits() {
     auto traits = ConcreteViewShadowNode::BaseTraits();
     traits.set(ShadowNodeTraits::Trait::LeafYogaNode);
     traits.set(ShadowNodeTraits::Trait::TextKind);
+    traits.set(ShadowNodeTraits::Trait::MeasurableYogaNode);
 
 #ifdef ANDROID
     // Unsetting `FormsStackingContext` trait is essential on Android where we
@@ -56,14 +58,15 @@ class ParagraphShadowNode : public ConcreteViewShadowNode<
    * `ParagraphShadowNode` uses the manager to measure text content
    * and construct `ParagraphState` objects.
    */
-  void setTextLayoutManager(SharedTextLayoutManager textLayoutManager);
+  void setTextLayoutManager(
+      std::shared_ptr<const TextLayoutManager> textLayoutManager);
 
 #pragma mark - LayoutableShadowNode
 
   void layout(LayoutContext layoutContext) override;
   Size measureContent(
-      LayoutContext const &layoutContext,
-      LayoutConstraints const &layoutConstraints) const override;
+      const LayoutContext& layoutContext,
+      const LayoutConstraints& layoutConstraints) const override;
 
   /*
    * Internal representation of the nested content of the node in a format
@@ -80,28 +83,25 @@ class ParagraphShadowNode : public ConcreteViewShadowNode<
   /*
    * Builds (if needed) and returns a reference to a `Content` object.
    */
-  Content const &getContent(LayoutContext const &layoutContext) const;
+  const Content& getContent(const LayoutContext& layoutContext) const;
 
   /*
    * Builds and returns a `Content` object with given `layoutConstraints`.
    */
   Content getContentWithMeasuredAttachments(
-      LayoutContext const &layoutContext,
-      LayoutConstraints const &layoutConstraints) const;
+      const LayoutContext& layoutContext,
+      const LayoutConstraints& layoutConstraints) const;
 
   /*
    * Creates a `State` object (with `AttributedText` and
    * `TextLayoutManager`) if needed.
    */
-  void updateStateIfNeeded(Content const &content);
-
-  SharedTextLayoutManager textLayoutManager_;
+  void updateStateIfNeeded(const Content& content);
 
   /*
    * Cached content of the subtree started from the node.
    */
-  mutable better::optional<Content> content_{};
+  mutable std::optional<Content> content_{};
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

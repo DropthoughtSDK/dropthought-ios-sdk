@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,8 +8,8 @@
 package com.facebook.react.modules.image;
 
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.SparseArray;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.facebook.common.executors.CallerThreadExecutor;
 import com.facebook.common.references.CloseableReference;
@@ -36,14 +36,13 @@ import com.facebook.react.modules.fresco.ReactNetworkImageRequest;
 import com.facebook.react.views.image.ReactCallerContextFactory;
 import com.facebook.react.views.imagehelper.ImageSource;
 
-@ReactModule(name = ImageLoaderModule.NAME)
+@ReactModule(name = NativeImageLoaderAndroidSpec.NAME)
 public class ImageLoaderModule extends NativeImageLoaderAndroidSpec
     implements LifecycleEventListener {
 
   private static final String ERROR_INVALID_URI = "E_INVALID_URI";
   private static final String ERROR_PREFETCH_FAILURE = "E_PREFETCH_FAILURE";
   private static final String ERROR_GET_SIZE_FAILURE = "E_GET_SIZE_FAILURE";
-  public static final String NAME = "ImageLoader";
 
   private @Nullable final Object mCallerContext;
   private final Object mEnqueuedRequestMonitor = new Object();
@@ -77,12 +76,6 @@ public class ImageLoaderModule extends NativeImageLoaderAndroidSpec
         : mCallerContext;
   }
 
-  @Override
-  @NonNull
-  public String getName() {
-    return NAME;
-  }
-
   private ImagePipeline getImagePipeline() {
     return mImagePipeline != null ? mImagePipeline : Fresco.getImagePipeline();
   }
@@ -90,9 +83,9 @@ public class ImageLoaderModule extends NativeImageLoaderAndroidSpec
   /**
    * Fetch the width and height of the given image.
    *
-   * @param uriString the URI of the remote image to prefetch
-   * @param promise the promise that is fulfilled when the image is successfully prefetched or
-   *     rejected when there is an error
+   * @param uriString the URI of the remote image
+   * @param promise the promise that is fulfilled when operation successfully completed or rejected
+   *     when there is an error
    */
   @ReactMethod
   public void getSize(final String uriString, final Promise promise) {
@@ -146,10 +139,10 @@ public class ImageLoaderModule extends NativeImageLoaderAndroidSpec
   /**
    * Fetch the width and height of the given image with headers.
    *
-   * @param uriString the URI of the remote image to prefetch
+   * @param uriString the URI of the remote image
    * @param headers headers send with the request
-   * @param promise the promise that is fulfilled when the image is successfully prefetched or
-   *     rejected when there is an error
+   * @param promise the promise that is fulfilled when operation successfully completed or rejected
+   *     when there is an error
    */
   @ReactMethod
   public void getSizeWithHeaders(
@@ -276,11 +269,13 @@ public class ImageLoaderModule extends NativeImageLoaderAndroidSpec
         ImagePipeline imagePipeline = getImagePipeline();
         for (int i = 0; i < uris.size(); i++) {
           String uriString = uris.getString(i);
-          final Uri uri = Uri.parse(uriString);
-          if (imagePipeline.isInBitmapMemoryCache(uri)) {
-            result.putString(uriString, "memory");
-          } else if (imagePipeline.isInDiskCacheSync(uri)) {
-            result.putString(uriString, "disk");
+          if (!TextUtils.isEmpty(uriString)) {
+            final Uri uri = Uri.parse(uriString);
+            if (imagePipeline.isInBitmapMemoryCache(uri)) {
+              result.putString(uriString, "memory");
+            } else if (imagePipeline.isInDiskCacheSync(uri)) {
+              result.putString(uriString, "disk");
+            }
           }
         }
         promise.resolve(result);

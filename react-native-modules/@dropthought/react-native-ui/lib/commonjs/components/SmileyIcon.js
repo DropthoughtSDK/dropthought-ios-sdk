@@ -4,21 +4,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _reactNative = require("react-native");
-
 var _react = _interopRequireDefault(require("react"));
-
 var _useWindowDimensions = require("../hooks/useWindowDimensions");
-
 var _styles = _interopRequireDefault(require("../styles"));
-
 var _translation = _interopRequireDefault(require("../translation"));
-
 var _theme = require("../contexts/theme");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 const SmileyIcon = props => {
   const {
     fontColor
@@ -33,6 +25,8 @@ const SmileyIcon = props => {
     minHeight: _translation.default.language === 'te' ? 30 : undefined
   }];
   return /*#__PURE__*/_react.default.createElement(_reactNative.TouchableWithoutFeedback, {
+    accessible: false,
+    testID: props.testID,
     onPress: props.onPress
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: containerStyle
@@ -41,13 +35,11 @@ const SmileyIcon = props => {
     style: styles.emoji,
     source: props.source
   }), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    testID: `test:id/smiley_label_${fontColor}`,
     style: textStyle
   }, props.label)) : null));
 };
-
-var _default = SmileyIcon;
-exports.default = _default;
-
+var _default = exports.default = SmileyIcon;
 const phoneStyles = _reactNative.StyleSheet.create({
   container: {
     alignItems: 'center',
@@ -69,7 +61,6 @@ const phoneStyles = _reactNative.StyleSheet.create({
     fontWeight: '500'
   }
 });
-
 const tabletStyles = _reactNative.StyleSheet.create({
   container: {
     alignItems: 'center',

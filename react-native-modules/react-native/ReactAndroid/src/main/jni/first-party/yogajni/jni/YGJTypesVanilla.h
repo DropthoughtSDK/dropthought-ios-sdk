@@ -1,36 +1,45 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "jni.h"
-#include <yoga/YGValue.h>
-#include <yoga/Yoga.h>
-#include <map>
-#include "common.h"
+#pragma once
 
-using namespace facebook::yoga::vanillajni;
-using namespace std;
+#include <map>
+#include <vector>
+
+#include <yoga/Yoga.h>
+
+#include "common.h"
+#include "jni.h"
 
 class PtrJNodeMapVanilla {
-  std::map<YGNodeRef, size_t> ptrsToIdxs_;
-  jobjectArray javaNodes_;
+  std::map<YGNodeConstRef, jsize> ptrsToIdxs_{};
+  jobjectArray javaNodes_{};
 
-public:
-  PtrJNodeMapVanilla() : ptrsToIdxs_{}, javaNodes_{} {}
-  PtrJNodeMapVanilla(
-      jlong* nativePointers,
-      size_t nativePointersSize,
-      jobjectArray javaNodes)
+ public:
+  PtrJNodeMapVanilla() = default;
+
+  PtrJNodeMapVanilla(jlongArray javaNativePointers, jobjectArray javaNodes)
       : javaNodes_{javaNodes} {
-    for (size_t i = 0; i < nativePointersSize; ++i) {
-      ptrsToIdxs_[(YGNodeRef) nativePointers[i]] = i;
+    using namespace facebook::yoga::vanillajni;
+
+    JNIEnv* env = getCurrentEnv();
+    jsize nativePointersSize = env->GetArrayLength(javaNativePointers);
+    std::vector<jlong> nativePointers(static_cast<size_t>(nativePointersSize));
+    env->GetLongArrayRegion(
+        javaNativePointers, 0, nativePointersSize, nativePointers.data());
+
+    for (jsize i = 0; i < nativePointersSize; ++i) {
+      ptrsToIdxs_[(YGNodeConstRef)nativePointers[static_cast<size_t>(i)]] = i;
     }
   }
 
-  ScopedLocalRef<jobject> ref(YGNodeRef node) {
+  facebook::yoga::vanillajni::ScopedLocalRef<jobject> ref(YGNodeConstRef node) {
+    using namespace facebook::yoga::vanillajni;
+
     JNIEnv* env = getCurrentEnv();
     auto idx = ptrsToIdxs_.find(node);
     if (idx == ptrsToIdxs_.end()) {

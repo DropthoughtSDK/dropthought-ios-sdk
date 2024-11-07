@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,8 +12,7 @@
 #include <functional>
 #include <memory>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * Event Beat serves two interleaving purposes: synchronization of event queues
@@ -36,18 +35,18 @@ class EventBeat {
    * around this issue; it allows to store the pointer later, right after the
    * creation of some other object that owns an `EventBeat`.
    */
-  using Owner = std::weak_ptr<void const>;
+  using Owner = std::weak_ptr<const void>;
   struct OwnerBox {
     Owner owner;
   };
   using SharedOwnerBox = std::shared_ptr<OwnerBox>;
 
   using Factory =
-      std::function<std::unique_ptr<EventBeat>(SharedOwnerBox const &ownerBox)>;
+      std::function<std::unique_ptr<EventBeat>(const SharedOwnerBox& ownerBox)>;
 
-  using BeatCallback = std::function<void(jsi::Runtime &runtime)>;
+  using BeatCallback = std::function<void(jsi::Runtime& runtime)>;
 
-  EventBeat(SharedOwnerBox const &ownerBox);
+  EventBeat(SharedOwnerBox ownerBox);
 
   virtual ~EventBeat() = default;
 
@@ -73,19 +72,18 @@ class EventBeat {
    * Sets the beat callback function.
    * The callback is must be called on the proper thread.
    */
-  void setBeatCallback(const BeatCallback &beatCallback);
+  void setBeatCallback(BeatCallback beatCallback);
 
  protected:
   /*
-   * Should be used by sublasses to send a beat.
+   * Should be used by subclasses to send a beat.
    * Receiver might ignore the call if a beat was not requested.
    */
-  void beat(jsi::Runtime &runtime) const;
+  void beat(jsi::Runtime& runtime) const;
 
   BeatCallback beatCallback_;
   SharedOwnerBox ownerBox_;
   mutable std::atomic<bool> isRequested_{false};
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

@@ -1,3 +1,4 @@
+import { Image } from 'react-native';
 import { isEmpty, isNil } from 'ramda';
 import type {
   Feedback,
@@ -9,6 +10,8 @@ import { matrixRatingValidator } from '../hooks/useMatrixRating';
 import { multipleOpenEndedValidator } from '../hooks/useMultipleOpenEnded';
 import { matrixChoiceValidator } from '../hooks/useMatrixChoice';
 import { multiplePictureChoiceValidator } from '../hooks/usePictureChoice';
+import fileUploadValidator from '../validators/fileUploadValidator';
+import type { ThemeContextProps } from '../contexts/theme/ThemeContext';
 
 /** @enum {'other'} */
 export const QuestionBrandType = {
@@ -158,9 +161,12 @@ export const getRequiredType = (question: Question): RequiredType => {
  */
 export const questionFeedbackValidator = (
   question: Question,
-  feedback: Feedback
+  feedback: Feedback,
+  theme: ThemeContextProps
 ): boolean => {
+  const { colorScheme } = theme;
   let isValid = false;
+
   if (question.type === 'multipleOpenEnded' && question.metaDataTypeList) {
     isValid = question.metaDataTypeList?.every((type, index) =>
       // @ts-ignore
@@ -173,13 +179,47 @@ export const questionFeedbackValidator = (
       question.metaDataType
     );
   }
+
+  const allFeedbackIsUploadedValidator =
+    question.type === 'file' && feedback
+      ? fileUploadValidator(question, feedback, colorScheme)
+      : true;
+
   return (
+    allFeedbackIsUploadedValidator &&
     // @ts-ignore
     isValid &&
     // @ts-ignore
     mandatoryQuestionValidator(question, feedback)
   );
 };
+
+export const getImageSize = (
+  uri: string
+): Promise<{ width: number; height: number }> =>
+  new Promise((resolve) => {
+    //@ts-ignore
+    if (!uri || typeof uri !== 'string') resolve({});
+
+    // pre-fetch the uri if it is not base64
+    const base64Reg = /^data:image\/.+;base64/;
+    if (!uri.match(base64Reg)) {
+      Image.prefetch(uri);
+    }
+    Image.getSize(
+      uri,
+      (width, height) => {
+        resolve({
+          width,
+          height,
+        });
+      },
+      () => {
+        //@ts-ignore
+        resolve({});
+      }
+    );
+  });
 
 export const scaleLogic: {
   [name in string]: number[];

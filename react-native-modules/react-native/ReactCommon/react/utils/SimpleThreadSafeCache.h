@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,12 +8,11 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <optional>
 
-#include <better/optional.h>
 #include <folly/container/EvictingCacheMap.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * Simple thread-safe LRU cache.
@@ -22,6 +21,7 @@ template <typename KeyT, typename ValueT, int maxSize>
 class SimpleThreadSafeCache {
  public:
   SimpleThreadSafeCache() : map_{maxSize} {}
+  SimpleThreadSafeCache(unsigned long size) : map_{size} {}
 
   /*
    * Returns a value from the map with a given key.
@@ -29,7 +29,7 @@ class SimpleThreadSafeCache {
    * generator function, stores it inside a cache and returns it.
    * Can be called from any thread.
    */
-  ValueT get(const KeyT &key, std::function<ValueT(const KeyT &key)> generator)
+  ValueT get(const KeyT& key, std::function<ValueT(const KeyT& key)> generator)
       const {
     std::lock_guard<std::mutex> lock(mutex_);
     auto iterator = map_.find(key);
@@ -47,7 +47,7 @@ class SimpleThreadSafeCache {
    * If the value wasn't found in the cache, returns empty optional.
    * Can be called from any thread.
    */
-  better::optional<ValueT> get(const KeyT &key) const {
+  std::optional<ValueT> get(const KeyT& key) const {
     std::lock_guard<std::mutex> lock(mutex_);
     auto iterator = map_.find(key);
     if (iterator == map_.end()) {
@@ -61,7 +61,7 @@ class SimpleThreadSafeCache {
    * Sets a key-value pair in the LRU cache.
    * Can be called from any thread.
    */
-  void set(const KeyT &key, const ValueT &value) const {
+  void set(const KeyT& key, const ValueT& value) const {
     std::lock_guard<std::mutex> lock(mutex_);
     map_.set(std::move(key), std::move(value));
   }
@@ -71,5 +71,4 @@ class SimpleThreadSafeCache {
   mutable std::mutex mutex_;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

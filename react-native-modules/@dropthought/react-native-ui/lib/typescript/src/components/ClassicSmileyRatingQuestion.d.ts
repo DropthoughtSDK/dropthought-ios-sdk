@@ -1,13 +1,13 @@
 import React from 'react';
 import type { Feedback as OriginFeedback, Question as OriginQuestion } from '../data';
-declare type Feedback = OriginFeedback & {
+type Feedback = OriginFeedback & {
     answers: string[];
 };
-declare type Question = OriginQuestion & {
+type Question = OriginQuestion & {
     options: string[];
     scale: string;
 };
-declare type Props = {
+type Props = {
     mandatoryErrorMessage: string;
     question: Question;
     onFeedback: ({ questionId, answers, type, }: {
@@ -18,5 +18,6 @@ declare type Props = {
     feedback: Feedback;
     forgot: boolean;
 };
-declare const _default: React.MemoExoticComponent<({ mandatoryErrorMessage, question, onFeedback, feedback, forgot, }: Props) => JSX.Element>;
+declare const _default: React.MemoExoticComponent<({ mandatoryErrorMessage, question, onFeedback, feedback, forgot, }: Props) => React.JSX.Element>;
 export default _default;
+//# sourceMappingURL=ClassicSmileyRatingQuestion.d.ts.map

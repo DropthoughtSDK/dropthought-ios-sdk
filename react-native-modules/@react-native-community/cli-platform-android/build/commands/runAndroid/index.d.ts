@@ -1,18 +1,22 @@
 import { Config } from '@react-native-community/cli-types';
-export interface Flags {
-    tasks?: Array<string>;
-    root: string;
-    variant: string;
-    appFolder: string;
+import adb from './adb';
+import tryRunAdbReverse from './tryRunAdbReverse';
+import getAdbPath from './getAdbPath';
+import listAndroidDevices from './listAndroidDevices';
+import { BuildFlags } from '../buildAndroid';
+export interface Flags extends BuildFlags {
     appId: string;
     appIdSuffix: string;
-    mainActivity: string;
-    deviceId?: string;
-    packager: boolean;
+    mainActivity?: string;
     port: number;
-    terminal: string;
-    jetifier: boolean;
+    terminal?: string;
+    packager?: boolean;
+    deviceId?: string;
+    listDevices?: boolean;
+    binaryPath?: string;
+    user?: number | string;
 }
+export type AndroidProject = NonNullable<Config['project']['android']>;
 /**
  * Starts the app on a connected Android emulator or device.
  */
@@ -24,7 +28,17 @@ declare const _default: {
     options: ({
         name: string;
         description: string;
+        parse?: undefined;
         default?: undefined;
+    } | {
+        name: string;
+        description: string;
+        parse: (val: string) => string[];
+        default?: undefined;
+    } | {
+        name: string;
+        description: string;
+        default: boolean;
         parse?: undefined;
     } | {
         name: string;
@@ -39,9 +53,10 @@ declare const _default: {
     } | {
         name: string;
         description: string;
-        parse: (val: string) => string[];
+        parse: NumberConstructor;
         default?: undefined;
     })[];
 };
 export default _default;
+export { adb, getAdbPath, listAndroidDevices, tryRunAdbReverse };
 //# sourceMappingURL=index.d.ts.map

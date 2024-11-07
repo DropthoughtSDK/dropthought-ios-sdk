@@ -4,40 +4,27 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireWildcard(require("react"));
-
 var _reactNative = require("react-native");
-
 var _styles = require("../styles");
-
 var _translation = _interopRequireDefault(require("../translation"));
-
 var _theme = require("../contexts/theme");
-
 var _reactNativeSafeAreaContext = require("react-native-safe-area-context");
-
 var _useWindowDimensions = require("../hooks/useWindowDimensions");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 // @ts-ignore
+
 const logoSource = {
   [_theme.COLOR_SCHEMES.light]: require('../assets/ic_dtlogo.png'),
   [_theme.COLOR_SCHEMES.dark]: require('../assets/ic_dtlogo_dark.png')
 };
-
 const defaultIconSource = require('../assets/rating.png');
-
 const defaultIconSize = {
   [_useWindowDimensions.DimensionWidthType.phone]: 65,
   [_useWindowDimensions.DimensionWidthType.tablet]: 72
 };
-
 const EndScreen = ({
   survey,
   onClose
@@ -47,7 +34,9 @@ const EndScreen = ({
     hexCode,
     colorScheme,
     fontColor,
-    backgroundColor
+    backgroundColor,
+    autoClose,
+    autoCloseCountdown
   } = (0, _theme.useTheme)();
   const rtl = _translation.default.dir() === 'rtl';
   const dimensionWidthType = (0, _useWindowDimensions.useDimensionWidthType)();
@@ -64,25 +53,31 @@ const EndScreen = ({
     height: imageHeight
   };
   (0, _react.useEffect)(() => {
+    let timer;
+    if (autoClose) {
+      timer = setTimeout(onClose, autoCloseCountdown);
+    }
     _reactNative.Image.getSize(image, (_, height) => {
       if (height < defaultIconSize[dimensionWidthType]) {
         setImageHeight(height);
       }
-    }, _ => {}); // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, _ => {});
+    return () => clearTimeout(timer);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const iconSource = image === undefined ? defaultIconSource : {
     uri: image
   };
-
   const iconView = /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: _styles.GlobalStyle.row
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
-    resizeMode: "contain",
+    resizeMode: "contain"
+    // @ts-ignore
+    ,
     style: iconStyle,
     source: iconSource
   }));
-
   const powerByStyle = [styles.power_by, {
     color: fontColor
   }];
@@ -94,7 +89,10 @@ const EndScreen = ({
   }, rtl && _styles.GlobalStyle.flexRowReverse, {
     backgroundColor
   }];
-  const titleStyle = [styles.headerTitle, {
+  const headerStyle = [styles.headerTitle, {
+    color: fontColor
+  }];
+  const subTitleStyle = [styles.subtitle, {
     color: fontColor
   }];
   const headerIconStyle = {
@@ -112,17 +110,17 @@ const EndScreen = ({
     style: styles.closeButton,
     onPress: onClose
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
+    testID: "test:id/icon_custom_close_preview",
     style: headerIconStyle,
     source: require('../assets/icClose24Px.png')
   })), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-    style: titleStyle,
+    style: headerStyle,
     numberOfLines: 1
   }, survey.surveyName))), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.main
   }, iconView, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-    style: [styles.subtitle, {
-      color: fontColor
-    }]
+    testID: "test:id/take_survey_thankful_msg",
+    style: subTitleStyle
   }, thankYouTextPlain)), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.vertical
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
@@ -136,10 +134,7 @@ const EndScreen = ({
     style: powerByBoldStyle
   }, "dropthought")));
 };
-
-var _default = EndScreen;
-exports.default = _default;
-
+var _default = exports.default = EndScreen;
 const styles = _reactNative.StyleSheet.create({
   container: {
     backgroundColor: _styles.Colors.white,

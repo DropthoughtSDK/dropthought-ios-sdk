@@ -3,7 +3,6 @@ import { Text, StyleSheet, View } from 'react-native';
 import GlobalStyle, { Colors } from '../styles';
 import i18n from '../translation';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
-
 const ClassicQuestionWarningMessage = ({
   message
 }) => {
@@ -23,10 +22,10 @@ const ClassicQuestionWarningMessage = ({
   }), /*#__PURE__*/React.createElement(View, {
     style: [styles.bubble, isDarkMode && styles.darkModeBubble]
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/preview_warning_msg",
     style: textStyle
   }, message)));
 };
-
 export default ClassicQuestionWarningMessage;
 const styles = StyleSheet.create({
   container: {

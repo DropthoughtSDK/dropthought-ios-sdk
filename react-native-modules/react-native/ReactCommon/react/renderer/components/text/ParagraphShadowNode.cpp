@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,23 +9,39 @@
 
 #include <cmath>
 
+#include <react/debug/react_native_assert.h>
 #include <react/renderer/attributedstring/AttributedStringBox.h>
 #include <react/renderer/components/view/ViewShadowNode.h>
 #include <react/renderer/components/view/conversions.h>
+#include <react/renderer/core/TraitCast.h>
 #include <react/renderer/graphics/rounding.h>
-#include <react/renderer/mounting/TransactionTelemetry.h>
+#include <react/renderer/telemetry/TransactionTelemetry.h>
+#include <react/utils/CoreFeatures.h>
 
 #include "ParagraphState.h"
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 using Content = ParagraphShadowNode::Content;
 
-char const ParagraphComponentName[] = "Paragraph";
+const char ParagraphComponentName[] = "Paragraph";
 
-Content const &ParagraphShadowNode::getContent(
-    LayoutContext const &layoutContext) const {
+ParagraphShadowNode::ParagraphShadowNode(
+    const ShadowNode& sourceShadowNode,
+    const ShadowNodeFragment& fragment)
+    : ConcreteViewShadowNode(sourceShadowNode, fragment) {
+  if (CoreFeatures::enableCleanParagraphYogaNode) {
+    if (!fragment.children && !fragment.props) {
+      // This ParagraphShadowNode was cloned but did not change
+      // in a way that affects its layout. Let's mark it clean
+      // to stop Yoga from traversing it.
+      cleanLayout();
+    }
+  }
+}
+
+const Content& ParagraphShadowNode::getContent(
+    const LayoutContext& layoutContext) const {
   if (content_.has_value()) {
     return content_.value();
   }
@@ -50,8 +66,8 @@ Content const &ParagraphShadowNode::getContent(
 }
 
 Content ParagraphShadowNode::getContentWithMeasuredAttachments(
-    LayoutContext const &layoutContext,
-    LayoutConstraints const &layoutConstraints) const {
+    const LayoutContext& layoutContext,
+    const LayoutConstraints& layoutConstraints) const {
   auto content = getContent(layoutContext);
 
   if (content.attachments.empty()) {
@@ -63,13 +79,13 @@ Content ParagraphShadowNode::getContentWithMeasuredAttachments(
   // Having enforced minimum size for text fragments doesn't make much sense.
   localLayoutConstraints.minimumSize = Size{0, 0};
 
-  auto &fragments = content.attributedString.getFragments();
+  auto& fragments = content.attributedString.getFragments();
 
-  for (auto const &attachment : content.attachments) {
+  for (const auto& attachment : content.attachments) {
     auto laytableShadowNode =
-        traitCast<LayoutableShadowNode const *>(attachment.shadowNode);
+        traitCast<const LayoutableShadowNode*>(attachment.shadowNode);
 
-    if (!laytableShadowNode) {
+    if (laytableShadowNode == nullptr) {
       continue;
     }
 
@@ -77,8 +93,8 @@ Content ParagraphShadowNode::getContentWithMeasuredAttachments(
         laytableShadowNode->measure(layoutContext, localLayoutConstraints);
 
     // Rounding to *next* value on the pixel grid.
-    size.width += 0.01;
-    size.height += 0.01;
+    size.width += 0.01f;
+    size.height += 0.01f;
     size = roundToPixel<&ceil>(size, layoutContext.pointScaleFactor);
 
     auto fragmentLayoutMetrics = LayoutMetrics{};
@@ -92,36 +108,34 @@ Content ParagraphShadowNode::getContentWithMeasuredAttachments(
 }
 
 void ParagraphShadowNode::setTextLayoutManager(
-    SharedTextLayoutManager textLayoutManager) {
+    std::shared_ptr<const TextLayoutManager> textLayoutManager) {
   ensureUnsealed();
-  textLayoutManager_ = textLayoutManager;
+  getStateData().paragraphLayoutManager.setTextLayoutManager(
+      std::move(textLayoutManager));
 }
 
-void ParagraphShadowNode::updateStateIfNeeded(Content const &content) {
+void ParagraphShadowNode::updateStateIfNeeded(const Content& content) {
   ensureUnsealed();
 
-  auto &state = getStateData();
+  auto& state = getStateData();
 
-  assert(textLayoutManager_);
-  assert(
-      (!state.layoutManager || state.layoutManager == textLayoutManager_) &&
-      "`StateData` refers to a different `TextLayoutManager`");
+  react_native_assert(state.paragraphLayoutManager.getTextLayoutManager());
 
-  if (state.attributedString == content.attributedString &&
-      state.layoutManager == textLayoutManager_) {
+  if (state.attributedString == content.attributedString) {
     return;
   }
 
-  setStateData(ParagraphState{content.attributedString,
-                              content.paragraphAttributes,
-                              textLayoutManager_});
+  setStateData(ParagraphState{
+      content.attributedString,
+      content.paragraphAttributes,
+      state.paragraphLayoutManager});
 }
 
 #pragma mark - LayoutableShadowNode
 
 Size ParagraphShadowNode::measureContent(
-    LayoutContext const &layoutContext,
-    LayoutConstraints const &layoutConstraints) const {
+    const LayoutContext& layoutContext,
+    const LayoutConstraints& layoutConstraints) const {
   auto content =
       getContentWithMeasuredAttachments(layoutContext, layoutConstraints);
 
@@ -138,16 +152,9 @@ Size ParagraphShadowNode::measureContent(
     attributedString.appendFragment({string, textAttributes, {}});
   }
 
-  auto telemetry = TransactionTelemetry::threadLocalTelemetry();
-  if (telemetry) {
-    telemetry->didMeasureText();
-  }
-
-  return textLayoutManager_
-      ->measure(
-          AttributedStringBox{attributedString},
-          content.paragraphAttributes,
-          layoutConstraints)
+  return getStateData()
+      .paragraphLayoutManager
+      .measure(attributedString, content.paragraphAttributes, layoutConstraints)
       .size;
 }
 
@@ -164,13 +171,11 @@ void ParagraphShadowNode::layout(LayoutContext layoutContext) {
 
   updateStateIfNeeded(content);
 
-  auto measurement = textLayoutManager_->measure(
-      AttributedStringBox{content.attributedString},
-      content.paragraphAttributes,
-      layoutConstraints);
+  auto measurement = getStateData().paragraphLayoutManager.measure(
+      content.attributedString, content.paragraphAttributes, layoutConstraints);
 
   if (getConcreteProps().onTextLayout) {
-    auto linesMeasurements = textLayoutManager_->measureLines(
+    auto linesMeasurements = getStateData().paragraphLayoutManager.measureLines(
         content.attributedString,
         content.paragraphAttributes,
         measurement.size);
@@ -184,18 +189,20 @@ void ParagraphShadowNode::layout(LayoutContext layoutContext) {
 
   //  Iterating on attachments, we clone shadow nodes and moving
   //  `paragraphShadowNode` that represents clones of `this` object.
-  auto paragraphShadowNode = static_cast<ParagraphShadowNode *>(this);
+  auto paragraphShadowNode = static_cast<ParagraphShadowNode*>(this);
   // `paragraphOwningShadowNode` is owning pointer to`paragraphShadowNode`
   // (besides the initial case when `paragraphShadowNode == this`), we need this
   // only to keep it in memory for a while.
   auto paragraphOwningShadowNode = ShadowNode::Unshared{};
 
-  assert(content.attachments.size() == measurement.attachments.size());
+  react_native_assert(
+      content.attachments.size() == measurement.attachments.size());
 
-  for (auto i = 0; i < content.attachments.size(); i++) {
-    auto &attachment = content.attachments.at(i);
+  for (size_t i = 0; i < content.attachments.size(); i++) {
+    auto& attachment = content.attachments.at(i);
 
-    if (!traitCast<LayoutableShadowNode const *>(attachment.shadowNode)) {
+    if (traitCast<const LayoutableShadowNode*>(attachment.shadowNode) ==
+        nullptr) {
       // Not a layoutable `ShadowNode`, no need to lay it out.
       continue;
     }
@@ -204,15 +211,15 @@ void ParagraphShadowNode::layout(LayoutContext layoutContext) {
 
     paragraphOwningShadowNode = paragraphShadowNode->cloneTree(
         attachment.shadowNode->getFamily(),
-        [&](ShadowNode const &oldShadowNode) {
+        [&](const ShadowNode& oldShadowNode) {
           clonedShadowNode = oldShadowNode.clone({});
           return clonedShadowNode;
         });
     paragraphShadowNode =
-        static_cast<ParagraphShadowNode *>(paragraphOwningShadowNode.get());
+        static_cast<ParagraphShadowNode*>(paragraphOwningShadowNode.get());
 
-    auto &layoutableShadowNode = const_cast<LayoutableShadowNode &>(
-        traitCast<LayoutableShadowNode const &>(*clonedShadowNode));
+    auto& layoutableShadowNode =
+        traitCast<LayoutableShadowNode&>(*clonedShadowNode);
 
     auto attachmentFrame = measurement.attachments[i].frame;
     auto attachmentSize = roundToPixel<&ceil>(
@@ -238,10 +245,8 @@ void ParagraphShadowNode::layout(LayoutContext layoutContext) {
   // reflect the changes that we made.
   if (paragraphShadowNode != this) {
     this->children_ =
-        static_cast<ParagraphShadowNode const *>(paragraphShadowNode)
-            ->children_;
+        static_cast<const ParagraphShadowNode*>(paragraphShadowNode)->children_;
   }
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

@@ -8,10 +8,11 @@ import {
   TouchableOpacity,
   Dimensions,
   FlatList,
-  ListRenderItem,
   Platform,
   ScrollView as RNScrollView,
 } from 'react-native';
+import type { ListRenderItem } from 'react-native';
+// @ts-ignore
 import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import type { TransformOptionType } from '../utils/data';
 import GlobalStyle, { Colors, addOpacityToColor } from '../styles';
@@ -52,7 +53,7 @@ const DropdownQuestion = ({
   themeColor,
 }: Props) => {
   const rtl = i18n.dir() === 'rtl';
-  const { questionTitle } = question;
+  const { questionTitlePlain } = question;
   const { fontColor, backgroundColor, colorScheme } = useTheme();
   const {
     selectedOptionIndexCache,
@@ -192,7 +193,7 @@ const DropdownQuestion = ({
         componentInside={
           <>
             <View style={subTitleContainerStyle}>
-              <Text style={subTitleTextStyle}>{questionTitle}</Text>
+              <Text style={subTitleTextStyle}>{questionTitlePlain}</Text>
             </View>
             <View style={bottomSheetStyles.content}>
               <View

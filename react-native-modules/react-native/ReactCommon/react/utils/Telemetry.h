@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,8 +10,7 @@
 #include <chrono>
 #include <type_traits>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * Represents a monotonic clock suitable for measuring intervals.
@@ -31,7 +30,7 @@ using TelemetryDuration = std::chrono::nanoseconds;
 /*
  * Represents a time point which never happens.
  */
-static TelemetryTimePoint const kTelemetryUndefinedTimePoint =
+static const TelemetryTimePoint kTelemetryUndefinedTimePoint =
     TelemetryTimePoint::max();
 
 /*
@@ -68,7 +67,7 @@ static inline double telemetryTimePointToSteadyClockSeconds(
   auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(
                          timePoint.time_since_epoch())
                          .count();
-  return nanoseconds / 1.0e9;
+  return (double)nanoseconds / 1.0e9;
 }
 
 /*
@@ -96,7 +95,7 @@ static inline double telemetryTimePointToSecondsSinceEpoch(
   auto systemClockTimePoint =
       clockCast<std::chrono::system_clock::time_point, TelemetryTimePoint>(
           timePoint);
-  return std::chrono::duration_cast<std::chrono::microseconds>(
+  return (double)std::chrono::duration_cast<std::chrono::microseconds>(
              systemClockTimePoint.time_since_epoch())
              .count() /
       1000000.0;
@@ -111,5 +110,4 @@ static inline int64_t telemetryDurationToMilliseconds(
       .count();
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

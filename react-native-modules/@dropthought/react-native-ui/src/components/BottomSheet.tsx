@@ -1,4 +1,4 @@
-import React, { ReactChild } from 'react';
+import React from 'react';
 import {
   StyleSheet,
   View,
@@ -20,10 +20,11 @@ interface Props {
   coverScreen: boolean;
   title?: string;
   onBackdropPress?: () => void;
-  componentInside?: ReactChild;
+  componentInside?: React.ReactNode;
   componentHeight: number;
   visible: boolean;
-  navigationComponent?: ReactChild;
+  navigationComponent?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 interface NavProps {
@@ -50,13 +51,18 @@ export const NavigationComponent: React.FC<NavProps> = ({
   return (
     <View style={containerStyle}>
       <View style={navStyles.content}>
-        <TouchableOpacity style={navStyles.buttonContainer} onPress={onCancel}>
+        <TouchableOpacity
+          testID="test:id/icon_cancel"
+          style={navStyles.buttonContainer}
+          onPress={onCancel}
+        >
           <Text style={navStyles.buttonLeft}>Cancel</Text>
         </TouchableOpacity>
         <View style={navStyles.labelContaienr}>
           <Text style={navStyles.label}>Select your option</Text>
         </View>
         <TouchableOpacity
+          testID="test:id/icon_check_image"
           disabled={disableOnConfirm}
           style={buttonRightStyle}
           onPress={onConfirm}

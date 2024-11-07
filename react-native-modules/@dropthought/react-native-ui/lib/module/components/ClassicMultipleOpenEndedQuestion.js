@@ -7,7 +7,6 @@ import useOpenEnded from '../hooks/useOpenEnded';
 import { metaDataFormatValidator } from '../utils/data';
 import i18n from '../translation';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
-
 const RowComponent = ({
   question,
   questionRow,
@@ -18,7 +17,6 @@ const RowComponent = ({
   index
 }) => {
   var _question$metaDataTyp;
-
   const {
     questionTitle,
     exampleMetadataText,
@@ -45,9 +43,8 @@ const RowComponent = ({
     fontColor
   } = useTheme();
   const isDark = colorScheme === COLOR_SCHEMES.dark;
-  const isValid = metaDataFormatValidator(text, question === null || question === void 0 ? void 0 : (_question$metaDataTyp = question.metaDataTypeList) === null || _question$metaDataTyp === void 0 ? void 0 : _question$metaDataTyp[index]);
+  const isValid = metaDataFormatValidator(text, question === null || question === void 0 || (_question$metaDataTyp = question.metaDataTypeList) === null || _question$metaDataTyp === void 0 ? void 0 : _question$metaDataTyp[index]);
   const isFoucsAndInValid = isFocus || !isValid && hasEdited;
-
   const onChangeText = textInput => {
     onChangeTextHandler(textInput);
     setSelectedAnswer(previous => {
@@ -56,7 +53,6 @@ const RowComponent = ({
       return answers;
     });
   };
-
   const rowContainerStyle = [styles.rowContainer, {
     backgroundColor: isFocus ? isDark ? Colors.rankingContainerBgDark : addOpacityToColor(themeColor || Colors.white, 0.1) : backgroundColor
   }];
@@ -66,13 +62,13 @@ const RowComponent = ({
   const hippaText = i18n.t('survey:hippa-hint');
   let inputBorderColor;
   let bottomTextComponent;
-
   if (!isValid && hasEdited) {
     inputBorderColor = Colors.warningRed;
     const errorTextStyle = [styles.responseText, {
       color: Colors.warningRed
     }];
     bottomTextComponent = /*#__PURE__*/React.createElement(Text, {
+      testID: "test:id/multiple_open_ended_warning",
       style: errorTextStyle
     }, responseErrorText);
   } else if (isFocus) {
@@ -87,7 +83,6 @@ const RowComponent = ({
     inputBorderColor = isDark ? Colors.rankingBorderDark : Colors.rankingBorder;
     bottomTextComponent = null;
   }
-
   const inputStyle = [styles.input, {
     backgroundColor: backgroundColor,
     borderColor: inputBorderColor,
@@ -96,12 +91,15 @@ const RowComponent = ({
   return /*#__PURE__*/React.createElement(View, {
     style: rowContainerStyle
   }, /*#__PURE__*/React.createElement(View, null, /*#__PURE__*/React.createElement(Text, {
+    testID: `test:id/multiple_open_ended_title_${fontColor}`,
     style: rowTitleTextStyle
   }, questionTitle)), /*#__PURE__*/React.createElement(View, {
     style: styles.rowContent
   }, exampleMetadataText && isFoucsAndInValid ? /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/multiple_open_ended_desc",
     style: styles.rowSubTitleText
   }, exampleMetadataText) : null, /*#__PURE__*/React.createElement(TextInput, {
+    testID: "test:id/field_multiple_open_ended",
     style: inputStyle,
     onChangeText: onChangeText,
     onEndEditing: onEndEditingHandler,
@@ -116,10 +114,10 @@ const RowComponent = ({
   }, /*#__PURE__*/React.createElement(View, {
     style: GlobalStyle.flex1
   }, bottomTextComponent), isFoucsAndInValid ? /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/multiple_open_ended_text_length",
     style: [styles.inputLengthText, GlobalStyle.textAlignRight]
   }, `${scale - text.length}/${scale}`) : null)));
 };
-
 const ClassicMultipleOpenEndedQuestion = ({
   mandatoryErrorMessage,
   question,
@@ -154,7 +152,6 @@ const ClassicMultipleOpenEndedQuestion = ({
     invalidMessage: handleErrorHint(forgot)
   }), rowList);
 };
-
 export default /*#__PURE__*/React.memo(ClassicMultipleOpenEndedQuestion);
 const styles = StyleSheet.create({
   questionContainer: {

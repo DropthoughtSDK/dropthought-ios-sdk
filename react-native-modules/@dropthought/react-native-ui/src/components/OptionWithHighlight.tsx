@@ -1,12 +1,6 @@
 import * as React from 'react';
-import {
-  StyleSheet,
-  Image,
-  View,
-  Text,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import { StyleSheet, Image, View, Text, TouchableOpacity } from 'react-native';
+import type { ViewStyle } from 'react-native';
 
 import { useDimensionWidthType } from '../hooks/useWindowDimensions';
 import GlobalStyle, {
@@ -89,7 +83,11 @@ function OptionWithHighlight({
       checked ? styles.checkedText : {},
       QuestionContentTextSize[dimensionWidthType],
     ];
-    content = <Text style={textStyle}>{title}</Text>;
+    content = (
+      <Text testID={`test:id/choice_option_${fontColor}`} style={textStyle}>
+        {title}
+      </Text>
+    );
   } else {
     content = title;
   }
@@ -100,7 +98,11 @@ function OptionWithHighlight({
   ];
 
   return (
-    <TouchableOpacity onPress={onPressHandler}>
+    <TouchableOpacity
+      accessible={false}
+      testID={`test:id/choice_selected_${checked}`}
+      onPress={onPressHandler}
+    >
       <View style={containerStyle}>
         <View style={styles.checkboxIconContainer}>
           {checked ? (

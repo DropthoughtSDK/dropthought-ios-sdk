@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,12 +7,11 @@
 
 #include "ScrollViewEventEmitter.h"
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 static jsi::Value scrollViewMetricsPayload(
-    jsi::Runtime &runtime,
-    const ScrollViewMetrics &scrollViewMetrics) {
+    jsi::Runtime& runtime,
+    const ScrollViewMetrics& scrollViewMetrics) {
   auto payload = jsi::Object(runtime);
 
   {
@@ -59,43 +58,42 @@ static jsi::Value scrollViewMetricsPayload(
 }
 
 void ScrollViewEventEmitter::onScroll(
-    const ScrollViewMetrics &scrollViewMetrics) const {
-  dispatchUniqueEvent("scroll", [scrollViewMetrics](jsi::Runtime &runtime) {
+    const ScrollViewMetrics& scrollViewMetrics) const {
+  dispatchUniqueEvent("scroll", [scrollViewMetrics](jsi::Runtime& runtime) {
     return scrollViewMetricsPayload(runtime, scrollViewMetrics);
   });
 }
 
 void ScrollViewEventEmitter::onScrollBeginDrag(
-    const ScrollViewMetrics &scrollViewMetrics) const {
+    const ScrollViewMetrics& scrollViewMetrics) const {
   dispatchScrollViewEvent("scrollBeginDrag", scrollViewMetrics);
 }
 
 void ScrollViewEventEmitter::onScrollEndDrag(
-    const ScrollViewMetrics &scrollViewMetrics) const {
+    const ScrollViewMetrics& scrollViewMetrics) const {
   dispatchScrollViewEvent("scrollEndDrag", scrollViewMetrics);
 }
 
 void ScrollViewEventEmitter::onMomentumScrollBegin(
-    const ScrollViewMetrics &scrollViewMetrics) const {
+    const ScrollViewMetrics& scrollViewMetrics) const {
   dispatchScrollViewEvent("momentumScrollBegin", scrollViewMetrics);
 }
 
 void ScrollViewEventEmitter::onMomentumScrollEnd(
-    const ScrollViewMetrics &scrollViewMetrics) const {
+    const ScrollViewMetrics& scrollViewMetrics) const {
   dispatchScrollViewEvent("momentumScrollEnd", scrollViewMetrics);
 }
 
 void ScrollViewEventEmitter::dispatchScrollViewEvent(
-    const std::string &name,
-    const ScrollViewMetrics &scrollViewMetrics,
+    std::string name,
+    const ScrollViewMetrics& scrollViewMetrics,
     EventPriority priority) const {
   dispatchEvent(
-      name,
-      [scrollViewMetrics](jsi::Runtime &runtime) {
+      std::move(name),
+      [scrollViewMetrics](jsi::Runtime& runtime) {
         return scrollViewMetricsPayload(runtime, scrollViewMetrics);
       },
       priority);
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

@@ -30,7 +30,14 @@ const defaultIconSize = {
 
 const EndScreen = ({ survey, onClose }: Props) => {
   const insets = useSafeAreaInsets();
-  const { hexCode, colorScheme, fontColor, backgroundColor } = useTheme();
+  const {
+    hexCode,
+    colorScheme,
+    fontColor,
+    backgroundColor,
+    autoClose,
+    autoCloseCountdown,
+  } = useTheme();
   const rtl = i18n.dir() === 'rtl';
   const dimensionWidthType = useDimensionWidthType();
 
@@ -43,6 +50,11 @@ const EndScreen = ({ survey, onClose }: Props) => {
   };
 
   useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (autoClose) {
+      timer = setTimeout(onClose, autoCloseCountdown);
+    }
+
     Image.getSize(
       image,
       (_, height) => {
@@ -52,6 +64,9 @@ const EndScreen = ({ survey, onClose }: Props) => {
       },
       (_) => {}
     );
+
+    return () => clearTimeout(timer);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -59,7 +74,12 @@ const EndScreen = ({ survey, onClose }: Props) => {
 
   const iconView = (
     <View style={GlobalStyle.row}>
-      <Image resizeMode="contain" style={iconStyle} source={iconSource} />
+      <Image
+        resizeMode="contain"
+        // @ts-ignore
+        style={iconStyle}
+        source={iconSource}
+      />
     </View>
   );
 
@@ -74,7 +94,8 @@ const EndScreen = ({ survey, onClose }: Props) => {
       backgroundColor,
     },
   ];
-  const titleStyle = [styles.headerTitle, { color: fontColor }];
+  const headerStyle = [styles.headerTitle, { color: fontColor }];
+  const subTitleStyle = [styles.subtitle, { color: fontColor }];
   const headerIconStyle = { tintColor: hexCode };
   return (
     <View style={[styles.container, { backgroundColor }]}>
@@ -82,18 +103,19 @@ const EndScreen = ({ survey, onClose }: Props) => {
         <View style={styles.headerRowContainer}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Image
+              testID="test:id/icon_custom_close_preview"
               style={headerIconStyle}
               source={require('../assets/icClose24Px.png')}
             />
           </TouchableOpacity>
-          <Text style={titleStyle} numberOfLines={1}>
+          <Text style={headerStyle} numberOfLines={1}>
             {survey.surveyName}
           </Text>
         </View>
       </View>
       <View style={styles.main}>
         {iconView}
-        <Text style={[styles.subtitle, { color: fontColor }]}>
+        <Text testID="test:id/take_survey_thankful_msg" style={subTitleStyle}>
           {thankYouTextPlain}
         </Text>
       </View>

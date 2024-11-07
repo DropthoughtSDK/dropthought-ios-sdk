@@ -4,37 +4,25 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireWildcard(require("react"));
-
 var _reactNative = require("react-native");
-
 var _styles = require("../styles");
-
 var _useWindowDimensions = require("../hooks/useWindowDimensions");
-
 var _theme = require("../contexts/theme");
-
 var _reactNativeSafeAreaContext = require("react-native-safe-area-context");
-
 var _LanguageUtils = require("../utils/LanguageUtils");
-
 var _translation = _interopRequireDefault(require("../translation"));
-
+var _usePollingRecord = require("../hooks/usePollingRecord");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 // @ts-ignore
-const defaultIconSource = require('../assets/rating.png');
 
-const defaultIconSize = {
+const defaultIconSource = require('../assets/rating.png');
+const defaultIconSize = Object.freeze({
   [_useWindowDimensions.DimensionWidthType.phone]: 65,
   [_useWindowDimensions.DimensionWidthType.tablet]: 72
-};
-
+});
 const StartScreen = ({
   onLanguageSelect,
   onClose,
@@ -68,24 +56,32 @@ const StartScreen = ({
       if (height < defaultIconSize[dimensionWidthType]) {
         setImageHeight(height);
       }
-    }, _ => {}); // eslint-disable-next-line react-hooks/exhaustive-deps
-
+    }, _ => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const {
+    resetRecord
+  } = (0, _usePollingRecord.usePollingRecord)();
+  (0, _react.useEffect)(() => {
+    resetRecord();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const iconSource = image === undefined ? defaultIconSource : {
     uri: image
   };
-
   const iconView = /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
-    resizeMode: "contain",
+    resizeMode: "contain"
+    // @ts-ignore
+    ,
     style: iconStyle,
     source: iconSource
   });
-
   const languagesView = () => {
     const {
       languages
-    } = survey; // if there's only one language or no languages, no need to display
+    } = survey;
 
+    // if there's only one language or no languages, no need to display
     if (!languages || !languages.length || languages.length <= 1) return null;
     const languageView = languages.map((lang, index) => /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
       key: index,
@@ -101,7 +97,6 @@ const StartScreen = ({
       style: styles.languages
     }, languageView);
   };
-
   const buttonStyle = [styles.button, {
     backgroundColor: hexCode,
     borderRadius: _translation.default.language === 'te' ? 25 : 20
@@ -111,12 +106,18 @@ const StartScreen = ({
   }, {
     backgroundColor
   }];
-  const titleStyle = [styles.headerTitle, {
+  const headerStyle = [styles.headerTitle, {
     color: fontColor
   }];
   const headerIconStyle = {
     tintColor: hexCode
   };
+  const titleStyle = [styles.title, {
+    color: fontColor
+  }];
+  const subTitleStyle = [styles.subtitle, {
+    color: fontColor
+  }];
   const startTextStyle = [styles.buttonTitle, {
     lineHeight: _translation.default.language === 'te' ? 26 : undefined
   }];
@@ -135,29 +136,26 @@ const StartScreen = ({
     style: headerIconStyle,
     source: require('../assets/icClose24Px.png')
   })), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-    style: titleStyle,
+    testID: "test:id/custom_survey_name_nav",
+    style: headerStyle,
     numberOfLines: 1
   }, surveyName))), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.main
   }, iconView, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-    style: [styles.title, {
-      color: fontColor
-    }]
+    testID: "test:id/custom_take_survey_name",
+    style: titleStyle
   }, surveyName), !!welcomeTextPlain && /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
-    style: [styles.subtitle, {
-      color: fontColor
-    }]
+    testID: "test:id/custom_take_survey_welcome_msg",
+    style: subTitleStyle
   }, welcomeTextPlain), /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
     style: buttonStyle,
     onPress: onStart
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    testID: "test:id/button_custom_take_survey",
     style: startTextStyle
   }, takeSurvey))), languagesView());
 };
-
-var _default = StartScreen;
-exports.default = _default;
-
+var _default = exports.default = StartScreen;
 const styles = _reactNative.StyleSheet.create({
   container: {
     backgroundColor: _styles.Colors.white,

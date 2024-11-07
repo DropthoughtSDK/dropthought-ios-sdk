@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,22 +8,11 @@
  * @format
  */
 
-import Platform from '../../Utilities/Platform';
-import * as React from 'react';
-import View from '../View/View';
-
-import type {HostComponent} from '../../Renderer/shims/ReactNativeTypes';
 import type {ViewProps} from '../View/ViewPropTypes';
 
-type Props = $ReadOnly<{|
-  ...ViewProps,
-  emulateUnlessSupported?: boolean,
-|}>;
-
-let exported: React.AbstractComponent<
-  Props,
-  React.ElementRef<HostComponent<mixed>>,
->;
+import Platform from '../../Utilities/Platform';
+import View from '../View/View';
+import * as React from 'react';
 
 /**
  * Renders nested content and automatically applies paddings reflect the portion
@@ -34,28 +23,12 @@ let exported: React.AbstractComponent<
  * limitation of the screen, such as rounded corners or camera notches (aka
  * sensor housing area on iPhone X).
  */
-if (Platform.OS === 'android') {
-  exported = React.forwardRef<Props, React.ElementRef<HostComponent<mixed>>>(
-    function SafeAreaView(props, forwardedRef) {
-      const {emulateUnlessSupported, ...localProps} = props;
-      return <View {...localProps} ref={forwardedRef} />;
-    },
-  );
-} else {
-  const RCTSafeAreaViewNativeComponent = require('./RCTSafeAreaViewNativeComponent')
-    .default;
+const exported: React.AbstractComponent<
+  ViewProps,
+  React.ElementRef<typeof View>,
+> = Platform.select({
+  ios: require('./RCTSafeAreaViewNativeComponent').default,
+  default: View,
+});
 
-  exported = React.forwardRef<Props, React.ElementRef<HostComponent<mixed>>>(
-    function SafeAreaView(props, forwardedRef) {
-      return (
-        <RCTSafeAreaViewNativeComponent
-          emulateUnlessSupported={true}
-          {...props}
-          ref={forwardedRef}
-        />
-      );
-    },
-  );
-}
-
-module.exports = exported;
+export default exported;

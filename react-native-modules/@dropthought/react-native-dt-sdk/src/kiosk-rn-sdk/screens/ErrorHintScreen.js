@@ -13,16 +13,14 @@ import {
   i18n,
 } from '@dropthought/react-native-ui';
 import CloseButton, { ICON_SIZE } from '../components/CloseButton';
-import { useSurveyContext } from '../contexts/survey';
+import { useSurveyContext } from '../contexts/survey/SurveyContext';
 
 const ErrorHintScreen = ({ onClose, hideCloseButton = false, children }) => {
   const { backgroundColor, colorScheme, fontColor, hexCode, themeOption } =
     useTheme();
   const { survey } = useSurveyContext();
   const isRtl = i18n.dir() === 'rtl';
-  const isClassicOrBijliride =
-    themeOption === THEME_OPTION.CLASSIC ||
-    themeOption === THEME_OPTION.BIJLIRIDE;
+  const isBijliride = themeOption === THEME_OPTION.BIJLIRIDE;
   const headerTextStyle = [styles.title, { color: fontColor }];
 
   const header = (
@@ -56,7 +54,7 @@ const ErrorHintScreen = ({ onClose, hideCloseButton = false, children }) => {
         />
       )}
       <SafeAreaView style={[GlobalStyle.flex1, { backgroundColor }]}>
-        {hideCloseButton || isClassicOrBijliride ? null : header}
+        {hideCloseButton || isBijliride ? null : header}
         <View style={GlobalStyle.flex1}>{children}</View>
       </SafeAreaView>
     </>

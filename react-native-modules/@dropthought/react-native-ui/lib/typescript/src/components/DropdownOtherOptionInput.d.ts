@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Question } from '../data';
-declare type Props = {
+type Props = {
     visible: boolean;
     question: Question;
     placeholder: string;
@@ -10,3 +10,4 @@ declare type Props = {
 };
 declare const DropdownOtherOptionInput: React.FC<Props>;
 export default DropdownOtherOptionInput;
+//# sourceMappingURL=DropdownOtherOptionInput.d.ts.map

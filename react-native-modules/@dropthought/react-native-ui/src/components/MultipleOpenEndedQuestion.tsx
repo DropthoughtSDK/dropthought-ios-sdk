@@ -7,6 +7,7 @@ import {
   Platform,
   ScrollView as RNScrollView,
 } from 'react-native';
+// @ts-ignore
 import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import GlobalStyle, { Colors, addOpacityToColor } from '../styles';
 import MandatoryTitle from './MandatoryTitle';

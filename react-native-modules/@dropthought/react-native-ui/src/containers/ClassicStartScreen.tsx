@@ -6,6 +6,7 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import { Colors } from '../styles';
 import {
@@ -13,9 +14,12 @@ import {
   useDimensionWidthType,
 } from '../hooks/useWindowDimensions';
 import Button from '../components/Button';
+import HtmlText from '../components/HtmlText';
 import { THEME_OPTION, useTheme } from '../contexts/theme';
 import type { Survey as OriginSurvey } from '../data';
 import { getLanguageBy } from '../utils/LanguageUtils';
+import { usePollingRecord } from '../hooks/usePollingRecord';
+import { htmlTrim } from '../utils/htmlHelper';
 
 type Survey = OriginSurvey & {
   languages: string[];
@@ -40,8 +44,14 @@ const ClassicStartScreen = ({ onLanguageSelect, onStart, survey }: Props) => {
   const isPhone = dimensionWidthType === DimensionWidthType.phone;
   const styles = isPhone ? phoneStyles : tabletStyles;
 
-  const { surveyProperty, surveyName, welcomeTextPlain, language, takeSurvey } =
-    survey;
+  const {
+    surveyProperty,
+    surveyName,
+    welcomeText,
+    welcomeTextPlain,
+    language,
+    takeSurvey,
+  } = survey;
   const { image } = surveyProperty;
 
   const [imageHeight, setImageHeight] = useState(65);
@@ -63,10 +73,21 @@ const ClassicStartScreen = ({ onLanguageSelect, onStart, survey }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const { resetRecord } = usePollingRecord();
+  useEffect(() => {
+    resetRecord();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const iconSource = image === undefined ? defaultIconSource : { uri: image };
 
   const iconView = (
-    <Image resizeMode="contain" style={iconStyle} source={iconSource} />
+    <Image
+      resizeMode="contain"
+      // @ts-ignore
+      style={iconStyle}
+      source={iconSource}
+    />
   );
 
   const buttonWidth = isPhone ? 143 : 160;
@@ -110,17 +131,28 @@ const ClassicStartScreen = ({ onLanguageSelect, onStart, survey }: Props) => {
   ];
 
   return (
-    <ScrollView contentContainerStyle={containerStyle}>
+    <ScrollView contentContainerStyle={containerStyle} scrollEnabled={false}>
       <View style={styles.main}>
         {iconView}
-        <Text style={[styles.title, { color: fontColor }]}>{surveyName}</Text>
-        {!!welcomeTextPlain && (
-          <Text style={[styles.subtitle, { color: fontColor }]}>
-            {welcomeTextPlain}
-          </Text>
+        <Text
+          testID="test:id/take_survey_name"
+          style={[styles.title, { color: fontColor }]}
+        >
+          {surveyName}
+        </Text>
+        {!!welcomeTextPlain && welcomeText && (
+          <View style={styles.subtitle}>
+            <HtmlText
+              accessibilityLabel={`welcome_${welcomeText}`}
+              html={htmlTrim(welcomeText)}
+              width={Dimensions.get('window').width - 76}
+              maxHeight={Dimensions.get('window').height * 0.4}
+            />
+          </View>
         )}
         <View style={styles.divider} />
         <Button
+          testID="test:id/button_take_survey"
           width={buttonWidth}
           title={takeSurvey}
           color={hexCode}
@@ -158,11 +190,7 @@ const phoneStyles = StyleSheet.create({
     lineHeight: 27,
   },
   subtitle: {
-    lineHeight: 23,
-    marginTop: 12,
-    fontSize: 16,
-    textAlign: 'center',
-    opacity: 0.72,
+    marginTop: 17,
   },
   divider: {
     backgroundColor: '#c3c3c3',
@@ -203,11 +231,7 @@ const tabletStyles = StyleSheet.create({
     opacity: 0.9,
   },
   subtitle: {
-    lineHeight: 25,
     marginTop: 17,
-    fontSize: 21,
-    textAlign: 'center',
-    opacity: 0.72,
   },
   divider: {
     backgroundColor: '#c3c3c3',

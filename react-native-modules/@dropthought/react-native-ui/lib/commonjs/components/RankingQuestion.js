@@ -4,33 +4,22 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireWildcard(require("react"));
-
 var _reactNative = require("react-native");
-
 var _useWindowDimensions = require("../hooks/useWindowDimensions");
-
 var _MandatoryTitle = _interopRequireDefault(require("./MandatoryTitle"));
-
 var _styles = _interopRequireWildcard(require("../styles"));
-
 var _theme = require("../contexts/theme");
-
 var _DraggableList = _interopRequireDefault(require("../utils/react-native-draggable-list/DraggableList"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 const swapElements = (array, index1, index2) => {
   let newArray = [...array];
+  // @ts-ignore
   newArray[index1] = newArray.splice(index2, 1, newArray[index1])[0];
   return newArray;
 };
-
 function RankingItem({
   item,
   index,
@@ -72,7 +61,7 @@ function RankingItem({
     source: require('../assets/icCheckBoxRounded.png')
   }) : /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: [styles.unCheckBox, {
-      borderColor: isDarkMode ? _styles.Colors.rankingCheckBoxBorder : themeColor !== null && themeColor !== void 0 ? themeColor : _styles.Colors.rankingCheckBoxBorder
+      borderColor: isDarkMode ? _styles.Colors.rankingCheckBoxBorder : themeColor ?? _styles.Colors.rankingCheckBoxBorder
     }]
   }), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: [styles.naText, {
@@ -116,7 +105,6 @@ function RankingItem({
     source: require('../assets/ic-expand-more-24-px.png')
   })), naComponent);
 }
-
 const RankingQuestion = ({
   survey,
   question,
@@ -143,18 +131,10 @@ const RankingQuestion = ({
       isNA: false
     };
   }));
-  const [list, setList] = (0, _react.useState)(originListRef.current);
-  const [normalList, setNormalList] = (0, _react.useState)(list);
-  const [visible, setVisible] = (0, _react.useState)(false);
-  const [selectedOption, setSelectedOption] = (0, _react.useState)();
-  (0, _react.useEffect)(() => {
-    setNormalList(list.filter(current => !current.isNA));
-  }, [list]);
-  (0, _react.useEffect)(() => {
+  const [list, setList] = (0, _react.useState)(() => {
     const {
       listForRankingQuestion
-    } = feedback !== null && feedback !== void 0 ? feedback : {};
-
+    } = feedback ?? {};
     if (feedback && listForRankingQuestion && listForRankingQuestion.length > 0) {
       let feedbackToOptions = [];
       let feedbackToNAOptions = [];
@@ -167,17 +147,22 @@ const RankingQuestion = ({
           index,
           isNA
         };
-
         if (isNA) {
           feedbackToNAOptions = [...feedbackToNAOptions, newOption];
         } else {
           feedbackToOptions = [...feedbackToOptions, newOption];
         }
       });
-      setList(listForRankingQuestion);
-    } // eslint-disable-next-line react-hooks/exhaustive-deps
-
-  }, []);
+      return listForRankingQuestion;
+    }
+    return originListRef.current;
+  });
+  const [normalList, setNormalList] = (0, _react.useState)(list);
+  const [visible, setVisible] = (0, _react.useState)(false);
+  const [selectedOption, setSelectedOption] = (0, _react.useState)();
+  (0, _react.useEffect)(() => {
+    setNormalList(list.filter(current => !current.isNA));
+  }, [list]);
   (0, _react.useEffect)(() => {
     const answers = list.map(({
       isNA,
@@ -190,17 +175,14 @@ const RankingQuestion = ({
       answers,
       type: 'ranking',
       listForRankingQuestion: list // for render usage after page navigations
-
-    }; // @ts-ignore
-
+    };
+    // @ts-ignore
     onFeedback(result);
   }, [list, onFeedback, questionId]);
-
   const onRankPressHandler = item => {
     setSelectedOption(item);
     isIPhone ? oniOSModal(item) : setVisible(true);
   };
-
   const onNAPressHandler = item => {
     if (list) {
       item.isNA = !item.isNA;
@@ -214,14 +196,11 @@ const RankingQuestion = ({
       });
     }
   };
-
   const oniOSModal = selectedItem => {
     let actionSheetOptions = ['Cancel', ...normalList.map((_, index) => (index + 1).toString())];
-
     if (allowNAForRanking) {
       actionSheetOptions = [...actionSheetOptions, 'N/A'];
     }
-
     _reactNative.ActionSheetIOS.showActionSheetWithOptions({
       title: 'Select your rating',
       options: actionSheetOptions,
@@ -247,7 +226,6 @@ const RankingQuestion = ({
       }
     });
   };
-
   const modalContainerStyle = [styles.modalContainer, {
     backgroundColor: isDarkMode ? 'rgb(55,55,55)' : _styles.Colors.white
   }];
@@ -257,7 +235,6 @@ const RankingQuestion = ({
   const modalItemStyle = [styles.modalItem, {
     borderTopColor: isDarkMode ? 'rgba(17,17,17,0.5)' : _styles.Colors.divider
   }];
-
   const rankingModal = /*#__PURE__*/_react.default.createElement(_reactNative.Modal, {
     transparent: true,
     animationType: "fade",
@@ -300,7 +277,6 @@ const RankingQuestion = ({
       if (selectedOption) {
         onNAPressHandler(selectedOption);
       }
-
       setVisible(false);
     }
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
@@ -311,7 +287,6 @@ const RankingQuestion = ({
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
     style: modalItemTitleStyle
   }, 'Cancel'))))));
-
   const renderItem = ({
     item,
     index
@@ -325,23 +300,23 @@ const RankingQuestion = ({
       onNAPress: onNAPressHandler
     });
   };
-
   const onDragEndHandler = newList => {
     setList(prev => {
       const result = newList.map(newData => {
+        // @ts-ignore
         const {
           isNA
         } = prev.filter(({
           option
         }) => option === newData.option)[0];
-        return { ...newData,
+        return {
+          ...newData,
           isNA
         };
       });
       return result;
     });
   };
-
   const [scrollEnabled, setScrollEnabled] = (0, _react.useState)(true);
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_reactNative.ScrollView, {
     style: styles.container,
@@ -366,11 +341,7 @@ const RankingQuestion = ({
     onDragEnd: onDragEndHandler
   }))), rankingModal);
 };
-
-var _default = /*#__PURE__*/_react.default.memo(RankingQuestion);
-
-exports.default = _default;
-
+var _default = exports.default = /*#__PURE__*/_react.default.memo(RankingQuestion);
 const styles = _reactNative.StyleSheet.create({
   container: {
     flex: 1
@@ -378,7 +349,8 @@ const styles = _reactNative.StyleSheet.create({
   title: {
     marginHorizontal: 16
   },
-  renderItem: { ..._styles.default.row,
+  renderItem: {
+    ..._styles.default.row,
     minHeight: 50,
     marginVertical: 4,
     borderWidth: 1,
@@ -393,7 +365,8 @@ const styles = _reactNative.StyleSheet.create({
     marginHorizontal: 12,
     fontSize: 15
   },
-  rankingContainer: { ..._styles.default.row,
+  rankingContainer: {
+    ..._styles.default.row,
     width: 53,
     height: 24,
     borderRadius: 4,
@@ -426,7 +399,8 @@ const styles = _reactNative.StyleSheet.create({
     borderRadius: 4,
     margin: 3
   },
-  modalBG: { ..._styles.default.row,
+  modalBG: {
+    ..._styles.default.row,
     justifyContent: 'center',
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.24)'

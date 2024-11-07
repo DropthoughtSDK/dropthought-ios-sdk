@@ -4,9 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _fetch = require("./fetch");
-
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -25,15 +23,25 @@ var _fetch = require("./fetch");
 async function isPackagerRunning(packagerPort = process.env.RCT_METRO_PORT || '8081') {
   try {
     const {
-      data
+      data,
+      headers
     } = await (0, _fetch.fetch)(`http://localhost:${packagerPort}/status`);
-    return data === 'packager-status:running' ? 'running' : 'unrecognized';
+    try {
+      if (data === 'packager-status:running') {
+        return {
+          status: 'running',
+          root: headers.get('X-React-Native-Project-Root') ?? ''
+        };
+      }
+    } catch (_error) {
+      return 'unrecognized';
+    }
+    return 'unrecognized';
   } catch (_error) {
     return 'not_running';
   }
 }
-
 var _default = isPackagerRunning;
 exports.default = _default;
 
-//# sourceMappingURL=isPackagerRunning.js.map
+//# sourceMappingURL=isPackagerRunning.ts.map

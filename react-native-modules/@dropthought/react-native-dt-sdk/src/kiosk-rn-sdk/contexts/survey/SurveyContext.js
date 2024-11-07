@@ -17,12 +17,13 @@ import {
   PlaceholderImageTypes,
   THEME_OPTION,
   ThemeProvider,
-} from '@dropthought/react-native-ui/src';
+} from '@dropthought/react-native-ui';
 
 import ErrorHintScreen from '../../screens/ErrorHintScreen';
 import { saveCache, loadCache } from '../../../lib/Storage';
 import {
   apiGetProgramById,
+  apiGetProgramTokenById,
   apiGetVisibilityById,
   sdkFetcher,
 } from '../../../lib/API';
@@ -70,6 +71,8 @@ const getVisibility = async ({ visibilityId, language, timezone }) => {
     appearance: visibility.appearance,
     fontColor: visibility.fontColor,
     backgroundColor: visibility.backgroundColor,
+    autoClose: visibility.autoClose,
+    autoCloseCountdown: visibility.autoCloseCountdown,
   };
 
   return getProgram({
@@ -148,6 +151,8 @@ const getProgram = async ({ surveyId, language, timezone, theme }) => {
         timeout: 10000,
       }
     );
+    const token = await apiGetProgramTokenById({ programId: surveyId });
+    survey.token = token;
   }
   // pre-fetch image
   survey = await preFetchImage(survey);
@@ -227,7 +232,7 @@ const defaultOnCloseHandler = () => {
 };
 
 /**
- * @param {Props} param0
+ * @param {SDKEntryProps} param0
  */
 export const SurveyContextProvider = ({
   baseURL,
@@ -238,10 +243,12 @@ export const SurveyContextProvider = ({
   defaultLanguage = 'en',
   onClose = defaultOnCloseHandler,
   themeOption,
-  appearance = 'system',
+  appearance,
   fontColor,
   backgroundColor,
   timezone,
+  autoClose,
+  autoCloseCountdown,
 }) => {
   if (baseURL || apiKey) {
     sdkFetcher.init({ baseURL, apiKey });
@@ -251,6 +258,8 @@ export const SurveyContextProvider = ({
     appearance,
     fontColor,
     backgroundColor,
+    autoClose,
+    autoCloseCountdown,
   };
   const [
     selectedLanguage,
@@ -290,11 +299,12 @@ export const SurveyContextProvider = ({
 
   const { survey, theme = themeDataFromSDKEntry } = data ?? {};
 
-  const transformedThemeOption = theme.themeOption;
   const hexCode = survey?.surveyProperty.hexCode ?? '';
   const transformedTheme = {
     ...theme,
-    themeOption: transformedThemeOption,
+    autoClose: theme.autoClose ?? autoClose,
+    autoCloseCountdown: theme.autoCloseCountdown ?? autoCloseCountdown,
+    appearance: appearance ?? theme.appearance, // use input appearance first, then use appearance from visibility
     hexCode,
   };
 
@@ -303,13 +313,13 @@ export const SurveyContextProvider = ({
     () => ({
       onClose,
       survey:
-        transformedThemeOption === THEME_OPTION.CLASSIC ||
-        transformedThemeOption === THEME_OPTION.BIJLIRIDE
+        theme.themeOption === THEME_OPTION.CLASSIC ||
+        theme.themeOption === THEME_OPTION.BIJLIRIDE
           ? survey
           : singleQuestionPerPageTransformer(survey),
       changeLanguage: setSelectedLanguageWithBackup,
     }),
-    [onClose, transformedThemeOption, survey, setSelectedLanguageWithBackup]
+    [onClose, theme.themeOption, survey, setSelectedLanguageWithBackup]
   );
 
   // initial loading data view
@@ -352,14 +362,13 @@ export const SurveyContextProvider = ({
   );
 };
 
-/** @typedef {import('../../SDKEntry').SDKEntryProps} Props */
-
 /**
  * @typedef {object} SurveyContextValue
  * @property {Survey} survey
  * @property {(language: string) => void} changeLanguage
  * @property {() => void} onClose
  */
-/** @typedef {import('../../../data').Survey} Survey */
+/** @typedef {import('@dropthought/react-native-ui').Survey} Survey */
 /** @typedef {import('../../../data').Visibility} Visibility */
 /** @typedef {import('../../../data').ThemeData} ThemeData */
+/** @typedef {import('../../SDKEntry').SDKEntryProps} SDKEntryProps */

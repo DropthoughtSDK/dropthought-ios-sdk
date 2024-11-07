@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { ViewStyle } from 'react-native';
-export declare type Props = {
+import type { ViewStyle } from 'react-native';
+export type Props = {
     type?: 'radio' | 'checkbox';
     id: any;
     containerStyle?: ViewStyle;
@@ -9,6 +9,7 @@ export declare type Props = {
     checkedColor?: string;
     onPress: (id: any) => void;
 };
-declare function OptionWithHighlight({ type, id: value, containerStyle: containerStyleFromProps, title, checked, checkedColor, onPress, }: Props): JSX.Element;
+declare function OptionWithHighlight({ type, id: value, containerStyle: containerStyleFromProps, title, checked, checkedColor, onPress, }: Props): React.JSX.Element;
 declare const _default: React.MemoExoticComponent<typeof OptionWithHighlight>;
 export default _default;
+//# sourceMappingURL=OptionWithHighlight.d.ts.map

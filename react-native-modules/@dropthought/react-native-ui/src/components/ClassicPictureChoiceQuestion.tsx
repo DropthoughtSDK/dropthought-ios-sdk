@@ -4,16 +4,18 @@ import GlobalStyle from '../styles';
 import PictureChoiceItem from './PictureChoiceItem';
 import PictureChoiceOtherItem from './PictureChoiceOtherItem';
 import { usePictureChoice } from '../hooks/usePictureChoice';
-import type { Question, Feedback, ImageFileProps } from '../data';
+import type { Question, Feedback } from '../data';
 import ClassicMandatoryTitle from './ClassicMandatoryTitle';
 import i18n from '../translation';
+// @ts-ignore
+import type { onUploadType } from '../dt-common';
 
 type Props = {
   mandatoryErrorMessage: string;
   question: Question;
   onFeedback: (feedback: Feedback) => void;
   feedback?: Feedback;
-  onUpload: (file: ImageFileProps) => Promise<string | undefined>;
+  onUpload: onUploadType;
   isUploading: boolean;
   forgot: boolean;
   themeColor: string;
@@ -105,7 +107,7 @@ const ClassicPictureChoiceQuestion = ({
       }}
       onUpload={async (file) => {
         setInvalidMessage(undefined);
-        const url = await onUpload(file);
+        const url = await onUpload(file, 'pictureChoice');
         if (typeof url !== 'string') {
           setInvalidMessage(`${i18n.t('picture-choice:uploadFailed')}`);
         } else if (url) {

@@ -1,9 +1,7 @@
 "use strict";
 
 var _ = require("..");
-
 var _index = require("../index");
-
 const surveyWithRules = {
   pageOrder: ['38923572-2924-45af-bf3f-b2b43b2b3929', '366065b9-a495-430e-927a-f4ddc02dc85a', '86a829b1-e2ee-4201-a006-ca43d2958e55', '6a6d5dca-bc10-4f7a-9d55-4e8ccfc2fbf1'],
   pages: [{
@@ -133,7 +131,6 @@ describe('rule set for page 1, conditions with &&', () => {
       answers: [0],
       questionId: '43c8f71b-4613-4b77-bd99-90cdfacb7f00'
     }]];
-
     for (const feedbacks of testFeedbacksSets) {
       const nextPageIndex = (0, _.nextPage)(0, feedbacks, surveyWithRules);
       expect(nextPageIndex).toBe(-1);
@@ -179,7 +176,6 @@ describe('rule set for page 2, condifionts with ||', () => {
       answers: [0],
       questionId: '6ab17499-9316-49cf-9d70-20827aa20fe3'
     }]];
-
     for (const feedbacks of testFeedbacksSets) {
       const nextPageIndex = (0, _.nextPage)(1, feedbacks, surveyWithRules);
       expect(nextPageIndex).toBe(-1);
@@ -227,7 +223,6 @@ describe('rule set for page 2, condifionts with ||', () => {
       answers: [''],
       questionId: '6ab17499-9316-49cf-9d70-20827aa20fe3'
     }]];
-
     for (const feedbacks of testFeedbacksSets) {
       const nextPageIndex = (0, _.nextPage)(1, feedbacks, surveyWithRules);
       expect(nextPageIndex).toBe(2);

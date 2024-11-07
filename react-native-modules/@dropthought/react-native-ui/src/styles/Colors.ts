@@ -61,6 +61,8 @@ export const Colors = {
   darkActionText: '#e1e1e1',
   bijlirideBackgroundColor: '#32cbf1',
   bijlirideHexCode: '#407d37',
+  lightActionBackground: 'rgba(249, 249, 249, 0.78)',
+  urlBlue: '#218ddd',
 };
 
 export const addOpacityToColor = (hexColor: string, opacity: number) => {

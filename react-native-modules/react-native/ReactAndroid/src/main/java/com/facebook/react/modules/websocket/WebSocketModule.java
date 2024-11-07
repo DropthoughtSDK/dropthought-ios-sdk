@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -19,7 +19,7 @@ import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.ReactConstants;
 import com.facebook.react.module.annotations.ReactModule;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.modules.network.CustomClientBuilder;
 import com.facebook.react.modules.network.ForwardingCookieHandler;
 import java.io.IOException;
 import java.net.URI;
@@ -36,12 +36,8 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okio.ByteString;
 
-@ReactModule(name = WebSocketModule.NAME, hasConstants = false)
+@ReactModule(name = NativeWebSocketModuleSpec.NAME)
 public final class WebSocketModule extends NativeWebSocketModuleSpec {
-  public static final String TAG = WebSocketModule.class.getSimpleName();
-
-  public static final String NAME = "WebSocketModule";
-
   public interface ContentHandler {
     void onMessage(String text, WritableMap params);
 
@@ -53,24 +49,37 @@ public final class WebSocketModule extends NativeWebSocketModuleSpec {
 
   private ForwardingCookieHandler mCookieHandler;
 
+  private static @Nullable CustomClientBuilder customClientBuilder = null;
+
   public WebSocketModule(ReactApplicationContext context) {
     super(context);
     mCookieHandler = new ForwardingCookieHandler(context);
   }
 
-  private void sendEvent(String eventName, WritableMap params) {
-    ReactApplicationContext reactApplicationContext = getReactApplicationContextIfActiveOrWarn();
+  public static void setCustomClientBuilder(CustomClientBuilder ccb) {
+    customClientBuilder = ccb;
+  }
 
-    if (reactApplicationContext != null) {
-      reactApplicationContext
-          .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-          .emit(eventName, params);
+  private static void applyCustomBuilder(OkHttpClient.Builder builder) {
+    if (customClientBuilder != null) {
+      customClientBuilder.apply(builder);
     }
   }
 
   @Override
-  public String getName() {
-    return NAME;
+  public void invalidate() {
+    for (WebSocket socket : mWebSocketConnections.values()) {
+      socket.close(1001 /* endpoint is going away */, null);
+    }
+    mWebSocketConnections.clear();
+    mContentHandlers.clear();
+  }
+
+  private void sendEvent(String eventName, WritableMap params) {
+    ReactApplicationContext reactApplicationContext = getReactApplicationContext();
+    if (reactApplicationContext.hasActiveReactInstance()) {
+      reactApplicationContext.emitDeviceEvent(eventName, params);
+    }
   }
 
   public void setContentHandler(final int id, final ContentHandler contentHandler) {
@@ -88,12 +97,15 @@ public final class WebSocketModule extends NativeWebSocketModuleSpec {
       @Nullable final ReadableMap options,
       final double socketID) {
     final int id = (int) socketID;
-    OkHttpClient client =
+    OkHttpClient.Builder okHttpBuilder =
         new OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(0, TimeUnit.MINUTES) // Disable timeouts for read
-            .build();
+            .readTimeout(0, TimeUnit.MINUTES); // Disable timeouts for read
+
+    applyCustomBuilder(okHttpBuilder);
+
+    OkHttpClient client = okHttpBuilder.build();
 
     Request.Builder builder = new Request.Builder().tag(id).url(url);
 

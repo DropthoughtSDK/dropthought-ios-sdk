@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,6 +10,7 @@
 #import <objc/runtime.h>
 
 #import "RCTAssert.h"
+#import "RCTBridge+Private.h"
 #import "RCTBridge.h"
 #import "RCTLog.h"
 #import "RCTPerformanceLogger.h"
@@ -50,46 +51,13 @@ static RCTRootViewSizeFlexibility convertToRootViewSizeFlexibility(RCTSurfaceSiz
 
 @implementation RCTSurfaceHostingProxyRootView
 
-- (instancetype)initWithBridge:(RCTBridge *)bridge
-                    moduleName:(NSString *)moduleName
-             initialProperties:(NSDictionary *)initialProperties
+- (instancetype)initWithSurface:(id<RCTSurfaceProtocol>)surface
 {
-  RCTAssertMainQueue();
-  RCTAssert(bridge, @"A bridge instance is required to create an RCTSurfaceHostingProxyRootView");
-  RCTAssert(moduleName, @"A moduleName is required to create an RCTSurfaceHostingProxyRootView");
-
-  RCT_PROFILE_BEGIN_EVENT(RCTProfileTagAlways, @"-[RCTSurfaceHostingProxyRootView init]", nil);
-
-  _bridge = bridge;
-
-  if (!bridge.isLoading) {
-    [bridge.performanceLogger markStartForTag:RCTPLTTI];
+  if (self = [super initWithSurface:surface
+                    sizeMeasureMode:RCTSurfaceSizeMeasureModeWidthExact | RCTSurfaceSizeMeasureModeHeightExact]) {
+    [surface start];
   }
-
-  // `RCTRootViewSizeFlexibilityNone` is the RCTRootView's default.
-  RCTSurfaceSizeMeasureMode sizeMeasureMode = convertToSurfaceSizeMeasureMode(RCTRootViewSizeFlexibilityNone);
-
-  id<RCTSurfaceProtocol> surface = [[self class] createSurfaceWithBridge:bridge
-                                                              moduleName:moduleName
-                                                       initialProperties:initialProperties];
-  [surface start];
-  if (self = [super initWithSurface:surface sizeMeasureMode:sizeMeasureMode]) {
-    self.backgroundColor = [UIColor whiteColor];
-  }
-
-  RCT_PROFILE_END_EVENT(RCTProfileTagAlways, @"");
-
   return self;
-}
-
-- (instancetype)initWithBundleURL:(NSURL *)bundleURL
-                       moduleName:(NSString *)moduleName
-                initialProperties:(NSDictionary *)initialProperties
-                    launchOptions:(NSDictionary *)launchOptions
-{
-  RCTBridge *bridge = [[RCTBridge alloc] initWithBundleURL:bundleURL moduleProvider:nil launchOptions:launchOptions];
-
-  return [self initWithBridge:bridge moduleName:moduleName initialProperties:initialProperties];
 }
 
 RCT_NOT_IMPLEMENTED(-(instancetype)initWithFrame : (CGRect)frame)
@@ -100,6 +68,11 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithCoder : (NSCoder *)aDecoder)
 - (NSString *)moduleName
 {
   return super.surface.moduleName;
+}
+
+- (UIView *)view
+{
+  return (UIView *)super.surface.view;
 }
 
 - (UIView *)contentView
@@ -170,6 +143,15 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithCoder : (NSCoder *)aDecoder)
 - (UIViewController *)reactViewController
 {
   return _reactViewController ?: [super reactViewController];
+}
+
+- (void)setMinimumSize:(CGSize)minimumSize
+{
+  if (!CGSizeEqualToSize(minimumSize, CGSizeZero)) {
+    // TODO (T93859532): Investigate implementation for this.
+    RCTLogError(@"RCTSurfaceHostingProxyRootView does not support changing the deprecated minimumSize");
+  }
+  _minimumSize = CGSizeZero;
 }
 
 #pragma mark unsupported

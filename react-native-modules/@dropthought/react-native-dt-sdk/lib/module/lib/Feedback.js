@@ -30,6 +30,38 @@ export const saveFeedback = async surveyFeedback => {
   return FeedbacksQueue.enqueue(surveyFeedback);
 };
 
+/**
+ * @param {Feedback[]} feedbacks
+ * @param {Survey} survey
+ * @returns {Feedback[]}
+ */
+export const finalizeSubmitedFeedback = (feedbacks, survey) => {
+  const {
+    pages
+  } = survey;
+  const result = [...feedbacks];
+  pages.forEach(page => {
+    const {
+      questions
+    } = page;
+    questions.forEach(question => {
+      const {
+        questionId,
+        type
+      } = question;
+      const hasAnswered = feedbacks.find(feedback => feedback.questionId === questionId);
+      if (type === 'statement' && !hasAnswered) {
+        result.push({
+          questionId: questionId,
+          answers: [-1],
+          type: 'statement'
+        });
+      }
+    });
+  });
+  return result;
+};
+
 /**@typedef {import('../data').Feedback} Feedback */
 /**@typedef {import('../data').SurveyFeedback} SurveyFeedback */
 //# sourceMappingURL=Feedback.js.map

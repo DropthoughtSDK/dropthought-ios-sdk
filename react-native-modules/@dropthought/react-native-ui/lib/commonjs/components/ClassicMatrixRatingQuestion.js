@@ -4,25 +4,15 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireDefault(require("react"));
-
 var _reactNative = require("react-native");
-
 var _styles = _interopRequireWildcard(require("../styles"));
-
 var _ClassicMandatoryTitle = _interopRequireDefault(require("./ClassicMandatoryTitle"));
-
 var _useMatrixRating = _interopRequireDefault(require("../hooks/useMatrixRating"));
-
 var _theme = require("../contexts/theme");
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 const MatrixColoum = ({
   title,
   rowIndex,
@@ -39,7 +29,6 @@ const MatrixColoum = ({
   let containerBackgroundColor;
   let textColor = _styles.Colors.white;
   let coloumIndexBackgroundColor = _styles.Colors.white;
-
   if (isDark && isSelected) {
     containerBackgroundColor = themeColor;
   } else if (isDark && !isSelected) {
@@ -51,7 +40,6 @@ const MatrixColoum = ({
     containerBackgroundColor = _styles.Colors.white;
     textColor = _styles.Colors.black;
   }
-
   const optionContainerStyle = [styles.optionContainer, {
     backgroundColor: containerBackgroundColor
   }];
@@ -64,6 +52,7 @@ const MatrixColoum = ({
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: optionContainerStyle
   }, /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+    accessible: false,
     style: styles.coloumButton,
     onPress: () => onColoumPress(rowIndex, coloumIndex)
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
@@ -71,11 +60,11 @@ const MatrixColoum = ({
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, null, coloumIndex + 1)), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: _styles.default.flex1
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    testID: "test:id/matrix_rating_option",
     numberOfLines: 2,
     style: textStyle
   }, title))));
 };
-
 const MatrixRow = ({
   title,
   rowIndex,
@@ -86,6 +75,7 @@ const MatrixRow = ({
   onRowPress,
   onColoumPress
 }) => {
+  var _optionsForMatrix$;
   const {
     questionId,
     optionsForMatrix
@@ -110,7 +100,7 @@ const MatrixRow = ({
   const textStyle = {
     color: fontColor
   };
-  const optionsList = !isCollapse ? optionsForMatrix[0].map((value, index) => /*#__PURE__*/_react.default.createElement(MatrixColoum, {
+  const optionsList = !isCollapse ? (_optionsForMatrix$ = optionsForMatrix[0]) === null || _optionsForMatrix$ === void 0 ? void 0 : _optionsForMatrix$.map((value, index) => /*#__PURE__*/_react.default.createElement(MatrixColoum, {
     title: value,
     rowIndex: rowIndex,
     coloumIndex: index,
@@ -119,26 +109,31 @@ const MatrixRow = ({
     onColoumPress: onColoumPress,
     key: `${questionId}-${value}-${index}`
   })) : null;
-  const optionSelectedText = selectedAnswer[rowIndex] !== -1 ? /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+  const answer = selectedAnswer[rowIndex];
+  const optionSelectedText = answer !== undefined && answer !== -1 ? /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.titleButtonSelected
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: optionSelectedIndexStyle
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    testID: "test:id/matrix_rating_selected_index",
     style: indexTextStyle
-  }, selectedAnswer[rowIndex] + 1)), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+  }, answer + 1)), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: _styles.default.flexShrink1
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    testID: "test:id/matrix_rating_selected_option",
     numberOfLines: 2,
     style: textStyle
-  }, optionsForMatrix[0][selectedAnswer[rowIndex]]))) : null;
+  }, optionsForMatrix[0] && optionsForMatrix[0][answer]))) : null;
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: containerStyle
   }, /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+    accessible: false,
     style: styles.titleButton,
     onPress: () => onRowPress(rowIndex)
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.titleButtonText
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    testID: `test:id/matrix_rating_title_${fontColor}`,
     style: textStyle
   }, title)), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.titleButtonContent
@@ -148,7 +143,6 @@ const MatrixRow = ({
     style: styles.titleContent
   }, optionsList));
 };
-
 const ClassicMatrixRatingQuestion = ({
   mandatoryErrorMessage,
   question,
@@ -190,11 +184,7 @@ const ClassicMatrixRatingQuestion = ({
     });
   }));
 };
-
-var _default = /*#__PURE__*/_react.default.memo(ClassicMatrixRatingQuestion);
-
-exports.default = _default;
-
+var _default = exports.default = /*#__PURE__*/_react.default.memo(ClassicMatrixRatingQuestion);
 const styles = _reactNative.StyleSheet.create({
   title: {
     marginBottom: 16
@@ -215,7 +205,8 @@ const styles = _reactNative.StyleSheet.create({
   titleButtonText: {
     flex: 6
   },
-  titleButtonContent: { ..._styles.default.row,
+  titleButtonContent: {
+    ..._styles.default.row,
     flex: 4,
     justifyContent: 'flex-end'
   },

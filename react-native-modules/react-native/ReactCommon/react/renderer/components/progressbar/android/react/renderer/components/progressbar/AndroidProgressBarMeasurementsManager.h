@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -13,18 +13,17 @@
 #include <react/renderer/core/LayoutConstraints.h>
 #include <react/utils/ContextContainer.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 class AndroidProgressBarMeasurementsManager {
  public:
   AndroidProgressBarMeasurementsManager(
-      const ContextContainer::Shared &contextContainer)
+      const ContextContainer::Shared& contextContainer)
       : contextContainer_(contextContainer) {}
 
   Size measure(
       SurfaceId surfaceId,
-      AndroidProgressBarProps props,
+      const AndroidProgressBarProps& props,
       LayoutConstraints layoutConstraints) const;
 
  private:
@@ -34,5 +33,4 @@ class AndroidProgressBarMeasurementsManager {
   mutable Size cachedMeasurement_{};
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

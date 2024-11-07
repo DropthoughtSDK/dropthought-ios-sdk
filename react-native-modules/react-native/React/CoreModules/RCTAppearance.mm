@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,6 +10,7 @@
 #import <FBReactNativeSpec/FBReactNativeSpec.h>
 #import <React/RCTConstants.h>
 #import <React/RCTEventEmitter.h>
+#import <React/RCTUtils.h>
 
 #import "CoreModulesPlugins.h"
 
@@ -30,37 +31,33 @@ void RCTOverrideAppearancePreference(NSString *const colorSchemeOverride)
   sColorSchemeOverride = colorSchemeOverride;
 }
 
+NSString *RCTCurrentOverrideAppearancePreference()
+{
+  return sColorSchemeOverride;
+}
+
 NSString *RCTColorSchemePreference(UITraitCollection *traitCollection)
 {
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && defined(__IPHONE_13_0) && \
-    __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0
-  if (@available(iOS 13.0, *)) {
-    static NSDictionary *appearances;
-    static dispatch_once_t onceToken;
+  static NSDictionary *appearances;
+  static dispatch_once_t onceToken;
 
-    if (sColorSchemeOverride) {
-      return sColorSchemeOverride;
-    }
-
-    dispatch_once(&onceToken, ^{
-      appearances = @{
-        @(UIUserInterfaceStyleLight) : RCTAppearanceColorSchemeLight,
-        @(UIUserInterfaceStyleDark) : RCTAppearanceColorSchemeDark
-      };
-    });
-
-    if (!sAppearancePreferenceEnabled) {
-      // Return the default if the app doesn't allow different color schemes.
-      return RCTAppearanceColorSchemeLight;
-    }
-
-    traitCollection = traitCollection ?: [UITraitCollection currentTraitCollection];
-    return appearances[@(traitCollection.userInterfaceStyle)] ?: RCTAppearanceColorSchemeLight;
+  if (sColorSchemeOverride) {
+    return sColorSchemeOverride;
   }
-#endif
 
-  // Default to light on older OS version - same behavior as Android.
-  return RCTAppearanceColorSchemeLight;
+  dispatch_once(&onceToken, ^{
+    appearances = @{
+      @(UIUserInterfaceStyleLight) : RCTAppearanceColorSchemeLight,
+      @(UIUserInterfaceStyleDark) : RCTAppearanceColorSchemeDark
+    };
+  });
+
+  if (!sAppearancePreferenceEnabled) {
+    // Return the default if the app doesn't allow different color schemes.
+    return RCTAppearanceColorSchemeLight;
+  }
+
+  return appearances[@(traitCollection.userInterfaceStyle)] ?: RCTAppearanceColorSchemeLight;
 }
 
 @interface RCTAppearance () <NativeAppearanceSpec>
@@ -68,6 +65,19 @@ NSString *RCTColorSchemePreference(UITraitCollection *traitCollection)
 
 @implementation RCTAppearance {
   NSString *_currentColorScheme;
+}
+
+- (instancetype)init
+{
+  if ((self = [super init])) {
+    UITraitCollection *traitCollection = RCTSharedApplication().delegate.window.traitCollection;
+    _currentColorScheme = RCTColorSchemePreference(traitCollection);
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(appearanceChanged:)
+                                                 name:RCTUserInterfaceStyleDidChangeNotification
+                                               object:nil];
+  }
+  return self;
 }
 
 RCT_EXPORT_MODULE(Appearance)
@@ -87,9 +97,18 @@ RCT_EXPORT_MODULE(Appearance)
   return std::make_shared<NativeAppearanceSpecJSI>(params);
 }
 
+RCT_EXPORT_METHOD(setColorScheme : (NSString *)style)
+{
+  UIUserInterfaceStyle userInterfaceStyle = [RCTConvert UIUserInterfaceStyle:style];
+  NSArray<__kindof UIWindow *> *windows = RCTSharedApplication().windows;
+
+  for (UIWindow *window in windows) {
+    window.overrideUserInterfaceStyle = userInterfaceStyle;
+  }
+}
+
 RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSString *, getColorScheme)
 {
-  _currentColorScheme = RCTColorSchemePreference(nil);
   return _currentColorScheme;
 }
 
@@ -116,19 +135,16 @@ RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSString *, getColorScheme)
 
 - (void)startObserving
 {
-  if (@available(iOS 13.0, *)) {
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(appearanceChanged:)
-                                                 name:RCTUserInterfaceStyleDidChangeNotification
-                                               object:nil];
-  }
 }
 
 - (void)stopObserving
 {
-  if (@available(iOS 13.0, *)) {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-  }
+}
+
+- (void)invalidate
+{
+  [super invalidate];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end

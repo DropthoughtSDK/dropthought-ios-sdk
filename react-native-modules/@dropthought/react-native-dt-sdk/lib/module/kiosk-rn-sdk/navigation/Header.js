@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { i18n, useDimensionWidthType, DimensionWidthType, useTheme, THEME_OPTION, Colors } from '@dropthought/react-native-ui/src';
+import { i18n, useDimensionWidthType, DimensionWidthType, useTheme, THEME_OPTION, Colors } from '@dropthought/react-native-ui';
 import CloseButton, { ICON_SIZE } from '../components/CloseButton';
 
 /**

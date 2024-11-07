@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -14,68 +14,54 @@
 #include <hermes/hermes.h>
 #include <jsi/decorator.h>
 
-#ifdef HERMES_ENABLE_DEBUGGER
+#include <hermes/inspector-modern/chrome/Registration.h>
 #include <hermes/inspector/RuntimeAdapter.h>
-#include <hermes/inspector/chrome/Registration.h>
-#endif
 
 #include "JSITracing.h"
 
 using namespace facebook::hermes;
 using namespace facebook::jsi;
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 namespace {
-
-std::unique_ptr<HermesRuntime> makeHermesRuntimeSystraced(
-    const ::hermes::vm::RuntimeConfig &runtimeConfig) {
-  SystraceSection s("HermesExecutorFactory::makeHermesRuntimeSystraced");
-  return hermes::makeHermesRuntime(runtimeConfig);
-}
 
 #ifdef HERMES_ENABLE_DEBUGGER
 
 class HermesExecutorRuntimeAdapter
-    : public facebook::hermes::inspector::RuntimeAdapter {
+    : public facebook::hermes::inspector_modern::RuntimeAdapter {
  public:
   HermesExecutorRuntimeAdapter(
-      std::shared_ptr<Runtime> runtime,
-      HermesRuntime &hermesRuntime,
+      std::shared_ptr<HermesRuntime> runtime,
       std::shared_ptr<MessageQueueThread> thread)
-      : runtime_(runtime),
-        hermesRuntime_(hermesRuntime),
-        thread_(std::move(thread)) {}
+      : runtime_(runtime), thread_(std::move(thread)) {}
 
   virtual ~HermesExecutorRuntimeAdapter() = default;
 
-  jsi::Runtime &getRuntime() override {
+  HermesRuntime& getRuntime() override {
     return *runtime_;
   }
 
-  debugger::Debugger &getDebugger() override {
-    return hermesRuntime_.getDebugger();
-  }
-
   void tickleJs() override {
-    // The queue will ensure that runtime_ is still valid when this
-    // gets invoked.
-    thread_->runOnQueue([&runtime = runtime_]() {
-      auto func =
-          runtime->global().getPropertyAsFunction(*runtime, "__tickleJs");
-      func.call(*runtime);
-    });
+    thread_->runOnQueue(
+        [weakRuntime = std::weak_ptr<HermesRuntime>(runtime_)]() {
+          auto runtime = weakRuntime.lock();
+          if (!runtime) {
+            return;
+          }
+          jsi::Function func =
+              runtime->global().getPropertyAsFunction(*runtime, "__tickleJs");
+          func.call(*runtime);
+        });
   }
 
  private:
-  std::shared_ptr<Runtime> runtime_;
-  HermesRuntime &hermesRuntime_;
+  std::shared_ptr<HermesRuntime> runtime_;
 
   std::shared_ptr<MessageQueueThread> thread_;
 };
 
-#endif
+#endif // HERMES_ENABLE_DEBUGGER
 
 struct ReentrancyCheck {
 // This is effectively a very subtle and complex assert, so only
@@ -154,25 +140,30 @@ class DecoratedRuntime : public jsi::WithRuntimeDecorator<ReentrancyCheck> {
   // manage the debugger registration.
   DecoratedRuntime(
       std::unique_ptr<Runtime> runtime,
-      HermesRuntime &hermesRuntime,
-      std::shared_ptr<MessageQueueThread> jsQueue)
+      HermesRuntime& hermesRuntime,
+      std::shared_ptr<MessageQueueThread> jsQueue,
+      bool enableDebugger,
+      const std::string& debuggerName)
       : jsi::WithRuntimeDecorator<ReentrancyCheck>(*runtime, reentrancyCheck_),
-        runtime_(std::move(runtime)),
-        hermesRuntime_(hermesRuntime) {
+        runtime_(std::move(runtime)) {
 #ifdef HERMES_ENABLE_DEBUGGER
-    auto adapter = std::make_unique<HermesExecutorRuntimeAdapter>(
-        runtime_, hermesRuntime_, jsQueue);
-    facebook::hermes::inspector::chrome::enableDebugging(
-        std::move(adapter), "Hermes React Native");
-#else
-    (void)hermesRuntime_;
-#endif
+    enableDebugger_ = enableDebugger;
+    if (enableDebugger_) {
+      std::shared_ptr<HermesRuntime> rt(runtime_, &hermesRuntime);
+      auto adapter =
+          std::make_unique<HermesExecutorRuntimeAdapter>(rt, jsQueue);
+      debugToken_ = facebook::hermes::inspector_modern::chrome::enableDebugging(
+          std::move(adapter), debuggerName);
+    }
+#endif // HERMES_ENABLE_DEBUGGER
   }
 
   ~DecoratedRuntime() {
 #ifdef HERMES_ENABLE_DEBUGGER
-    facebook::hermes::inspector::chrome::disableDebugging(hermesRuntime_);
-#endif
+    if (enableDebugger_) {
+      facebook::hermes::inspector_modern::chrome::disableDebugging(debugToken_);
+    }
+#endif // HERMES_ENABLE_DEBUGGER
   }
 
  private:
@@ -185,19 +176,38 @@ class DecoratedRuntime : public jsi::WithRuntimeDecorator<ReentrancyCheck> {
 
   std::shared_ptr<Runtime> runtime_;
   ReentrancyCheck reentrancyCheck_;
-  HermesRuntime &hermesRuntime_;
+#ifdef HERMES_ENABLE_DEBUGGER
+  bool enableDebugger_;
+  facebook::hermes::inspector_modern::chrome::DebugSessionToken debugToken_;
+#endif // HERMES_ENABLE_DEBUGGER
 };
 
 } // namespace
 
+void HermesExecutorFactory::setEnableDebugger(bool enableDebugger) {
+  enableDebugger_ = enableDebugger;
+}
+
+void HermesExecutorFactory::setDebuggerName(const std::string& debuggerName) {
+  debuggerName_ = debuggerName;
+}
+
 std::unique_ptr<JSExecutor> HermesExecutorFactory::createJSExecutor(
     std::shared_ptr<ExecutorDelegate> delegate,
     std::shared_ptr<MessageQueueThread> jsQueue) {
-  std::unique_ptr<HermesRuntime> hermesRuntime =
-      makeHermesRuntimeSystraced(runtimeConfig_);
-  HermesRuntime &hermesRuntimeRef = *hermesRuntime;
+  std::unique_ptr<HermesRuntime> hermesRuntime;
+  {
+    SystraceSection s("makeHermesRuntime");
+    hermesRuntime = hermes::makeHermesRuntime(runtimeConfig_);
+  }
+
+  HermesRuntime& hermesRuntimeRef = *hermesRuntime;
   auto decoratedRuntime = std::make_shared<DecoratedRuntime>(
-      std::move(hermesRuntime), hermesRuntimeRef, jsQueue);
+      std::move(hermesRuntime),
+      hermesRuntimeRef,
+      jsQueue,
+      enableDebugger_,
+      debuggerName_);
 
   // So what do we have now?
   // DecoratedRuntime -> HermesRuntime
@@ -221,15 +231,20 @@ std::unique_ptr<JSExecutor> HermesExecutorFactory::createJSExecutor(
       decoratedRuntime, delegate, jsQueue, timeoutInvoker_, runtimeInstaller_);
 }
 
+::hermes::vm::RuntimeConfig HermesExecutorFactory::defaultRuntimeConfig() {
+  return ::hermes::vm::RuntimeConfig::Builder()
+      .withEnableSampleProfiling(true)
+      .build();
+}
+
 HermesExecutor::HermesExecutor(
     std::shared_ptr<jsi::Runtime> runtime,
     std::shared_ptr<ExecutorDelegate> delegate,
     std::shared_ptr<MessageQueueThread> jsQueue,
-    const JSIScopedTimeoutInvoker &timeoutInvoker,
+    const JSIScopedTimeoutInvoker& timeoutInvoker,
     RuntimeInstaller runtimeInstaller)
     : JSIExecutor(runtime, delegate, timeoutInvoker, runtimeInstaller) {
   jsi::addNativeTracingHooks(*runtime);
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react
