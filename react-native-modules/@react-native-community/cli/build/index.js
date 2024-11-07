@@ -3,249 +3,180 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.run = run;
-Object.defineProperty(exports, "init", {
+exports.bin = void 0;
+Object.defineProperty(exports, "loadConfig", {
   enumerable: true,
   get: function () {
-    return _initCompat.default;
+    return _cliConfig().default;
   }
 });
-exports.bin = void 0;
-
-function _chalk() {
-  const data = _interopRequireDefault(require("chalk"));
-
-  _chalk = function () {
+exports.run = run;
+function _cliConfig() {
+  const data = _interopRequireDefault(require("@react-native-community/cli-config"));
+  _cliConfig = function () {
     return data;
   };
-
   return data;
 }
-
-function _child_process() {
-  const data = _interopRequireDefault(require("child_process"));
-
-  _child_process = function () {
-    return data;
-  };
-
-  return data;
-}
-
-function _commander() {
-  const data = _interopRequireDefault(require("commander"));
-
-  _commander = function () {
-    return data;
-  };
-
-  return data;
-}
-
-function _leven() {
-  const data = _interopRequireDefault(require("leven"));
-
-  _leven = function () {
-    return data;
-  };
-
-  return data;
-}
-
-function _path() {
-  const data = _interopRequireDefault(require("path"));
-
-  _path = function () {
-    return data;
-  };
-
-  return data;
-}
-
 function _cliTools() {
   const data = require("@react-native-community/cli-tools");
-
   _cliTools = function () {
     return data;
   };
-
   return data;
 }
-
+function _chalk() {
+  const data = _interopRequireDefault(require("chalk"));
+  _chalk = function () {
+    return data;
+  };
+  return data;
+}
+function _child_process() {
+  const data = _interopRequireDefault(require("child_process"));
+  _child_process = function () {
+    return data;
+  };
+  return data;
+}
+function _commander() {
+  const data = require("commander");
+  _commander = function () {
+    return data;
+  };
+  return data;
+}
+function _path() {
+  const data = _interopRequireDefault(require("path"));
+  _path = function () {
+    return data;
+  };
+  return data;
+}
 var _commands = require("./commands");
-
-var _initCompat = _interopRequireDefault(require("./commands/init/initCompat"));
-
-var _config = _interopRequireDefault(require("./tools/config"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const pkgJson = require("../package.json");
-
-_commander().default.usage('<command> [options]').option('--version', 'Print CLI version').option('--verbose', 'Increase logging verbosity');
-
-_commander().default.arguments('<command>').action(cmd => {
-  printUnknownCommand(cmd);
-  process.exit(1);
-});
-
+const pkgJson = require('../package.json');
+const program = new (_commander().Command)().usage('[command] [options]').version(pkgJson.version, '-v', 'Output the current version').enablePositionalOptions();
 const handleError = err => {
   _cliTools().logger.enable();
-
-  if (_commander().default.verbose) {
+  if (program.opts().verbose) {
     _cliTools().logger.error(err.message);
   } else {
     // Some error messages (esp. custom ones) might have `.` at the end already.
     const message = err.message.replace(/\.$/, '');
-
     _cliTools().logger.error(`${message}.`);
   }
-
   if (err.stack) {
     _cliTools().logger.log(err.stack);
   }
-
-  if (!_commander().default.verbose) {
+  if (!program.opts().verbose && _cliTools().logger.hasDebugMessages()) {
     _cliTools().logger.info(_chalk().default.dim(`Run CLI with ${_chalk().default.reset('--verbose')} ${_chalk().default.dim('flag for more details.')}`));
   }
-
   process.exit(1);
 };
-/**
- * Custom printHelpInformation command inspired by internal Commander.js
- * one modified to suit our needs
- */
-
-
-function printHelpInformation(examples, pkg) {
-  let cmdName = this._name;
-
-  const argsList = this._args.map(arg => arg.required ? `<${arg.name}>` : `[${arg.name}]`).join(' ');
-
-  if (this._alias) {
-    cmdName = `${cmdName}|${this._alias}`;
-  }
-
-  const sourceInformation = pkg ? [`${_chalk().default.bold('Source:')} ${pkg.name}@${pkg.version}`, ''] : [];
-  let output = [_chalk().default.bold(`react-native ${cmdName} ${argsList}`), this._description ? `\n${this._description}\n` : '', ...sourceInformation, `${_chalk().default.bold('Options:')}`, this.optionHelp().replace(/^/gm, '  ')];
-
+function printExamples(examples) {
+  let output = [];
   if (examples && examples.length > 0) {
     const formattedUsage = examples.map(example => `  ${example.desc}: \n  ${_chalk().default.cyan(example.cmd)}`).join('\n\n');
     output = output.concat([_chalk().default.bold('\nExample usage:'), formattedUsage]);
   }
-
   return output.join('\n').concat('\n');
 }
 
-function printUnknownCommand(cmdName) {
-  const availableCommands = _commander().default.commands.map(cmd => cmd._name);
-
-  const suggestion = availableCommands.find(cmd => {
-    return (0, _leven().default)(cmd, cmdName) < cmd.length * 0.4;
-  });
-  let errorMsg = `Unrecognized command "${_chalk().default.bold(cmdName)}".`;
-
-  if (suggestion) {
-    errorMsg += ` Did you mean "${suggestion}"?`;
-  }
-
-  if (cmdName) {
-    _cliTools().logger.error(errorMsg);
-
-    _cliTools().logger.info(`Run ${_chalk().default.bold('"react-native --help"')} to see a list of all available commands.`);
-  } else {
-    _commander().default.outputHelp();
-  }
-}
 /**
  * Custom type assertion needed for the `makeCommand` conditional
  * types to be properly resolved.
  */
-
-
-const isDetachedCommand = command => {
+function isDetachedCommand(command) {
   return command.detached === true;
-};
+}
+function isAttachedCommand(command) {
+  return !isDetachedCommand(command);
+}
+
 /**
  * Attaches a new command onto global `commander` instance.
  *
  * Note that this function takes additional argument of `Config` type in case
  * passed `command` needs it for its execution.
  */
-
-
-function attachCommand(command, ...rest) {
-  const cmd = _commander().default.command(command.name).action(async function handleAction(...args) {
+function attachCommand(command, config) {
+  // commander@9.x will internally push commands into an array structure!
+  // Commands with duplicate names (e.g. from config) must be reduced before
+  // calling this function.
+  // https://unpkg.com/browse/commander@9.4.1/lib/command.js#L1308
+  if (program.commands.find(cmd => cmd.name() === command.name)) {
+    throw new Error('Invariant Violation: Attempted to override an already registered ' + `command: '${command.name}'. This is not supported by the underlying ` + 'library and will cause bugs. Ensure a command with this `name` is ' + 'only registered once.');
+  }
+  const cmd = program.command(command.name).option('--verbose', 'Increase logging verbosity').action(async function handleAction(...args) {
     const passedOptions = this.opts();
     const argv = Array.from(args).slice(0, -1);
-
     try {
       if (isDetachedCommand(command)) {
-        await command.func(argv, passedOptions);
+        await command.func(argv, passedOptions, config);
+      } else if (isAttachedCommand(command)) {
+        await command.func(argv, config, passedOptions);
       } else {
-        await command.func(argv, rest[0], passedOptions);
+        throw new Error('A command must be either attached or detached');
       }
     } catch (error) {
       handleError(error);
     }
   });
-
   if (command.description) {
     cmd.description(command.description);
   }
-
-  cmd.helpInformation = printHelpInformation.bind(cmd, command.examples, command.pkg);
-
+  cmd.addHelpText('after', printExamples(command.examples));
   for (const opt of command.options || []) {
-    cmd.option(opt.name, opt.description, opt.parse || (val => val), typeof opt.default === 'function' ? opt.default(rest[0]) : opt.default);
+    cmd.option(opt.name, opt.description ?? '', opt.parse || (val => val), typeof opt.default === 'function' ? opt.default(config) : opt.default);
   }
 }
 
-async function run() {
+// Platform name is optional argument passed by out of tree platforms.
+async function run(platformName) {
   try {
-    await setupAndRun();
+    await setupAndRun(platformName);
   } catch (e) {
     handleError(e);
   }
 }
-
-async function setupAndRun() {
+const isCommandPassed = commandName => {
+  return process.argv.filter(arg => arg === commandName).length > 0;
+};
+async function setupAndRun(platformName) {
   // Commander is not available yet
+
   // when we run `config`, we don't want to output anything to the console. We
   // expect it to return valid JSON
-  if (process.argv.includes('config')) {
+  if (isCommandPassed('config')) {
     _cliTools().logger.disable();
   }
+  _cliTools().logger.setVerbose(process.argv.includes('--verbose'));
 
-  _cliTools().logger.setVerbose(process.argv.includes('--verbose')); // We only have a setup script for UNIX envs currently
-
-
+  // We only have a setup script for UNIX envs currently
   if (process.platform !== 'win32') {
     const scriptName = 'setup_env.sh';
-
     const absolutePath = _path().default.join(__dirname, '..', scriptName);
-
     try {
       _child_process().default.execFileSync(absolutePath, {
         stdio: 'pipe'
       });
     } catch (error) {
       _cliTools().logger.warn(`Failed to run environment setup script "${scriptName}"\n\n${_chalk().default.red(error)}`);
-
       _cliTools().logger.info(`React Native CLI will continue to run if your local environment matches what React Native expects. If it does fail, check out "${absolutePath}" and adjust your environment to match it.`);
     }
   }
-
-  for (const command of _commands.detachedCommands) {
-    attachCommand(command);
-  }
-
+  let config;
   try {
-    const config = (0, _config.default)();
-
+    config = (0, _cliConfig().default)();
     _cliTools().logger.enable();
+    const commands = {};
 
+    // Reduce overridden commands before registering
     for (const command of [..._commands.projectCommands, ...config.commands]) {
+      commands[command.name] = command;
+    }
+    for (const command of Object.values(commands)) {
       attachCommand(command, config);
     }
   } catch (error) {
@@ -255,29 +186,24 @@ async function setupAndRun() {
      */
     if (error.message.includes("We couldn't find a package.json")) {
       _cliTools().logger.debug(error.message);
-
       _cliTools().logger.debug('Failed to load configuration of your project. Only a subset of commands will be available.');
     } else {
       throw new (_cliTools().CLIError)('Failed to load configuration of your project.', error);
     }
+  } finally {
+    for (const command of _commands.detachedCommands) {
+      attachCommand(command, config);
+    }
   }
+  const argv = [...process.argv];
 
-  _commander().default.parse(process.argv);
-
-  if (_commander().default.rawArgs.length === 2) {
-    _commander().default.outputHelp();
-  } // We handle --version as a special case like this because both `commander`
-  // and `yargs` append it to every command and we don't want to do that.
-  // E.g. outside command `init` has --version flag and we want to preserve it.
-
-
-  if (_commander().default.args.length === 0 && _commander().default.rawArgs.includes('--version')) {
-    console.log(pkgJson.version);
+  // If out of tree platform specifices custom platform name, we need to pass it to argv array for the init command.
+  if (isCommandPassed('init') && platformName) {
+    argv.push('--platform-name', platformName);
   }
+  program.parse(argv);
 }
-
-const bin = require.resolve("./bin");
-
+const bin = require.resolve('./bin');
 exports.bin = bin;
 
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=index.ts.map

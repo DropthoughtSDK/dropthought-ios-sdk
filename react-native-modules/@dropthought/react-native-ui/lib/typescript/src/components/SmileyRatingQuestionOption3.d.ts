@@ -1,12 +1,13 @@
+import React from 'react';
 import type { Feedback as OriginFeedback, Question as OriginQuestion, Survey } from '../data';
-declare type Feedback = OriginFeedback & {
+type Feedback = OriginFeedback & {
     answers: string[];
 };
-declare type Question = OriginQuestion & {
+type Question = OriginQuestion & {
     options: string[];
     scale: string;
 };
-declare type Props = {
+type Props = {
     survey: Survey;
     pageIndex: number;
     question: Question;
@@ -20,6 +21,8 @@ declare type Props = {
         type: string;
     }) => void;
     feedback: Feedback;
+    isLastPage: boolean;
 };
-declare const SmileyRatingQuestionOption3: ({ survey, pageIndex, question, forgot, onClose, onPrevPage, onNextPage, onFeedback, feedback, }: Props) => JSX.Element;
+declare const SmileyRatingQuestionOption3: ({ survey, pageIndex, question, forgot, onClose, onPrevPage, onNextPage, onFeedback, feedback, isLastPage, }: Props) => React.JSX.Element;
 export default SmileyRatingQuestionOption3;
+//# sourceMappingURL=SmileyRatingQuestionOption3.d.ts.map

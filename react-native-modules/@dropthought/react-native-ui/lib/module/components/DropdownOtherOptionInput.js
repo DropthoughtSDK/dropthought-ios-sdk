@@ -1,5 +1,4 @@
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 import React, { useRef } from 'react';
 import { StyleSheet, TextInput, View, Text } from 'react-native';
 import GlobalStyle, { Colors, addOpacityToColor } from '../styles';
@@ -7,7 +6,6 @@ import i18n from '../translation';
 import { metadataTypeKeyboard, metadataTypeAutoCapitalize } from './MultiLineTextInput/MultiLineTextInput';
 import MetadataDesc from './MetadataDesc';
 import { useTheme } from '../contexts/theme';
-
 const useFocus = (onBlur, onFocus) => {
   const [isFocused, setIsFocused] = React.useState(false);
   const onFocusHandler = React.useCallback(() => {
@@ -24,7 +22,6 @@ const useFocus = (onBlur, onFocus) => {
     onBlur: onBlurHandler
   };
 };
-
 const DropdownOtherOptionInput = ({
   visible,
   question,
@@ -38,11 +35,8 @@ const DropdownOtherOptionInput = ({
   const {
     fontColor
   } = useTheme();
-
   const onFocusHandler = () => {};
-
   const onBlurHandler = () => {};
-
   const {
     isFocused,
     ...focusProps
@@ -78,7 +72,6 @@ const DropdownOtherOptionInput = ({
     style: [styles.descText, rtl && GlobalStyle.textAlignLeft]
   }, value.length, "/100"));
 };
-
 const styles = StyleSheet.create({
   textInputContainer: {
     height: 80,

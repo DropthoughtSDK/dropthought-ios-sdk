@@ -6,7 +6,6 @@ import i18n from '../translation';
 import { useTheme } from '../contexts/theme';
 import MultiLineTextInput from './MultiLineTextInput';
 import MetadataDesc from './MetadataDesc';
-
 const OpenQuestion = ({
   survey,
   anonymous,
@@ -17,30 +16,29 @@ const OpenQuestion = ({
   forgot,
   themeColor
 }) => {
-  var _question$responseErr;
-
   const rtl = i18n.dir() === 'rtl';
   const {
     backgroundColor
   } = useTheme();
   const [text, setText] = React.useState(feedback !== null && feedback !== void 0 && feedback.answers[0] ? `${feedback === null || feedback === void 0 ? void 0 : feedback.answers[0]}` : '');
   const textRef = React.useRef(feedback !== null && feedback !== void 0 && feedback.answers[0] ? `${feedback === null || feedback === void 0 ? void 0 : feedback.answers[0]}` : '');
-  const [hasEdited, setHasEdited] = React.useState(false); // It will be used in valid title
+  const [hasEdited, setHasEdited] = React.useState(false);
 
+  // It will be used in valid title
   const isValid = metaDataFormatValidator(text, question.metaDataType);
   const appearanceBackgroundColorStyle = {
     backgroundColor: backgroundColor
   };
-  /** @type {Feedback} */
 
+  /** @type {Feedback} */
   const tempFeedback = {
     questionId: question.questionId,
     answers: [text],
     type: 'open'
-  }; // It will be used in valid title
+  };
 
+  // It will be used in valid title
   const hasForgot = forgot && !mandatoryQuestionValidator(question, tempFeedback);
-
   const onEndEditingHandler = () => {
     setHasEdited(true);
     onFeedback({
@@ -49,18 +47,17 @@ const OpenQuestion = ({
       type: 'open'
     });
   };
-
   const onChangeTextHandler = t => {
     setText(t);
     textRef.current = t;
   };
-
   const upperView = /*#__PURE__*/React.createElement(View, {
     style: styles.upperView
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
     forgot: hasForgot,
-    invalidMessage: // show the error message after the user has done edited
-    hasEdited && !isValid ? (_question$responseErr = question.responseErrorText) !== null && _question$responseErr !== void 0 ? _question$responseErr : i18n.t('metadata-invalid-message', question.metaDataType) : '',
+    invalidMessage:
+    // show the error message after the user has done edited
+    hasEdited && !isValid ? question.responseErrorText : '',
     mandatoryErrorMessage: survey.mandatoryErrorMessage,
     question: question
   }), /*#__PURE__*/React.createElement(MetadataDesc, {
@@ -79,7 +76,6 @@ const OpenQuestion = ({
     showErrorHint: hasForgot || hasEdited && !isValid
   }));
 };
-
 export default /*#__PURE__*/React.memo(OpenQuestion);
 const styles = StyleSheet.create({
   container: {

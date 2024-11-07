@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,9 +8,10 @@
 package com.facebook.react.uimanager;
 
 import androidx.annotation.Nullable;
+import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Dynamic;
-import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
 import com.facebook.react.bridge.ReadableType;
+import com.facebook.react.common.ReactConstants;
 import com.facebook.react.modules.i18nmanager.I18nUtil;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.annotations.ReactPropGroup;
@@ -60,11 +61,16 @@ public class LayoutShadowNode extends ReactShadowNodeImpl {
           unit = YogaUnit.PERCENT;
           value = Float.parseFloat(s.substring(0, s.length() - 1));
         } else {
-          throw new IllegalArgumentException("Unknown value: " + s);
+          FLog.w(ReactConstants.TAG, "Unknown value: " + s);
+          unit = YogaUnit.UNDEFINED;
+          value = YogaConstants.UNDEFINED;
         }
-      } else {
+      } else if (dynamic.getType() == ReadableType.Number) {
         unit = YogaUnit.POINT;
         value = PixelUtil.toPixelFromDIP(dynamic.asDouble());
+      } else {
+        unit = YogaUnit.UNDEFINED;
+        value = YogaConstants.UNDEFINED;
       }
     }
   }
@@ -224,6 +230,30 @@ public class LayoutShadowNode extends ReactShadowNodeImpl {
     super.setFlexGrow(flexGrow);
   }
 
+  @ReactProp(name = ViewProps.ROW_GAP, defaultFloat = YogaConstants.UNDEFINED)
+  public void setRowGap(float rowGap) {
+    if (isVirtual()) {
+      return;
+    }
+    super.setRowGap(PixelUtil.toPixelFromDIP(rowGap));
+  }
+
+  @ReactProp(name = ViewProps.COLUMN_GAP, defaultFloat = YogaConstants.UNDEFINED)
+  public void setColumnGap(float columnGap) {
+    if (isVirtual()) {
+      return;
+    }
+    super.setColumnGap(PixelUtil.toPixelFromDIP(columnGap));
+  }
+
+  @ReactProp(name = ViewProps.GAP, defaultFloat = YogaConstants.UNDEFINED)
+  public void setGap(float gap) {
+    if (isVirtual()) {
+      return;
+    }
+    super.setGap(PixelUtil.toPixelFromDIP(gap));
+  }
+
   @ReactProp(name = ViewProps.FLEX_SHRINK, defaultFloat = 0f)
   public void setFlexShrink(float flexShrink) {
     if (isVirtual()) {
@@ -294,8 +324,9 @@ public class LayoutShadowNode extends ReactShadowNodeImpl {
         }
       default:
         {
-          throw new JSApplicationIllegalArgumentException(
-              "invalid value for flexDirection: " + flexDirection);
+          FLog.w(ReactConstants.TAG, "invalid value for flexDirection: " + flexDirection);
+          setFlexDirection(YogaFlexDirection.COLUMN);
+          break;
         }
     }
   }
@@ -329,8 +360,9 @@ public class LayoutShadowNode extends ReactShadowNodeImpl {
         }
       default:
         {
-          throw new JSApplicationIllegalArgumentException(
-              "invalid value for flexWrap: " + flexWrap);
+          FLog.w(ReactConstants.TAG, "invalid value for flexWrap: " + flexWrap);
+          setFlexWrap(YogaWrap.NO_WRAP);
+          break;
         }
     }
   }
@@ -389,8 +421,9 @@ public class LayoutShadowNode extends ReactShadowNodeImpl {
         }
       default:
         {
-          throw new JSApplicationIllegalArgumentException(
-              "invalid value for alignSelf: " + alignSelf);
+          FLog.w(ReactConstants.TAG, "invalid value for alignSelf: " + alignSelf);
+          setAlignSelf(YogaAlign.AUTO);
+          return;
         }
     }
   }
@@ -449,8 +482,9 @@ public class LayoutShadowNode extends ReactShadowNodeImpl {
         }
       default:
         {
-          throw new JSApplicationIllegalArgumentException(
-              "invalid value for alignItems: " + alignItems);
+          FLog.w(ReactConstants.TAG, "invalid value for alignItems: " + alignItems);
+          setAlignItems(YogaAlign.STRETCH);
+          return;
         }
     }
   }
@@ -509,8 +543,9 @@ public class LayoutShadowNode extends ReactShadowNodeImpl {
         }
       default:
         {
-          throw new JSApplicationIllegalArgumentException(
-              "invalid value for alignContent: " + alignContent);
+          FLog.w(ReactConstants.TAG, "invalid value for alignContent: " + alignContent);
+          setAlignContent(YogaAlign.FLEX_START);
+          return;
         }
     }
   }
@@ -559,8 +594,9 @@ public class LayoutShadowNode extends ReactShadowNodeImpl {
         }
       default:
         {
-          throw new JSApplicationIllegalArgumentException(
-              "invalid value for justifyContent: " + justifyContent);
+          FLog.w(ReactConstants.TAG, "invalid value for justifyContent: " + justifyContent);
+          setJustifyContent(YogaJustify.FLEX_START);
+          break;
         }
     }
   }
@@ -593,8 +629,9 @@ public class LayoutShadowNode extends ReactShadowNodeImpl {
         }
       default:
         {
-          throw new JSApplicationIllegalArgumentException(
-              "invalid value for overflow: " + overflow);
+          FLog.w(ReactConstants.TAG, "invalid value for overflow: " + overflow);
+          setOverflow(YogaOverflow.VISIBLE);
+          break;
         }
     }
   }
@@ -623,7 +660,9 @@ public class LayoutShadowNode extends ReactShadowNodeImpl {
         }
       default:
         {
-          throw new JSApplicationIllegalArgumentException("invalid value for display: " + display);
+          FLog.w(ReactConstants.TAG, "invalid value for display: " + display);
+          setDisplay(YogaDisplay.FLEX);
+          break;
         }
     }
   }
@@ -796,8 +835,9 @@ public class LayoutShadowNode extends ReactShadowNodeImpl {
         }
       default:
         {
-          throw new JSApplicationIllegalArgumentException(
-              "invalid value for position: " + position);
+          FLog.w(ReactConstants.TAG, "invalid value for position: " + position);
+          setPositionType(YogaPositionType.RELATIVE);
+          break;
         }
     }
   }
@@ -806,5 +846,23 @@ public class LayoutShadowNode extends ReactShadowNodeImpl {
   @ReactProp(name = "onLayout")
   public void setShouldNotifyOnLayout(boolean shouldNotifyOnLayout) {
     super.setShouldNotifyOnLayout(shouldNotifyOnLayout);
+  }
+
+  @ReactProp(name = "onPointerEnter")
+  public void setShouldNotifyPointerEnter(boolean value) {
+    // This method exists to inject Native View configs in RN Android VR
+    // DO NOTHING
+  }
+
+  @ReactProp(name = "onPointerLeave")
+  public void setShouldNotifyPointerLeave(boolean value) {
+    // This method exists to inject Native View configs in RN Android VR
+    // DO NOTHING
+  }
+
+  @ReactProp(name = "onPointerMove")
+  public void setShouldNotifyPointerMove(boolean value) {
+    // This method exists to inject Native View configs in RN Android VR
+    // DO NOTHING
   }
 }

@@ -57,6 +57,7 @@ type Props = {
     type: string;
   }) => void;
   feedback: Feedback;
+  isLastPage: boolean;
 };
 
 const SmileyRatingQuestionOption3 = ({
@@ -69,15 +70,15 @@ const SmileyRatingQuestionOption3 = ({
   onNextPage,
   onFeedback,
   feedback,
+  isLastPage,
 }: Props) => {
   const answered =
     feedback &&
     feedback.answers &&
     !isNil(feedback.answers[0]) &&
     typeof feedback.answers[0] === 'number';
-  const answeredValue: number = answered
-    ? parseInt(feedback.answers[0], 10)
-    : 0;
+  const answeredValue: number =
+    answered && feedback.answers[0] ? parseInt(feedback.answers[0], 10) : 0;
 
   const {
     hexCode,
@@ -139,19 +140,21 @@ const SmileyRatingQuestionOption3 = ({
   });
   // choose which scale logic we want to use.
   const scaleLogicList = scaleLogic[scale];
-  const scaledIndex = scaleLogicList[selectedIndex];
+  const scaledIndex = (scaleLogicList && scaleLogicList[selectedIndex]) ?? 0;
 
   useEffect(() => {
-    const loopList = scaleLogicList.map((value) => {
-      const scaleKey = String(value + 1);
-      return loopFaceTable.get(scaleKey);
-    });
+    if (scaleLogicList) {
+      const loopList = scaleLogicList.map((value) => {
+        const scaleKey = String(value + 1);
+        return loopFaceTable.get(scaleKey);
+      });
 
-    setLoopLotties(loopList);
+      setLoopLotties(loopList);
+    }
   }, [scaleLogicList]);
 
   const updateScore = React.useCallback(
-    (number) => {
+    (number: number) => {
       const isAtCoverScreen = score === -1;
       const newScore = score + number;
       setScore(newScore);
@@ -261,25 +264,49 @@ const SmileyRatingQuestionOption3 = ({
   const hintTextStyle = [commonStyles.hintText, { color: fontColor }];
 
   const lottieContainer = (
-    <View style={commonStyles.lottieContainer}>
-      <LottieView
-        // @ts-ignore
-        ref={lottieRef}
-        source={loopLotties[selectedIndex]}
-        autoPlay
-        loop
-        speed={0.5}
-      />
+    <View
+      accessibilityLabel={`selected_custom_smilely1_${selectedIndex}`}
+      style={commonStyles.lottieContainer}
+    >
+      {loopLotties[selectedIndex] ? (
+        <LottieView
+          /* @ts-ignore */
+          ref={lottieRef}
+          source={loopLotties[selectedIndex]}
+          autoPlay
+          loop
+          style={commonStyles.lottieContent}
+          speed={0.5}
+        />
+      ) : null}
     </View>
   );
   const scoreContainer = (
     <View style={commonStyles.scoreContainer}>
-      <View style={commonStyles.scoreText}>
-        <Animated.Text style={scoreSelectedStyle}>{renderScore}</Animated.Text>
+      <View
+        testID="test:id/custom_smilely1_score_value"
+        style={commonStyles.scoreText}
+      >
+        <Animated.Text
+          testID="test:id/custom_smilely1_render_score"
+          style={scoreSelectedStyle}
+        >
+          {renderScore}
+        </Animated.Text>
         <Animated.Text style={slashStyle}>{'/'}</Animated.Text>
-        <Animated.Text style={scoreTotalStyle}>{totalScore}</Animated.Text>
+        <Animated.Text
+          testID="test:id/custom_smilely1_total_score"
+          style={scoreTotalStyle}
+        >
+          {totalScore}
+        </Animated.Text>
       </View>
-      <Animated.Text style={descStyle}>{options[selectedIndex]}</Animated.Text>
+      <Animated.Text
+        testID="test:id/custom_smilely1_score_desc"
+        style={descStyle}
+      >
+        {options[selectedIndex]}
+      </Animated.Text>
     </View>
   );
 
@@ -305,8 +332,11 @@ const SmileyRatingQuestionOption3 = ({
             </>
           ) : null}
           <View style={hintContainerStyle}>
-            <Text style={hintTextStyle}>
-              {i18n.t('option3HintDescription:title')}
+            <Text
+              testID={`test:id/custom_smilely1_title_${colorScheme}`}
+              style={hintTextStyle}
+            >
+              {`${i18n.t('option3HintDescription:title')}`}
             </Text>
           </View>
         </View>
@@ -315,7 +345,7 @@ const SmileyRatingQuestionOption3 = ({
         submitSurvey={survey.submitSurvey}
         surveyColor={hexCode}
         isFirstPage={pageIndex === 0}
-        isLastPage={pageIndex === survey.pageOrder.length - 1}
+        isLastPage={isLastPage}
         onPrevPage={onPrevPage}
         onNextPage={onNextPage}
         backgroundColor={backgroundColor}
@@ -374,6 +404,10 @@ const commonStyles = StyleSheet.create({
     alignItems: 'flex-end',
     height: 61,
     marginBottom: 10,
+  },
+  lottieContent: {
+    width: '100%',
+    height: '100%',
   },
 });
 

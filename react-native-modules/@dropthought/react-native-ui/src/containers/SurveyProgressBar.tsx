@@ -1,6 +1,5 @@
-import * as React from 'react';
+import React from 'react';
 import { StyleSheet, View, Platform } from 'react-native';
-import { sum } from 'ramda';
 // @ts-ignore
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useKeyboard } from '@react-native-community/hooks';
@@ -8,8 +7,9 @@ import { useKeyboard } from '@react-native-community/hooks';
 import ClassicProgressBar from '../components/ClassicProgressBar';
 import { useFeedbackState } from '../contexts/feedback';
 import { opacity10 } from '../styles';
-import type { Survey, Feedback } from '../data';
+import type { Feedback } from '../data';
 import { useTheme } from '../contexts/theme';
+import i18n from '../translation';
 
 const numValidFeedbacks = ({
   answeredQuestionIds,
@@ -36,19 +36,14 @@ const numValidFeedbacks = ({
   }).length;
 };
 
-const numTotalQuestions = (survey: Survey) => {
-  const questionNumOfPages = survey.pages.map((page) => page.questions.length);
-  return sum(questionNumOfPages);
-};
-
 const isAndroid = Platform.OS === 'android';
 
 type Props = {
-  rtl: boolean;
-  survey: Survey;
+  displayDictionary: { [questionId: string]: boolean };
 };
 
-const SurveyProgressBar = ({ rtl, ...props }: Props) => {
+const SurveyProgressBar = ({ displayDictionary }: Props) => {
+  const rtl = i18n.dir() === 'rtl';
   const feedbackState = useFeedbackState();
   const { hexCode } = useTheme();
   const themeColor = hexCode;
@@ -74,11 +69,15 @@ const SurveyProgressBar = ({ rtl, ...props }: Props) => {
   // hide this bar when it is android and keyboard is shown
   if (isAndroid && keyboardShown) return null;
 
+  const maxValue = Object.values(displayDictionary).filter(
+    (item) => item === true
+  ).length;
+
   return (
     <View style={containerStyle}>
       <ClassicProgressBar
         value={numValidFeedbacks(feedbackState)}
-        maxValue={numTotalQuestions(props.survey)}
+        maxValue={maxValue}
         themeColor={themeColor}
         rtl={rtl}
       />

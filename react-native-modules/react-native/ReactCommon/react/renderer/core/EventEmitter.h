@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,12 +12,13 @@
 
 #include <folly/dynamic.h>
 #include <react/renderer/core/EventDispatcher.h>
+#include <react/renderer/core/EventPayload.h>
 #include <react/renderer/core/EventPriority.h>
 #include <react/renderer/core/EventTarget.h>
 #include <react/renderer/core/ReactPrimitives.h>
+#include <react/renderer/core/ValueFactoryEventPayload.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 class EventEmitter;
 
@@ -31,15 +32,14 @@ using SharedEventEmitter = std::shared_ptr<const EventEmitter>;
  */
 class EventEmitter {
  public:
-  using Shared = std::shared_ptr<EventEmitter const>;
+  using Shared = std::shared_ptr<const EventEmitter>;
 
-  static std::mutex &DispatchMutex();
+  static std::mutex& DispatchMutex();
 
   static ValueFactory defaultPayloadFactory();
 
   EventEmitter(
       SharedEventTarget eventTarget,
-      Tag tag,
       EventDispatcher::Weak eventDispatcher);
 
   virtual ~EventEmitter() = default;
@@ -56,6 +56,8 @@ class EventEmitter {
    */
   void setEnabled(bool enabled) const;
 
+  const SharedEventTarget& getEventTarget() const;
+
  protected:
 #ifdef ANDROID
   // We need this temporarily due to lack of Java-counterparts for particular
@@ -68,20 +70,33 @@ class EventEmitter {
    * Is used by particular subclasses only.
    */
   void dispatchEvent(
-      const std::string &type,
-      const ValueFactory &payloadFactory =
+      std::string type,
+      const ValueFactory& payloadFactory =
           EventEmitter::defaultPayloadFactory(),
-      const EventPriority &priority = EventPriority::AsynchronousBatched) const;
+      EventPriority priority = EventPriority::AsynchronousBatched,
+      RawEvent::Category category = RawEvent::Category::Unspecified) const;
 
   void dispatchEvent(
-      const std::string &type,
-      const folly::dynamic &payload,
-      const EventPriority &priority = EventPriority::AsynchronousBatched) const;
+      std::string type,
+      const folly::dynamic& payload,
+      EventPriority priority = EventPriority::AsynchronousBatched,
+      RawEvent::Category category = RawEvent::Category::Unspecified) const;
+
+  void dispatchEvent(
+      std::string type,
+      SharedEventPayload payload,
+      EventPriority priority = EventPriority::AsynchronousBatched,
+      RawEvent::Category category = RawEvent::Category::Unspecified) const;
+
+  void dispatchUniqueEvent(std::string type, const folly::dynamic& payload)
+      const;
 
   void dispatchUniqueEvent(
-      const std::string &type,
-      const ValueFactory &payloadFactory =
+      std::string type,
+      const ValueFactory& payloadFactory =
           EventEmitter::defaultPayloadFactory()) const;
+
+  void dispatchUniqueEvent(std::string type, SharedEventPayload payload) const;
 
  private:
   void toggleEventTargetOwnership_() const;
@@ -95,5 +110,4 @@ class EventEmitter {
   mutable bool isEnabled_{false};
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

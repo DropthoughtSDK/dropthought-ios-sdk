@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Keyboard, KeyboardTypeOptions } from 'react-native';
+import { Keyboard } from 'react-native';
+import type { KeyboardTypeOptions } from 'react-native';
 import { QuestionMetaDataType } from '../utils/data';
 import type {
   Feedback,

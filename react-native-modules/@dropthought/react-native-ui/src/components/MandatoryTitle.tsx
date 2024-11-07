@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, ViewStyle } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import type { ViewStyle } from 'react-native';
 import * as React from 'react';
 
 import { useAddMandatoryRef } from '../contexts/survey-page';
@@ -17,6 +18,7 @@ type Props = {
   invalidMessage?: string;
   mandatoryErrorMessage: string;
   question: Question;
+  subTitleMessage?: string;
   style?: ViewStyle;
 };
 
@@ -25,12 +27,13 @@ const MandatoryTitle = ({
   invalidMessage = '',
   mandatoryErrorMessage,
   question,
+  subTitleMessage,
   style,
 }: Props) => {
   const rtl = i18n.dir() === 'rtl';
   const dimensionWidthType = useDimensionWidthType();
   const { fontColor, themeOption, customFontColor } = useTheme();
-  const { questionId, questionTitle, mandatory, type, subType, optional } =
+  const { questionId, questionTitlePlain, mandatory, type, subType, optional } =
     question;
 
   const ref = React.useRef<View>(null);
@@ -67,13 +70,18 @@ const MandatoryTitle = ({
       ref={ref}
       style={[styles.horizontal, style, rtl && GlobalStyle.flexRowReverse]}
     >
-      <Text style={textStyle}>
-        {questionTitle}
+      <Text testID="test:id/mandatory_title" style={textStyle}>
+        {questionTitlePlain}
         {
           //optional was been used on matrix question
           (mandatory || optional) && <Text style={styles.hint}>*</Text>
         }
       </Text>
+      {subTitleMessage ? (
+        <View style={rtl && GlobalStyle.flexRowReverse}>
+          <Text style={styles.subTitle}>{subTitleMessage}</Text>
+        </View>
+      ) : null}
       <QuestionWarningMessage
         // forgot message has higher priority than custom invalid message
         message={forgot ? mandatoryErrorMessage : invalidMessage}
@@ -108,5 +116,9 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  subTitle: {
+    marginTop: 8,
+    color: Colors.border,
   },
 });

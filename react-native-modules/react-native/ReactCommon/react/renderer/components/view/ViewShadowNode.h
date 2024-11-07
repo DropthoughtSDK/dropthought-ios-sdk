@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,37 +10,47 @@
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 #include <react/renderer/components/view/ViewProps.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 extern const char ViewComponentName[];
+
+/**
+ * Implementation of the ViewProps that propagates feature flag.
+ */
+class ViewShadowNodeProps final : public ViewProps {
+ public:
+  ViewShadowNodeProps() = default;
+  ViewShadowNodeProps(
+      const PropsParserContext& context,
+      const ViewShadowNodeProps& sourceProps,
+      const RawProps& rawProps);
+};
 
 /*
  * `ShadowNode` for <View> component.
  */
 class ViewShadowNode final : public ConcreteViewShadowNode<
                                  ViewComponentName,
-                                 ViewProps,
+                                 ViewShadowNodeProps,
                                  ViewEventEmitter> {
  public:
   static ShadowNodeTraits BaseTraits() {
-    auto traits = BaseShadowNode::BaseTraits();
+    auto traits = ConcreteViewShadowNode::BaseTraits();
     traits.set(ShadowNodeTraits::Trait::View);
     return traits;
   }
 
   ViewShadowNode(
-      ShadowNodeFragment const &fragment,
-      ShadowNodeFamily::Shared const &family,
+      const ShadowNodeFragment& fragment,
+      const ShadowNodeFamily::Shared& family,
       ShadowNodeTraits traits);
 
   ViewShadowNode(
-      ShadowNode const &sourceShadowNode,
-      ShadowNodeFragment const &fragment);
+      const ShadowNode& sourceShadowNode,
+      const ShadowNodeFragment& fragment);
 
  private:
   void initialize() noexcept;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

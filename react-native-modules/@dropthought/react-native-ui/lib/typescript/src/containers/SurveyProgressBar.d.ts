@@ -1,8 +1,9 @@
-import * as React from 'react';
-import type { Survey } from '../data';
-declare type Props = {
-    rtl: boolean;
-    survey: Survey;
+import React from 'react';
+type Props = {
+    displayDictionary: {
+        [questionId: string]: boolean;
+    };
 };
-declare const _default: React.MemoExoticComponent<({ rtl, ...props }: Props) => JSX.Element | null>;
+declare const _default: React.MemoExoticComponent<({ displayDictionary }: Props) => React.JSX.Element | null>;
 export default _default;
+//# sourceMappingURL=SurveyProgressBar.d.ts.map

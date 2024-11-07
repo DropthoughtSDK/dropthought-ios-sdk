@@ -1,4 +1,5 @@
 import type { Feedback, Question, RequiredType, QuestionMetaDataType as DataQuestionMetaDataType } from '../data';
+import type { ThemeContextProps } from '../contexts/theme/ThemeContext';
 /** @enum {'other'} */
 export declare const QuestionBrandType: {
     Other: string;
@@ -12,7 +13,7 @@ export declare const QuestionMetaDataType: {
     Date: string;
     String: string;
 };
-export declare type TransformOptionType = {
+export type TransformOptionType = {
     isOther: boolean;
     title: string;
     placeholder: string;
@@ -26,7 +27,7 @@ export declare const getOptionsFromQuestion: (question: Question) => TransformOp
 /**
  * validate if value match metaDataType question' rule
  */
-export declare const metaDataFormatValidator: (value: string, metaDataType?: DataQuestionMetaDataType | undefined) => boolean;
+export declare const metaDataFormatValidator: (value: string, metaDataType?: DataQuestionMetaDataType) => boolean;
 /**
  * if mandatory question has feedback
  */
@@ -36,7 +37,11 @@ export declare const getRequiredType: (question: Question) => RequiredType;
  * validate if question's feedback is valid:
  * metadata type value check, mandatory check
  */
-export declare const questionFeedbackValidator: (question: Question, feedback: Feedback) => boolean;
+export declare const questionFeedbackValidator: (question: Question, feedback: Feedback, theme: ThemeContextProps) => boolean;
+export declare const getImageSize: (uri: string) => Promise<{
+    width: number;
+    height: number;
+}>;
 export declare const scaleLogic: {
     [name in string]: number[];
 };
@@ -44,3 +49,4 @@ export declare const option4FaceTable: string[];
 export declare const option3LoopFaceTable: Map<string, any>;
 export declare const option4LoopFaceTable: Map<string, any>;
 export declare const option4TransformTable: Map<string, any>;
+//# sourceMappingURL=data.d.ts.map

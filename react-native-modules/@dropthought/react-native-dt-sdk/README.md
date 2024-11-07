@@ -4,10 +4,15 @@ This repository contains all the sources of dropthought SDK for react-native
 
 ## Latest version
 
-- 5.5.0
+- 5.12.0
 
 ## Features
 
+- Statement
+- File upload
+- Poll
+- Auto Close on End Page
+- Bijliride Theme
 - Picture Choice
 - Matrix choice
 - Multiple open question
@@ -37,14 +42,16 @@ yarn add @dropthought/react-native-dt-sdk
 ### Installing dependencies
 
 ```sh
-yarn add react-native-aes-crypto react-native-secure-key-store react-native-safe-area-context@^3.0.7 lottie-react-native@5.1.6 react-native-image-picker@7.0.1
+yarn add react-native-aes-crypto react-native-secure-key-store react-native-safe-area-context lottie-react-native@6.7.2 react-native-image-crop-picker react-native-webview react-native-svg
 ```
 
 - [react-native-aes-crypto](https://www.npmjs.com/package/react-native-aes-crypto)
-- [react-native-safe-area-context, @^3.0.7](https://github.com/th3rdwave/react-native-safe-area-context#getting-started)
+- [react-native-safe-area-context](https://github.com/th3rdwave/react-native-safe-area-context#getting-started)
 - [react-native-secure-key-store](https://www.npmjs.com/package/react-native-secure-key-store)
-- [lottie-react-native, use 5.1.6](https://github.com/lottie-react-native/lottie-react-native)
-- [react-native-image-picker, use 7.0.1](https://github.com/react-native-image-picker/react-native-image-picker)
+- [lottie-react-native, use 6.7.2](https://github.com/lottie-react-native/lottie-react-native)
+- [react-native-image-crop-picker](https://github.com/ivpusic/react-native-image-crop-picker)
+- [react-native-webview](https://github.com/react-native-webview/react-native-webview)
+- [react-native-svg](https://github.com/react-native-community/react-native-svg)
 
 ## initialize
 
@@ -123,6 +130,30 @@ const onButtonPress = () => {
   });
 };
 ```
+
+</br>
+
+### - Set auto close on end page
+
+```js
+import { useOpenSurvey } from '@dropthought/react-native-dt-sdk';
+
+// ...
+
+const onButtonPress = () => {
+  // declare this hook
+  const openSurvey = useOpenSurvey();
+
+  // survey screen will be open by calling below method
+  openSurvey({
+    visibilityId: 'YOUR_VISIBILITY_ID',
+    autoClose: true, // default is false
+    autoCloseCountdown: 3000, // countdown in milliseconds, defailt is 3000
+  });
+};
+```
+
+`autoClose` & `autoCloseCountdown` is temporary available in openSurvey props, will soon move to sdk-control-center.
 
 </br>
 

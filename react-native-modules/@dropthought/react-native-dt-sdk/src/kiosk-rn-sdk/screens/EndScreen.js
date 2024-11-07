@@ -1,11 +1,11 @@
 import React from 'react';
 import { useBackHandler } from '@react-native-community/hooks';
-import { EndScreenLayout } from '@dropthought/react-native-ui/src';
-import { useSurvey, useSurveyContext } from '../contexts/survey';
+import { EndScreenLayout } from '@dropthought/react-native-ui';
+import { useSurvey, useSurveyContext } from '../contexts/survey/SurveyContext';
 import {
   useOnSubmitSuccessCallback,
   useOnSubmitCallback,
-} from '../contexts/custom-props';
+} from '../contexts/custom-props/CustomPropsContext';
 
 const useBackForDismiss = () => {
   const { onClose } = useSurveyContext();

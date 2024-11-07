@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -14,6 +14,7 @@
 #import <React/RCTAssert.h>
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
+#import <React/RCTConstants.h>
 #import <React/RCTConvert.h>
 #import <React/RCTDefines.h>
 #import <React/RCTLog.h>
@@ -23,7 +24,7 @@
 
 #if RCT_DEV
 
-#import <React/RCTSRWebSocket.h>
+#import <SocketRocket/SRWebSocket.h>
 
 @interface RCTPackagerConnection () <RCTReconnectingWebSocketDelegate>
 @end
@@ -41,6 +42,7 @@ struct Registration {
   RCTReconnectingWebSocket *_socket;
   BOOL _socketConnected;
   NSString *_serverHostPortForSocket;
+  NSString *_serverSchemeForSocket;
   id _bundleURLChangeObserver;
   uint32_t _nextToken;
   std::vector<Registration<RCTNotificationHandler>> _notificationRegistrations;
@@ -63,7 +65,8 @@ struct Registration {
   if (self = [super init]) {
     _nextToken = 1; // Prevent randomly erasing a handler if you pass a bogus 0 token
     _serverHostPortForSocket = [[RCTBundleURLProvider sharedSettings] packagerServerHostPort];
-    _socket = socketForLocation(_serverHostPortForSocket);
+    _serverSchemeForSocket = [[RCTBundleURLProvider sharedSettings] packagerScheme];
+    _socket = socketForLocation(_serverHostPortForSocket, _serverSchemeForSocket);
     _socket.delegate = self;
     [_socket start];
 
@@ -79,7 +82,7 @@ struct Registration {
   return self;
 }
 
-static RCTReconnectingWebSocket *socketForLocation(NSString *const serverHostPort)
+static RCTReconnectingWebSocket *socketForLocation(NSString *const serverHostPort, NSString *scheme)
 {
   NSString *serverHost;
   NSString *serverPort;
@@ -90,12 +93,15 @@ static RCTReconnectingWebSocket *socketForLocation(NSString *const serverHostPor
   if ([locationComponents count] > 1) {
     serverPort = locationComponents[1];
   }
+  if (![scheme length]) {
+    scheme = @"http";
+  }
   NSURLComponents *const components = [NSURLComponents new];
   components.host = serverHost ?: @"localhost";
-  components.scheme = @"http";
+  components.scheme = scheme;
   components.port = serverPort ? @(serverPort.integerValue) : @(kRCTBundleURLProviderDefaultPort);
   components.path = @"/message";
-  components.queryItems = @[ [NSURLQueryItem queryItemWithName:@"role" value:@"ios"] ];
+  components.queryItems = @[ [NSURLQueryItem queryItemWithName:@"role" value:RCTPlatformName] ];
   static dispatch_queue_t queue;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
@@ -120,24 +126,30 @@ static RCTReconnectingWebSocket *socketForLocation(NSString *const serverHostPor
   _requestRegistrations.clear();
 }
 
-- (void)bundleURLSettingsChanged
+- (void)reconnect:(NSString *)packagerServerHostPort
 {
   std::lock_guard<std::mutex> l(_mutex);
   if (_socket == nil) {
     return; // already stopped
   }
 
-  NSString *const serverHostPort = [[RCTBundleURLProvider sharedSettings] packagerServerHostPort];
-  if ([serverHostPort isEqual:_serverHostPortForSocket]) {
+  NSString *const serverScheme = [[RCTBundleURLProvider sharedSettings] packagerScheme];
+  if ([packagerServerHostPort isEqual:_serverHostPortForSocket] && [serverScheme isEqual:_serverSchemeForSocket]) {
     return; // unchanged
   }
 
   _socket.delegate = nil;
   [_socket stop];
-  _serverHostPortForSocket = serverHostPort;
-  _socket = socketForLocation(serverHostPort);
+  _serverHostPortForSocket = packagerServerHostPort;
+  _serverSchemeForSocket = serverScheme;
+  _socket = socketForLocation(packagerServerHostPort, serverScheme);
   _socket.delegate = self;
   [_socket start];
+}
+
+- (void)bundleURLSettingsChanged
+{
+  [self reconnect:[[RCTBundleURLProvider sharedSettings] packagerServerHostPort]];
 }
 
 - (RCTHandlerToken)addNotificationHandler:(RCTNotificationHandler)handler

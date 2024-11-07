@@ -29,3 +29,4 @@ export declare const defaultStyles: {
         height: number;
     };
 };
+//# sourceMappingURL=styles.d.ts.map

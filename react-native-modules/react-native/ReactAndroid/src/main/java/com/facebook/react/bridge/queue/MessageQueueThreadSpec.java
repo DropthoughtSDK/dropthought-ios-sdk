@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -16,7 +16,7 @@ public class MessageQueueThreadSpec {
   // The Thread constructor interprets zero the same as not specifying a stack size
   public static final long DEFAULT_STACK_SIZE_BYTES = 0;
 
-  protected static enum ThreadType {
+  protected enum ThreadType {
     MAIN_UI,
     NEW_BACKGROUND,
   }

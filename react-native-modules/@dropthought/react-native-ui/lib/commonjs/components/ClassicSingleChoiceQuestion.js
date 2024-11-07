@@ -4,38 +4,24 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireWildcard(require("react"));
-
 var _reactNative = require("react-native");
-
 var _ramda = require("ramda");
-
 var _styles = _interopRequireDefault(require("../styles"));
-
 var _ClassicMandatoryTitle = _interopRequireDefault(require("./ClassicMandatoryTitle"));
-
 var _OptionWithHighlight = _interopRequireDefault(require("./OptionWithHighlight"));
-
 var _OtherOptionWithHighlight = _interopRequireDefault(require("./OtherOptionWithHighlight"));
-
 var _data = require("../utils/data");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 class ClassicSingleChoiceQuestion extends _react.PureComponent {
   constructor(props) {
     super(props);
     let otherText = '';
-
     function getInitialValueFromFeedbackProps() {
       if (props.feedback && props.feedback.answers && !(0, _ramda.isNil)(props.feedback.answers[0])) {
         const answer = props.feedback.answers[0];
-
         if (Number.isInteger(answer)) {
           return answer;
         } else {
@@ -46,10 +32,8 @@ class ClassicSingleChoiceQuestion extends _react.PureComponent {
           return props.question.options.length;
         }
       }
-
       return undefined;
     }
-
     this.onFeedback = this.onFeedback.bind(this);
     this.onChangeValueHandler = this.onChangeValueHandler.bind(this);
     this.state = {
@@ -58,9 +42,9 @@ class ClassicSingleChoiceQuestion extends _react.PureComponent {
       options: (0, _data.getOptionsFromQuestion)(props.question),
       otherText
     };
-  } // when normal option is pressed, set the id(index) as answer
+  }
 
-
+  // when normal option is pressed, set the id(index) as answer
   onFeedback(id) {
     this.setState({
       value: id,
@@ -72,9 +56,9 @@ class ClassicSingleChoiceQuestion extends _react.PureComponent {
       answers: [id],
       type: 'singleChoice'
     });
-  } // when other option's value is changed, newValues is {checked: boolean, value: string}
+  }
 
-
+  // when other option's value is changed, newValues is {checked: boolean, value: string}
   onChangeValueHandler(index, newValue) {
     this.setState({
       // if newValues is checked, set value to this index
@@ -91,14 +75,12 @@ class ClassicSingleChoiceQuestion extends _react.PureComponent {
       otherFlag: newValue.checked
     });
   }
-
   renderRadios() {
     return this.state.options.map(({
       title: option,
       isOther
     }, index) => {
       const isActive = this.state.value === index;
-
       if (isOther) {
         return /*#__PURE__*/_react.default.createElement(_OtherOptionWithHighlight.default, {
           id: index,
@@ -112,7 +94,6 @@ class ClassicSingleChoiceQuestion extends _react.PureComponent {
           question: this.props.question
         });
       }
-
       return /*#__PURE__*/_react.default.createElement(_OptionWithHighlight.default, {
         id: index,
         key: index,
@@ -123,7 +104,6 @@ class ClassicSingleChoiceQuestion extends _react.PureComponent {
       });
     });
   }
-
   render() {
     return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
       style: _styles.default.questionContainer
@@ -135,15 +115,11 @@ class ClassicSingleChoiceQuestion extends _react.PureComponent {
       style: styles.radioForm
     }, this.renderRadios()));
   }
-
 }
-
 const styles = _reactNative.StyleSheet.create({
   radioForm: {
     marginTop: 20
   }
 });
-
-var _default = ClassicSingleChoiceQuestion;
-exports.default = _default;
+var _default = exports.default = ClassicSingleChoiceQuestion;
 //# sourceMappingURL=ClassicSingleChoiceQuestion.js.map

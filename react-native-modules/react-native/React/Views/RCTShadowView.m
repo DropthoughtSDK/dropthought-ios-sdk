@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -50,7 +50,7 @@ typedef NS_ENUM(unsigned int, meta_prop_t) {
   dispatch_once(&onceToken, ^{
     yogaConfig = YGConfigNew();
     YGConfigSetPointScaleFactor(yogaConfig, RCTScreenScale());
-    YGConfigSetUseLegacyStretchBehaviour(yogaConfig, true);
+    YGConfigSetErrata(yogaConfig, YGErrataAll);
   });
   return yogaConfig;
 }
@@ -60,7 +60,7 @@ typedef NS_ENUM(unsigned int, meta_prop_t) {
 
 // YogaNode API
 
-static void RCTPrint(YGNodeRef node)
+static void RCTPrint(YGNodeConstRef node)
 {
   RCTShadowView *shadowView = (__bridge RCTShadowView *)YGNodeGetContext(node);
   printf("%s(%lld), ", shadowView.viewName.UTF8String, (long long)shadowView.reactTag.integerValue);
@@ -267,8 +267,9 @@ static void RCTProcessMetaPropsBorder(const YGValue metaProps[META_PROP_COUNT], 
 {
   YGNodeRef yogaNode = _yogaNode;
 
-  CGSize oldMinimumSize = (CGSize){RCTCoreGraphicsFloatFromYogaValue(YGNodeStyleGetMinWidth(yogaNode), 0.0),
-                                   RCTCoreGraphicsFloatFromYogaValue(YGNodeStyleGetMinHeight(yogaNode), 0.0)};
+  CGSize oldMinimumSize = (CGSize){
+      RCTCoreGraphicsFloatFromYogaValue(YGNodeStyleGetMinWidth(yogaNode), 0.0),
+      RCTCoreGraphicsFloatFromYogaValue(YGNodeStyleGetMinHeight(yogaNode), 0.0)};
 
   if (!CGSizeEqualToSize(oldMinimumSize, minimumSize)) {
     YGNodeStyleSetMinWidth(yogaNode, RCTYogaFloatFromCoreGraphicsFloat(minimumSize.width));
@@ -303,7 +304,7 @@ static void RCTProcessMetaPropsBorder(const YGValue metaProps[META_PROP_COUNT], 
 {
   if (!RCTLayoutMetricsEqualToLayoutMetrics(self.layoutMetrics, layoutMetrics)) {
     self.layoutMetrics = layoutMetrics;
-    [layoutContext.affectedShadowViews addObject:self];
+    [layoutContext.affectedShadowViews addPointer:((__bridge void *)self)];
   }
 }
 
@@ -567,7 +568,7 @@ RCT_POSITION_PROPERTY(End, end, YGEdgeEnd)
 // IntrinsicContentSize
 
 static inline YGSize
-RCTShadowViewMeasure(YGNodeRef node, float width, YGMeasureMode widthMode, float height, YGMeasureMode heightMode)
+RCTShadowViewMeasure(YGNodeConstRef node, float width, YGMeasureMode widthMode, float height, YGMeasureMode heightMode)
 {
   RCTShadowView *shadowView = (__bridge RCTShadowView *)YGNodeGetContext(node);
 
@@ -640,6 +641,20 @@ RCTShadowViewMeasure(YGNodeRef node, float width, YGMeasureMode widthMode, float
 {
   return YGNodeStyleGetFlexBasis(_yogaNode);
 }
+
+#define RCT_GAP_PROPERTY(setProp, getProp, cssProp, type, gap) \
+  -(void)set##setProp : (type)value                            \
+  {                                                            \
+    YGNodeStyleSet##cssProp(_yogaNode, gap, value);            \
+  }                                                            \
+  -(type)getProp                                               \
+  {                                                            \
+    return YGNodeStyleGet##cssProp(_yogaNode, gap);            \
+  }
+
+RCT_GAP_PROPERTY(RowGap, rowGap, Gap, float, YGGutterRow);
+RCT_GAP_PROPERTY(ColumnGap, columnGap, Gap, float, YGGutterColumn);
+RCT_GAP_PROPERTY(Gap, gap, Gap, float, YGGutterAll);
 
 #define RCT_STYLE_PROPERTY(setProp, getProp, cssProp, type) \
   -(void)set##setProp : (type)value                         \

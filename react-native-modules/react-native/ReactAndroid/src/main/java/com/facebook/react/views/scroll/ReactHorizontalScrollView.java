@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,9 +7,12 @@
 
 package com.facebook.react.views.scroll;
 
-import android.animation.Animator;
+import static com.facebook.react.views.scroll.ReactScrollViewHelper.SNAP_ALIGNMENT_CENTER;
+import static com.facebook.react.views.scroll.ReactScrollViewHelper.SNAP_ALIGNMENT_DISABLED;
+import static com.facebook.react.views.scroll.ReactScrollViewHelper.SNAP_ALIGNMENT_END;
+import static com.facebook.react.views.scroll.ReactScrollViewHelper.SNAP_ALIGNMENT_START;
+
 import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -17,45 +20,61 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.view.FocusFinder;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.accessibility.AccessibilityEvent;
+import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.OverScroller;
 import androidx.annotation.Nullable;
-import androidx.core.text.TextUtilsCompat;
-import androidx.core.view.AccessibilityDelegateCompat;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import com.facebook.common.logging.FLog;
 import com.facebook.infer.annotation.Assertions;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.common.ReactConstants;
-import com.facebook.react.config.ReactFeatureFlags;
-import com.facebook.react.uimanager.FabricViewStateManager;
+import com.facebook.react.common.build.ReactBuildConfig;
+import com.facebook.react.modules.i18nmanager.I18nUtil;
 import com.facebook.react.uimanager.MeasureSpecAssertions;
-import com.facebook.react.uimanager.PixelUtil;
+import com.facebook.react.uimanager.PointerEvents;
 import com.facebook.react.uimanager.ReactClippingViewGroup;
 import com.facebook.react.uimanager.ReactClippingViewGroupHelper;
+import com.facebook.react.uimanager.ReactOverflowViewWithInset;
+import com.facebook.react.uimanager.StateWrapper;
 import com.facebook.react.uimanager.ViewProps;
 import com.facebook.react.uimanager.events.NativeGestureUtil;
+import com.facebook.react.views.scroll.ReactScrollViewHelper.HasFlingAnimator;
+import com.facebook.react.views.scroll.ReactScrollViewHelper.HasScrollEventThrottle;
+import com.facebook.react.views.scroll.ReactScrollViewHelper.HasScrollState;
+import com.facebook.react.views.scroll.ReactScrollViewHelper.HasSmoothScroll;
+import com.facebook.react.views.scroll.ReactScrollViewHelper.HasStateWrapper;
+import com.facebook.react.views.scroll.ReactScrollViewHelper.ReactScrollViewScrollState;
 import com.facebook.react.views.view.ReactViewBackgroundManager;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /** Similar to {@link ReactScrollView} but only supports horizontal scrolling. */
 public class ReactHorizontalScrollView extends HorizontalScrollView
-    implements ReactClippingViewGroup, FabricViewStateManager.HasFabricViewStateManager {
+    implements ReactClippingViewGroup,
+        ViewGroup.OnHierarchyChangeListener,
+        View.OnLayoutChangeListener,
+        ReactOverflowViewWithInset,
+        HasScrollState,
+        HasStateWrapper,
+        HasFlingAnimator,
+        HasScrollEventThrottle,
+        HasSmoothScroll {
+
+  private static boolean DEBUG_MODE = false && ReactBuildConfig.DEBUG;
+  private static String TAG = ReactHorizontalScrollView.class.getSimpleName();
+
+  private static int NO_SCROLL_POSITION = Integer.MIN_VALUE;
 
   private static @Nullable Field sScrollerField;
   private static boolean sTriedToGetScrollerField = false;
-  private static final String CONTENT_OFFSET_LEFT = "contentOffsetLeft";
-  private static final String CONTENT_OFFSET_TOP = "contentOffsetTop";
+
+  private int mScrollXAfterMeasure = NO_SCROLL_POSITION;
 
   private static final int UNSET_CONTENT_OFFSET = -1;
 
@@ -63,6 +82,7 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
   private final @Nullable OverScroller mScroller;
   private final VelocityHelper mVelocityHelper = new VelocityHelper();
   private final Rect mRect = new Rect();
+  private final Rect mOverflowInset = new Rect();
 
   private boolean mActivelyScrolling;
   private @Nullable Rect mClippingRect;
@@ -79,22 +99,22 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
   private int mEndFillColor = Color.TRANSPARENT;
   private boolean mDisableIntervalMomentum = false;
   private int mSnapInterval = 0;
-  private float mDecelerationRate = 0.985f;
   private @Nullable List<Integer> mSnapOffsets;
   private boolean mSnapToStart = true;
   private boolean mSnapToEnd = true;
+  private int mSnapToAlignment = SNAP_ALIGNMENT_DISABLED;
   private ReactViewBackgroundManager mReactBackgroundManager;
   private boolean mPagedArrowScrolling = false;
   private int pendingContentOffsetX = UNSET_CONTENT_OFFSET;
   private int pendingContentOffsetY = UNSET_CONTENT_OFFSET;
-  private final FabricViewStateManager mFabricViewStateManager = new FabricViewStateManager();
-
-  private @Nullable ValueAnimator mScrollAnimator;
-  private int mFinalAnimatedPositionScrollX = 0;
-  private int mFinalAnimatedPositionScrollY = 0;
-
-  private int mLastStateUpdateScrollX = -1;
-  private int mLastStateUpdateScrollY = -1;
+  private StateWrapper mStateWrapper = null;
+  private final ReactScrollViewScrollState mReactScrollViewScrollState;
+  private final ValueAnimator DEFAULT_FLING_ANIMATOR = ObjectAnimator.ofInt(this, "scrollX", 0, 0);
+  private PointerEvents mPointerEvents = PointerEvents.AUTO;
+  private long mLastScrollDispatchTime = 0;
+  private int mScrollEventThrottle = 0;
+  private @Nullable View mContentView;
+  private @Nullable MaintainVisibleScrollPositionHelper mMaintainVisibleContentPositionHelper;
 
   private final Rect mTempRect = new Rect();
 
@@ -107,24 +127,27 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
     mReactBackgroundManager = new ReactViewBackgroundManager(this);
     mFpsListener = fpsListener;
 
-    ViewCompat.setAccessibilityDelegate(
-        this,
-        new AccessibilityDelegateCompat() {
-          @Override
-          public void onInitializeAccessibilityEvent(View host, AccessibilityEvent event) {
-            super.onInitializeAccessibilityEvent(host, event);
-            event.setScrollable(mScrollEnabled);
-          }
-
-          @Override
-          public void onInitializeAccessibilityNodeInfo(
-              View host, AccessibilityNodeInfoCompat info) {
-            super.onInitializeAccessibilityNodeInfo(host, info);
-            info.setScrollable(mScrollEnabled);
-          }
-        });
+    ViewCompat.setAccessibilityDelegate(this, new ReactScrollViewAccessibilityDelegate());
 
     mScroller = getOverScrollerFromParent();
+    mReactScrollViewScrollState =
+        new ReactScrollViewScrollState(
+            // TODO: The ScrollView content may be laid out in a different direction than the
+            // instance if the `direction` style is set on the ScrollView or above it.
+            I18nUtil.getInstance().isRTL(context)
+                ? ViewCompat.LAYOUT_DIRECTION_RTL
+                : ViewCompat.LAYOUT_DIRECTION_LTR);
+
+    setOnHierarchyChangeListener(this);
+  }
+
+  public boolean getScrollEnabled() {
+    return mScrollEnabled;
+  }
+
+  @Override
+  public boolean canScrollHorizontally(int direction) {
+    return mScrollEnabled && super.canScrollHorizontally(direction);
   }
 
   @Nullable
@@ -138,7 +161,7 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
         sScrollerField.setAccessible(true);
       } catch (NoSuchFieldException e) {
         FLog.w(
-            ReactConstants.TAG,
+            TAG,
             "Failed to get mScroller field for HorizontalScrollView! "
                 + "This app will exhibit the bounce-back scrolling bug :(");
       }
@@ -151,7 +174,7 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
           scroller = (OverScroller) scrollerValue;
         } else {
           FLog.w(
-              ReactConstants.TAG,
+              TAG,
               "Failed to cast mScroller field in HorizontalScrollView (probably due to OEM changes to AOSP)! "
                   + "This app will exhibit the bounce-back scrolling bug :(");
           scroller = null;
@@ -201,10 +224,16 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
   }
 
   public void setDecelerationRate(float decelerationRate) {
-    mDecelerationRate = decelerationRate;
+    getReactScrollViewScrollState().setDecelerationRate(decelerationRate);
 
     if (mScroller != null) {
-      mScroller.setFriction(1.0f - mDecelerationRate);
+      mScroller.setFriction(1.0f - decelerationRate);
+    }
+  }
+
+  public void abortAnimation() {
+    if (mScroller != null && !mScroller.isFinished()) {
+      mScroller.abortAnimation();
     }
   }
 
@@ -224,6 +253,10 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
     mSnapToEnd = snapToEnd;
   }
 
+  public void setSnapToAlignment(int snapToAlignment) {
+    mSnapToAlignment = snapToAlignment;
+  }
+
   public void flashScrollIndicators() {
     awakenScrollBars();
   }
@@ -233,8 +266,41 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
     invalidate();
   }
 
+  public void setMaintainVisibleContentPosition(
+      @Nullable MaintainVisibleScrollPositionHelper.Config config) {
+    if (config != null && mMaintainVisibleContentPositionHelper == null) {
+      mMaintainVisibleContentPositionHelper = new MaintainVisibleScrollPositionHelper(this, true);
+      mMaintainVisibleContentPositionHelper.start();
+    } else if (config == null && mMaintainVisibleContentPositionHelper != null) {
+      mMaintainVisibleContentPositionHelper.stop();
+      mMaintainVisibleContentPositionHelper = null;
+    }
+    if (mMaintainVisibleContentPositionHelper != null) {
+      mMaintainVisibleContentPositionHelper.setConfig(config);
+    }
+  }
+
+  @Override
+  public @Nullable String getOverflow() {
+    return mOverflow;
+  }
+
+  @Override
+  public void setOverflowInset(int left, int top, int right, int bottom) {
+    mOverflowInset.set(left, top, right, bottom);
+  }
+
+  @Override
+  public Rect getOverflowInset() {
+    return mOverflowInset;
+  }
+
   @Override
   protected void onDraw(Canvas canvas) {
+    if (DEBUG_MODE) {
+      FLog.i(TAG, "onDraw[%d]", getId());
+    }
+
     getDrawingRect(mRect);
 
     switch (mOverflow) {
@@ -252,20 +318,70 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
     MeasureSpecAssertions.assertExplicitMeasureSpec(widthMeasureSpec, heightMeasureSpec);
 
-    setMeasuredDimension(
-        MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
+    int measuredWidth = MeasureSpec.getSize(widthMeasureSpec);
+    int measuredHeight = MeasureSpec.getSize(heightMeasureSpec);
+
+    if (DEBUG_MODE) {
+      FLog.i(
+          TAG,
+          "onMeasure[%d] measured width: %d measured height: %d",
+          getId(),
+          measuredWidth,
+          measuredHeight);
+    }
+
+    boolean measuredHeightChanged = getMeasuredHeight() != measuredHeight;
+
+    setMeasuredDimension(measuredWidth, measuredHeight);
+
+    // See how `mScrollXAfterMeasure` is used in `onLayout`, and why we only enable the
+    // hack if the height has changed.
+    if (measuredHeightChanged && mScroller != null) {
+      mScrollXAfterMeasure = mScroller.getCurrX();
+    }
   }
 
   @Override
   protected void onLayout(boolean changed, int l, int t, int r, int b) {
-    // Call with the present values in order to re-layout if necessary
-    // If a "pending" value has been set, we restore that value.
-    // That value gets cleared by reactScrollTo.
-    int scrollToX =
-        pendingContentOffsetX != UNSET_CONTENT_OFFSET ? pendingContentOffsetX : getScrollX();
-    int scrollToY =
-        pendingContentOffsetY != UNSET_CONTENT_OFFSET ? pendingContentOffsetY : getScrollY();
-    reactScrollTo(scrollToX, scrollToY);
+    if (DEBUG_MODE) {
+      FLog.i(TAG, "onLayout[%d] l %d t %d r %d b %d", getId(), l, t, r, b);
+    }
+
+    // Has the scrollX changed between the last onMeasure and this layout?
+    // If so, cancel the animation.
+    // Essentially, if the height changes (due to keyboard popping up, for instance) the
+    // underlying View.layout method will in some cases scroll to an incorrect X position -
+    // see also the hacks in `fling`. The order of layout is called in the order of: onMeasure,
+    // layout, onLayout.
+    // We cannot override `layout` but we can detect the sequence of events between onMeasure
+    // and onLayout.
+    if (mScrollXAfterMeasure != NO_SCROLL_POSITION
+        && mScroller != null
+        && mScrollXAfterMeasure != mScroller.getFinalX()
+        && !mScroller.isFinished()) {
+      if (DEBUG_MODE) {
+        FLog.i(
+            TAG,
+            "onLayout[%d] scroll hack enabled: reset to previous scrollX position of %d",
+            getId(),
+            mScrollXAfterMeasure);
+      }
+      mScroller.startScroll(mScrollXAfterMeasure, mScroller.getFinalY(), 0, 0);
+      mScroller.forceFinished(true);
+      mScrollXAfterMeasure = NO_SCROLL_POSITION;
+    }
+
+    // Apply pending contentOffset in case it was set before the view was laid out.
+    if (isContentReady()) {
+      // If a "pending" content offset value has been set, we restore that value.
+      // Upon call to scrollTo, the "pending" values will be re-set.
+      int scrollToX =
+          pendingContentOffsetX != UNSET_CONTENT_OFFSET ? pendingContentOffsetX : getScrollX();
+      int scrollToY =
+          pendingContentOffsetY != UNSET_CONTENT_OFFSET ? pendingContentOffsetY : getScrollY();
+      scrollTo(scrollToX, scrollToY);
+    }
+
     ReactScrollViewHelper.emitLayoutEvent(this);
   }
 
@@ -318,7 +434,7 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
   }
 
   /** Returns whether the given descendent is partially scrolled in view */
-  private boolean isPartiallyScrolledInView(View descendent) {
+  public boolean isPartiallyScrolledInView(View descendent) {
     int scrollDelta = getScrollDelta(descendent);
     descendent.getDrawingRect(mTempRect);
     return scrollDelta != 0 && Math.abs(scrollDelta) < mTempRect.width();
@@ -341,6 +457,10 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
 
   @Override
   protected void onScrollChanged(int x, int y, int oldX, int oldY) {
+    if (DEBUG_MODE) {
+      FLog.i(TAG, "onScrollChanged[%d] x %d y %d oldx %d oldy %d", getId(), x, y, oldX, oldY);
+    }
+
     super.onScrollChanged(x, y, oldX, oldY);
 
     mActivelyScrolling = true;
@@ -350,11 +470,59 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
         updateClippingRect();
       }
 
-      ReactScrollViewHelper.emitScrollEvent(
+      ReactScrollViewHelper.updateStateOnScrollChanged(
           this,
           mOnScrollDispatchHelper.getXFlingVelocity(),
           mOnScrollDispatchHelper.getYFlingVelocity());
     }
+  }
+
+  @Nullable
+  private static HorizontalScrollView findDeepestScrollViewForMotionEvent(
+      View view, MotionEvent ev) {
+    return findDeepestScrollViewForMotionEvent(view, ev, true);
+  }
+
+  @Nullable
+  private static HorizontalScrollView findDeepestScrollViewForMotionEvent(
+      View view, MotionEvent ev, boolean skipInitialView) {
+    if (view == null) {
+      return null;
+    }
+
+    Rect rectOnScreen = new Rect();
+    view.getGlobalVisibleRect(rectOnScreen);
+    if (!rectOnScreen.contains((int) ev.getRawX(), (int) ev.getRawY())) {
+      return null;
+    }
+
+    // Only consider the current view if it's not the initial view. We check the
+    // current view first to bail out of recursion. Essentially if there's any
+    // nested horizontal scrollview with nested scrolling enabled, the parent
+    // scroll view shouldn't pick up the down event.
+    if (!skipInitialView
+        && view instanceof HorizontalScrollView
+        && ViewCompat.isNestedScrollingEnabled(view)
+        && (view instanceof ReactHorizontalScrollView
+            && ((ReactHorizontalScrollView) view).mScrollEnabled)) {
+      return (HorizontalScrollView) view;
+    }
+
+    // First, check child views recursively before considering this view.
+    if (view instanceof ViewGroup) {
+      for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+        HorizontalScrollView foundScrollView =
+            findDeepestScrollViewForMotionEvent(((ViewGroup) view).getChildAt(i), ev, false);
+
+        if (foundScrollView != null) {
+          // If a deeper HorizontalScrollView is found in child views, return it.
+          return foundScrollView;
+        }
+      }
+    }
+
+    // Return null if no matching view is found.
+    return null;
   }
 
   @Override
@@ -363,12 +531,19 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
       return false;
     }
 
+    if ((ev.getAction() == MotionEvent.ACTION_DOWN)
+        && findDeepestScrollViewForMotionEvent(this, ev) != null) {
+      return false;
+    }
+
+    // We intercept the touch event if the children are not supposed to receive it.
+    if (!PointerEvents.canChildrenBeTouchTarget(mPointerEvents)) {
+      return true;
+    }
+
     try {
       if (super.onInterceptTouchEvent(ev)) {
-        NativeGestureUtil.notifyNativeGestureStarted(this, ev);
-        ReactScrollViewHelper.emitScrollBeginDragEvent(this);
-        mDragging = true;
-        enableFpsListener();
+        handleInterceptedTouchEvent(ev);
         return true;
       }
     } catch (IllegalArgumentException e) {
@@ -379,6 +554,14 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
     }
 
     return false;
+  }
+
+  protected void handleInterceptedTouchEvent(MotionEvent ev) {
+    NativeGestureUtil.notifyNativeGestureStarted(this, ev);
+    ReactScrollViewHelper.emitScrollBeginDragEvent(this);
+    mDragging = true;
+    enableFpsListener();
+    getFlingAnimator().cancel();
   }
 
   @Override
@@ -402,7 +585,7 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
       if (getChildCount() > 0) {
         View currentFocused = findFocus();
         View nextFocused = FocusFinder.getInstance().findNextFocus(this, currentFocused, direction);
-        View rootChild = getChildAt(0);
+        View rootChild = getContentView();
         if (rootChild != null && nextFocused != null && nextFocused.getParent() == rootChild) {
           if (!isScrolledInView(nextFocused) && !isMostlyScrolledInView(nextFocused)) {
             smoothScrollToNextPage(direction);
@@ -429,21 +612,41 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
       return false;
     }
 
+    // We do not accept the touch event if this view is not supposed to receive it.
+    if (!PointerEvents.canBeTouchTarget(mPointerEvents)) {
+      return false;
+    }
+
     mVelocityHelper.calculateVelocity(ev);
-    int action = ev.getAction() & MotionEvent.ACTION_MASK;
+    int action = ev.getActionMasked();
     if (action == MotionEvent.ACTION_UP && mDragging) {
-      updateStateOnScroll();
+      ReactScrollViewHelper.updateFabricScrollState(this);
 
       float velocityX = mVelocityHelper.getXVelocity();
       float velocityY = mVelocityHelper.getYVelocity();
       ReactScrollViewHelper.emitScrollEndDragEvent(this, velocityX, velocityY);
+      NativeGestureUtil.notifyNativeGestureEnded(this, ev);
       mDragging = false;
       // After the touch finishes, we may need to do some scrolling afterwards either as a result
       // of a fling or because we need to page align the content
       handlePostTouchScrolling(Math.round(velocityX), Math.round(velocityY));
     }
 
+    if (action == MotionEvent.ACTION_DOWN) {
+      cancelPostTouchScrolling();
+    }
+
     return super.onTouchEvent(ev);
+  }
+
+  @Override
+  public boolean dispatchGenericPointerEvent(MotionEvent ev) {
+    // We do not dispatch the pointer event if its children are not supposed to receive it
+    if (!PointerEvents.canChildrenBeTouchTarget(mPointerEvents)) {
+      return false;
+    }
+
+    return super.dispatchGenericPointerEvent(ev);
   }
 
   @Override
@@ -459,6 +662,9 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
 
   @Override
   public void fling(int velocityX) {
+    if (DEBUG_MODE) {
+      FLog.i(TAG, "fling[%d] velocityX %d", getId(), velocityX);
+    }
 
     // Workaround.
     // On Android P if a ScrollView is inverted, we will get a wrong sign for
@@ -468,7 +674,9 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
     // Hence, we can use the absolute value from whatever the OS gives
     // us and use the sign of what mOnScrollDispatchHelper has tracked.
     final int correctedVelocityX =
-        (int) (Math.abs(velocityX) * Math.signum(mOnScrollDispatchHelper.getXFlingVelocity()));
+        Build.VERSION.SDK_INT == Build.VERSION_CODES.P
+            ? (int) (Math.abs(velocityX) * Math.signum(mOnScrollDispatchHelper.getXFlingVelocity()))
+            : velocityX;
 
     if (mPagingEnabled) {
       flingAndSnap(correctedVelocityX);
@@ -522,6 +730,17 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
     if (mRemoveClippedSubviews) {
       updateClippingRect();
     }
+    if (mMaintainVisibleContentPositionHelper != null) {
+      mMaintainVisibleContentPositionHelper.start();
+    }
+  }
+
+  @Override
+  protected void onDetachedFromWindow() {
+    super.onDetachedFromWindow();
+    if (mMaintainVisibleContentPositionHelper != null) {
+      mMaintainVisibleContentPositionHelper.stop();
+    }
   }
 
   @Override
@@ -533,7 +752,7 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
     Assertions.assertNotNull(mClippingRect);
 
     ReactClippingViewGroupHelper.calculateClippingRect(this, mClippingRect);
-    View contentView = getChildAt(0);
+    View contentView = getContentView();
     if (contentView instanceof ReactClippingViewGroup) {
       ((ReactClippingViewGroup) contentView).updateClippingRect();
     }
@@ -546,9 +765,7 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
 
   @Override
   public boolean getChildVisibleRect(View child, Rect r, android.graphics.Point offset) {
-    return ReactFeatureFlags.clipChildRectsIfOverflowIsHidden
-        ? ReactClippingViewGroupHelper.getChildVisibleRectHelper(child, r, offset, this, mOverflow)
-        : super.getChildVisibleRect(child, r, offset);
+    return super.getChildVisibleRect(child, r, offset);
   }
 
   private int getSnapInterval() {
@@ -556,6 +773,10 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
       return mSnapInterval;
     }
     return getWidth();
+  }
+
+  private View getContentView() {
+    return getChildAt(0);
   }
 
   public void setEndFillColor(int color) {
@@ -567,6 +788,17 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
 
   @Override
   protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+    if (DEBUG_MODE) {
+      FLog.i(
+          TAG,
+          "onOverScrolled[%d] scrollX %d scrollY %d clampedX %b clampedY %b",
+          getId(),
+          scrollX,
+          scrollY,
+          clampedX,
+          clampedY);
+    }
+
     if (mScroller != null) {
       // FB SCROLLVIEW CHANGE
 
@@ -586,6 +818,18 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
     }
 
     super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
+  }
+
+  @Override
+  public void onChildViewAdded(View parent, View child) {
+    mContentView = child;
+    mContentView.addOnLayoutChangeListener(this);
+  }
+
+  @Override
+  public void onChildViewRemoved(View parent, View child) {
+    mContentView.removeOnLayoutChangeListener(this);
+    mContentView = null;
   }
 
   private void enableFpsListener() {
@@ -611,7 +855,7 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
   @Override
   public void draw(Canvas canvas) {
     if (mEndFillColor != Color.TRANSPARENT) {
-      final View content = getChildAt(0);
+      final View content = getContentView();
       if (mEndBackground != null && content != null && content.getRight() < getWidth()) {
         mEndBackground.setBounds(content.getRight(), 0, getWidth(), getHeight());
         mEndBackground.draw(canvas);
@@ -627,6 +871,15 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
    * runnable that checks if we scrolled in the last frame and if so assumes we are still scrolling.
    */
   private void handlePostTouchScrolling(int velocityX, int velocityY) {
+    if (DEBUG_MODE) {
+      FLog.i(
+          TAG,
+          "handlePostTouchScrolling[%d] velocityX %d velocityY %d",
+          getId(),
+          velocityX,
+          velocityY);
+    }
+
     // Check if we are already handling this which may occur if this is called by both the touch up
     // and a fling call
     if (mPostTouchRunnable != null) {
@@ -642,7 +895,6 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
         new Runnable() {
 
           private boolean mSnappingToPage = false;
-          private boolean mRunning = true;
           private int mStableFrames = 0;
 
           @Override
@@ -651,10 +903,11 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
               // We are still scrolling.
               mActivelyScrolling = false;
               mStableFrames = 0;
-              mRunning = true;
+              ViewCompat.postOnAnimationDelayed(
+                  ReactHorizontalScrollView.this, this, ReactScrollViewHelper.MOMENTUM_DELAY);
             } else {
               // There has not been a scroll update since the last time this Runnable executed.
-              updateStateOnScroll();
+              ReactScrollViewHelper.updateFabricScrollState(ReactHorizontalScrollView.this);
 
               // We keep checking for updates until the ScrollView has "stabilized" and hasn't
               // scrolled for N consecutive frames. This number is arbitrary: big enough to catch
@@ -664,30 +917,24 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
               // fire before the first scroll event of an animated scroll/fling, and stop
               // immediately.
               mStableFrames++;
-              mRunning = (mStableFrames < 3);
 
-              if (mPagingEnabled && !mSnappingToPage) {
-                // Only if we have pagingEnabled and we have not snapped to the page do we
-                // need to continue checking for the scroll.  And we cause that scroll by asking for
-                // it
-                mSnappingToPage = true;
-                flingAndSnap(0);
-                ViewCompat.postOnAnimationDelayed(
-                    ReactHorizontalScrollView.this, this, ReactScrollViewHelper.MOMENTUM_DELAY);
-              } else {
+              if (mStableFrames >= 3) {
+                mPostTouchRunnable = null;
                 if (mSendMomentumEvents) {
                   ReactScrollViewHelper.emitScrollMomentumEndEvent(ReactHorizontalScrollView.this);
                 }
                 disableFpsListener();
+              } else {
+                if (mPagingEnabled && !mSnappingToPage) {
+                  // If we have pagingEnabled and we have not snapped to the page
+                  // we need to cause that scroll by asking for it
+                  mSnappingToPage = true;
+                  flingAndSnap(0);
+                }
+                // The scrollview has not "stabilized" so we just post to check again a frame later
+                ViewCompat.postOnAnimationDelayed(
+                    ReactHorizontalScrollView.this, this, ReactScrollViewHelper.MOMENTUM_DELAY);
               }
-            }
-
-            // We are still scrolling so we just post to check again a frame later
-            if (mRunning) {
-              ViewCompat.postOnAnimationDelayed(
-                  ReactHorizontalScrollView.this, this, ReactScrollViewHelper.MOMENTUM_DELAY);
-            } else {
-              mPostTouchRunnable = null;
             }
           }
         };
@@ -695,43 +942,27 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
         this, mPostTouchRunnable, ReactScrollViewHelper.MOMENTUM_DELAY);
   }
 
-  /** Get current X position or position after current animation finishes, if any. */
-  private int getPostAnimationScrollX() {
-    return mScrollAnimator != null && mScrollAnimator.isRunning()
-        ? mFinalAnimatedPositionScrollX
-        : getScrollX();
-  }
-
-  /** Get current X position or position after current animation finishes, if any. */
-  private int getPostAnimationScrollY() {
-    return mScrollAnimator != null && mScrollAnimator.isRunning()
-        ? mFinalAnimatedPositionScrollY
-        : getScrollY();
+  private void cancelPostTouchScrolling() {
+    if (mPostTouchRunnable != null) {
+      removeCallbacks(mPostTouchRunnable);
+      mPostTouchRunnable = null;
+      getFlingAnimator().cancel();
+    }
   }
 
   private int predictFinalScrollPosition(int velocityX) {
-    // ScrollView can *only* scroll for 250ms when using smoothScrollTo and there's
-    // no way to customize the scroll duration. So, we create a temporary OverScroller
-    // so we can predict where a fling would land and snap to nearby that point.
-    OverScroller scroller = new OverScroller(getContext());
-    scroller.setFriction(1.0f - mDecelerationRate);
-
     // predict where a fling would end up so we can scroll to the nearest snap offset
-    int maximumOffset = Math.max(0, computeHorizontalScrollRange() - getWidth());
-    int width = getWidth() - ViewCompat.getPaddingStart(this) - ViewCompat.getPaddingEnd(this);
-    scroller.fling(
-        getPostAnimationScrollX(), // startX
-        getPostAnimationScrollY(), // startY
-        velocityX, // velocityX
-        0, // velocityY
-        0, // minX
-        maximumOffset, // maxX
-        0, // minY
-        0, // maxY
-        width / 2, // overX
-        0 // overY
-        );
-    return scroller.getFinalX();
+    final int maximumOffset = Math.max(0, computeHorizontalScrollRange() - getWidth());
+    // TODO(T106335409): Existing prediction still uses overscroller. Consider change this to use
+    // fling animator instead.
+    return getFlingAnimator() == DEFAULT_FLING_ANIMATOR
+        ? ReactScrollViewHelper.predictFinalScrollPosition(this, velocityX, 0, maximumOffset, 0).x
+        : ReactScrollViewHelper.getNextFlingStartValue(
+                this,
+                getScrollX(),
+                getReactScrollViewScrollState().getFinalAnimatedPositionScroll().x,
+                velocityX)
+            + getFlingExtrapolatedDistance(velocityX);
   }
 
   /**
@@ -740,8 +971,18 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
    * scrolling, and handling any momentum scrolling.
    */
   private void smoothScrollAndSnap(int velocity) {
+    if (DEBUG_MODE) {
+      FLog.i(TAG, "smoothScrollAndSnap[%d] velocity %d", getId(), velocity);
+    }
+
     double interval = (double) getSnapInterval();
-    double currentOffset = (double) (getPostAnimationScrollX());
+    double currentOffset =
+        (double)
+            (ReactScrollViewHelper.getNextFlingStartValue(
+                this,
+                getScrollX(),
+                getReactScrollViewScrollState().getFinalAnimatedPositionScroll().x,
+                velocity));
     double targetOffset = (double) predictFinalScrollPosition(velocity);
 
     int previousPage = (int) Math.floor(currentOffset / interval);
@@ -785,16 +1026,21 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
   }
 
   private void flingAndSnap(int velocityX) {
+    if (DEBUG_MODE) {
+      FLog.i(TAG, "smoothScrollAndSnap[%d] velocityX %d", getId(), velocityX);
+    }
+
     if (getChildCount() <= 0) {
       return;
     }
 
     // pagingEnabled only allows snapping one interval at a time
-    if (mSnapInterval == 0 && mSnapOffsets == null) {
+    if (mSnapInterval == 0 && mSnapOffsets == null && mSnapToAlignment == SNAP_ALIGNMENT_DISABLED) {
       smoothScrollAndSnap(velocityX);
       return;
     }
 
+    boolean hasCustomizedFlingAnimator = getFlingAnimator() != DEFAULT_FLING_ANIMATOR;
     int maximumOffset = Math.max(0, computeHorizontalScrollRange() - getWidth());
     int targetOffset = predictFinalScrollPosition(velocityX);
     if (mDisableIntervalMomentum) {
@@ -806,12 +1052,10 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
     int firstOffset = 0;
     int lastOffset = maximumOffset;
     int width = getWidth() - ViewCompat.getPaddingStart(this) - ViewCompat.getPaddingEnd(this);
+    int layoutDirection = getReactScrollViewScrollState().getLayoutDirection();
 
     // offsets are from the right edge in RTL layouts
-    boolean isRTL =
-        TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault())
-            == ViewCompat.LAYOUT_DIRECTION_RTL;
-    if (isRTL) {
+    if (layoutDirection == LAYOUT_DIRECTION_RTL) {
       targetOffset = maximumOffset - targetOffset;
       velocityX = -velocityX;
     }
@@ -836,8 +1080,57 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
           }
         }
       }
+    } else if (mSnapToAlignment != SNAP_ALIGNMENT_DISABLED) {
+      if (mSnapInterval > 0) {
+        double ratio = (double) targetOffset / mSnapInterval;
+        smallerOffset =
+            Math.max(
+                getItemStartOffset(
+                    mSnapToAlignment,
+                    (int) (Math.floor(ratio) * mSnapInterval),
+                    mSnapInterval,
+                    width),
+                0);
+        largerOffset =
+            Math.min(
+                getItemStartOffset(
+                    mSnapToAlignment,
+                    (int) (Math.ceil(ratio) * mSnapInterval),
+                    mSnapInterval,
+                    width),
+                maximumOffset);
+      } else {
+        ViewGroup contentView = (ViewGroup) getContentView();
+        int smallerChildOffset = largerOffset;
+        int largerChildOffset = smallerOffset;
+        for (int i = 0; i < contentView.getChildCount(); i++) {
+          View item = contentView.getChildAt(i);
+          int itemStartOffset =
+              getItemStartOffset(mSnapToAlignment, item.getLeft(), item.getWidth(), width);
+          if (itemStartOffset <= targetOffset) {
+            if (targetOffset - itemStartOffset < targetOffset - smallerOffset) {
+              smallerOffset = itemStartOffset;
+            }
+          }
+
+          if (itemStartOffset >= targetOffset) {
+            if (itemStartOffset - targetOffset < largerOffset - targetOffset) {
+              largerOffset = itemStartOffset;
+            }
+          }
+
+          smallerChildOffset = Math.min(smallerChildOffset, itemStartOffset);
+          largerChildOffset = Math.max(largerChildOffset, itemStartOffset);
+        }
+
+        // For Recycler ViewGroup, the maximumOffset can be much larger than the total heights of
+        // items in the layout. In this case snapping is not possible beyond the currently rendered
+        // children.
+        smallerOffset = Math.max(smallerOffset, smallerChildOffset);
+        largerOffset = Math.min(largerOffset, largerChildOffset);
+      }
     } else {
-      double interval = (double) getSnapInterval();
+      double interval = getSnapInterval();
       double ratio = (double) targetOffset / interval;
       smallerOffset = (int) (Math.floor(ratio) * interval);
       largerOffset = Math.min((int) (Math.ceil(ratio) * interval), maximumOffset);
@@ -845,12 +1138,14 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
 
     // Calculate the nearest offset
     int nearestOffset =
-        targetOffset - smallerOffset < largerOffset - targetOffset ? smallerOffset : largerOffset;
+        Math.abs(targetOffset - smallerOffset) < Math.abs(largerOffset - targetOffset)
+            ? smallerOffset
+            : largerOffset;
 
     // if scrolling after the last snap offset and snapping to the
     // end of the list is disabled, then we allow free scrolling
     int currentOffset = getScrollX();
-    if (isRTL) {
+    if (layoutDirection == LAYOUT_DIRECTION_RTL) {
       currentOffset = maximumOffset - currentOffset;
     }
     if (!mSnapToEnd && targetOffset >= lastOffset) {
@@ -868,13 +1163,19 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
         targetOffset = firstOffset;
       }
     } else if (velocityX > 0) {
-      // when snapping velocity can feel sluggish for slow swipes
-      velocityX += (int) ((largerOffset - targetOffset) * 10.0);
+      if (!hasCustomizedFlingAnimator) {
+        // The default animator requires boost on initial velocity as when snapping velocity can
+        // feel sluggish for slow swipes
+        velocityX += (int) ((largerOffset - targetOffset) * 10.0);
+      }
 
       targetOffset = largerOffset;
     } else if (velocityX < 0) {
-      // when snapping velocity can feel sluggish for slow swipes
-      velocityX -= (int) ((targetOffset - smallerOffset) * 10.0);
+      if (!hasCustomizedFlingAnimator) {
+        // The default animator requires boost on initial velocity as when snapping velocity can
+        // feel sluggish for slow swipes
+        velocityX -= (int) ((targetOffset - smallerOffset) * 10.0);
+      }
 
       targetOffset = smallerOffset;
     } else {
@@ -884,16 +1185,18 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
     // Make sure the new offset isn't out of bounds
     targetOffset = Math.min(Math.max(0, targetOffset), maximumOffset);
 
-    if (isRTL) {
+    if (layoutDirection == LAYOUT_DIRECTION_RTL) {
       targetOffset = maximumOffset - targetOffset;
       velocityX = -velocityX;
     }
 
-    // smoothScrollTo will always scroll over 250ms which is often *waaay*
-    // too short and will cause the scrolling to feel almost instant
-    // try to manually interact with OverScroller instead
-    // if velocity is 0 however, fling() won't work, so we want to use smoothScrollTo
-    if (mScroller != null) {
+    if (hasCustomizedFlingAnimator || mScroller == null) {
+      reactSmoothScrollTo(targetOffset, getScrollY());
+    } else {
+      // smoothScrollTo will always scroll over 250ms which is often *waaay*
+      // too short and will cause the scrolling to feel almost instant
+      // try to manually interact with OverScroller instead
+      // if velocity is 0 however, fling() won't work, so we want to use smoothScrollTo
       mActivelyScrolling = true;
 
       mScroller.fling(
@@ -915,12 +1218,33 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
           );
 
       postInvalidateOnAnimation();
-    } else {
-      reactSmoothScrollTo(targetOffset, getScrollY());
     }
   }
 
+  private int getItemStartOffset(
+      int snapToAlignment, int itemStartPosition, int itemWidth, int viewPortWidth) {
+    int itemStartOffset;
+    switch (snapToAlignment) {
+      case SNAP_ALIGNMENT_CENTER:
+        itemStartOffset = itemStartPosition - (viewPortWidth - itemWidth) / 2;
+        break;
+      case SNAP_ALIGNMENT_START:
+        itemStartOffset = itemStartPosition;
+        break;
+      case SNAP_ALIGNMENT_END:
+        itemStartOffset = itemStartPosition - (viewPortWidth - itemWidth);
+        break;
+      default:
+        throw new IllegalStateException("Invalid SnapToAlignment value: " + mSnapToAlignment);
+    }
+    return itemStartOffset;
+  }
+
   private void smoothScrollToNextPage(int direction) {
+    if (DEBUG_MODE) {
+      FLog.i(TAG, "smoothScrollToNextPage[%d] direction %d", getId(), direction);
+    }
+
     int width = getWidth();
     int currentX = getScrollX();
 
@@ -975,65 +1299,33 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
    * scroll view and state. Calling raw `smoothScrollTo` doesn't update state.
    */
   public void reactSmoothScrollTo(int x, int y) {
-    // `smoothScrollTo` contains some logic that, if called multiple times in a short amount of
-    // time, will treat all calls as part of the same animation and will not lengthen the duration
-    // of the animation. This means that, for example, if the user is scrolling rapidly, multiple
-    // pages could be considered part of one animation, causing some page animations to be animated
-    // very rapidly - looking like they're not animated at all.
-    if (mScrollAnimator != null) {
-      mScrollAnimator.cancel();
-    }
-
-    mFinalAnimatedPositionScrollX = x;
-    mFinalAnimatedPositionScrollY = y;
-    PropertyValuesHolder scrollX = PropertyValuesHolder.ofInt("scrollX", getScrollX(), x);
-    PropertyValuesHolder scrollY = PropertyValuesHolder.ofInt("scrollY", getScrollY(), y);
-    mScrollAnimator = ObjectAnimator.ofPropertyValuesHolder(scrollX, scrollY);
-    mScrollAnimator.setDuration(
-        ReactScrollViewHelper.getDefaultScrollAnimationDuration(getContext()));
-    mScrollAnimator.addUpdateListener(
-        new ValueAnimator.AnimatorUpdateListener() {
-          @Override
-          public void onAnimationUpdate(ValueAnimator valueAnimator) {
-            int scrollValueX = (Integer) valueAnimator.getAnimatedValue("scrollX");
-            int scrollValueY = (Integer) valueAnimator.getAnimatedValue("scrollY");
-            scrollTo(scrollValueX, scrollValueY);
-          }
-        });
-    mScrollAnimator.addListener(
-        new Animator.AnimatorListener() {
-          @Override
-          public void onAnimationStart(Animator animator) {}
-
-          @Override
-          public void onAnimationEnd(Animator animator) {
-            mFinalAnimatedPositionScrollX = -1;
-            mFinalAnimatedPositionScrollY = -1;
-            mScrollAnimator = null;
-            updateStateOnScroll();
-          }
-
-          @Override
-          public void onAnimationCancel(Animator animator) {}
-
-          @Override
-          public void onAnimationRepeat(Animator animator) {}
-        });
-    mScrollAnimator.start();
-    updateStateOnScroll(x, y);
+    ReactScrollViewHelper.smoothScrollTo(this, x, y);
     setPendingContentOffsets(x, y);
   }
 
   /**
-   * Calls `reactScrollTo` and updates state.
+   * Calls `super.scrollTo` and updates state.
    *
-   * <p>`reactScrollTo` changes `contentOffset` and we need to keep `contentOffset` in sync between
-   * scroll view and state. Calling raw `reactScrollTo` doesn't update state.
+   * <p>`super.scrollTo` changes `contentOffset` and we need to keep `contentOffset` in sync between
+   * scroll view and state.
+   *
+   * <p>Note that while we can override scrollTo, we *cannot* override `smoothScrollTo` because it
+   * is final. See `reactSmoothScrollTo`.
    */
-  public void reactScrollTo(int x, int y) {
-    scrollTo(x, y);
-    updateStateOnScroll(x, y);
+  @Override
+  public void scrollTo(int x, int y) {
+    if (DEBUG_MODE) {
+      FLog.i(TAG, "scrollTo[%d] x %d y %d", getId(), x, y);
+    }
+
+    super.scrollTo(x, y);
+    ReactScrollViewHelper.updateFabricScrollState(this);
     setPendingContentOffsets(x, y);
+  }
+
+  private boolean isContentReady() {
+    View child = getContentView();
+    return child != null && child.getWidth() != 0 && child.getHeight() != 0;
   }
 
   /**
@@ -1044,8 +1336,11 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
    * @param y
    */
   private void setPendingContentOffsets(int x, int y) {
-    View child = getChildAt(0);
-    if (child != null && child.getWidth() != 0 && child.getHeight() != 0) {
+    if (DEBUG_MODE) {
+      FLog.i(TAG, "setPendingContentOffsets[%d] x %d y %d", getId(), x, y);
+    }
+
+    if (isContentReady()) {
       pendingContentOffsetX = UNSET_CONTENT_OFFSET;
       pendingContentOffsetY = UNSET_CONTENT_OFFSET;
     } else {
@@ -1054,36 +1349,149 @@ public class ReactHorizontalScrollView extends HorizontalScrollView
     }
   }
 
-  /**
-   * Called on any stabilized onScroll change to propagate content offset value to a Shadow Node.
-   */
-  private void updateStateOnScroll(final int scrollX, final int scrollY) {
-    // Dedupe events to reduce JNI traffic
-    if (scrollX == mLastStateUpdateScrollX && scrollY == mLastStateUpdateScrollY) {
+  @Override
+  public void onLayoutChange(
+      View v,
+      int left,
+      int top,
+      int right,
+      int bottom,
+      int oldLeft,
+      int oldTop,
+      int oldRight,
+      int oldBottom) {
+    if (mContentView == null) {
       return;
     }
 
-    mLastStateUpdateScrollX = scrollX;
-    mLastStateUpdateScrollY = scrollY;
-
-    mFabricViewStateManager.setState(
-        new FabricViewStateManager.StateUpdateCallback() {
-          @Override
-          public WritableMap getStateUpdate() {
-            WritableMap map = new WritableNativeMap();
-            map.putDouble(CONTENT_OFFSET_LEFT, PixelUtil.toDIPFromPixel(scrollX));
-            map.putDouble(CONTENT_OFFSET_TOP, PixelUtil.toDIPFromPixel(scrollY));
-            return map;
-          }
-        });
+    // Adjust the scroll position to follow new content. In RTL, this means we keep a constant
+    // offset from the right edge instead of the left edge, so content added to the end of the flow
+    // does not shift layout. If `maintainVisibleContentPosition` is enabled, we try to adjust
+    // position so that the viewport keeps the same insets to previously visible views. TODO: MVCP
+    // does not work in RTL.
+    if (mReactScrollViewScrollState.getLayoutDirection() == LAYOUT_DIRECTION_RTL) {
+      adjustPositionForContentChangeRTL(left, right, oldLeft, oldRight);
+    } else if (mMaintainVisibleContentPositionHelper != null) {
+      mMaintainVisibleContentPositionHelper.updateScrollPosition();
+    }
   }
 
-  private void updateStateOnScroll() {
-    updateStateOnScroll(getScrollX(), getScrollY());
+  private void adjustPositionForContentChangeRTL(int left, int right, int oldLeft, int oldRight) {
+    // If we have any pending custon flings (e.g. from aninmated `scrollTo`, or flinging to a snap
+    // point), finish them, commiting the final `scrollX`.
+    // TODO: Can we be more graceful (like OverScroller flings)?
+    if (getFlingAnimator().isRunning()) {
+      getFlingAnimator().end();
+    }
+
+    int distanceToRightEdge = oldRight - getScrollX();
+    int newWidth = right - left;
+    int scrollX = newWidth - distanceToRightEdge;
+    scrollTo(scrollX, getScrollY());
+
+    // If we are in the middle of a fling animation from the user removing their finger
+    // (OverScroller is in `FLING_MODE`), we must cancel and recreate the existing fling animation
+    // since it was calculated against outdated scroll offsets.
+    if (mScroller != null && !mScroller.isFinished()) {
+      // Calculate the veliocity and position of the fling animation at the time of this layout
+      // event, which may be later than the last ScrollView tick. These values are not commited to
+      // the underlying ScrollView, which will recalculate positions on its next tick.
+      int scrollerXBeforeTick = mScroller.getCurrX();
+      boolean hasMoreTicks = mScroller.computeScrollOffset();
+
+      // Stop the existing animation at the current state of the scroller. We will then recreate
+      // it starting at the adjusted x offset.
+      mScroller.forceFinished(true);
+
+      if (hasMoreTicks) {
+        // OverScroller.getCurrVelocity() returns an absolute value of the velocity a current fling
+        // animation (only FLING_MODE animations). We derive direction along the X axis from the
+        // start and end of the, animation assuming HorizontalScrollView never fires vertical fling
+        // animations.
+        // TODO: This does not fully handle overscroll.
+        float direction = Math.signum(mScroller.getFinalX() - mScroller.getStartX());
+        float flingVelocityX = mScroller.getCurrVelocity() * direction;
+
+        mScroller.fling(
+            scrollX, getScrollY(), (int) flingVelocityX, 0, 0, newWidth - getWidth(), 0, 0);
+      } else {
+        scrollTo(scrollX + (mScroller.getCurrX() - scrollerXBeforeTick), getScrollY());
+      }
+    }
+  }
+
+  @Nullable
+  public StateWrapper getStateWrapper() {
+    return mStateWrapper;
+  }
+
+  public void setStateWrapper(StateWrapper stateWrapper) {
+    mStateWrapper = stateWrapper;
   }
 
   @Override
-  public FabricViewStateManager getFabricViewStateManager() {
-    return mFabricViewStateManager;
+  public ReactScrollViewScrollState getReactScrollViewScrollState() {
+    return mReactScrollViewScrollState;
+  }
+
+  @Override
+  public void startFlingAnimator(int start, int end) {
+    // Always cancel existing animator before starting the new one. `smoothScrollTo` contains some
+    // logic that, if called multiple times in a short amount of time, will treat all calls as part
+    // of the same animation and will not lengthen the duration of the animation. This means that,
+    // for example, if the user is scrolling rapidly, multiple pages could be considered part of one
+    // animation, causing some page animations to be animated very rapidly - looking like they're
+    // not animated at all.
+    DEFAULT_FLING_ANIMATOR.cancel();
+
+    // Update the fling animator with new values
+    DEFAULT_FLING_ANIMATOR
+        .setDuration(ReactScrollViewHelper.getDefaultScrollAnimationDuration(getContext()))
+        .setIntValues(start, end);
+
+    // Start the animator
+    DEFAULT_FLING_ANIMATOR.start();
+  }
+
+  @Override
+  public ValueAnimator getFlingAnimator() {
+    return DEFAULT_FLING_ANIMATOR;
+  }
+
+  @Override
+  public int getFlingExtrapolatedDistance(int velocityX) {
+    // The DEFAULT_FLING_ANIMATOR uses AccelerateDecelerateInterpolator, which is not depending on
+    // the init velocity. We use the overscroller to decide the fling distance.
+    return ReactScrollViewHelper.predictFinalScrollPosition(
+            this, velocityX, 0, Math.max(0, computeHorizontalScrollRange() - getWidth()), 0)
+        .x;
+  }
+
+  public void setPointerEvents(PointerEvents pointerEvents) {
+    mPointerEvents = pointerEvents;
+  }
+
+  public PointerEvents getPointerEvents() {
+    return mPointerEvents;
+  }
+
+  @Override
+  public void setScrollEventThrottle(int scrollEventThrottle) {
+    mScrollEventThrottle = scrollEventThrottle;
+  }
+
+  @Override
+  public int getScrollEventThrottle() {
+    return mScrollEventThrottle;
+  }
+
+  @Override
+  public void setLastScrollDispatchTime(long lastScrollDispatchTime) {
+    mLastScrollDispatchTime = lastScrollDispatchTime;
+  }
+
+  @Override
+  public long getLastScrollDispatchTime() {
+    return mLastScrollDispatchTime;
   }
 }

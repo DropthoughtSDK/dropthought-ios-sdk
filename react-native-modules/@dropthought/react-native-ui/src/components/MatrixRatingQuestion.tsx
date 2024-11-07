@@ -144,7 +144,7 @@ const MatrixRow = ({
   };
 
   const optionsList = !isCollapse
-    ? optionsForMatrix[0].map((value, index) => (
+    ? optionsForMatrix[0]?.map((value, index) => (
         <MatrixColoum
           title={value}
           rowIndex={rowIndex}
@@ -157,15 +157,16 @@ const MatrixRow = ({
       ))
     : null;
 
+  const answer = selectedAnswer[rowIndex];
   const optionSelectedText =
-    selectedAnswer[rowIndex] !== -1 ? (
+    answer !== undefined && answer !== -1 ? (
       <View style={styles.titleButtonSelected}>
         <View style={optionSelectedIndexStyle}>
-          <Text style={indexTextStyle}>{selectedAnswer[rowIndex] + 1}</Text>
+          <Text style={indexTextStyle}>{answer + 1}</Text>
         </View>
         <View style={GlobalStyle.flexShrink1}>
           <Text numberOfLines={2} style={textStyle}>
-            {optionsForMatrix[0][selectedAnswer[rowIndex]]}
+            {optionsForMatrix[0] && optionsForMatrix[0][answer]}
           </Text>
         </View>
       </View>

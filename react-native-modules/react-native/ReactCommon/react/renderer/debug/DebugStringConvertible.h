@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,28 +9,14 @@
 
 #include <climits>
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_set>
 #include <vector>
 
-namespace facebook {
-namespace react {
+#include "flags.h"
 
-#ifndef NDEBUG
-#define RN_DEBUG_STRING_CONVERTIBLE 1
-#endif
-
-// To Debug Yoga layout, uncomment the following line.
-// #define RN_DEBUG_YOGA_LOGGER 1
-//
-// Additional logging can be enabled editing yoga.cpp (e.g. gPrintChanges,
-// gPrintSkips)
-
-// To Debug introspection of RN Shadow tree, uncomment the following line:
-// #define RN_SHADOW_TREE_INTROSPECTION 1
-
-// To enable asserts (crashing) when checking stub trees
-// #define RN_VALIDATE_SHADOW_TREE_STUB 1
+namespace facebook::react {
 
 #if RN_DEBUG_STRING_CONVERTIBLE
 
@@ -95,6 +81,7 @@ class DebugStringConvertible {
 
 #else
 
+struct DebugStringConvertibleOptions {};
 class DebugStringConvertible {};
 
 #endif
@@ -105,12 +92,20 @@ class DebugStringConvertible {};
  * Set of particular-format-opinionated functions that convert base types to
  * `std::string`; practically incapsulate `folly:to<>` and `folly::format`.
  */
-std::string toString(std::string const &value);
-std::string toString(int const &value);
-std::string toString(bool const &value);
-std::string toString(float const &value);
-std::string toString(double const &value);
-std::string toString(void const *value);
+std::string toString(const std::string& value);
+std::string toString(const int& value);
+std::string toString(const bool& value);
+std::string toString(const float& value);
+std::string toString(const double& value);
+std::string toString(const void* value);
+
+template <typename T>
+std::string toString(const std::optional<T>& value) {
+  if (!value) {
+    return "null";
+  }
+  return toString(value.value());
+}
 
 /*
  * *Informal* `DebugStringConvertible` interface.
@@ -145,32 +140,32 @@ std::string toString(void const *value);
  * types.
  */
 template <typename T>
-std::string getDebugName(T const &object) {
+std::string getDebugName(T const& object) {
   return "Node";
 }
 
 template <typename T>
-std::string getDebugValue(T const &object) {
+std::string getDebugValue(T const& object) {
   return "";
 }
 
 template <typename T>
 std::vector<T> getDebugChildren(
-    T const &object,
+    T const& object,
     DebugStringConvertibleOptions options) {
   return {};
 }
 
 template <typename T>
 std::vector<T> getDebugProps(
-    T const &object,
+    T const& object,
     DebugStringConvertibleOptions options) {
   return {};
 }
 
 template <typename T>
 std::string getDebugPropsDescription(
-    T const &object,
+    T const& object,
     DebugStringConvertibleOptions options) {
   if (options.depth >= options.maximumDepth) {
     return "";
@@ -200,22 +195,22 @@ std::string getDebugPropsDescription(
 
 template <typename T>
 std::string getDebugChildrenDescription(
-    T const &object,
+    T const& object,
     DebugStringConvertibleOptions options) {
   if (options.depth >= options.maximumDepth) {
     return "";
   }
 
-  auto trailing = options.format ? std::string{"\n"} : std::string{""};
+  auto separator = options.format ? std::string{"\n"} : std::string{""};
   auto childrenString = std::string{""};
   options.depth++;
 
   for (auto child : getDebugChildren(object, options)) {
-    childrenString += getDebugDescription(child, options) + trailing;
+    childrenString += getDebugDescription(child, options) + separator;
   }
 
-  if (!childrenString.empty() && !trailing.empty()) {
-    // Removing trailing fragment.
+  if (!childrenString.empty() && !separator.empty()) {
+    // Removing separator fragment.
     childrenString.erase(childrenString.end() - 1);
   }
 
@@ -224,7 +219,7 @@ std::string getDebugChildrenDescription(
 
 template <typename T>
 std::string getDebugDescription(
-    T const &object,
+    T const& object,
     DebugStringConvertibleOptions options) {
   auto nameString = getDebugName(object);
   auto valueString = getDebugValue(object);
@@ -244,16 +239,16 @@ std::string getDebugDescription(
   auto childrenString = getDebugChildrenDescription(object, options);
   auto propsString = getDebugPropsDescription(object, options);
 
-  auto leading =
+  auto prefix =
       options.format ? std::string(options.depth * 2, ' ') : std::string{""};
-  auto trailing = options.format ? std::string{"\n"} : std::string{""};
+  auto separator = options.format ? std::string{"\n"} : std::string{""};
 
-  return leading + "<" + nameString +
+  return prefix + "<" + nameString +
       (valueString.empty() ? "" : "=" + valueString) +
       (propsString.empty() ? "" : " " + propsString) +
       (childrenString.empty() ? "/>"
-                              : ">" + trailing + childrenString + trailing +
-               leading + "</" + nameString + ">");
+                              : ">" + separator + childrenString + separator +
+               prefix + "</" + nameString + ">");
 }
 
 /*
@@ -289,43 +284,43 @@ inline std::string getDebugDescription(
 
 // `void *`
 inline std::string getDebugDescription(
-    void *pointer,
+    void* pointer,
     DebugStringConvertibleOptions options) {
   return toString(pointer);
 }
 
 // `std::string`
 inline std::string getDebugDescription(
-    std::string const &string,
+    const std::string& string,
     DebugStringConvertibleOptions options) {
   return string;
 }
 
 // `std::vector<T>`
 template <typename T, typename... Ts>
-std::string getDebugName(std::vector<T, Ts...> const &vector) {
+std::string getDebugName(const std::vector<T, Ts...>& vector) {
   return "List";
 }
 
 template <typename T, typename... Ts>
 std::vector<T, Ts...> getDebugChildren(
-    std::vector<T, Ts...> const &vector,
+    const std::vector<T, Ts...>& vector,
     DebugStringConvertibleOptions options) {
   return vector;
 }
 
 // `std::array<T, Size>`
 template <typename T, size_t Size>
-std::string getDebugName(std::array<T, Size> const &array) {
+std::string getDebugName(const std::array<T, Size>& array) {
   return "List";
 }
 
 template <typename T, size_t Size>
 std::vector<T> getDebugChildren(
-    std::array<T, Size> const &array,
+    const std::array<T, Size>& array,
     DebugStringConvertibleOptions options) {
   auto vector = std::vector<T>{};
-  for (auto const &value : array) {
+  for (const auto& value : array) {
     vector.push_back(value);
   }
   return vector;
@@ -333,13 +328,13 @@ std::vector<T> getDebugChildren(
 
 // `std::unordered_set<T>`
 template <typename T, typename... Ts>
-std::string getDebugName(std::unordered_set<T, Ts...> const &set) {
+std::string getDebugName(const std::unordered_set<T, Ts...>& set) {
   return "Set";
 }
 
 template <typename T, typename... Ts>
 std::vector<T> getDebugChildren(
-    std::unordered_set<T, Ts...> const &set,
+    const std::unordered_set<T, Ts...>& set,
     DebugStringConvertibleOptions options) {
   auto vector = std::vector<T>{};
   vector.insert(vector.end(), set.begin(), set.end());
@@ -349,25 +344,25 @@ std::vector<T> getDebugChildren(
 // `std::shared_ptr<T>`
 template <typename T>
 inline std::string getDebugDescription(
-    std::shared_ptr<T> const &pointer,
+    const std::shared_ptr<T>& pointer,
     DebugStringConvertibleOptions options) {
-  return getDebugDescription((void *)pointer.get(), options) + "(shared)";
+  return getDebugDescription((void*)pointer.get(), options) + "(shared)";
 }
 
 // `std::weak_ptr<T>`
 template <typename T>
 inline std::string getDebugDescription(
-    std::weak_ptr<T> const &pointer,
+    const std::weak_ptr<T>& pointer,
     DebugStringConvertibleOptions options) {
-  return getDebugDescription((void *)pointer.lock().get(), options) + "(weak)";
+  return getDebugDescription((void*)pointer.lock().get(), options) + "(weak)";
 }
 
 // `std::unique_ptr<T>`
 template <typename T>
 inline std::string getDebugDescription(
-    std::unique_ptr<T const> const &pointer,
+    const std::unique_ptr<T const>& pointer,
     DebugStringConvertibleOptions options) {
-  return getDebugDescription((void *)pointer.get(), options) + "(unique)";
+  return getDebugDescription((void*)pointer.get(), options) + "(unique)";
 }
 
 /*
@@ -379,15 +374,14 @@ struct DebugStringConvertibleObject {
   std::string value;
 };
 
-inline std::string getDebugName(DebugStringConvertibleObject const &object) {
+inline std::string getDebugName(const DebugStringConvertibleObject& object) {
   return object.name;
 }
 
-inline std::string getDebugValue(DebugStringConvertibleObject const &object) {
+inline std::string getDebugValue(const DebugStringConvertibleObject& object) {
   return object.value;
 }
 
 #endif
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

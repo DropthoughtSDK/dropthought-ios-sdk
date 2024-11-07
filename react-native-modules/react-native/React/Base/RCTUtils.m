@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -167,8 +167,12 @@ id RCTJSONClean(id object)
   static dispatch_once_t onceToken;
   static NSSet<Class> *validLeafTypes;
   dispatch_once(&onceToken, ^{
-    validLeafTypes =
-        [[NSSet alloc] initWithArray:@ [[NSString class], [NSMutableString class], [NSNumber class], [NSNull class], ]];
+    validLeafTypes = [[NSSet alloc] initWithArray:@[
+      [NSString class],
+      [NSMutableString class],
+      [NSNumber class],
+      [NSNull class],
+    ]];
   });
 
   if ([validLeafTypes containsObject:[object classForCoder]]) {
@@ -242,7 +246,7 @@ NSString *RCTMD5Hash(NSString *string)
                                     result[15]];
 }
 
-BOOL RCTIsMainQueue()
+BOOL RCTIsMainQueue(void)
 {
   static void *mainQueueKey = &mainQueueKey;
   static dispatch_once_t onceToken;
@@ -292,19 +296,26 @@ static void RCTUnsafeExecuteOnMainQueueOnceSync(dispatch_once_t *onceToken, disp
   }
 }
 
-CGFloat RCTScreenScale()
+static dispatch_once_t onceTokenScreenScale;
+static CGFloat screenScale;
+
+void RCTComputeScreenScale(void)
 {
-  static dispatch_once_t onceToken;
-  static CGFloat scale;
-
-  RCTUnsafeExecuteOnMainQueueOnceSync(&onceToken, ^{
-    scale = [UIScreen mainScreen].scale;
+  dispatch_once(&onceTokenScreenScale, ^{
+    screenScale = [UIScreen mainScreen].scale;
   });
-
-  return scale;
 }
 
-CGFloat RCTFontSizeMultiplier()
+CGFloat RCTScreenScale(void)
+{
+  RCTUnsafeExecuteOnMainQueueOnceSync(&onceTokenScreenScale, ^{
+    screenScale = [UIScreen mainScreen].scale;
+  });
+
+  return screenScale;
+}
+
+CGFloat RCTFontSizeMultiplier(void)
 {
   static NSDictionary<NSString *, NSNumber *> *mapping;
   static dispatch_once_t onceToken;
@@ -328,9 +339,9 @@ CGFloat RCTFontSizeMultiplier()
   return mapping[RCTSharedApplication().preferredContentSizeCategory].floatValue;
 }
 
-CGSize RCTScreenSize()
+CGSize RCTScreenSize(void)
 {
-  // FIXME: this caches the bounds at app start, whatever those were, and then
+  // FIXME: this caches whatever the bounds were when it was first called, and then
   // doesn't update when the device is rotated. We need to find another thread-
   // safe way to get the screen size.
 
@@ -345,7 +356,7 @@ CGSize RCTScreenSize()
   return size;
 }
 
-CGSize RCTViewportSize()
+CGSize RCTViewportSize(void)
 {
   UIWindow *window = RCTKeyWindow();
   return window ? window.bounds.size : RCTScreenSize();
@@ -1036,10 +1047,10 @@ RCT_EXTERN BOOL RCTUIManagerTypeForTagIsFabric(NSNumber *reactTag)
 RCT_EXTERN BOOL RCTValidateTypeOfViewCommandArgument(
     NSObject *obj,
     id expectedClass,
-    NSString const *expectedType,
-    NSString const *componentName,
-    NSString const *commandName,
-    NSString const *argPos)
+    const NSString *expectedType,
+    const NSString *componentName,
+    const NSString *commandName,
+    const NSString *argPos)
 {
   if (![obj isKindOfClass:expectedClass]) {
     NSString *kindOfClass = RCTHumanReadableType(obj);
@@ -1055,4 +1066,9 @@ RCT_EXTERN BOOL RCTValidateTypeOfViewCommandArgument(
   }
 
   return true;
+}
+
+BOOL RCTIsAppActive(void)
+{
+  return [RCTSharedApplication() applicationState] == UIApplicationStateActive;
 }

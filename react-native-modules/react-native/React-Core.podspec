@@ -1,4 +1,4 @@
-# Copyright (c) Facebook, Inc. and its affiliates.
+# Copyright (c) Meta Platforms, Inc. and affiliates.
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
@@ -11,14 +11,17 @@ version = package['version']
 source = { :git => 'https://github.com/facebook/react-native.git' }
 if version == '1000.0.0'
   # This is an unpublished version, use the latest commit hash of the react-native repo, which we’re presumably in.
-  source[:commit] = `git rev-parse HEAD`.strip
+  source[:commit] = `git rev-parse HEAD`.strip if system("git rev-parse --git-dir > /dev/null 2>&1")
 else
   source[:tag] = "v#{version}"
 end
 
-folly_compiler_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32'
-folly_version = '2020.01.13.00'
+folly_compiler_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -DFOLLY_CFG_NO_COROUTINES=1 -Wno-comma -Wno-shorten-64-to-32'
+folly_version = '2022.05.16.00'
+socket_rocket_version = '0.6.1'
 boost_compiler_flags = '-Wno-documentation'
+
+use_hermes = ENV['USE_HERMES'] == nil || ENV['USE_HERMES'] == '1'
 
 header_subspecs = {
   'CoreModulesHeaders'          => 'React/CoreModules/**/*.h',
@@ -34,44 +37,62 @@ header_subspecs = {
   'RCTVibrationHeaders'         => 'Libraries/Vibration/*.h',
 }
 
+frameworks_search_paths = []
+frameworks_search_paths << "\"$(PODS_CONFIGURATION_BUILD_DIR)/React-hermes\"" if use_hermes
+
+header_search_paths = [
+  "$(PODS_TARGET_SRCROOT)/ReactCommon",
+  "$(PODS_ROOT)/boost",
+  "$(PODS_ROOT)/DoubleConversion",
+  "$(PODS_ROOT)/fmt/include",
+  "$(PODS_ROOT)/RCT-Folly",
+  "${PODS_ROOT}/Headers/Public/FlipperKit",
+  "$(PODS_ROOT)/Headers/Public/ReactCommon",
+].concat(use_hermes ? [
+  "$(PODS_ROOT)/Headers/Public/React-hermes",
+  "$(PODS_ROOT)/Headers/Public/hermes-engine"
+] : [])
+
 Pod::Spec.new do |s|
   s.name                   = "React-Core"
   s.version                = version
   s.summary                = "The core of React Native."
   s.homepage               = "https://reactnative.dev/"
   s.license                = package["license"]
-  s.author                 = "Facebook, Inc. and its affiliates"
-  s.platforms              = { :ios => "10.0" }
+  s.author                 = "Meta Platforms, Inc. and its affiliates"
+  s.platforms              = min_supported_versions
   s.source                 = source
-  s.resource_bundle        = { "AccessibilityResources" => ["React/AccessibilityResources/*.lproj"]}
+  s.resource_bundle        = { "RCTI18nStrings" => ["React/I18n/strings/*.lproj"]}
   s.compiler_flags         = folly_compiler_flags + ' ' + boost_compiler_flags
   s.header_dir             = "React"
   s.framework              = "JavaScriptCore"
-  s.library                = "stdc++"
-  s.pod_target_xcconfig    = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/ReactCommon\" \"$(PODS_ROOT)/boost-for-react-native\" \"$(PODS_ROOT)/DoubleConversion\" \"$(PODS_ROOT)/RCT-Folly\"", "DEFINES_MODULE" => "YES" }
+  s.pod_target_xcconfig    = {
+                               "HEADER_SEARCH_PATHS" => header_search_paths,
+                               "DEFINES_MODULE" => "YES",
+                               "GCC_PREPROCESSOR_DEFINITIONS" => "RCT_METRO_PORT=${RCT_METRO_PORT}",
+                               "CLANG_CXX_LANGUAGE_STANDARD" => "c++20",
+                               "FRAMEWORK_SEARCH_PATHS" => frameworks_search_paths.join(" ")
+                             }
   s.user_target_xcconfig   = { "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/Headers/Private/React-Core\""}
   s.default_subspec        = "Default"
 
   s.subspec "Default" do |ss|
     ss.source_files           = "React/**/*.{c,h,m,mm,S,cpp}"
-    ss.exclude_files          = "React/CoreModules/**/*",
-                                "React/DevSupport/**/*",
-                                "React/Fabric/**/*",
-                                "React/FBReactNativeSpec/**/*",
-                                "React/Tests/**/*",
-                                "React/Inspector/**/*"
+    exclude_files = [
+      "React/CoreModules/**/*",
+      "React/DevSupport/**/*",
+      "React/Fabric/**/*",
+      "React/FBReactNativeSpec/**/*",
+      "React/Tests/**/*",
+      "React/Inspector/**/*",
+    ]
+    # If we are using Hermes (the default is use hermes, so USE_HERMES can be nil), we don't have jsc installed
+    # So we have to exclude the JSCExecutorFactory
+    if use_hermes
+      exclude_files = exclude_files.append("React/CxxBridge/JSCExecutorFactory.{h,mm}")
+    end
+    ss.exclude_files = exclude_files
     ss.private_header_files   = "React/Cxx*/*.h"
-  end
-
-  s.subspec "Hermes" do |ss|
-    ss.platforms = { :osx => "10.14", :ios => "10.0" }
-    ss.source_files = "ReactCommon/hermes/executor/*.{cpp,h}",
-                      "ReactCommon/hermes/inspector/*.{cpp,h}",
-                      "ReactCommon/hermes/inspector/chrome/*.{cpp,h}",
-                      "ReactCommon/hermes/inspector/detail/*.{cpp,h}"
-    ss.pod_target_xcconfig = { "GCC_PREPROCESSOR_DEFINITIONS" => "HERMES_ENABLE_DEBUGGER=1" }
-    ss.dependency "RCT-Folly/Futures"
-    ss.dependency "hermes-engine"
   end
 
   s.subspec "DevSupport" do |ss|
@@ -98,10 +119,20 @@ Pod::Spec.new do |s|
   end
 
   s.dependency "RCT-Folly", folly_version
-  s.dependency "React-cxxreact", version
-  s.dependency "React-perflogger", version
-  s.dependency "React-jsi", version
-  s.dependency "React-jsiexecutor", version
+  s.dependency "React-cxxreact"
+  s.dependency "React-perflogger"
+  s.dependency "React-jsi"
+  s.dependency "React-jsiexecutor"
+  s.dependency "React-utils"
+  s.dependency "SocketRocket", socket_rocket_version
+  s.dependency "React-runtimescheduler"
   s.dependency "Yoga"
   s.dependency "glog"
+
+  if use_hermes
+    s.dependency 'React-hermes'
+    s.dependency 'hermes-engine'
+  else
+    s.dependency 'React-jsc'
+  end
 end

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,12 +12,11 @@
 #include <react/renderer/core/LayoutContext.h>
 #include "ImageState.h"
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 const char ImageComponentName[] = "Image";
 
-void ImageShadowNode::setImageManager(const SharedImageManager &imageManager) {
+void ImageShadowNode::setImageManager(const SharedImageManager& imageManager) {
   ensureUnsealed();
   imageManager_ = imageManager;
 }
@@ -25,8 +24,8 @@ void ImageShadowNode::setImageManager(const SharedImageManager &imageManager) {
 void ImageShadowNode::updateStateIfNeeded() {
   ensureUnsealed();
 
-  auto const &imageSource = getImageSource();
-  auto const &currentState = getStateData();
+  auto imageSource = getImageSource();
+  const auto& currentState = getStateData();
   bool hasSameRadius =
       getConcreteProps().blurRadius == currentState.getBlurRadius();
   bool hasSameImageSource = currentState.getImageSource() == imageSource;
@@ -35,10 +34,10 @@ void ImageShadowNode::updateStateIfNeeded() {
     return;
   }
 
-  auto state =
-      ImageState{imageSource,
-                 imageManager_->requestImage(imageSource, getSurfaceId()),
-                 getConcreteProps().blurRadius};
+  auto state = ImageState{
+      imageSource,
+      imageManager_->requestImage(imageSource, getSurfaceId()),
+      getConcreteProps().blurRadius};
   setStateData(std::move(state));
 }
 
@@ -67,7 +66,7 @@ ImageSource ImageShadowNode::getImageSource() const {
 
   auto bestSource = ImageSource{};
 
-  for (const auto &source : sources) {
+  for (const auto& source : sources) {
     auto sourceSize = source.size;
     auto sourceScale = source.scale == 0 ? scale : source.scale;
     auto sourceArea =
@@ -94,5 +93,4 @@ void ImageShadowNode::layout(LayoutContext layoutContext) {
   ConcreteViewShadowNode::layout(layoutContext);
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

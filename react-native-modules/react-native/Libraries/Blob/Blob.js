@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -57,7 +57,10 @@ class Blob {
    * Currently we only support creating Blobs from other Blobs.
    * Reference: https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob
    */
-  constructor(parts: Array<Blob | string> = [], options?: BlobOptions) {
+  constructor(
+    parts: Array<$ArrayBufferView | ArrayBuffer | Blob | string> = [],
+    options?: BlobOptions,
+  ) {
     const BlobManager = require('./BlobManager');
     this.data = BlobManager.createFromParts(parts, options).data;
   }
@@ -81,7 +84,7 @@ class Blob {
     return this._data;
   }
 
-  slice(start?: number, end?: number): Blob {
+  slice(start?: number, end?: number, contentType: string = ''): Blob {
     const BlobManager = require('./BlobManager');
     let {offset, size} = this.data;
 
@@ -98,6 +101,10 @@ class Blob {
           // $FlowFixMe[reassign-const]
           end = this.size + end;
         }
+        if (end > this.size) {
+          // $FlowFixMe[reassign-const]
+          end = this.size;
+        }
         size = end - start;
       }
     }
@@ -105,6 +112,13 @@ class Blob {
       blobId: this.data.blobId,
       offset,
       size,
+      type: contentType,
+      /* Since `blob.slice()` creates a new view onto the same binary
+       * data as the original blob, we should re-use the same collector
+       * object so that the underlying resource gets deallocated when
+       * the last view into the data is released, not the first.
+       */
+      __collector: this.data.__collector,
     });
   }
 

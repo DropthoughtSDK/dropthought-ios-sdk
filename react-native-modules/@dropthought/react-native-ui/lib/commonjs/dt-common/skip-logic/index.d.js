@@ -12,11 +12,8 @@ Object.defineProperty(exports, "IQAData", {
     return _IfcRule.IQAData;
   }
 });
-
 var _IfcRule = require("./IfcRule");
-
 var _SkipLogic = require("./SkipLogic");
-
 Object.keys(_SkipLogic).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;

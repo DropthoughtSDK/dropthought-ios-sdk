@@ -4,13 +4,15 @@ import {
   Easing,
   I18nManager,
   Image,
+  PanResponder,
+  View,
+  StyleSheet,
+} from 'react-native';
+import type {
   ImageSourcePropType,
   LayoutChangeEvent,
-  PanResponder,
   PanResponderInstance,
-  View,
   ViewStyle,
-  StyleSheet,
 } from 'react-native';
 // styles
 import { defaultStyles as styles } from './styles';
@@ -132,6 +134,7 @@ const updateValues = ({
         return valueToSet;
       }
 
+      // @ts-ignore
       return new Animated.Value(valueToSet);
     });
   }
@@ -142,6 +145,7 @@ const updateValues = ({
 const indexOfLowest = (values: Array<number>): number => {
   let lowestIndex = 0;
   values.forEach((value, index, array) => {
+    // @ts-ignore
     if (value < array[lowestIndex]) {
       lowestIndex = index;
     }
@@ -246,7 +250,9 @@ export class Slider extends PureComponent<SliderProps, SliderState> {
   }
 
   _getRawValues(
-    values: Array<Animated.Value> | Array<Animated.AnimatedInterpolation>
+    values:
+      | Array<Animated.Value>
+      | Array<Animated.AnimatedInterpolation<number>>
   ) {
     //@ts-ignore
     return values.map((value) => value.__getValue());
@@ -451,6 +457,7 @@ export class Slider extends PureComponent<SliderProps, SliderState> {
       useNativeDriver: false,
     };
     Animated[animationType](
+      // @ts-ignore
       this.state.values[thumbIndex],
       animationConfig
     ).start();
@@ -568,7 +575,7 @@ export class Slider extends PureComponent<SliderProps, SliderState> {
   _trackSize: Dimensions | null | undefined;
 
   _renderDebugThumbTouchRect = (
-    thumbLeft: Animated.AnimatedInterpolation,
+    thumbLeft: Animated.AnimatedInterpolation<number>,
     index: number
   ) => {
     const { height, y, width } = this._getThumbTouchRect() || {};
@@ -699,7 +706,8 @@ export class Slider extends PureComponent<SliderProps, SliderState> {
           : Animated.add(minThumbValue, thumbSize.width / 2),
       width:
         interpolatedTrackValues.length === 1
-          ? Animated.add(minTrackWidth, thumbSize.width / 2)
+          ? // @ts-ignore
+            Animated.add(minTrackWidth, thumbSize.width / 2)
           : Animated.add(Animated.multiply(minThumbValue, -1), maxThumbValue),
       backgroundColor: minimumTrackTintColor,
       ...valueVisibleStyle,
@@ -715,6 +723,7 @@ export class Slider extends PureComponent<SliderProps, SliderState> {
             {interpolatedThumbValues.map((interpolationValue, i) => {
               const animatedValue = values[i] || 0;
               let v = 0;
+              // @ts-ignore
               animatedValue.addListener(({ value }) => {
                 v = value;
               });
@@ -893,22 +902,19 @@ const SliderContainer = (props: SliderContainerProps) => {
     onCustomValueChange,
   } = props;
 
-  let renderTrackMarkComponent: React.ReactNode;
+  const renderTrackMarkComponent =
+    trackMarks?.length && (!Array.isArray(value) || value?.length === 1)
+      ? (index: number) => {
+          const currentMarkValue = trackMarks[index];
 
-  if (trackMarks?.length && (!Array.isArray(value) || value?.length === 1)) {
-    /**
-     * @param {number} index
-     */
-    renderTrackMarkComponent = (index: number) => {
-      const currentMarkValue = trackMarks[index];
-
-      const style =
-        currentMarkValue > Math.max(Array.isArray(value) ? value[0] : value)
-          ? trackMarkStyles?.activeMark
-          : trackMarkStyles?.inactiveMark;
-      return <View style={style} />;
-    };
-  }
+          const style =
+            currentMarkValue &&
+            currentMarkValue > Math.max(Array.isArray(value) ? value[0] : value)
+              ? trackMarkStyles?.activeMark
+              : trackMarkStyles?.inactiveMark;
+          return <View style={style} />;
+        }
+      : undefined;
 
   const renderChildren = () => {
     return React.Children.map(props.children, (child) => {

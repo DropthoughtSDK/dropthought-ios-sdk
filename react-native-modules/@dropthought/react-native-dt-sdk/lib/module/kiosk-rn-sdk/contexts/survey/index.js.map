@@ -1,1 +1,1 @@
-{"version":3,"names":[],"sources":["index.js"],"sourcesContent":["export * from './SurveyContext';\n"],"mappings":"AAAA,cAAc,iBAAiB"}
+{"version":3,"names":["SurveyContextProvider"],"sourceRoot":"../../../../../src","sources":["kiosk-rn-sdk/contexts/survey/index.js"],"mappings":"AAAA,SAASA,qBAAqB,QAAQ,iBAAiB"}

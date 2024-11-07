@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,17 +7,16 @@
 
 #pragma once
 
-#include <better/optional.h>
 #include <limits>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
 #include <react/renderer/debug/DebugStringConvertible.h>
 #include <react/renderer/debug/DebugStringConvertibleItem.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 #if RN_DEBUG_STRING_CONVERTIBLE
 
@@ -28,15 +27,16 @@ debugStringConvertibleItem(std::string name, T value, T defaultValue = {}) {
     return nullptr;
   }
 
-  return std::make_shared<DebugStringConvertibleItem>(name, toString(value));
+  return std::make_shared<DebugStringConvertibleItem>(
+      name, facebook::react::toString(value));
 }
 
 template <typename T>
 inline SharedDebugStringConvertible debugStringConvertibleItem(
     std::string name,
-    better::optional<T> value,
+    std::optional<T> value,
     T defaultValue = {}) {
-  if (!value.hasValue()) {
+  if (!value.has_value()) {
     return nullptr;
   }
 
@@ -45,8 +45,8 @@ inline SharedDebugStringConvertible debugStringConvertibleItem(
 }
 
 inline SharedDebugStringConvertibleList operator+(
-    const SharedDebugStringConvertibleList &lhs,
-    const SharedDebugStringConvertibleList &rhs) {
+    const SharedDebugStringConvertibleList& lhs,
+    const SharedDebugStringConvertibleList& rhs) {
   auto result = SharedDebugStringConvertibleList{};
   std::move(lhs.begin(), lhs.end(), std::back_inserter(result));
   std::move(rhs.begin(), rhs.end(), std::back_inserter(result));
@@ -63,5 +63,4 @@ inline SharedDebugStringConvertible debugStringConvertibleItem(
 
 #endif
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,17 +7,17 @@
 
 #import <React/RCTInspector.h>
 
-#if RCT_DEV
+#if RCT_DEV || RCT_REMOTE_PROFILE
 
-#include <jsinspector/InspectorInterfaces.h>
+#include <jsinspector-modern/InspectorInterfaces.h>
 
 #import <React/RCTDefines.h>
 #import <React/RCTInspectorPackagerConnection.h>
 #import <React/RCTLog.h>
-#import <React/RCTSRWebSocket.h>
 #import <React/RCTUtils.h>
 
 using namespace facebook::react;
+using namespace facebook::react::jsinspector_modern;
 
 // This is a port of the Android impl, at
 // react-native-github/ReactAndroid/src/main/java/com/facebook/react/bridge/Inspector.java
@@ -58,7 +58,7 @@ class RemoteConnection : public IRemoteConnection {
 
 static IInspector *getInstance()
 {
-  return &facebook::react::getInspectorInstance();
+  return &facebook::react::jsinspector_modern::getInspectorInstance();
 }
 
 @implementation RCTInspector

@@ -1,2 +1,2 @@
-export * from './CustomPropsContext';
+export { CustomPropsContextProvider } from './CustomPropsContext';
 //# sourceMappingURL=index.js.map

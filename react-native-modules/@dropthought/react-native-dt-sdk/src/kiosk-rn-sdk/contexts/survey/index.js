@@ -1,1 +1,1 @@
-export * from './SurveyContext';
+export { SurveyContextProvider } from './SurveyContext';

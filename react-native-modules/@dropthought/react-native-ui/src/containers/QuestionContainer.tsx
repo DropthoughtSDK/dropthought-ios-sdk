@@ -24,11 +24,18 @@ import MatrixRatingQuestion from '../components/MatrixRatingQuestion';
 import MatrixChoiceQuestion from '../components/MatrixChoiceQuestion';
 import MultipleOpenEndedQuestion from '../components/MultipleOpenEndedQuestion';
 import PictureChoiceQuestion from '../components/PictureChoiceQuestion';
+import PollingQuestion from '../components/PollingQuestion';
+import FileQuestion from '../components/FileQuestion';
+import StatementQuestion from '../components/StatementQuestion';
 import MandatoryTitle from '../components/MandatoryTitle';
 import GlobalStyle from '../styles';
+import type { onPostPollChoiceType } from '../containers/SurveyScreenLayout';
 
-import type { Question, Feedback, Survey, ImageFileProps } from '../data';
-import type { THEME_OPTION } from '../contexts/theme';
+import type { Question, Feedback, Survey } from '../data';
+import { THEME_OPTION } from '../contexts/theme';
+import type { IThemeOptionType } from '../contexts/theme';
+// @ts-ignore
+import type { onUploadType } from '../dt-common';
 
 const TempComponent = ({
   mandatoryErrorMessage,
@@ -51,7 +58,9 @@ const TempComponent = ({
 };
 
 type Props = {
+  key: string;
   anonymous: boolean;
+  mandatoryErrorMessage: string;
   question: Question;
   validationStarted: boolean;
   themeColor: string;
@@ -59,12 +68,15 @@ type Props = {
   onPrevPage: () => void;
   onNextPage: () => void;
   onFeedback?: (feedback: Feedback) => void;
-  onUpload?: (file: ImageFileProps) => void;
+  onUpload?: onUploadType;
   isUploading?: boolean;
+  onPostPollChoice?: onPostPollChoiceType;
+  isPostingPollChoice?: boolean;
   survey: Survey;
   pageIndex: number;
-  themeOption: THEME_OPTION;
+  themeOption: IThemeOptionType;
   preview: boolean;
+  isLastPage: boolean;
 };
 
 const QuestionContainer = (props: Props) => {
@@ -100,23 +112,23 @@ const QuestionContainer = (props: Props) => {
     case 'rating':
       if (props.question.subType === 'smiley') {
         switch (themeOption) {
-          case 'option1':
+          case THEME_OPTION.OPTION1:
             // @ts-ignore
             QuestionComponent = SmileyRatingQuestionOption1;
             break;
-          case 'option2':
+          case THEME_OPTION.OPTION2:
             // @ts-ignore
             QuestionComponent = SmileyRatingQuestionOption2;
             break;
-          case 'option3':
+          case THEME_OPTION.OPTION3:
             // @ts-ignore
             QuestionComponent = SmileyRatingQuestionOption3;
             break;
-          case 'option4':
+          case THEME_OPTION.OPTION4:
             // @ts-ignore
             QuestionComponent = SmileyRatingQuestionOption4;
             break;
-          case 'option6':
+          case THEME_OPTION.OPTION6:
             // @ts-ignore
             QuestionComponent = SmileyRatingQuestionOption6;
             break;
@@ -167,6 +179,18 @@ const QuestionContainer = (props: Props) => {
     case 'pictureChoice':
       // @ts-ignore
       QuestionComponent = PictureChoiceQuestion;
+      break;
+    case 'poll':
+      // @ts-ignore
+      QuestionComponent = PollingQuestion;
+      break;
+    case 'file':
+      // @ts-ignore
+      QuestionComponent = FileQuestion;
+      break;
+    case 'statement':
+      // @ts-ignore
+      QuestionComponent = StatementQuestion;
       break;
     default:
       QuestionComponent = TempComponent;

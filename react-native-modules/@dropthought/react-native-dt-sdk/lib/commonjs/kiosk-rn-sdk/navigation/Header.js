@@ -7,7 +7,7 @@ exports.default = void 0;
 var React = _interopRequireWildcard(require("react"));
 var _reactNative = require("react-native");
 var _reactNativeSafeAreaContext = require("react-native-safe-area-context");
-var _src = require("@dropthought/react-native-ui/src");
+var _reactNativeUi = require("@dropthought/react-native-ui");
 var _CloseButton = _interopRequireWildcard(require("../components/CloseButton"));
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
@@ -29,11 +29,11 @@ const Header = ({
 }) => {
   const {
     themeOption
-  } = (0, _src.useTheme)();
+  } = (0, _reactNativeUi.useTheme)();
   const insets = (0, _reactNativeSafeAreaContext.useSafeAreaInsets)();
-  const isRtl = _src.i18n.dir() === 'rtl';
-  const isPhone = (0, _src.useDimensionWidthType)() === _src.DimensionWidthType.phone;
-  const backgroundColor = themeOption === _src.THEME_OPTION.BIJLIRIDE ? _src.Colors.bijlirideHexCode : themeColor;
+  const isRtl = _reactNativeUi.i18n.dir() === 'rtl';
+  const isPhone = (0, _reactNativeUi.useDimensionWidthType)() === _reactNativeUi.DimensionWidthType.phone;
+  const backgroundColor = themeOption === _reactNativeUi.THEME_OPTION.BIJLIRIDE ? _reactNativeUi.Colors.bijlirideHexCode : themeColor;
   const classicHeader = /*#__PURE__*/React.createElement(_reactNative.View, {
     style: [styles.container, {
       backgroundColor,
@@ -49,7 +49,7 @@ const Header = ({
   }, /*#__PURE__*/React.createElement(_CloseButton.default, {
     onPress: onClose
   }))));
-  return themeOption === _src.THEME_OPTION.CLASSIC || themeOption === _src.THEME_OPTION.BIJLIRIDE ? classicHeader : null;
+  return themeOption === _reactNativeUi.THEME_OPTION.CLASSIC || themeOption === _reactNativeUi.THEME_OPTION.BIJLIRIDE ? classicHeader : null;
 };
 var _default = exports.default = Header;
 const styles = _reactNative.StyleSheet.create({

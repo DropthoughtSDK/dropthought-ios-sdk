@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,8 +9,7 @@
 
 #pragma once
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 class MountingCoordinator;
 
@@ -22,7 +21,7 @@ class MountingCoordinator;
 class MountingOverrideDelegate {
  public:
   virtual bool shouldOverridePullTransaction() const = 0;
-  virtual ~MountingOverrideDelegate(){};
+  virtual ~MountingOverrideDelegate() = default;
 
   /**
    * Delegates that override this method are responsible for:
@@ -36,12 +35,11 @@ class MountingOverrideDelegate {
    * @param mountingCoordinator
    * @return
    */
-  virtual better::optional<MountingTransaction> pullTransaction(
+  virtual std::optional<MountingTransaction> pullTransaction(
       SurfaceId surfaceId,
       MountingTransaction::Number number,
-      TransactionTelemetry const &telemetry,
+      const TransactionTelemetry& telemetry,
       ShadowViewMutationList mutations) const = 0;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

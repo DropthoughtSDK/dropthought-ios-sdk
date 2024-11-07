@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -11,23 +11,19 @@
 
 #include <react/renderer/core/StateData.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 class ShadowNodeFamily;
-using SharedShadowNodeFamily = std::shared_ptr<ShadowNodeFamily const>;
+using SharedShadowNodeFamily = std::shared_ptr<const ShadowNodeFamily>;
 
 class StateUpdate {
  public:
   using Callback =
-      std::function<StateData::Shared(StateData::Shared const &data)>;
+      std::function<StateData::Shared(const StateData::Shared& data)>;
   using FailureCallback = std::function<void()>;
 
   SharedShadowNodeFamily family;
   Callback callback;
-  FailureCallback failureCallback;
-  bool autorepeat;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

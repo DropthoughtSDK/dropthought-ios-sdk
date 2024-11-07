@@ -8,10 +8,10 @@ import * as React from 'react';
 import { View, ActivityIndicator, Image, Alert } from 'react-native';
 import { evolve, merge, isNil } from 'ramda';
 import { useAsync } from 'react-async';
-import { i18n, ActivityIndicatorMask, GlobalStyle, PlaceholderScreen, PlaceholderImageTypes, THEME_OPTION, ThemeProvider } from '@dropthought/react-native-ui/src';
+import { i18n, ActivityIndicatorMask, GlobalStyle, PlaceholderScreen, PlaceholderImageTypes, THEME_OPTION, ThemeProvider } from '@dropthought/react-native-ui';
 import ErrorHintScreen from '../../screens/ErrorHintScreen';
 import { saveCache, loadCache } from '../../../lib/Storage';
-import { apiGetProgramById, apiGetVisibilityById, sdkFetcher } from '../../../lib/API';
+import { apiGetProgramById, apiGetProgramTokenById, apiGetVisibilityById, sdkFetcher } from '../../../lib/API';
 import { isRequestTimeoutError, isNoInternetError } from '../../../lib/Fetcher';
 const DT_ERR_MISSING_PARAMS = 'dt-missing-parameters';
 const DT_ERR_NO_BIND_PROGRAM = 'dt-no-bind-program';
@@ -55,7 +55,9 @@ const getVisibility = async ({
     themeOption: visibility.themeOption,
     appearance: visibility.appearance,
     fontColor: visibility.fontColor,
-    backgroundColor: visibility.backgroundColor
+    backgroundColor: visibility.backgroundColor,
+    autoClose: visibility.autoClose,
+    autoCloseCountdown: visibility.autoCloseCountdown
   };
   return getProgram({
     surveyId: visibility.program.programId,
@@ -132,6 +134,10 @@ const getProgram = async ({
     }, {
       timeout: 10000
     });
+    const token = await apiGetProgramTokenById({
+      programId: surveyId
+    });
+    survey.token = token;
   }
   // pre-fetch image
   survey = await preFetchImage(survey);
@@ -213,7 +219,7 @@ const defaultOnCloseHandler = () => {
 };
 
 /**
- * @param {Props} param0
+ * @param {SDKEntryProps} param0
  */
 export const SurveyContextProvider = ({
   baseURL,
@@ -224,10 +230,12 @@ export const SurveyContextProvider = ({
   defaultLanguage = 'en',
   onClose = defaultOnCloseHandler,
   themeOption,
-  appearance = 'system',
+  appearance,
   fontColor,
   backgroundColor,
-  timezone
+  timezone,
+  autoClose,
+  autoCloseCountdown
 }) => {
   if (baseURL || apiKey) {
     sdkFetcher.init({
@@ -239,7 +247,9 @@ export const SurveyContextProvider = ({
     themeOption,
     appearance,
     fontColor,
-    backgroundColor
+    backgroundColor,
+    autoClose,
+    autoCloseCountdown
   };
   const [selectedLanguage, prevSelectedLanguage, setSelectedLanguageWithBackup, setSelectedLanguage] = useSelectedLanguageState(defaultLanguage);
 
@@ -269,20 +279,22 @@ export const SurveyContextProvider = ({
     survey,
     theme = themeDataFromSDKEntry
   } = data ?? {};
-  const transformedThemeOption = theme.themeOption;
   const hexCode = (survey === null || survey === void 0 ? void 0 : survey.surveyProperty.hexCode) ?? '';
   const transformedTheme = {
     ...theme,
-    themeOption: transformedThemeOption,
+    autoClose: theme.autoClose ?? autoClose,
+    autoCloseCountdown: theme.autoCloseCountdown ?? autoCloseCountdown,
+    appearance: appearance ?? theme.appearance,
+    // use input appearance first, then use appearance from visibility
     hexCode
   };
 
   /** @type {SurveyContextValue} */
   const contextValue = React.useMemo(() => ({
     onClose,
-    survey: transformedThemeOption === THEME_OPTION.CLASSIC || transformedThemeOption === THEME_OPTION.BIJLIRIDE ? survey : singleQuestionPerPageTransformer(survey),
+    survey: theme.themeOption === THEME_OPTION.CLASSIC || theme.themeOption === THEME_OPTION.BIJLIRIDE ? survey : singleQuestionPerPageTransformer(survey),
     changeLanguage: setSelectedLanguageWithBackup
-  }), [onClose, transformedThemeOption, survey, setSelectedLanguageWithBackup]);
+  }), [onClose, theme.themeOption, survey, setSelectedLanguageWithBackup]);
 
   // initial loading data view
   if (!data) {
@@ -319,15 +331,14 @@ export const SurveyContextProvider = ({
   }))));
 };
 
-/** @typedef {import('../../SDKEntry').SDKEntryProps} Props */
-
 /**
  * @typedef {object} SurveyContextValue
  * @property {Survey} survey
  * @property {(language: string) => void} changeLanguage
  * @property {() => void} onClose
  */
-/** @typedef {import('../../../data').Survey} Survey */
+/** @typedef {import('@dropthought/react-native-ui').Survey} Survey */
 /** @typedef {import('../../../data').Visibility} Visibility */
 /** @typedef {import('../../../data').ThemeData} ThemeData */
+/** @typedef {import('../../SDKEntry').SDKEntryProps} SDKEntryProps */
 //# sourceMappingURL=SurveyContext.js.map

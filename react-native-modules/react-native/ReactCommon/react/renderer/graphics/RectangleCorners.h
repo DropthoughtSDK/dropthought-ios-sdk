@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,11 +9,10 @@
 
 #include <tuple>
 
-#include <folly/Hash.h>
 #include <react/renderer/graphics/Float.h>
+#include <react/utils/hash_combine.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * Generic data structure describes some values associated with *corners*
@@ -26,7 +25,7 @@ struct RectangleCorners {
   T bottomLeft{};
   T bottomRight{};
 
-  bool operator==(RectangleCorners<T> const &rhs) const noexcept {
+  bool operator==(const RectangleCorners<T>& rhs) const noexcept {
     return std::tie(
                this->topLeft,
                this->topRight,
@@ -35,7 +34,7 @@ struct RectangleCorners {
         std::tie(rhs.topLeft, rhs.topRight, rhs.bottomLeft, rhs.bottomRight);
   }
 
-  bool operator!=(RectangleCorners<T> const &rhs) const noexcept {
+  bool operator!=(const RectangleCorners<T>& rhs) const noexcept {
     return !(*this == rhs);
   }
 
@@ -50,17 +49,15 @@ struct RectangleCorners {
  */
 using CornerInsets = RectangleCorners<Float>;
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react
 
 namespace std {
 
 template <typename T>
 struct hash<facebook::react::RectangleCorners<T>> {
-  size_t operator()(facebook::react::RectangleCorners<T> const &corners) const
-      noexcept {
-    return folly::hash::hash_combine(
-        0,
+  size_t operator()(
+      const facebook::react::RectangleCorners<T>& corners) const noexcept {
+    return facebook::react::hash_combine(
         corners.topLeft,
         corners.bottomLeft,
         corners.topRight,

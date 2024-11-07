@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useMemo } from 'react';
 import {
   ScrollView as RNScrollView,
   StyleSheet,
@@ -14,22 +14,27 @@ import DefaultSurveyProgressBar from './SurveyProgressBar';
 import ClassicSurveyFooter from './ClassicSurveyFooter';
 import SurveyFooter from './SurveyFooter';
 import DefaultSurveyPageIndicator from '../components/SurveyPageIndicator';
+// @ts-ignore
 import { KeyboardAvoidingScrollView } from '../components/KeyboardAvoidingView';
 import GlobalStyle from '../styles';
 import i18n from '../translation';
 import { THEME_OPTION, useTheme } from '../contexts/theme';
-import type {
-  Survey,
-  SurveyFeedback,
-  Page,
-  Feedback,
-  ImageFileProps,
-} from '../data';
+import type { Survey, SurveyFeedback, Page, Feedback } from '../data';
 import { questionFeedbackValidator } from '../utils/data';
+// @ts-ignore
 import { nextPage } from '../dt-common';
-import { useFeedbackState } from '../contexts/feedback';
+// @ts-ignore
+import type { onUploadType } from '../dt-common';
+import {
+  useFeedbackDispatch,
+  useFeedbackState,
+  removeSingleFeedback,
+} from '../contexts/feedback';
 import { useSurveyPageContext } from '../contexts/survey-page';
 import SurveyHeader from './SurveyHeader';
+import fileUploadValidator from '../validators/fileUploadValidator';
+import type { ThemeContextProps } from '../contexts/theme/ThemeContext';
+import { useDisplayLogic } from '../hooks/displaylogic';
 
 export const SurveyProgressBarPosition = {
   FixedBottom: 0,
@@ -46,22 +51,29 @@ type FeedbackReducerState = any;
  */
 const firstInvalidQuestionId = (
   page: Page,
-  feedbackState: FeedbackReducerState
+  feedbackState: FeedbackReducerState,
+  theme: ThemeContextProps,
+  dictionary: {
+    [questionId: string]: boolean;
+  }
 ): string | undefined => {
   let invalidQuestionId;
   for (const question of page.questions) {
     const feedback = feedbackState.feedbacksMap[question.questionId];
-    if (
-      (question.mandatory && feedback === undefined) ||
-      (question.optional && feedback === undefined)
-    ) {
-      invalidQuestionId = question.questionId;
-      break;
-    }
+    // this line is for handle mandatory question if the question is been displayed.
+    if (dictionary[question.questionId]) {
+      if (
+        (question.mandatory && feedback === undefined) ||
+        (question.optional && feedback === undefined)
+      ) {
+        invalidQuestionId = question.questionId;
+        break;
+      }
 
-    if (feedback && !questionFeedbackValidator(question, feedback)) {
-      invalidQuestionId = question.questionId;
-      break;
+      if (feedback && !questionFeedbackValidator(question, feedback, theme)) {
+        invalidQuestionId = question.questionId;
+        break;
+      }
     }
   }
   return invalidQuestionId;
@@ -76,6 +88,20 @@ const getFeedbacks = (feedbackState: FeedbackReducerState): Feedback[] => {
   );
 };
 
+export interface PollResult {
+  [key: string]: number;
+}
+
+type PollChoiceData = {
+  questionId: string;
+  choice?: string;
+  isOther: boolean;
+};
+
+export type onPostPollChoiceType = (
+  data: PollChoiceData
+) => Promise<PollResult | undefined>;
+
 interface Props {
   pageIndex: number; //current page index (start from 0)
   survey: Survey;
@@ -86,8 +112,10 @@ interface Props {
   onPageEnter?: () => void;
   onPageLeave?: () => void;
   onFeedback?: () => void;
-  onUpload?: (file: ImageFileProps) => Promise<string | undefined>;
+  onUpload?: onUploadType;
   isUploading?: boolean;
+  onPostPollChoice?: onPostPollChoiceType;
+  isPostingPollChoice?: boolean;
   SurveyProgressBar?: any;
   surveyProgressBarPosition?: number;
   SurveyPageIndicator?: any;
@@ -103,24 +131,25 @@ const SurveyScreenLayout = ({
   onSubmit,
   onUpload,
   isUploading,
+  onPostPollChoice,
+  isPostingPollChoice,
   SurveyPageIndicator = DefaultSurveyPageIndicator,
   SurveyProgressBar = DefaultSurveyProgressBar,
   surveyProgressBarPosition = SurveyProgressBarPosition.FixedBottom,
   preview,
 }: Props) => {
-  const { hexCode, themeOption, backgroundColor } = useTheme();
+  // need add filter survey for new EUX skiplogic and displaylogic here
+  const theme = useTheme();
+  const { hexCode, themeOption, backgroundColor, colorScheme } = theme;
+  const isClassicTheme =
+    themeOption === THEME_OPTION.CLASSIC ||
+    themeOption === THEME_OPTION.BIJLIRIDE;
+
   const scrollViewRef = React.useRef<RNScrollView>(null);
   const [scrollEnabled, setScrollEnabled] = React.useState(true);
 
-  const surveyProgressBar = (
-    <SurveyProgressBar
-      survey={survey}
-      pageIndex={pageIndex}
-      rtl={i18n.dir() === 'rtl'}
-    />
-  );
-
-  const singleQuestion = survey.pages[pageIndex].questions[0];
+  const currentPage = survey.pages[pageIndex];
+  const singleQuestion = currentPage?.questions[0];
 
   // when validation start, set the state
   const [validationStarted, setValidationStarted] = React.useState(false);
@@ -129,9 +158,10 @@ const SurveyScreenLayout = ({
   }, []);
 
   // when validation failed, scroll to the ref
-  const onValidationFailedHandler = React.useCallback((_, targetReg) => {
-    if (targetReg && scrollViewRef.current) {
-      targetReg.measureLayout(
+  const onValidationFailedHandler = React.useCallback((targetRef: View) => {
+    if (targetRef && scrollViewRef.current) {
+      targetRef.measureLayout(
+        // @ts-ignore
         findNodeHandle(scrollViewRef.current),
         (_x: number, y: number) => {
           if (scrollViewRef.current) {
@@ -147,44 +177,108 @@ const SurveyScreenLayout = ({
   }, []);
 
   const onPrevPageHandler = () => {
-    onPrevPage && onPrevPage();
+    const isValid = validatePrevPageFeedbacks();
+    if (isValid) {
+      onPrevPage && onPrevPage();
+    }
   };
 
   const feedbackState = useFeedbackState();
   const { mandatoryQuestionTitleRefs } = useSurveyPageContext();
-  const currentPage = survey.pages[pageIndex];
+
+  const feedbackDispatch = useFeedbackDispatch();
+  const removeSingleFeedbackHandler = (questionId: string) => {
+    removeSingleFeedback(feedbackDispatch, questionId);
+  };
+  const feedbacksMap = feedbackState?.feedbacksMap;
+  const feedbacks = React.useMemo(
+    () => (feedbacksMap ? Object.values(feedbacksMap) : []),
+    [feedbacksMap]
+  );
+  const { displayDictionary, getDisplayStatusForPage } = useDisplayLogic({
+    survey,
+    feedbacks,
+    removeSingleFeedbackHandler,
+  });
+
   const surveyId = survey.surveyId;
 
   // check if feedbacks are valid
   const validatePageFeedbacks = React.useCallback(() => {
-    onValidationStartHandler();
-    const invalidQuestionId = firstInvalidQuestionId(
-      currentPage,
-      feedbackState
-    );
-    // if there's an invalid question, call onValidationFailed
-    if (invalidQuestionId)
-      onValidationFailedHandler(
-        invalidQuestionId,
-        mandatoryQuestionTitleRefs[invalidQuestionId]
+    if (currentPage) {
+      onValidationStartHandler();
+      const invalidQuestionId = firstInvalidQuestionId(
+        currentPage,
+        feedbackState,
+        theme,
+        displayDictionary
       );
-    return !invalidQuestionId;
+      // if there's an invalid question, call onValidationFailed
+      if (invalidQuestionId)
+        onValidationFailedHandler(
+          mandatoryQuestionTitleRefs[invalidQuestionId]
+        );
+      return !invalidQuestionId;
+    } else {
+      return true;
+    }
   }, [
     onValidationStartHandler,
+    displayDictionary,
     currentPage,
     feedbackState,
     onValidationFailedHandler,
     mandatoryQuestionTitleRefs,
+    theme,
   ]);
+
+  const validatePrevPageFeedbacks = React.useCallback(() => {
+    if (currentPage) {
+      for (const question of currentPage.questions) {
+        const feedback = feedbackState.feedbacksMap[question.questionId];
+        const allFeedbackIsUploadedValidator =
+          question.type === 'file' && feedback && feedback.answers
+            ? fileUploadValidator(question, feedback, colorScheme)
+            : true;
+        if (!allFeedbackIsUploadedValidator)
+          return allFeedbackIsUploadedValidator;
+      }
+    }
+    return true;
+  }, [currentPage, feedbackState, colorScheme]);
+
+  const nextPageIndex = useMemo(() => {
+    // calculate by skip logic
+    let next: number = nextPage(
+      pageIndex,
+      getFeedbacks(feedbackState),
+      survey,
+      themeOption
+    );
+    // calculate by display logic
+    const getNextValidPageIndexByDisplayLogic = (): number => {
+      const page = survey.pages[next];
+      if (page && next >= 0) {
+        const displayStatus = getDisplayStatusForPage(page);
+        if (displayStatus.every((value) => value === false)) {
+          next += 1;
+
+          if (next < survey.pages.length) {
+            return getNextValidPageIndexByDisplayLogic();
+          } else {
+            return -1;
+          }
+        }
+      }
+      return next;
+    };
+    next = getNextValidPageIndexByDisplayLogic();
+    return next;
+  }, [getDisplayStatusForPage, feedbackState, survey, themeOption, pageIndex]);
 
   const onNextPageHandler = React.useCallback(() => {
     const isValid = validatePageFeedbacks();
     if (isValid) {
-      const nextPageIndex = nextPage(
-        pageIndex,
-        getFeedbacks(feedbackState),
-        survey
-      );
       if (nextPageIndex === -1) {
         onSubmit({
           surveyId,
@@ -196,30 +290,33 @@ const SurveyScreenLayout = ({
     }
   }, [
     validatePageFeedbacks,
-    pageIndex,
     feedbackState,
-    survey,
     onSubmit,
-    onNextPage,
     surveyId,
+    onNextPage,
+    nextPageIndex,
   ]);
 
-  const classicQuestions = survey.pages[pageIndex].questions.map((question) => {
-    return (
+  const classicQuestions = currentPage?.questions.map((question) => {
+    const allowToDisplay = displayDictionary[question.questionId];
+    return allowToDisplay ? (
       <ClassicQuestionContainer
         key={question.questionId}
         mandatoryErrorMessage={survey.mandatoryErrorMessage}
         anonymous={survey.anonymous}
         question={question}
+        survey={survey}
         validationStarted={validationStarted}
         themeColor={hexCode}
         onDragGrant={() => setScrollEnabled(false)}
         onDragEnd={() => setScrollEnabled(true)}
         onUpload={onUpload}
         isUploading={isUploading}
+        onPostPollChoice={onPostPollChoice}
+        isPostingPollChoice={isPostingPollChoice}
         preview={preview}
       />
-    );
+    ) : null;
   });
 
   const classicLayout = (
@@ -243,15 +340,21 @@ const SurveyScreenLayout = ({
           <ClassicSurveyFooter
             survey={survey}
             pageIndex={pageIndex}
+            isLast={
+              pageIndex === survey.pageOrder.length - 1 || nextPageIndex === -1
+            }
             onPrevPage={onPrevPageHandler}
             onNextPage={onNextPageHandler}
           />
-          {surveyProgressBarPosition === SurveyProgressBarPosition.BelowBody &&
-            surveyProgressBar}
+          {surveyProgressBarPosition ===
+            SurveyProgressBarPosition.BelowBody && (
+            <SurveyProgressBar displayDictionary={displayDictionary} />
+          )}
         </View>
       </ScrollView>
-      {surveyProgressBarPosition === SurveyProgressBarPosition.FixedBottom &&
-        surveyProgressBar}
+      {surveyProgressBarPosition === SurveyProgressBarPosition.FixedBottom && (
+        <SurveyProgressBar displayDictionary={displayDictionary} />
+      )}
     </>
   );
 
@@ -260,7 +363,7 @@ const SurveyScreenLayout = ({
   };
 
   // Can rename this if have better name
-  const newLayout = (
+  const newLayout = singleQuestion && (
     <>
       {singleQuestion.type === 'rating' &&
       singleQuestion.subType === 'smiley' ? null : (
@@ -273,6 +376,7 @@ const SurveyScreenLayout = ({
       )}
       <QuestionContainer
         key={singleQuestion.questionId}
+        mandatoryErrorMessage={survey.mandatoryErrorMessage}
         anonymous={survey.anonymous}
         question={singleQuestion}
         validationStarted={validationStarted}
@@ -282,10 +386,15 @@ const SurveyScreenLayout = ({
         onNextPage={onNextPageHandler}
         onUpload={onUpload}
         isUploading={isUploading}
+        onPostPollChoice={onPostPollChoice}
+        isPostingPollChoice={isPostingPollChoice}
         survey={survey}
         pageIndex={pageIndex}
         themeOption={themeOption}
         preview={preview}
+        isLastPage={
+          pageIndex === survey.pageOrder.length - 1 || nextPageIndex === -1
+        }
       />
       {singleQuestion.type === 'rating' &&
       singleQuestion.subType === 'smiley' ? null : (
@@ -293,7 +402,9 @@ const SurveyScreenLayout = ({
           submitSurvey={survey.submitSurvey}
           surveyColor={hexCode}
           isFirstPage={pageIndex === 0}
-          isLastPage={pageIndex === survey.pageOrder.length - 1}
+          isLastPage={
+            pageIndex === survey.pageOrder.length - 1 || nextPageIndex === -1
+          }
           onPrevPage={onPrevPageHandler}
           onNextPage={onNextPageHandler}
           backgroundColor={backgroundColor}
@@ -305,10 +416,7 @@ const SurveyScreenLayout = ({
   return (
     <SurveyPageProvider>
       <View style={[GlobalStyle.flex1, { backgroundColor }]}>
-        {themeOption === THEME_OPTION.CLASSIC ||
-        themeOption === THEME_OPTION.BIJLIRIDE
-          ? classicLayout
-          : newLayout}
+        {isClassicTheme ? classicLayout : newLayout}
       </View>
     </SurveyPageProvider>
   );

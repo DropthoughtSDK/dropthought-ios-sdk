@@ -53,9 +53,13 @@ const ClassicProgressBar = ({ value, maxValue, themeColor, rtl }: Props) => {
       {/* the progress bar */}
       <View style={GlobalStyle.flex1}>
         <View style={trackStyle} />
-        <View style={progressBarStyle} />
+        <View
+          // @ts-ignore
+          style={progressBarStyle}
+        />
       </View>
       <Text
+        testID="test:id/preview_progress_percentage"
         style={[
           styles.title,
           rtl && GlobalStyle.textAlignRight,
@@ -63,7 +67,7 @@ const ClassicProgressBar = ({ value, maxValue, themeColor, rtl }: Props) => {
         ]}
       >
         {/* {percentage}% of 100% completed */}
-        {i18n.t('survey:progress-bar', { percentage })}
+        {`${i18n.t('survey:progress-bar', { percentage })}`}
       </Text>
     </View>
   );

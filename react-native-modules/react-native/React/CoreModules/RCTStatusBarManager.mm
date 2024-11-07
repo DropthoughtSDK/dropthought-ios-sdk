@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -21,25 +21,11 @@
   static NSDictionary *mapping;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    if (@available(iOS 13.0, *)) {
-      mapping = @{
-        @"default" : @(UIStatusBarStyleDefault),
-        @"light-content" : @(UIStatusBarStyleLightContent),
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && defined(__IPHONE_13_0) && \
-    __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0
-        @"dark-content" : @(UIStatusBarStyleDarkContent)
-#else
-          @"dark-content": @(UIStatusBarStyleDefault)
-#endif
-      };
-
-    } else {
-      mapping = @{
-        @"default" : @(UIStatusBarStyleDefault),
-        @"light-content" : @(UIStatusBarStyleLightContent),
-        @"dark-content" : @(UIStatusBarStyleDefault)
-      };
-    }
+    mapping = @{
+      @"default" : @(UIStatusBarStyleDefault),
+      @"light-content" : @(UIStatusBarStyleLightContent),
+      @"dark-content" : @(UIStatusBarStyleDarkContent)
+    };
   });
   return _RCT_CAST(
       UIStatusBarStyle,
@@ -181,7 +167,7 @@ RCT_EXPORT_METHOD(setNetworkActivityIndicatorVisible : (BOOL)visible)
   RCTUnsafeExecuteOnMainQueueSync(^{
     constants = facebook::react::typedConstants<JS::NativeStatusBarManagerIOS::Constants>({
         .HEIGHT = RCTSharedApplication().statusBarFrame.size.height,
-        .DEFAULT_BACKGROUND_COLOR = folly::none,
+        .DEFAULT_BACKGROUND_COLOR = std::nullopt,
     });
   });
 

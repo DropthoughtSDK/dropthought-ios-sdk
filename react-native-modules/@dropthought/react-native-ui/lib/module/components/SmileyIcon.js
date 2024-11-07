@@ -4,7 +4,6 @@ import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDim
 import GlobalStyle from '../styles';
 import i18n from '../translation';
 import { useTheme } from '../contexts/theme';
-
 const SmileyIcon = props => {
   const {
     fontColor
@@ -19,6 +18,8 @@ const SmileyIcon = props => {
     minHeight: i18n.language === 'te' ? 30 : undefined
   }];
   return /*#__PURE__*/React.createElement(TouchableWithoutFeedback, {
+    accessible: false,
+    testID: props.testID,
     onPress: props.onPress
   }, /*#__PURE__*/React.createElement(View, {
     style: containerStyle
@@ -27,10 +28,10 @@ const SmileyIcon = props => {
     style: styles.emoji,
     source: props.source
   }), /*#__PURE__*/React.createElement(Text, {
+    testID: `test:id/smiley_label_${fontColor}`,
     style: textStyle
   }, props.label)) : null));
 };
-
 export default SmileyIcon;
 const phoneStyles = StyleSheet.create({
   container: {

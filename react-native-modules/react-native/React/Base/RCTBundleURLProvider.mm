@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,19 +7,27 @@
 
 #import "RCTBundleURLProvider.h"
 
+#import "RCTConstants.h"
 #import "RCTConvert.h"
 #import "RCTDefines.h"
+#import "RCTLog.h"
 
 NSString *const RCTBundleURLProviderUpdatedNotification = @"RCTBundleURLProviderUpdatedNotification";
 
 const NSUInteger kRCTBundleURLProviderDefaultPort = RCT_METRO_PORT;
 
+#if RCT_DEV_MENU | RCT_PACKAGER_LOADING_FUNCTIONALITY
+static BOOL kRCTAllowPackagerAccess = YES;
+void RCTBundleURLProviderAllowPackagerServerAccess(BOOL allowed)
+{
+  kRCTAllowPackagerAccess = allowed;
+}
+#endif
+static NSString *const kRCTPackagerSchemeKey = @"RCT_packager_scheme";
 static NSString *const kRCTJsLocationKey = @"RCT_jsLocation";
-// This option is no longer exposed in the dev menu UI.
-// It was renamed in D15958697 so it doesn't get stuck with no way to turn it off:
-static NSString *const kRCTEnableLiveReloadKey = @"RCT_enableLiveReload_LEGACY";
 static NSString *const kRCTEnableDevKey = @"RCT_enableDev";
 static NSString *const kRCTEnableMinificationKey = @"RCT_enableMinification";
+static NSString *const kRCTInlineSourceMapKey = @"RCT_inlineSourceMap";
 
 @implementation RCTBundleURLProvider
 
@@ -27,7 +35,7 @@ static NSString *const kRCTEnableMinificationKey = @"RCT_enableMinification";
 {
   self = [super init];
   if (self) {
-    [self setDefaults];
+    [self _setDefaults];
   }
   return self;
 }
@@ -35,7 +43,6 @@ static NSString *const kRCTEnableMinificationKey = @"RCT_enableMinification";
 - (NSDictionary *)defaults
 {
   return @{
-    kRCTEnableLiveReloadKey : @NO,
     kRCTEnableDevKey : @YES,
     kRCTEnableMinificationKey : @NO,
   };
@@ -46,37 +53,47 @@ static NSString *const kRCTEnableMinificationKey = @"RCT_enableMinification";
   [[NSNotificationCenter defaultCenter] postNotificationName:RCTBundleURLProviderUpdatedNotification object:self];
 }
 
-- (void)setDefaults
-{
-  [[NSUserDefaults standardUserDefaults] registerDefaults:[self defaults]];
-}
-
 - (void)resetToDefaults
 {
   for (NSString *key in [[self defaults] allKeys]) {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:key];
   }
-  [self setDefaults];
+  [self _setDefaults];
   [self settingsUpdated];
 }
 
-static NSURL *serverRootWithHostPort(NSString *hostPort)
+static NSURL *serverRootWithHostPort(NSString *hostPort, NSString *scheme)
 {
-  if ([hostPort rangeOfString:@":"].location != NSNotFound) {
-    return [NSURL URLWithString:[NSString stringWithFormat:@"http://%@/", hostPort]];
+  if (![scheme length]) {
+    scheme = @"http";
   }
-  return [NSURL
-      URLWithString:[NSString
-                        stringWithFormat:@"http://%@:%lu/", hostPort, (unsigned long)kRCTBundleURLProviderDefaultPort]];
+  if ([hostPort rangeOfString:@":"].location != NSNotFound) {
+    return [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/", scheme, hostPort]];
+  }
+  return [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@:%lu/",
+                                                         scheme,
+                                                         hostPort,
+                                                         (unsigned long)kRCTBundleURLProviderDefaultPort]];
 }
 
-#if RCT_DEV_MENU
+#if RCT_DEV_MENU | RCT_PACKAGER_LOADING_FUNCTIONALITY
 + (BOOL)isPackagerRunning:(NSString *)hostPort
 {
-  NSURL *url = [serverRootWithHostPort(hostPort) URLByAppendingPathComponent:@"status"];
+  return [RCTBundleURLProvider isPackagerRunning:hostPort scheme:nil];
+}
+
++ (BOOL)isPackagerRunning:(NSString *)hostPort scheme:(NSString *)scheme
+{
+  if (!kRCTAllowPackagerAccess) {
+    return NO;
+  }
+
+  NSURL *url = [serverRootWithHostPort(hostPort, scheme) URLByAppendingPathComponent:@"status"];
 
   NSURLSession *session = [NSURLSession sharedSession];
-  NSURLRequest *request = [NSURLRequest requestWithURL:url];
+  NSURLRequest *request = [NSURLRequest requestWithURL:url
+                                           cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                       timeoutInterval:10];
   __block NSURLResponse *response;
   __block NSData *data;
 
@@ -115,6 +132,11 @@ static NSURL *serverRootWithHostPort(NSString *hostPort)
 {
   return false;
 }
+
++ (BOOL)isPackagerRunning:(NSString *)hostPort scheme:(NSString *)scheme
+{
+  return false;
+}
 #endif
 
 - (NSString *)packagerServerHost
@@ -131,9 +153,16 @@ static NSURL *serverRootWithHostPort(NSString *hostPort)
 
 - (NSString *)packagerServerHostPort
 {
+#if RCT_DEV_MENU | RCT_PACKAGER_LOADING_FUNCTIONALITY
+  if (!kRCTAllowPackagerAccess) {
+    RCTLogInfo(@"Packager server access is disabled in this environment");
+    return nil;
+  }
+#endif
   NSString *location = [self jsLocation];
 #if RCT_DEV_MENU
-  if ([location length] && ![RCTBundleURLProvider isPackagerRunning:location]) {
+  NSString *scheme = [self packagerScheme];
+  if ([location length] && ![RCTBundleURLProvider isPackagerRunning:location scheme:scheme]) {
     location = nil;
   }
 #endif
@@ -157,8 +186,12 @@ static NSURL *serverRootWithHostPort(NSString *hostPort)
   } else {
     return [RCTBundleURLProvider jsBundleURLForBundleRoot:bundleRoot
                                              packagerHost:packagerServerHostPort
+                                           packagerScheme:[self packagerScheme]
                                                 enableDev:[self enableDev]
-                                       enableMinification:[self enableMinification]];
+                                       enableMinification:[self enableMinification]
+                                          inlineSourceMap:[self inlineSourceMap]
+                                              modulesOnly:NO
+                                                runModule:YES];
   }
 }
 
@@ -166,32 +199,31 @@ static NSURL *serverRootWithHostPort(NSString *hostPort)
 {
   return [RCTBundleURLProvider jsBundleURLForBundleRoot:bundleRoot
                                            packagerHost:[self packagerServerHostPort]
+                                         packagerScheme:[self packagerScheme]
                                               enableDev:[self enableDev]
                                      enableMinification:[self enableMinification]
+                                        inlineSourceMap:[self inlineSourceMap]
                                             modulesOnly:YES
                                               runModule:NO];
 }
 
-- (NSURL *)jsBundleURLForBundleRoot:(NSString *)bundleRoot
-                   fallbackResource:(NSString *)resourceName
-                  fallbackExtension:(NSString *)extension
+- (NSURL *)jsBundleURLForBundleRoot:(NSString *)bundleRoot fallbackExtension:(NSString *)extension
 {
   return [self jsBundleURLForBundleRoot:bundleRoot
                     fallbackURLProvider:^NSURL * {
-                      return [self jsBundleURLForFallbackResource:resourceName fallbackExtension:extension];
+                      return [self jsBundleURLForFallbackExtension:extension];
                     }];
 }
 
-- (NSURL *)jsBundleURLForBundleRoot:(NSString *)bundleRoot fallbackResource:(NSString *)resourceName
+- (NSURL *)jsBundleURLForBundleRoot:(NSString *)bundleRoot
 {
-  return [self jsBundleURLForBundleRoot:bundleRoot fallbackResource:resourceName fallbackExtension:nil];
+  return [self jsBundleURLForBundleRoot:bundleRoot fallbackExtension:nil];
 }
 
-- (NSURL *)jsBundleURLForFallbackResource:(NSString *)resourceName fallbackExtension:(NSString *)extension
+- (NSURL *)jsBundleURLForFallbackExtension:(NSString *)extension
 {
-  resourceName = resourceName ?: @"main";
   extension = extension ?: @"jsbundle";
-  return [[NSBundle mainBundle] URLForResource:resourceName withExtension:extension];
+  return [[NSBundle mainBundle] URLForResource:@"main" withExtension:extension];
 }
 
 - (NSURL *)resourceURLForResourceRoot:(NSString *)root
@@ -200,25 +232,30 @@ static NSURL *serverRootWithHostPort(NSString *hostPort)
                         offlineBundle:(NSBundle *)offlineBundle
 {
   NSString *packagerServerHostPort = [self packagerServerHostPort];
+  NSString *packagerServerScheme = [self packagerScheme];
   if (!packagerServerHostPort) {
     // Serve offline bundle (local file)
     NSBundle *bundle = offlineBundle ?: [NSBundle mainBundle];
     return [bundle URLForResource:name withExtension:extension];
   }
   NSString *path = [NSString stringWithFormat:@"/%@/%@.%@", root, name, extension];
-  return [[self class] resourceURLForResourcePath:path packagerHost:packagerServerHostPort query:nil];
+  return [[self class] resourceURLForResourcePath:path
+                                     packagerHost:packagerServerHostPort
+                                           scheme:packagerServerScheme
+                                       queryItems:nil];
 }
 
 + (NSURL *)jsBundleURLForBundleRoot:(NSString *)bundleRoot
                        packagerHost:(NSString *)packagerHost
                           enableDev:(BOOL)enableDev
                  enableMinification:(BOOL)enableMinification
-
 {
   return [self jsBundleURLForBundleRoot:bundleRoot
                            packagerHost:packagerHost
+                         packagerScheme:nil
                               enableDev:enableDev
                      enableMinification:enableMinification
+                        inlineSourceMap:NO
                             modulesOnly:NO
                               runModule:YES];
 }
@@ -227,38 +264,89 @@ static NSURL *serverRootWithHostPort(NSString *hostPort)
                        packagerHost:(NSString *)packagerHost
                           enableDev:(BOOL)enableDev
                  enableMinification:(BOOL)enableMinification
+                    inlineSourceMap:(BOOL)inlineSourceMap
+
+{
+  return [self jsBundleURLForBundleRoot:bundleRoot
+                           packagerHost:packagerHost
+                         packagerScheme:nil
+                              enableDev:enableDev
+                     enableMinification:enableMinification
+                        inlineSourceMap:inlineSourceMap
+                            modulesOnly:NO
+                              runModule:YES];
+}
+
++ (NSURL *)jsBundleURLForBundleRoot:(NSString *)bundleRoot
+                       packagerHost:(NSString *)packagerHost
+                     packagerScheme:(NSString *)scheme
+                          enableDev:(BOOL)enableDev
+                 enableMinification:(BOOL)enableMinification
+                        modulesOnly:(BOOL)modulesOnly
+                          runModule:(BOOL)runModule
+{
+  return [self jsBundleURLForBundleRoot:bundleRoot
+                           packagerHost:packagerHost
+                         packagerScheme:nil
+                              enableDev:enableDev
+                     enableMinification:enableMinification
+                        inlineSourceMap:NO
+                            modulesOnly:modulesOnly
+                              runModule:runModule];
+}
+
++ (NSURL *)jsBundleURLForBundleRoot:(NSString *)bundleRoot
+                       packagerHost:(NSString *)packagerHost
+                     packagerScheme:(NSString *)scheme
+                          enableDev:(BOOL)enableDev
+                 enableMinification:(BOOL)enableMinification
+                    inlineSourceMap:(BOOL)inlineSourceMap
                         modulesOnly:(BOOL)modulesOnly
                           runModule:(BOOL)runModule
 {
   NSString *path = [NSString stringWithFormat:@"/%@.bundle", bundleRoot];
-#ifdef HERMES_BYTECODE_VERSION
-  NSString *runtimeBytecodeVersion = [NSString stringWithFormat:@"&runtimeBytecodeVersion=%u", HERMES_BYTECODE_VERSION];
-#else
-  NSString *runtimeBytecodeVersion = @"";
-#endif
-
-  // When we support only iOS 8 and above, use queryItems for a better API.
-  NSString *query = [NSString stringWithFormat:@"platform=ios&dev=%@&minify=%@&modulesOnly=%@&runModule=%@%@",
-                                               enableDev ? @"true" : @"false",
-                                               enableMinification ? @"true" : @"false",
-                                               modulesOnly ? @"true" : @"false",
-                                               runModule ? @"true" : @"false",
-                                               runtimeBytecodeVersion];
+  BOOL lazy = enableDev;
+  NSArray<NSURLQueryItem *> *queryItems = @[
+    [[NSURLQueryItem alloc] initWithName:@"platform" value:RCTPlatformName],
+    [[NSURLQueryItem alloc] initWithName:@"dev" value:enableDev ? @"true" : @"false"],
+    [[NSURLQueryItem alloc] initWithName:@"lazy" value:lazy ? @"true" : @"false"],
+    [[NSURLQueryItem alloc] initWithName:@"minify" value:enableMinification ? @"true" : @"false"],
+    [[NSURLQueryItem alloc] initWithName:@"inlineSourceMap" value:inlineSourceMap ? @"true" : @"false"],
+    [[NSURLQueryItem alloc] initWithName:@"modulesOnly" value:modulesOnly ? @"true" : @"false"],
+    [[NSURLQueryItem alloc] initWithName:@"runModule" value:runModule ? @"true" : @"false"],
+  ];
 
   NSString *bundleID = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleIdentifierKey];
   if (bundleID) {
-    query = [NSString stringWithFormat:@"%@&app=%@", query, bundleID];
+    queryItems = [queryItems arrayByAddingObject:[[NSURLQueryItem alloc] initWithName:@"app" value:bundleID]];
   }
-  return [[self class] resourceURLForResourcePath:path packagerHost:packagerHost query:query];
+  return [[self class] resourceURLForResourcePath:path packagerHost:packagerHost scheme:scheme queryItems:queryItems];
 }
 
-+ (NSURL *)resourceURLForResourcePath:(NSString *)path packagerHost:(NSString *)packagerHost query:(NSString *)query
++ (NSURL *)resourceURLForResourcePath:(NSString *)path
+                         packagerHost:(NSString *)packagerHost
+                               scheme:(NSString *)scheme
+                                query:(NSString *)query
 {
-  NSURLComponents *components = [NSURLComponents componentsWithURL:serverRootWithHostPort(packagerHost)
+  NSURLComponents *components = [NSURLComponents componentsWithURL:serverRootWithHostPort(packagerHost, scheme)
                                            resolvingAgainstBaseURL:NO];
   components.path = path;
   if (query != nil) {
     components.query = query;
+  }
+  return components.URL;
+}
+
++ (NSURL *)resourceURLForResourcePath:(NSString *)path
+                         packagerHost:(NSString *)packagerHost
+                               scheme:(NSString *)scheme
+                           queryItems:(NSArray<NSURLQueryItem *> *)queryItems
+{
+  NSURLComponents *components = [NSURLComponents componentsWithURL:serverRootWithHostPort(packagerHost, scheme)
+                                           resolvingAgainstBaseURL:NO];
+  components.path = path;
+  if (queryItems != nil) {
+    components.queryItems = queryItems;
   }
   return components.URL;
 }
@@ -275,14 +363,14 @@ static NSURL *serverRootWithHostPort(NSString *hostPort)
   return [[NSUserDefaults standardUserDefaults] boolForKey:kRCTEnableDevKey];
 }
 
-- (BOOL)enableLiveReload
-{
-  return [[NSUserDefaults standardUserDefaults] boolForKey:kRCTEnableLiveReloadKey];
-}
-
 - (BOOL)enableMinification
 {
   return [[NSUserDefaults standardUserDefaults] boolForKey:kRCTEnableMinificationKey];
+}
+
+- (BOOL)inlineSourceMap
+{
+  return [[NSUserDefaults standardUserDefaults] boolForKey:kRCTInlineSourceMapKey];
 }
 
 - (NSString *)jsLocation
@@ -290,14 +378,18 @@ static NSURL *serverRootWithHostPort(NSString *hostPort)
   return [[NSUserDefaults standardUserDefaults] stringForKey:kRCTJsLocationKey];
 }
 
+- (NSString *)packagerScheme
+{
+  NSString *packagerScheme = [[NSUserDefaults standardUserDefaults] stringForKey:kRCTPackagerSchemeKey];
+  if (![packagerScheme length]) {
+    return @"http";
+  }
+  return packagerScheme;
+}
+
 - (void)setEnableDev:(BOOL)enableDev
 {
   [self updateValue:@(enableDev) forKey:kRCTEnableDevKey];
-}
-
-- (void)setEnableLiveReload:(BOOL)enableLiveReload
-{
-  [self updateValue:@(enableLiveReload) forKey:kRCTEnableLiveReloadKey];
 }
 
 - (void)setJsLocation:(NSString *)jsLocation
@@ -310,6 +402,16 @@ static NSURL *serverRootWithHostPort(NSString *hostPort)
   [self updateValue:@(enableMinification) forKey:kRCTEnableMinificationKey];
 }
 
+- (void)setInlineSourceMap:(BOOL)inlineSourceMap
+{
+  [self updateValue:@(inlineSourceMap) forKey:kRCTInlineSourceMapKey];
+}
+
+- (void)setPackagerScheme:(NSString *)packagerScheme
+{
+  [self updateValue:packagerScheme forKey:kRCTPackagerSchemeKey];
+}
+
 + (instancetype)sharedSettings
 {
   static RCTBundleURLProvider *sharedInstance;
@@ -318,6 +420,13 @@ static NSURL *serverRootWithHostPort(NSString *hostPort)
     sharedInstance = [RCTBundleURLProvider new];
   });
   return sharedInstance;
+}
+
+#pragma mark - Private helpers
+
+- (void)_setDefaults
+{
+  [[NSUserDefaults standardUserDefaults] registerDefaults:[self defaults]];
 }
 
 @end

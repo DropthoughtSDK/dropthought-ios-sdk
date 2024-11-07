@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,30 +12,36 @@
 
 #include <cxxreact/ReactMarker.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 class JReactMarker : public facebook::jni::JavaClass<JReactMarker> {
  public:
   static constexpr auto kJavaDescriptor =
       "Lcom/facebook/react/bridge/ReactMarker;";
+  static void registerNatives();
   static void setLogPerfMarkerIfNeeded();
 
  private:
-  static void logMarker(const std::string &marker);
-  static void logMarker(const std::string &marker, const std::string &tag);
+  static void logMarker(const std::string& marker);
+  static void logMarker(const std::string& marker, const std::string& tag);
   static void logMarker(
-      const std::string &marker,
-      const std::string &tag,
+      const std::string& marker,
+      const std::string& tag,
       const int instanceKey);
   static void logPerfMarker(
       const ReactMarker::ReactMarkerId markerId,
-      const char *tag);
+      const char* tag);
+  static void logPerfMarkerBridgeless(
+      const ReactMarker::ReactMarkerId markerId,
+      const char* tag);
   static void logPerfMarkerWithInstanceKey(
       const ReactMarker::ReactMarkerId markerId,
-      const char *tag,
+      const char* tag,
       const int instanceKey);
+  static void nativeLogMarker(
+      jni::alias_ref<jclass> /* unused */,
+      std::string markerNameStr,
+      jlong markerTime);
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

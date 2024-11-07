@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,10 +9,10 @@
 
 #include <ReactCommon/RuntimeExecutor.h>
 #include <react/renderer/core/EventBeat.h>
+#include <react/renderer/runtimescheduler/RuntimeScheduler.h>
 #include <react/utils/RunLoopObserver.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * Event beat associated with main run loop.
@@ -23,14 +23,15 @@ class SynchronousEventBeat final : public EventBeat,
  public:
   SynchronousEventBeat(
       RunLoopObserver::Unique uiRunLoopObserver,
-      RuntimeExecutor runtimeExecutor);
+      RuntimeExecutor runtimeExecutor,
+      std::shared_ptr<RuntimeScheduler> runtimeScheduler);
 
   void induce() const override;
 
 #pragma mark - RunLoopObserver::Delegate
 
   void activityDidChange(
-      RunLoopObserver::Delegate const *delegate,
+      const RunLoopObserver::Delegate* delegate,
       RunLoopObserver::Activity activity) const noexcept override;
 
  private:
@@ -38,7 +39,7 @@ class SynchronousEventBeat final : public EventBeat,
 
   RunLoopObserver::Unique uiRunLoopObserver_;
   RuntimeExecutor runtimeExecutor_;
+  std::shared_ptr<RuntimeScheduler> runtimeScheduler_;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

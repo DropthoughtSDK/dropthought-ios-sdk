@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -13,8 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import androidx.annotation.Nullable;
-import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
+import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.common.ReactConstants;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.BaseViewManager;
 import com.facebook.react.uimanager.PixelUtil;
@@ -44,6 +45,7 @@ public class ReactProgressBarViewManager
   private final WeakHashMap<Integer, Pair<Integer, Integer>> mMeasuredStyles = new WeakHashMap<>();
 
   /* package */ static final String PROP_STYLE = "styleAttr";
+  /* package */ static final String PROP_ATTR = "typeAttr";
   /* package */ static final String PROP_INDETERMINATE = "indeterminate";
   /* package */ static final String PROP_PROGRESS = "progress";
   /* package */ static final String PROP_ANIMATING = "animating";
@@ -115,6 +117,7 @@ public class ReactProgressBarViewManager
   }
 
   @Override
+  @ReactProp(name = PROP_ATTR)
   public void setTypeAttr(ProgressBarContainerView view, @Nullable String value) {}
 
   @Override
@@ -144,8 +147,8 @@ public class ReactProgressBarViewManager
 
   /* package */ static int getStyleFromString(@Nullable String styleStr) {
     if (styleStr == null) {
-      throw new JSApplicationIllegalArgumentException(
-          "ProgressBar needs to have a style, null received");
+      FLog.w(ReactConstants.TAG, "ProgressBar needs to have a style, null received");
+      return android.R.attr.progressBarStyle;
     } else if (styleStr.equals("Horizontal")) {
       return android.R.attr.progressBarStyleHorizontal;
     } else if (styleStr.equals("Small")) {
@@ -161,7 +164,8 @@ public class ReactProgressBarViewManager
     } else if (styleStr.equals("Normal")) {
       return android.R.attr.progressBarStyle;
     } else {
-      throw new JSApplicationIllegalArgumentException("Unknown ProgressBar style: " + styleStr);
+      FLog.w(ReactConstants.TAG, "Unknown ProgressBar style: " + styleStr);
+      return android.R.attr.progressBarStyle;
     }
   }
 

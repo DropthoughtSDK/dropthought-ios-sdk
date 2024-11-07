@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,12 +10,10 @@
 #include <react/renderer/imagemanager/ImageResponse.h>
 #include <react/renderer/imagemanager/ImageResponseObserver.h>
 
-#include <better/small_vector.h>
 #include <mutex>
 #include <vector>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * The ImageResponseObserverCoordinator receives events and completed image
@@ -30,12 +28,12 @@ class ImageResponseObserverCoordinator {
    * If the current image request status is not equal to `Loading`, the observer
    * will be called immediately.
    */
-  void addObserver(ImageResponseObserver const &observer) const;
+  void addObserver(const ImageResponseObserver& observer) const;
 
   /*
    * Interested parties may stop observing the image response.
    */
-  void removeObserver(ImageResponseObserver const &observer) const;
+  void removeObserver(const ImageResponseObserver& observer) const;
 
   /*
    * Platform-specific image loader will call this method with progress updates.
@@ -46,7 +44,7 @@ class ImageResponseObserverCoordinator {
    * Platform-specific image loader will call this method with a completed image
    * response.
    */
-  void nativeImageResponseComplete(ImageResponse const &imageResponse) const;
+  void nativeImageResponseComplete(const ImageResponse& imageResponse) const;
 
   /*
    * Platform-specific image loader will call this method in case of any
@@ -59,7 +57,7 @@ class ImageResponseObserverCoordinator {
    * List of observers.
    * Mutable: protected by mutex_.
    */
-  mutable better::small_vector<ImageResponseObserver const *, 1> observers_;
+  mutable std::vector<const ImageResponseObserver*> observers_;
 
   /*
    * Current status of image loading.
@@ -85,5 +83,4 @@ class ImageResponseObserverCoordinator {
   mutable std::mutex mutex_;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

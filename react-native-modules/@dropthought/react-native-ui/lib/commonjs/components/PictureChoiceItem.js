@@ -4,25 +4,15 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = exports.ChooseIcon = void 0;
-
 var _react = _interopRequireWildcard(require("react"));
-
 var _reactNative = require("react-native");
-
 var _styles = _interopRequireWildcard(require("../styles"));
-
 var _ActivityIndicatorMask = _interopRequireDefault(require("./ActivityIndicatorMask"));
-
 var _theme = require("../contexts/theme");
-
 var _translation = _interopRequireDefault(require("../translation"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 const ChooseIcon = ({
   isMultipleChoice,
   selected,
@@ -45,9 +35,7 @@ const ChooseIcon = ({
     style: cubeStyle
   });
 };
-
 exports.ChooseIcon = ChooseIcon;
-
 const PictureChoiceItem = ({
   title,
   uri,
@@ -74,11 +62,9 @@ const PictureChoiceItem = ({
       };
     }
   }, [columnGap, index, rtl]);
-
   const {
     width
   } = _reactNative.Dimensions.get('window');
-
   const questionMargin = 30;
   const itemWidth = Math.floor((width - 2 * questionMargin - columnGap) / 2);
   const [loadingImage, setLoadingImage] = (0, _react.useState)(true);
@@ -93,7 +79,6 @@ const PictureChoiceItem = ({
     const reloadTextStyle = [styles.reloadText, {
       color: fontColor
     }];
-
     if (imageLoadError) {
       const reloadStyle = [styles.pictureReloadContainer, {
         width: itemWidth,
@@ -148,21 +133,25 @@ const PictureChoiceItem = ({
   const selection = (0, _react.useMemo)(() => {
     const containerStyle = [styles.optionContainer, rtl && _styles.default.flexRowReverse];
     const textStyle = colorScheme === _theme.COLOR_SCHEMES.dark ? [styles.optionText, {
-      color: fontColor !== null && fontColor !== void 0 ? fontColor : _styles.Colors.appearanceSubBlack
+      color: fontColor ?? _styles.Colors.appearanceSubBlack
     }] : [styles.optionText, {
       color: fontColor
     }];
     return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+      accessibilityLabel: `test:id/picture_choice_selected_${selected}`,
       style: containerStyle
     }, /*#__PURE__*/_react.default.createElement(ChooseIcon, {
       isMultipleChoice: isMultipleChoice,
       selected: selected,
       themeColor: themeColor
     }), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+      testID: `test:id/picture_choice_item_${fontColor}`,
       style: textStyle
     }, title));
   }, [colorScheme, fontColor, isMultipleChoice, rtl, selected, themeColor, title]);
   return /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+    accessible: false,
+    testID: `test:id/picture_choice_loading_${loadingImage}`,
     style: itemGapStyle,
     onPress: () => {
       if (imageLoadError) {
@@ -174,11 +163,7 @@ const PictureChoiceItem = ({
     }
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, null, photo, border, selection));
 };
-
-var _default = /*#__PURE__*/_react.default.memo(PictureChoiceItem);
-
-exports.default = _default;
-
+var _default = exports.default = /*#__PURE__*/_react.default.memo(PictureChoiceItem);
 const styles = _reactNative.StyleSheet.create({
   optionContainer: {
     flexDirection: 'row',

@@ -3,9 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
 var _FeedbackProvider = require("./FeedbackProvider");
-
 Object.keys(_FeedbackProvider).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (key in exports && exports[key] === _FeedbackProvider[key]) return;
@@ -16,9 +14,7 @@ Object.keys(_FeedbackProvider).forEach(function (key) {
     }
   });
 });
-
 var _FeedbackHooks = require("./FeedbackHooks");
-
 Object.keys(_FeedbackHooks).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (key in exports && exports[key] === _FeedbackHooks[key]) return;
@@ -29,9 +25,7 @@ Object.keys(_FeedbackHooks).forEach(function (key) {
     }
   });
 });
-
 var _FeedbackHelpers = require("./FeedbackHelpers");
-
 Object.keys(_FeedbackHelpers).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (key in exports && exports[key] === _FeedbackHelpers[key]) return;

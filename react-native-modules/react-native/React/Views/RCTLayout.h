@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -31,7 +31,7 @@ typedef struct CG_BOXABLE RCTLayoutMetrics RCTLayoutMetrics;
 
 struct RCTLayoutContext {
   CGPoint absolutePosition;
-  __unsafe_unretained NSHashTable<RCTShadowView *> *_Nonnull affectedShadowViews;
+  __unsafe_unretained NSPointerArray *_Nonnull affectedShadowViews;
   __unsafe_unretained NSHashTable<NSString *> *_Nonnull other;
 };
 typedef struct CG_BOXABLE RCTLayoutContext RCTLayoutContext;

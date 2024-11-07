@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -118,11 +118,9 @@ RCT_EXPORT_MODULE()
   return self;
 }
 
-- (void)setBridge:(RCTBridge *)bridge
+- (void)initialize
 {
-  RCTAssert(!_bridge, @"Should never be initialized twice!");
   [self setup];
-  _bridge = bridge;
 }
 
 - (void)setup
@@ -130,6 +128,11 @@ RCT_EXPORT_MODULE()
   _paused = YES;
   _timers = [NSMutableDictionary new];
   _inBackground = NO;
+  RCTExecuteOnMainQueue(^{
+    if (!self->_inBackground && [RCTSharedApplication() applicationState] == UIApplicationStateBackground) {
+      [self appDidMoveToBackground];
+    }
+  });
 
   for (NSString *name in @[
          UIApplicationWillResignActiveNotification,
@@ -258,9 +261,9 @@ RCT_EXPORT_MODULE()
   }
 
   if (_sendIdleEvents) {
-    NSTimeInterval currentTimestamp = [[NSDate date] timeIntervalSince1970];
-    NSTimeInterval frameElapsed = currentTimestamp - update.timestamp;
+    NSTimeInterval frameElapsed = (CACurrentMediaTime() - update.timestamp);
     if (kFrameDuration - frameElapsed >= kIdleCallbackFrameDeadline) {
+      NSTimeInterval currentTimestamp = [[NSDate date] timeIntervalSince1970];
       NSNumber *absoluteFrameStartMS = @((currentTimestamp - frameElapsed) * 1000);
       if (_bridge) {
         [_bridge enqueueJSCall:@"JSTimers" method:@"callIdleCallbacks" args:@[ absoluteFrameStartMS ] completion:NULL];

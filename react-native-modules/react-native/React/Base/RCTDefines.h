@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -47,6 +47,43 @@
 #endif
 
 /**
+ * RCT_REMOTE_PROFILE: RCT_PROFILE + RCT_ENABLE_INSPECTOR + enable the
+ * connectivity functionality to control the profiler remotely, such as via Chrome DevTools or
+ * Flipper.
+ */
+#ifndef RCT_REMOTE_PROFILE
+#define RCT_REMOTE_PROFILE RCT_DEV
+#endif
+
+/**
+ * Enable the code to support making calls to the underlying sampling profiler mechanism.
+ */
+#ifndef RCT_PROFILE
+#define RCT_PROFILE RCT_REMOTE_PROFILE
+#endif
+
+#ifndef RCT_ENABLE_INSPECTOR
+#if (RCT_DEV || RCT_REMOTE_PROFILE) && __has_include(<React/RCTInspectorDevServerHelper.h>)
+#define RCT_ENABLE_INSPECTOR 1
+#else
+#define RCT_ENABLE_INSPECTOR 0
+#endif
+#endif
+
+/**
+ * Sanity check that these compile-time flags are compatible. RCT_REMOTE_PROFILE requires RCT_PROFILE and
+ * RCT_ENABLE_INSPECTOR
+ */
+#if RCT_REMOTE_PROFILE
+#if !RCT_PROFILE
+#error "RCT_PROFILE needs to be set to fulfill RCT_REMOTE_PROFILE"
+#endif // RCT_PROFILE
+#if !RCT_ENABLE_INSPECTOR
+#error "RCT_ENABLE_INSPECTOR needs to be set to fulfill RCT_REMOTE_PROFILE"
+#endif // RCT_ENABLE_INSPECTOR
+#endif // RCT_REMOTE_PROFILE
+
+/**
  * RCT_DEV_MENU can be used to toggle the dev menu separately from RCT_DEV.
  * By default though, it will inherit from RCT_DEV.
  */
@@ -54,19 +91,20 @@
 #define RCT_DEV_MENU RCT_DEV
 #endif
 
-#ifndef RCT_ENABLE_INSPECTOR
-#if RCT_DEV && __has_include(<React/RCTInspectorDevServerHelper.h>)
-#define RCT_ENABLE_INSPECTOR 1
-#else
-#define RCT_ENABLE_INSPECTOR 0
-#endif
+/**
+ * Controls for the core packgaer loading functionality
+ * By default, this inherits from RCT_DEV_MENU but it also gives the capability to
+ * enable the packager functionality without the rest of the dev tools from RCT_DEV_MENU
+ */
+#ifndef RCT_ENABLE_LOADING_FROM_PACKAGER
+#define RCT_ENABLE_LOADING_FROM_PACKAGER RCT_DEV_MENU
 #endif
 
-#ifndef ENABLE_PACKAGER_CONNECTION
+#ifndef RCT_DEV_SETTINGS_ENABLE_PACKAGER_CONNECTION
 #if RCT_DEV && (__has_include("RCTPackagerConnection.h") || __has_include(<React/RCTPackagerConnection.h>))
-#define ENABLE_PACKAGER_CONNECTION 1
+#define RCT_DEV_SETTINGS_ENABLE_PACKAGER_CONNECTION 1
 #else
-#define ENABLE_PACKAGER_CONNECTION 0
+#define RCT_DEV_SETTINGS_ENABLE_PACKAGER_CONNECTION 0
 #endif
 #endif
 
@@ -142,3 +180,13 @@
     @throw _RCTNotImplementedException(_cmd, [self class]);                                             \
   }                                                                                                     \
   _Pragma("clang diagnostic pop")
+
+/**
+ * Controls for activating the new architecture without the legacy system.
+ * Note: this is work in progress.
+ */
+#ifdef REACT_NATIVE_FORCE_NEW_ARCHITECTURE
+#define RCT_ONLY_NEW_ARCHITECTURE 1
+#else
+#define RCT_ONLY_NEW_ARCHITECTURE 0
+#endif

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 
 import { Colors } from '../styles';
 import {
@@ -9,6 +9,7 @@ import {
 import { useTheme } from '../contexts/theme';
 import type { Survey } from '../data';
 import { GlobalStyle } from '../styles';
+import HtmlText from '../components/HtmlText';
 
 const logoSource = require('../assets/ic_dtlogo.png');
 
@@ -20,16 +21,18 @@ const defaultIconSize = {
 
 type Props = {
   survey: Survey;
+  onClose: () => void;
 };
 
-const ClassicEndScreen = ({ survey }: Props) => {
+const ClassicEndScreen = ({ survey, onClose }: Props) => {
   const dimensionWidthType = useDimensionWidthType();
-  const { fontColor, backgroundColor } = useTheme();
+  const { fontColor, backgroundColor, autoClose, autoCloseCountdown } =
+    useTheme();
 
   const isPhone = dimensionWidthType === DimensionWidthType.phone;
   const styles = isPhone ? phoneStyles : tabletStyles;
 
-  const { surveyProperty, thankYouTextPlain } = survey;
+  const { surveyProperty, thankYouText } = survey;
 
   const { image } = surveyProperty;
   const [imageHeight, setImageHeight] = useState(65);
@@ -39,6 +42,11 @@ const ClassicEndScreen = ({ survey }: Props) => {
   };
 
   useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (autoClose) {
+      timer = setTimeout(onClose, autoCloseCountdown);
+    }
+
     Image.getSize(
       image,
       (_, height) => {
@@ -48,6 +56,9 @@ const ClassicEndScreen = ({ survey }: Props) => {
       },
       (_) => {}
     );
+
+    return () => clearTimeout(timer);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -55,7 +66,12 @@ const ClassicEndScreen = ({ survey }: Props) => {
 
   const iconView = (
     <View style={GlobalStyle.row}>
-      <Image resizeMode="contain" style={iconStyle} source={iconSource} />
+      <Image
+        resizeMode="contain"
+        // @ts-ignore
+        style={iconStyle}
+        source={iconSource}
+      />
     </View>
   );
 
@@ -63,9 +79,16 @@ const ClassicEndScreen = ({ survey }: Props) => {
     <View style={[shareStyles.container, { backgroundColor }]}>
       <View style={styles.main}>
         {iconView}
-        <Text style={[styles.subtitle, { color: fontColor }]}>
-          {thankYouTextPlain}
-        </Text>
+        {thankYouText && (
+          <View style={styles.subtitle}>
+            <HtmlText
+              accessibilityLabel={`thankful_${thankYouText}`}
+              html={thankYouText}
+              width={Dimensions.get('window').width - 76}
+              maxHeight={Dimensions.get('window').height * 0.4}
+            />
+          </View>
+        )}
       </View>
       <View style={styles.vertical}>
         <View style={styles.horizontal}>
@@ -105,10 +128,6 @@ const phoneStyles = StyleSheet.create({
   },
   subtitle: {
     marginTop: 17,
-    fontSize: 19,
-    textAlign: 'center',
-    opacity: 0.72,
-    paddingBottom: 10,
   },
   vertical: {
     alignItems: 'center',
@@ -154,11 +173,7 @@ const tabletStyles = StyleSheet.create({
     opacity: 0.9,
   },
   subtitle: {
-    lineHeight: 25,
     marginTop: 17,
-    fontSize: 21,
-    textAlign: 'center',
-    opacity: 0.72,
   },
   vertical: {
     alignItems: 'center',

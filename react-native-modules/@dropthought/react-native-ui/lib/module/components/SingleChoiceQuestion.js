@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Platform, ScrollView as RNScrollView } from 'react-native';
+// @ts-ignore
 import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import MandatoryTitle from './MandatoryTitle';
 import { getOptionsFromQuestion } from '../utils/data';
@@ -7,7 +8,6 @@ import { isNil } from 'ramda';
 import NewOtherOptionWithHighlight from './NewOtherOptionWithHighlight';
 import NewOptionWithHighlight from './NewOptionWithHighlight';
 const ScrollView = Platform.OS === 'ios' ? KeyboardAvoidingScrollView : RNScrollView;
-
 const SingleChoiceQuestion = ({
   survey,
   anonymous,
@@ -22,14 +22,11 @@ const SingleChoiceQuestion = ({
     questionId
   } = question;
   const options = getOptionsFromQuestion(question);
-
   function getInitialValueFromFeedbackProps() {
     let value;
     let otherText;
-
     if (feedback && feedback.answers && !isNil(feedback.answers[0])) {
       const answer = feedback.answers[0];
-
       if (Number.isInteger(answer)) {
         value = answer;
       } else {
@@ -40,16 +37,13 @@ const SingleChoiceQuestion = ({
         value = question.options.length;
       }
     }
-
     return {
       value: value,
       otherText
     };
   }
-
   const initialSelected = getInitialValueFromFeedbackProps();
   const [selected, setSelected] = React.useState(initialSelected);
-
   const handleFeedback = id => {
     setSelected({
       value: id,
@@ -60,9 +54,9 @@ const SingleChoiceQuestion = ({
       answers: [id],
       type: 'singleChoice'
     });
-  }; // when other option's value is changed, newValues is {checked: boolean, value: string}
+  };
 
-
+  // when other option's value is changed, newValues is {checked: boolean, value: string}
   const onChangeValueHandler = (index, newValue) => {
     setSelected({
       // if newValues is checked, set value to this index
@@ -79,13 +73,11 @@ const SingleChoiceQuestion = ({
       otherFlag: newValue.checked
     });
   };
-
   const buttonList = options.map(({
     title,
     isOther
   }, index) => {
     var _selected$otherText;
-
     const isActive = selected.value === index;
     return isOther ? /*#__PURE__*/React.createElement(NewOtherOptionWithHighlight, {
       key: index,
@@ -123,7 +115,6 @@ const SingleChoiceQuestion = ({
     }), buttonList)
   );
 };
-
 export default /*#__PURE__*/React.memo(SingleChoiceQuestion);
 const commonStyles = StyleSheet.create({
   container: {

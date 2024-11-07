@@ -4,7 +4,6 @@ import GlobalStyle, { Colors, addOpacityToColor } from '../styles';
 import ClassicMandatoryTitle from './ClassicMandatoryTitle';
 import useMatrixRating from '../hooks/useMatrixRating';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
-
 const MatrixColoum = ({
   title,
   rowIndex,
@@ -21,7 +20,6 @@ const MatrixColoum = ({
   let containerBackgroundColor;
   let textColor = Colors.white;
   let coloumIndexBackgroundColor = Colors.white;
-
   if (isDark && isSelected) {
     containerBackgroundColor = themeColor;
   } else if (isDark && !isSelected) {
@@ -33,7 +31,6 @@ const MatrixColoum = ({
     containerBackgroundColor = Colors.white;
     textColor = Colors.black;
   }
-
   const optionContainerStyle = [styles.optionContainer, {
     backgroundColor: containerBackgroundColor
   }];
@@ -46,6 +43,7 @@ const MatrixColoum = ({
   return /*#__PURE__*/React.createElement(View, {
     style: optionContainerStyle
   }, /*#__PURE__*/React.createElement(TouchableOpacity, {
+    accessible: false,
     style: styles.coloumButton,
     onPress: () => onColoumPress(rowIndex, coloumIndex)
   }, /*#__PURE__*/React.createElement(View, {
@@ -53,11 +51,11 @@ const MatrixColoum = ({
   }, /*#__PURE__*/React.createElement(Text, null, coloumIndex + 1)), /*#__PURE__*/React.createElement(View, {
     style: GlobalStyle.flex1
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/matrix_rating_option",
     numberOfLines: 2,
     style: textStyle
   }, title))));
 };
-
 const MatrixRow = ({
   title,
   rowIndex,
@@ -68,6 +66,7 @@ const MatrixRow = ({
   onRowPress,
   onColoumPress
 }) => {
+  var _optionsForMatrix$;
   const {
     questionId,
     optionsForMatrix
@@ -92,7 +91,7 @@ const MatrixRow = ({
   const textStyle = {
     color: fontColor
   };
-  const optionsList = !isCollapse ? optionsForMatrix[0].map((value, index) => /*#__PURE__*/React.createElement(MatrixColoum, {
+  const optionsList = !isCollapse ? (_optionsForMatrix$ = optionsForMatrix[0]) === null || _optionsForMatrix$ === void 0 ? void 0 : _optionsForMatrix$.map((value, index) => /*#__PURE__*/React.createElement(MatrixColoum, {
     title: value,
     rowIndex: rowIndex,
     coloumIndex: index,
@@ -101,26 +100,31 @@ const MatrixRow = ({
     onColoumPress: onColoumPress,
     key: `${questionId}-${value}-${index}`
   })) : null;
-  const optionSelectedText = selectedAnswer[rowIndex] !== -1 ? /*#__PURE__*/React.createElement(View, {
+  const answer = selectedAnswer[rowIndex];
+  const optionSelectedText = answer !== undefined && answer !== -1 ? /*#__PURE__*/React.createElement(View, {
     style: styles.titleButtonSelected
   }, /*#__PURE__*/React.createElement(View, {
     style: optionSelectedIndexStyle
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/matrix_rating_selected_index",
     style: indexTextStyle
-  }, selectedAnswer[rowIndex] + 1)), /*#__PURE__*/React.createElement(View, {
+  }, answer + 1)), /*#__PURE__*/React.createElement(View, {
     style: GlobalStyle.flexShrink1
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/matrix_rating_selected_option",
     numberOfLines: 2,
     style: textStyle
-  }, optionsForMatrix[0][selectedAnswer[rowIndex]]))) : null;
+  }, optionsForMatrix[0] && optionsForMatrix[0][answer]))) : null;
   return /*#__PURE__*/React.createElement(View, {
     style: containerStyle
   }, /*#__PURE__*/React.createElement(TouchableOpacity, {
+    accessible: false,
     style: styles.titleButton,
     onPress: () => onRowPress(rowIndex)
   }, /*#__PURE__*/React.createElement(View, {
     style: styles.titleButtonText
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: `test:id/matrix_rating_title_${fontColor}`,
     style: textStyle
   }, title)), /*#__PURE__*/React.createElement(View, {
     style: styles.titleButtonContent
@@ -130,7 +134,6 @@ const MatrixRow = ({
     style: styles.titleContent
   }, optionsList));
 };
-
 const ClassicMatrixRatingQuestion = ({
   mandatoryErrorMessage,
   question,
@@ -172,7 +175,6 @@ const ClassicMatrixRatingQuestion = ({
     });
   }));
 };
-
 export default /*#__PURE__*/React.memo(ClassicMatrixRatingQuestion);
 const styles = StyleSheet.create({
   title: {
@@ -194,7 +196,8 @@ const styles = StyleSheet.create({
   titleButtonText: {
     flex: 6
   },
-  titleButtonContent: { ...GlobalStyle.row,
+  titleButtonContent: {
+    ...GlobalStyle.row,
     flex: 4,
     justifyContent: 'flex-end'
   },

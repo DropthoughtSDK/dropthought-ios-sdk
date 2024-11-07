@@ -55,6 +55,7 @@ type Props = {
     type: string;
   }) => void;
   feedback: Feedback;
+  isLastPage: boolean;
 };
 
 const SmileyRatingQuestionOption2 = ({
@@ -67,15 +68,15 @@ const SmileyRatingQuestionOption2 = ({
   onNextPage,
   onFeedback,
   feedback,
+  isLastPage,
 }: Props) => {
   const answered =
     feedback &&
     feedback.answers &&
     !isNil(feedback.answers[0]) &&
     typeof feedback.answers[0] === 'number';
-  const answeredValue: number = answered
-    ? parseInt(feedback.answers[0], 10)
-    : 0;
+  const answeredValue: number =
+    answered && feedback.answers[0] ? parseInt(feedback.answers[0], 10) : 0;
 
   const {
     hexCode,
@@ -90,10 +91,11 @@ const SmileyRatingQuestionOption2 = ({
   const hasSelected = selectedIndex > -1;
 
   const scaleLogicList = scaleLogic[scale];
-  const lottieSelectedIndex = scaleLogicList[selectedIndex];
+  const lottieSelectedIndex =
+    (scaleLogicList && scaleLogicList[selectedIndex]) ?? 0;
 
   const setSelectedAndFeedback = React.useCallback(
-    (index) => {
+    (index: number) => {
       onFeedback({
         questionId,
         answers: [index],
@@ -108,7 +110,7 @@ const SmileyRatingQuestionOption2 = ({
     setSelectedAndFeedback(index);
   };
 
-  const descriptions = scaleLogicList.map((_, index) => options[index]);
+  const descriptions = scaleLogicList?.map((_, index) => options[index]) ?? [];
   const dummyDescroptions = ['Select', ...descriptions];
 
   const dimensionWidthType = useDimensionWidthType();
@@ -153,16 +155,22 @@ const SmileyRatingQuestionOption2 = ({
               mandatoryErrorMessage={survey.mandatoryErrorMessage}
               forgot={forgot}
             />
-            <View style={commonStyles.centerContainer}>
+            <View
+              accessibilityLabel={`selected_custom_smilely2_${selectedIndex}`}
+              style={commonStyles.centerContainer}
+            >
               <LottieView
                 source={lotties[lottieSelectedIndex]}
+                style={commonStyles.lottieContent}
                 autoPlay
+                loop
                 speed={0.5}
               />
             </View>
             <View style={commonStyles.wheelContainer}>
               <WheelPicker
                 selectedIndex={selectedIndex}
+                // @ts-ignore
                 options={descriptions}
                 onChange={(index) => {
                   if (index > -1) handleSelected(index);
@@ -188,13 +196,17 @@ const SmileyRatingQuestionOption2 = ({
               forgot={forgot}
             />
             <View style={commonStyles.centerContainer}>
-              <Text style={hintTextStyle}>
-                {i18n.t('option1HintDescription:title')}
+              <Text
+                testID={`test:id/custom_smilely2_title_${colorScheme}`}
+                style={hintTextStyle}
+              >
+                {`${i18n.t('option1HintDescription:title')}`}
               </Text>
             </View>
             <View style={commonStyles.wheelContainer}>
               <WheelPicker
                 selectedIndex={0}
+                // @ts-ignore
                 options={dummyDescroptions}
                 onChange={(index) => {
                   handleSelected(index - 1);
@@ -218,7 +230,7 @@ const SmileyRatingQuestionOption2 = ({
         submitSurvey={survey.submitSurvey}
         surveyColor={hexCode}
         isFirstPage={pageIndex === 0}
-        isLastPage={pageIndex === survey.pageOrder.length - 1}
+        isLastPage={isLastPage}
         onPrevPage={onPrevPage}
         onNextPage={onNextPage}
         backgroundColor={backgroundColor}
@@ -256,6 +268,10 @@ const commonStyles = StyleSheet.create({
     paddingVertical: 9,
     width: '100%',
     textAlign: 'center',
+  },
+  lottieContent: {
+    width: '100%',
+    height: '100%',
   },
 });
 

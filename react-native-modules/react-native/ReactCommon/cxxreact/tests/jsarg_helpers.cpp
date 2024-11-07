@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,16 +12,15 @@
 #include <gtest/gtest.h>
 #include <algorithm>
 
-using namespace std;
-using namespace folly;
 using namespace facebook::xplat;
+using dynamic = folly::dynamic;
 
 #define EXPECT_JSAE(statement, exstr)                                         \
   do {                                                                        \
     try {                                                                     \
       statement;                                                              \
       FAIL() << "Expected JsArgumentException(" << (exstr) << ") not thrown"; \
-    } catch (const JsArgumentException &ex) {                                 \
+    } catch (const JsArgumentException& ex) {                                 \
       EXPECT_EQ(ex.what(), std::string(exstr));                               \
     }                                                                         \
   } while (0) // let any other exception escape, gtest will deal.
@@ -30,10 +29,10 @@ TEST(JsArgumentHelpersTest, args) {
   const bool aBool = true;
   const int64_t anInt = 17;
   const double aDouble = 3.14;
-  const string aString = "word";
+  const std::string aString = "word";
   const dynamic anArray = dynamic::array("a", "b", "c");
   const dynamic anObject = dynamic::object("k1", "v1")("k2", "v2");
-  const string aNumericString = to<string>(anInt);
+  const std::string aNumericString = folly::to<std::string>(anInt);
 
   folly::dynamic args = dynamic::array(
       aBool, anInt, aDouble, aString, anArray, anObject, aNumericString);
@@ -46,8 +45,8 @@ TEST(JsArgumentHelpersTest, args) {
   EXPECT_EQ(jsArgAsObject(args, 5), anObject);
 
   // const args
-  const folly::dynamic &cargs = args;
-  const folly::dynamic &a4 = jsArgAsArray(cargs, 4);
+  const folly::dynamic& cargs = args;
+  const folly::dynamic& a4 = jsArgAsArray(cargs, 4);
   EXPECT_EQ(a4, anArray);
   EXPECT_EQ(jsArgAsObject(cargs, 5), anObject);
 
@@ -86,7 +85,7 @@ TEST(JsArgumentHelpersTest, args) {
     jsArgAsInt(args, 3);
     FAIL() << "Expected JsArgumentException(" << exhead << "..." << extail
            << ") not thrown";
-  } catch (const JsArgumentException &ex) {
+  } catch (const JsArgumentException& ex) {
     const std::string exwhat = ex.what();
 
     EXPECT_GT(exwhat.size(), exhead.size());

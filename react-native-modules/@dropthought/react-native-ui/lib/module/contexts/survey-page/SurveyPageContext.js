@@ -22,8 +22,8 @@ export function SurveyPageProvider({
     // update the refs map by setting the questionId to ref
     setRefs(assoc(questionId, ref));
   }, []);
-  /** @type {SurveyPageContextValue} */
 
+  /** @type {SurveyPageContextValue} */
   const state = React.useMemo(() => ({
     mandatoryQuestionTitleRefs,
     addMandatoryQuestionTitleRef

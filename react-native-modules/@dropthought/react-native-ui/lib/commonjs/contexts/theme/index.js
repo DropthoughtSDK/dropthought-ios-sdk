@@ -3,9 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
 var _ThemeProvider = require("./ThemeProvider");
-
 Object.keys(_ThemeProvider).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (key in exports && exports[key] === _ThemeProvider[key]) return;
@@ -16,9 +14,7 @@ Object.keys(_ThemeProvider).forEach(function (key) {
     }
   });
 });
-
 var _ThemeHooks = require("./ThemeHooks");
-
 Object.keys(_ThemeHooks).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (key in exports && exports[key] === _ThemeHooks[key]) return;
@@ -29,9 +25,7 @@ Object.keys(_ThemeHooks).forEach(function (key) {
     }
   });
 });
-
 var _theme = require("./theme.const");
-
 Object.keys(_theme).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (key in exports && exports[key] === _theme[key]) return;

@@ -1,5 +1,4 @@
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 import React, { useRef } from 'react';
 import { StyleSheet, TextInput, View, Text } from 'react-native';
 import GlobalStyle, { Colors } from '../styles';
@@ -7,7 +6,6 @@ import i18n from '../translation';
 import { metadataTypeKeyboard, metadataTypeAutoCapitalize } from './ClassicOpenQuestion';
 import MetadataDesc from './MetadataDesc';
 import { useTheme } from '../contexts/theme';
-
 const useFocus = (onBlur, onFocus) => {
   const [isFocused, setIsFocused] = React.useState(false);
   const onFocusHandler = React.useCallback(() => {
@@ -24,7 +22,6 @@ const useFocus = (onBlur, onFocus) => {
     onBlur: onBlurHandler
   };
 };
-
 const ClassicDropdownOtherOptionInput = ({
   visible,
   question,
@@ -38,11 +35,8 @@ const ClassicDropdownOtherOptionInput = ({
   const {
     fontColor
   } = useTheme();
-
   const onFocusHandler = () => {};
-
   const onBlurHandler = () => {};
-
   const {
     isFocused,
     ...focusProps
@@ -60,6 +54,7 @@ const ClassicDropdownOtherOptionInput = ({
   }), /*#__PURE__*/React.createElement(View, {
     style: [styles.textInputContainer, rtl && GlobalStyle.flexRowReverse]
   }, /*#__PURE__*/React.createElement(TextInput, _extends({
+    testID: "test:id/field_dropdown_other",
     ref: inputRef,
     style: [styles.textInput, rtl && GlobalStyle.textAlignRight, inputTextBorderStyle, inputTextColorStyle],
     placeholder: placeholder,
@@ -73,10 +68,10 @@ const ClassicDropdownOtherOptionInput = ({
     keyboardType: metadataTypeKeyboard(question.metaDataType),
     autoCapitalize: metadataTypeAutoCapitalize(question.metaDataType)
   }, focusProps))), /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/dropdown_text_length",
     style: [styles.descText, rtl && GlobalStyle.textAlignLeft]
   }, value.length, "/100"));
 };
-
 const styles = StyleSheet.create({
   textInputContainer: {
     height: 80,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -11,13 +11,15 @@
 #include <mutex>
 
 #include <react/renderer/mounting/MountingTransaction.h>
-#include <react/renderer/mounting/MountingTransactionMetadata.h>
-#include <react/renderer/mounting/TransactionTelemetry.h>
+#include <react/renderer/telemetry/TransactionTelemetry.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 class MountingCoordinator;
+
+using MountingTransactionCallback = std::function<void(
+    const MountingTransaction& transaction,
+    const SurfaceTelemetry& surfaceTelemetry)>;
 
 /*
  * Provides convenient tools for aggregating and accessing telemetry data
@@ -29,13 +31,13 @@ class TelemetryController final {
   /*
    * To be used by `MountingCoordinator`.
    */
-  TelemetryController(MountingCoordinator const &mountingCoordinator) noexcept;
+  TelemetryController(const MountingCoordinator& mountingCoordinator) noexcept;
 
   /*
    * Not copyable.
    */
-  TelemetryController(TelemetryController const &other) noexcept = delete;
-  TelemetryController &operator=(TelemetryController const &other) noexcept =
+  TelemetryController(const TelemetryController& other) noexcept = delete;
+  TelemetryController& operator=(const TelemetryController& other) noexcept =
       delete;
 
  public:
@@ -43,15 +45,14 @@ class TelemetryController final {
    * Calls `MountingCoordinator::pullTransaction()` and aggregates telemetry.
    */
   bool pullTransaction(
-      std::function<void(MountingTransactionMetadata metadata)> willMount,
-      std::function<void(ShadowViewMutationList const &mutations)> doMount,
-      std::function<void(MountingTransactionMetadata metadata)> didMount) const;
+      const MountingTransactionCallback& willMount,
+      const MountingTransactionCallback& doMount,
+      const MountingTransactionCallback& didMount) const;
 
  private:
-  MountingCoordinator const &mountingCoordinator_;
+  const MountingCoordinator& mountingCoordinator_;
   mutable SurfaceTelemetry compoundTelemetry_{};
   mutable std::mutex mutex_;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

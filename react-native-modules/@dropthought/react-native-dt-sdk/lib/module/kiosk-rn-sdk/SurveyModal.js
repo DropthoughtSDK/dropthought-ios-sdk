@@ -2,7 +2,7 @@ function _extends() { _extends = Object.assign ? Object.assign.bind() : function
 import * as React from 'react';
 import { View, Modal, Dimensions } from 'react-native';
 import { pick, omit } from 'ramda';
-import { GlobalStyle, Colors } from '@dropthought/react-native-ui/src';
+import { GlobalStyle, Colors } from '@dropthought/react-native-ui';
 import SDKEntry from './SDKEntry';
 const ModalProps = ['animated', 'animationType', 'transparent', 'visible', 'onRequestClose', 'onShow', 'presentationStyle', 'supportedOrientations', 'onDismiss', 'onOrientationChange', 'hardwareAccelerated'];
 const height = Dimensions.get('window').height;
@@ -76,13 +76,11 @@ export const SurveyModalContainer = ({
 };
 
 /**
+ * @typedef {import('./SurveyModal').SurveyModalProps} SurveyModalProps
  * @typedef {import('./SDKEntry').SDKEntryProps} SDKEntryProps
  * @typedef {import('react-native').ModalProps} ModalProps
  */
-/**
- * @typedef {object} SurveyModalProps
- * @property {boolean} visible
- */
+
 /**
  * @typedef {SDKEntryProps & ModalProps} OpenSurveyProps
  */

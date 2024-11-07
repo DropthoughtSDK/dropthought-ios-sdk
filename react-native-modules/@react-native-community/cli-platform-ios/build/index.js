@@ -3,22 +3,10 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-Object.defineProperty(exports, "linkConfig", {
-  enumerable: true,
-  get: function () {
-    return _link.default;
-  }
-});
 Object.defineProperty(exports, "commands", {
   enumerable: true,
   get: function () {
     return _commands.default;
-  }
-});
-Object.defineProperty(exports, "projectConfig", {
-  enumerable: true,
-  get: function () {
-    return _config.projectConfig;
   }
 });
 Object.defineProperty(exports, "dependencyConfig", {
@@ -27,13 +15,34 @@ Object.defineProperty(exports, "dependencyConfig", {
     return _config.dependencyConfig;
   }
 });
-
-var _link = _interopRequireDefault(require("./link"));
-
+Object.defineProperty(exports, "findPodfilePaths", {
+  enumerable: true,
+  get: function () {
+    return _config.findPodfilePaths;
+  }
+});
+Object.defineProperty(exports, "getArchitecture", {
+  enumerable: true,
+  get: function () {
+    return _getArchitecture.default;
+  }
+});
+Object.defineProperty(exports, "installPods", {
+  enumerable: true,
+  get: function () {
+    return _installPods.default;
+  }
+});
+Object.defineProperty(exports, "projectConfig", {
+  enumerable: true,
+  get: function () {
+    return _config.projectConfig;
+  }
+});
 var _commands = _interopRequireDefault(require("./commands"));
-
 var _config = require("./config");
-
+var _getArchitecture = _interopRequireDefault(require("./tools/getArchitecture"));
+var _installPods = _interopRequireDefault(require("./tools/installPods"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=index.ts.map

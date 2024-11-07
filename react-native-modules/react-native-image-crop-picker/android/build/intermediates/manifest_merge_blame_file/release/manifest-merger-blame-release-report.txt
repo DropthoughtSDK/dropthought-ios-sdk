@@ -2,52 +2,48 @@
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 3    package="com.reactnative.ivpusic.imagepicker" >
 4
-5    <uses-sdk
-6        android:minSdkVersion="26"
-6-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml
-7        android:targetSdkVersion="30" />
-7-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml
-8
-9    <queries>
-9-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:4:5-8:15
-10        <intent>
-10-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:5:9-7:18
-11            <action android:name="android.media.action.IMAGE_CAPTURE" />
-11-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:6:13-73
-11-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:6:21-70
-12        </intent>
-13    </queries>
+5    <uses-sdk android:minSdkVersion="26" />
+6
+7    <queries>
+7-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:4:5-8:15
+8        <intent>
+8-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:5:9-7:18
+9            <action android:name="android.media.action.IMAGE_CAPTURE" />
+9-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:6:13-73
+9-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:6:21-70
+10        </intent>
+11    </queries>
+12
+13    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+13-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:10:5-81
+13-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:10:22-78
 14
-15    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-15-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:10:5-81
-15-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:10:22-78
-16
-17    <application>
-17-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:12:5-27:19
-18        <provider
-18-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:14:9-22:20
-19            android:name="androidx.core.content.FileProvider"
-19-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:15:13-62
-20            android:authorities="${applicationId}.provider"
-20-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:16:13-60
-21            android:exported="false"
-21-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:17:13-37
-22            android:grantUriPermissions="true" >
-22-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:18:13-47
-23            <meta-data
-23-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:19:13-21:58
-24                android:name="android.support.FILE_PROVIDER_PATHS"
-24-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:20:17-67
-25                android:resource="@xml/provider_paths" />
-25-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:21:17-55
-26        </provider>
-27
-28        <activity
-28-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:24:9-26:72
-29            android:name="com.yalantis.ucrop.UCropActivity"
-29-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:25:13-60
-30            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-30-->/Users/bct-barney/Documents/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:26:13-69
-31    </application>
-32
-33</manifest>
+15    <application>
+15-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:12:5-27:19
+16        <provider
+16-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:14:9-22:20
+17            android:name="com.reactnative.ivpusic.imagepicker.IvpusicImagePickerFileProvider"
+17-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:15:13-59
+18            android:authorities="${applicationId}.provider"
+18-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:16:13-60
+19            android:exported="false"
+19-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:17:13-37
+20            android:grantUriPermissions="true" >
+20-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:18:13-47
+21            <meta-data
+21-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:19:13-21:78
+22                android:name="android.support.FILE_PROVIDER_PATHS"
+22-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:20:17-67
+23                android:resource="@xml/ivpusic_imagepicker_provider_paths" />
+23-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:21:17-75
+24        </provider>
+25
+26        <activity
+26-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:24:9-26:72
+27            android:name="com.yalantis.ucrop.UCropActivity"
+27-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:25:13-60
+28            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+28-->/Users/rambo/bct/dropthought-sdk/node_modules/react-native-image-crop-picker/android/src/main/AndroidManifest.xml:26:13-69
+29    </application>
+30
+31</manifest>

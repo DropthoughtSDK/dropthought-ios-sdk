@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -17,36 +17,36 @@
 #import <unordered_map>
 
 Class RCTCoreModulesClassProvider(const char *name) {
-  static std::unordered_map<std::string, Class (*)(void)> sCoreModuleClassMap = {
+  // Intentionally leak to avoid crashing after static destructors are run.
+  static const auto sCoreModuleClassMap = new const std::unordered_map<std::string, Class (*)(void)>{
     {"AccessibilityManager", RCTAccessibilityManagerCls},
-    {"Appearance", RCTAppearanceCls},
-    {"DeviceInfo", RCTDeviceInfoCls},
-    {"ExceptionsManager", RCTExceptionsManagerCls},
-    {"PlatformConstants", RCTPlatformCls},
-    {"Clipboard", RCTClipboardCls},
-    {"I18nManager", RCTI18nManagerCls},
-    {"SourceCode", RCTSourceCodeCls},
     {"ActionSheetManager", RCTActionSheetManagerCls},
     {"AlertManager", RCTAlertManagerCls},
-    {"AsyncLocalStorage", RCTAsyncLocalStorageCls},
-    {"Timing", RCTTimingCls},
-    {"StatusBarManager", RCTStatusBarManagerCls},
-    {"KeyboardObserver", RCTKeyboardObserverCls},
     {"AppState", RCTAppStateCls},
-    {"PerfMonitor", RCTPerfMonitorCls},
+    {"Appearance", RCTAppearanceCls},
+    {"Clipboard", RCTClipboardCls},
+    {"DevLoadingView", RCTDevLoadingViewCls},
     {"DevMenu", RCTDevMenuCls},
     {"DevSettings", RCTDevSettingsCls},
-    {"RedBox", RCTRedBoxCls},
+    {"DeviceInfo", RCTDeviceInfoCls},
+    {"EventDispatcher", RCTEventDispatcherCls},
+    {"ExceptionsManager", RCTExceptionsManagerCls},
+    {"I18nManager", RCTI18nManagerCls},
+    {"KeyboardObserver", RCTKeyboardObserverCls},
     {"LogBox", RCTLogBoxCls},
+    {"PerfMonitor", RCTPerfMonitorCls},
+    {"PlatformConstants", RCTPlatformCls},
+    {"RedBox", RCTRedBoxCls},
+    {"SourceCode", RCTSourceCodeCls},
+    {"StatusBarManager", RCTStatusBarManagerCls},
+    {"Timing", RCTTimingCls},
     {"WebSocketExecutor", RCTWebSocketExecutorCls},
     {"WebSocketModule", RCTWebSocketModuleCls},
-    {"DevLoadingView", RCTDevLoadingViewCls},
-    {"DevSplitBundleLoader", RCTDevSplitBundleLoaderCls},
-    {"EventDispatcher", RCTEventDispatcherCls},
+    {"BlobModule", RCTBlobManagerCls},
   };
 
-  auto p = sCoreModuleClassMap.find(name);
-  if (p != sCoreModuleClassMap.end()) {
+  auto p = sCoreModuleClassMap->find(name);
+  if (p != sCoreModuleClassMap->end()) {
     auto classFunc = p->second;
     return classFunc();
   }

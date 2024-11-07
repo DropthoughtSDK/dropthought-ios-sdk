@@ -4,29 +4,17 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireWildcard(require("react"));
-
 var _reactNative = require("react-native");
-
 var _styles = _interopRequireWildcard(require("../styles"));
-
 var _translation = _interopRequireDefault(require("../translation"));
-
 var _ActivityIndicatorMask = _interopRequireDefault(require("./ActivityIndicatorMask"));
-
 var _reactNativeImageCropPicker = _interopRequireDefault(require("react-native-image-crop-picker"));
-
 var _PictureChoiceItem = require("./PictureChoiceItem");
-
 var _theme = require("../contexts/theme");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 const MAXIMUM_SIZE_KB = 5 * 1024 * 1024; // 5MB
 
 const PictureChoiceOtherItem = ({
@@ -49,11 +37,9 @@ const PictureChoiceOtherItem = ({
     colorScheme
   } = (0, _theme.useTheme)();
   const isDarkMode = colorScheme === _theme.COLOR_SCHEMES.dark;
-
   const {
     width
   } = _reactNative.Dimensions.get('window');
-
   const questionMargin = 30;
   const itemWidth = (width - 2 * questionMargin - columnGap) / 2;
   const [imageLoadError, setImageLoadError] = (0, _react.useState)(false);
@@ -73,7 +59,6 @@ const PictureChoiceOtherItem = ({
   const [loadingImage, setLoadingImage] = (0, _react.useState)(false);
   const [isUploading, setIsUploading] = (0, _react.useState)(false);
   const validTypes = ['image/png', 'image/jpg', 'image/jpeg'];
-
   const uploadPicture = image => {
     const {
       path: uri,
@@ -83,7 +68,6 @@ const PictureChoiceOtherItem = ({
     } = image;
     const pieces = uri.split('/');
     const name = pieces[pieces.length - 1];
-
     if (type && !validTypes.includes(type)) {
       onError(`${_translation.default.t('picture-choice:invalidTypeHint')}`);
     } else if (size && size > MAXIMUM_SIZE_KB) {
@@ -102,19 +86,18 @@ const PictureChoiceOtherItem = ({
       }
     }
   };
-
   async function hasAndroidPermission() {
     const permission = _reactNative.PermissionsAndroid.PERMISSIONS.CAMERA;
-    const hasPermission = await _reactNative.PermissionsAndroid.check(permission);
-
-    if (hasPermission) {
-      return true;
+    if (permission) {
+      const hasPermission = await _reactNative.PermissionsAndroid.check(permission);
+      if (hasPermission) {
+        return true;
+      }
+      const status = await _reactNative.PermissionsAndroid.request(permission);
+      return status === _reactNative.PermissionsAndroid.RESULTS.GRANTED;
     }
-
-    const status = await _reactNative.PermissionsAndroid.request(permission);
-    return status === _reactNative.PermissionsAndroid.RESULTS.GRANTED;
+    return false;
   }
-
   const openPhotoLibrary = () => {
     if (_reactNative.Platform.OS === 'android') {
       _reactNativeImageCropPicker.default.openPicker({
@@ -135,20 +118,17 @@ const PictureChoiceOtherItem = ({
         includeBase64: true
       }).then(images => {
         setActionSheetVisible(false);
-
-        if (images.length > 0) {
+        if (images.length > 0 && images[0]) {
           uploadPicture(images[0]);
         }
       }).catch(e => {
         setActionSheetVisible(false);
-
         if (e.code !== 'E_PICKER_CANCELLED') {
           onError(`${_translation.default.t('picture-choice:invalidTypeHint')}`);
         }
       });
     }
   };
-
   const openCamera = () => {
     if (_reactNative.Platform.OS === 'android') {
       hasAndroidPermission().then(result => {
@@ -178,24 +158,23 @@ const PictureChoiceOtherItem = ({
       });
     }
   };
-
   const placeholderTextStyle = colorScheme === _theme.COLOR_SCHEMES.dark ? [styles.placeholderText, {
-    color: fontColor !== null && fontColor !== void 0 ? fontColor : _styles.Colors.appearanceSubBlack
+    color: fontColor ?? _styles.Colors.appearanceSubBlack
   }] : [styles.placeholderText, {
     color: fontColor
   }];
   const optionalTextStyle = colorScheme === _theme.COLOR_SCHEMES.dark ? [styles.optionalText, {
-    color: fontColor !== null && fontColor !== void 0 ? fontColor : _styles.Colors.appearanceSubBlack
+    color: fontColor ?? _styles.Colors.appearanceSubBlack
   }] : [styles.optionalText, {
     color: fontColor
   }];
   const optionTextStyle = colorScheme === _theme.COLOR_SCHEMES.dark ? [styles.optionText, {
-    color: fontColor !== null && fontColor !== void 0 ? fontColor : _styles.Colors.appearanceSubBlack
+    color: fontColor ?? _styles.Colors.appearanceSubBlack
   }] : [styles.optionText, {
     color: fontColor
   }];
   const inputStyle = colorScheme === _theme.COLOR_SCHEMES.dark ? [styles.input, {
-    color: fontColor !== null && fontColor !== void 0 ? fontColor : _styles.Colors.appearanceSubBlack
+    color: fontColor ?? _styles.Colors.appearanceSubBlack
   }] : [styles.input, {
     color: fontColor
   }];
@@ -208,7 +187,6 @@ const PictureChoiceOtherItem = ({
   const reloadTextStyle = [styles.reloadText, {
     color: fontColor
   }];
-
   const actionSheet = /*#__PURE__*/_react.default.createElement(_reactNative.Modal, {
     animationType: "fade",
     transparent: true,
@@ -223,6 +201,7 @@ const PictureChoiceOtherItem = ({
     style: isDarkMode ? styles.darkUpperAction : styles.upperAction,
     onPress: openPhotoLibrary
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    testID: "test:id/picture_choice_photo_lib",
     style: isDarkMode ? styles.darkActionText : styles.actionText
   }, `${_translation.default.t('picture-choice:photoLibrary')}`)), /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
     style: isDarkMode ? styles.darkBottomAction : styles.bottomAction,
@@ -233,13 +212,14 @@ const PictureChoiceOtherItem = ({
     style: isDarkMode ? styles.darkCancelAction : styles.cancelAction,
     onPress: () => setActionSheetVisible(false)
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    testID: "test:id/picture_choice_photo_cancel",
     style: isDarkMode ? styles.darkActionText : styles.actionCancelText
   }, `${_translation.default.t('picture-choice:cancel')}`)))));
-
   const maskStyle = {
     backgroundColor: (0, _styles.addOpacityToHex)(themeColor, 0.1)
   };
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, null, /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+    testID: `test:id/picture_choice_other_loading_${isUploading}`,
     style: styles.buttonContainer,
     disabled: preview,
     onPress: () => {
@@ -292,13 +272,14 @@ const PictureChoiceOtherItem = ({
   }, `${_translation.default.t('picture-choice:optional')}`))), /*#__PURE__*/_react.default.createElement(_ActivityIndicatorMask.default, {
     loading: selected && isUploading
   })), /*#__PURE__*/_react.default.createElement(_reactNative.TouchableOpacity, {
+    accessible: false,
+    accessibilityLabel: `test:id/picture_choice_selected_${selected}`,
     style: [styles.optionContainer, rtl && _styles.default.flexRowReverse],
     disabled: preview,
     onPress: () => {
       if (!selected) {
         setActionSheetVisible(true);
       }
-
       onSelect();
     }
   }, /*#__PURE__*/_react.default.createElement(_PictureChoiceItem.ChooseIcon, {
@@ -308,8 +289,10 @@ const PictureChoiceOtherItem = ({
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: _styles.default.flex1
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    testID: "test:id/picture_choice_item_other",
     style: optionTextStyle
   }, `${_translation.default.t('picture-choice:other')}`), /*#__PURE__*/_react.default.createElement(_reactNative.TextInput, {
+    testID: "test:id/field_picture_choice_item_other",
     multiline: true,
     style: inputStyle,
     maxLength: 100,
@@ -321,10 +304,7 @@ const PictureChoiceOtherItem = ({
     onChangeText: onChangeText
   }))), actionSheet);
 };
-
-var _default = PictureChoiceOtherItem;
-exports.default = _default;
-
+var _default = exports.default = PictureChoiceOtherItem;
 const styles = _reactNative.StyleSheet.create({
   buttonContainer: {
     borderRadius: 12,

@@ -1,12 +1,13 @@
-import React, { ReactChild } from 'react';
+import React from 'react';
 interface Props {
     coverScreen: boolean;
     title?: string;
     onBackdropPress?: () => void;
-    componentInside?: ReactChild;
+    componentInside?: React.ReactNode;
     componentHeight: number;
     visible: boolean;
-    navigationComponent?: ReactChild;
+    navigationComponent?: React.ReactNode;
+    children?: React.ReactNode;
 }
 interface NavProps {
     backgroundColor?: string;
@@ -17,3 +18,4 @@ interface NavProps {
 export declare const NavigationComponent: React.FC<NavProps>;
 declare const BottomSheet: React.FC<Props>;
 export default BottomSheet;
+//# sourceMappingURL=BottomSheet.d.ts.map

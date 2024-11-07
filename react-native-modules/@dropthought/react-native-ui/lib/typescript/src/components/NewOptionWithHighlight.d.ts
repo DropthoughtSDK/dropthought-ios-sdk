@@ -1,5 +1,5 @@
 import * as React from 'react';
-export declare type Props = {
+export type Props = {
     type?: 'radio' | 'checkbox';
     id: any;
     title: string | React.ReactNode;
@@ -7,6 +7,7 @@ export declare type Props = {
     themeColor: string;
     onPress: (id: any) => void;
 };
-declare function NewOptionWithHighlight({ type, id: value, title, checked, themeColor, onPress, }: Props): JSX.Element;
+declare function NewOptionWithHighlight({ type, id: value, title, checked, themeColor, onPress, }: Props): React.JSX.Element;
 declare const _default: React.MemoExoticComponent<typeof NewOptionWithHighlight>;
 export default _default;
+//# sourceMappingURL=NewOptionWithHighlight.d.ts.map

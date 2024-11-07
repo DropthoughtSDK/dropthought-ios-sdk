@@ -1,24 +1,34 @@
 import * as React from 'react';
-import { Dimensions, StyleProp, StyleSheet, ViewStyle } from 'react-native';
-import NativeSafeAreaProvider from './NativeSafeAreaProvider';
-import { EdgeInsets, InsetChangedEvent, Metrics, Rect } from './SafeArea.types';
+import { Dimensions, StyleSheet, type ViewProps } from 'react-native';
+import { NativeSafeAreaProvider } from './NativeSafeAreaProvider';
+import type {
+  EdgeInsets,
+  InsetChangedEvent,
+  Metrics,
+  Rect,
+} from './SafeArea.types';
+
+const isDev = process.env.NODE_ENV !== 'production';
 
 export const SafeAreaInsetsContext = React.createContext<EdgeInsets | null>(
   null,
 );
-SafeAreaInsetsContext.displayName = 'SafeAreaInsetsContext';
+if (isDev) {
+  SafeAreaInsetsContext.displayName = 'SafeAreaInsetsContext';
+}
 
 export const SafeAreaFrameContext = React.createContext<Rect | null>(null);
-SafeAreaFrameContext.displayName = 'SafeAreaFrameContext';
+if (isDev) {
+  SafeAreaFrameContext.displayName = 'SafeAreaFrameContext';
+}
 
-export interface SafeAreaViewProps {
+export interface SafeAreaProviderProps extends ViewProps {
   children?: React.ReactNode;
   initialMetrics?: Metrics | null;
   /**
    * @deprecated
    */
   initialSafeAreaInsets?: EdgeInsets | null;
-  style?: StyleProp<ViewStyle>;
 }
 
 export function SafeAreaProvider({
@@ -26,7 +36,8 @@ export function SafeAreaProvider({
   initialMetrics,
   initialSafeAreaInsets,
   style,
-}: SafeAreaViewProps) {
+  ...others
+}: SafeAreaProviderProps) {
   const parentInsets = useParentSafeAreaInsets();
   const parentFrame = useParentSafeAreaFrame();
   const [insets, setInsets] = React.useState<EdgeInsets | null>(
@@ -42,40 +53,46 @@ export function SafeAreaProvider({
         height: Dimensions.get('window').height,
       },
   );
-  const onInsetsChange = React.useCallback(
-    (event: InsetChangedEvent) => {
-      const {
-        nativeEvent: { frame: nextFrame, insets: nextInsets },
-      } = event;
+  const onInsetsChange = React.useCallback((event: InsetChangedEvent) => {
+    const {
+      nativeEvent: { frame: nextFrame, insets: nextInsets },
+    } = event;
 
+    setFrame((curFrame) => {
       if (
         // Backwards compat with old native code that won't send frame.
         nextFrame &&
-        (nextFrame.height !== frame.height ||
-          nextFrame.width !== frame.width ||
-          nextFrame.x !== frame.x ||
-          nextFrame.y !== frame.y)
+        (nextFrame.height !== curFrame.height ||
+          nextFrame.width !== curFrame.width ||
+          nextFrame.x !== curFrame.x ||
+          nextFrame.y !== curFrame.y)
       ) {
-        setFrame(nextFrame);
+        return nextFrame;
+      } else {
+        return curFrame;
       }
+    });
 
+    setInsets((curInsets) => {
       if (
-        !insets ||
-        nextInsets.bottom !== insets.bottom ||
-        nextInsets.left !== insets.left ||
-        nextInsets.right !== insets.right ||
-        nextInsets.top !== insets.top
+        !curInsets ||
+        nextInsets.bottom !== curInsets.bottom ||
+        nextInsets.left !== curInsets.left ||
+        nextInsets.right !== curInsets.right ||
+        nextInsets.top !== curInsets.top
       ) {
-        setInsets(nextInsets);
+        return nextInsets;
+      } else {
+        return curInsets;
       }
-    },
-    [frame, insets],
-  );
+    });
+  }, []);
 
   return (
     <NativeSafeAreaProvider
       style={[styles.fill, style]}
       onInsetsChange={onInsetsChange}
+      {...others}
     >
       {insets != null ? (
         <SafeAreaFrameContext.Provider value={frame}>
@@ -100,34 +117,40 @@ function useParentSafeAreaFrame(): Rect | null {
   return React.useContext(SafeAreaFrameContext);
 }
 
+const NO_INSETS_ERROR =
+  'No safe area value available. Make sure you are rendering `<SafeAreaProvider>` at the top of your app.';
+
 export function useSafeAreaInsets(): EdgeInsets {
-  const safeArea = React.useContext(SafeAreaInsetsContext);
-  if (safeArea == null) {
-    throw new Error(
-      'No safe area insets value available. Make sure you are rendering `<SafeAreaProvider>` at the top of your app.',
-    );
+  const insets = React.useContext(SafeAreaInsetsContext);
+  if (insets == null) {
+    throw new Error(NO_INSETS_ERROR);
   }
-  return safeArea;
+  return insets;
 }
 
 export function useSafeAreaFrame(): Rect {
   const frame = React.useContext(SafeAreaFrameContext);
   if (frame == null) {
-    throw new Error(
-      'No safe area frame value available. Make sure you are rendering `<SafeAreaProvider>` at the top of your app.',
-    );
+    throw new Error(NO_INSETS_ERROR);
   }
   return frame;
 }
 
+export type WithSafeAreaInsetsProps = {
+  insets: EdgeInsets;
+};
+
 export function withSafeAreaInsets<T>(
-  WrappedComponent: React.ComponentType<T>,
-) {
-  return React.forwardRef((props: T, ref: React.Ref<T>) => (
-    <SafeAreaConsumer>
-      {(insets) => <WrappedComponent {...props} insets={insets} ref={ref} />}
-    </SafeAreaConsumer>
-  ));
+  WrappedComponent: React.ComponentType<
+    (React.PropsWithoutRef<T> | T) & WithSafeAreaInsetsProps
+  >,
+): React.ForwardRefExoticComponent<
+  React.PropsWithoutRef<T> & React.RefAttributes<unknown>
+> {
+  return React.forwardRef<unknown, T>((props, ref) => {
+    const insets = useSafeAreaInsets();
+    return <WrappedComponent {...props} insets={insets} ref={ref} />;
+  });
 }
 
 /**

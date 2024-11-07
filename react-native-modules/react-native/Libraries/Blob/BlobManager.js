@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,14 +8,14 @@
  * @format
  */
 
-'use strict';
+import type {BlobCollector, BlobData, BlobOptions} from './BlobTypes';
+
+import NativeBlobModule from './NativeBlobModule';
+import {fromByteArray} from 'base64-js';
+import invariant from 'invariant';
 
 const Blob = require('./Blob');
 const BlobRegistry = require('./BlobRegistry');
-
-import type {BlobData, BlobOptions, BlobCollector} from './BlobTypes';
-import NativeBlobModule from './NativeBlobModule';
-import invariant from 'invariant';
 
 /*eslint-disable no-bitwise */
 /*eslint-disable eqeqeq */
@@ -60,22 +60,20 @@ class BlobManager {
    * Create blob from existing array of blobs.
    */
   static createFromParts(
-    parts: Array<Blob | string>,
+    parts: Array<$ArrayBufferView | ArrayBuffer | Blob | string>,
     options?: BlobOptions,
   ): Blob {
     invariant(NativeBlobModule, 'NativeBlobModule is available.');
 
     const blobId = uuidv4();
     const items = parts.map(part => {
-      if (
-        part instanceof ArrayBuffer ||
-        (global.ArrayBufferView && part instanceof global.ArrayBufferView)
-      ) {
-        throw new Error(
-          "Creating blobs from 'ArrayBuffer' and 'ArrayBufferView' are not supported",
-        );
-      }
-      if (part instanceof Blob) {
+      if (part instanceof ArrayBuffer || ArrayBuffer.isView(part)) {
+        return {
+          // $FlowFixMe[incompatible-cast]
+          data: fromByteArray(new Uint8Array((part: ArrayBuffer))),
+          type: 'string',
+        };
+      } else if (part instanceof Blob) {
         return {
           data: part.data,
           type: 'blob',
@@ -112,6 +110,7 @@ class BlobManager {
    */
   static createFromOptions(options: BlobData): Blob {
     BlobRegistry.register(options.blobId);
+    // $FlowFixMe[prop-missing]
     return Object.assign(Object.create(Blob.prototype), {
       data:
         // Reuse the collector instance when creating from an existing blob.

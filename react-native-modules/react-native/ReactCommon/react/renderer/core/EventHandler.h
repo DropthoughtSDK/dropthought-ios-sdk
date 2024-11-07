@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,8 +9,7 @@
 
 #include <memory>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * We need this types only to ensure type-safety when we deal with them.
@@ -26,5 +25,4 @@ struct EventHandler {
 };
 using UniqueEventHandler = std::unique_ptr<const EventHandler>;
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Platform, ScrollView as RNScrollView } from 'react-native';
+// @ts-ignore
 import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import { last } from 'ramda';
 import type {
@@ -87,7 +88,7 @@ const MultiChoiceQuestion = ({
           // only return the answer if checked
           if (value) {
             // for 'other option', return the text
-            if (options[index].isOther) {
+            if (options[index]?.isOther) {
               return otherText;
             }
             return index;
@@ -137,7 +138,7 @@ const MultiChoiceQuestion = ({
         id={index}
         type={'checkbox'}
         title={title}
-        checked={selected.values[index]}
+        checked={selected.values[index] ?? false}
         themeColor={themeColor}
         onPress={onOptionPressHandler}
         onChangeValue={onChangeValueHandler}
@@ -152,7 +153,7 @@ const MultiChoiceQuestion = ({
         id={index}
         type={'checkbox'}
         title={title}
-        checked={selected.values[index]}
+        checked={selected.values[index] ?? false}
         themeColor={themeColor}
         onPress={onOptionPressHandler}
       />

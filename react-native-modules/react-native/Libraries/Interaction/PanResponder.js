@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,10 +10,10 @@
 
 'use strict';
 
+import type {PressEvent} from '../Types/CoreEventTypes';
+
 const InteractionManager = require('./InteractionManager');
 const TouchHistoryMath = require('./TouchHistoryMath');
-
-import type {PressEvent} from '../Types/CoreEventTypes';
 
 const currentCentroidXOfTouchesChangedAfter =
   TouchHistoryMath.currentCentroidXOfTouchesChangedAfter;
@@ -121,7 +121,7 @@ const currentCentroidY = TouchHistoryMath.currentCentroidY;
  * ### Working Example
  *
  * To see it in action, try the
- * [PanResponder example in RNTester](https://github.com/facebook/react-native/blob/master/packages/rn-tester/js/examples/PanResponder/PanResponderExample.js)
+ * [PanResponder example in RNTester](https://github.com/facebook/react-native/blob/HEAD/packages/rn-tester/js/examples/PanResponder/PanResponderExample.js)
  */
 
 export type GestureState = {|
@@ -189,6 +189,21 @@ type ActiveCallback = (
 ) => boolean;
 
 type PassiveCallback = (event: PressEvent, gestureState: GestureState) => mixed;
+
+export type PanHandlers = {|
+  onMoveShouldSetResponder: (event: PressEvent) => boolean,
+  onMoveShouldSetResponderCapture: (event: PressEvent) => boolean,
+  onResponderEnd: (event: PressEvent) => void,
+  onResponderGrant: (event: PressEvent) => boolean,
+  onResponderMove: (event: PressEvent) => void,
+  onResponderReject: (event: PressEvent) => void,
+  onResponderRelease: (event: PressEvent) => void,
+  onResponderStart: (event: PressEvent) => void,
+  onResponderTerminate: (event: PressEvent) => void,
+  onResponderTerminationRequest: (event: PressEvent) => boolean,
+  onStartShouldSetResponder: (event: PressEvent) => boolean,
+  onStartShouldSetResponderCapture: (event: PressEvent) => boolean,
+|};
 
 type PanResponderConfig = $ReadOnly<{|
   onMoveShouldSetPanResponder?: ?ActiveCallback,
@@ -383,25 +398,10 @@ const PanResponder = {
    *  accordingly. (numberActiveTouches) may not be totally accurate unless you
    *  are the responder.
    */
-  create(
-    config: PanResponderConfig,
-  ): $TEMPORARY$object<{|
+  create(config: PanResponderConfig): {
     getInteractionHandle: () => ?number,
-    panHandlers: $TEMPORARY$object<{|
-      onMoveShouldSetResponder: (event: PressEvent) => boolean,
-      onMoveShouldSetResponderCapture: (event: PressEvent) => boolean,
-      onResponderEnd: (event: PressEvent) => void,
-      onResponderGrant: (event: PressEvent) => boolean,
-      onResponderMove: (event: PressEvent) => void,
-      onResponderReject: (event: PressEvent) => void,
-      onResponderRelease: (event: PressEvent) => void,
-      onResponderStart: (event: PressEvent) => void,
-      onResponderTerminate: (event: PressEvent) => void,
-      onResponderTerminationRequest: (event: PressEvent) => boolean,
-      onStartShouldSetResponder: (event: PressEvent) => boolean,
-      onStartShouldSetResponderCapture: (event: PressEvent) => boolean,
-    |}>,
-  |}> {
+    panHandlers: PanHandlers,
+  } {
     const interactionState = {
       handle: (null: ?number),
     };
@@ -462,7 +462,8 @@ const PanResponder = {
 
       onResponderGrant(event: PressEvent): boolean {
         if (!interactionState.handle) {
-          interactionState.handle = InteractionManager.createInteractionHandle();
+          interactionState.handle =
+            InteractionManager.createInteractionHandle();
         }
         gestureState.x0 = currentCentroidX(event.touchHistory);
         gestureState.y0 = currentCentroidY(event.touchHistory);
@@ -573,9 +574,6 @@ function clearInteractionHandle(
   }
 }
 
-export type PanResponderInstance = $Call<
-  $PropertyType<typeof PanResponder, 'create'>,
-  PanResponderConfig,
->;
+export type PanResponderInstance = ReturnType<(typeof PanResponder)['create']>;
 
-module.exports = PanResponder;
+export default PanResponder;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,12 +12,13 @@ import com.facebook.proguard.annotations.DoNotStrip;
 import com.facebook.react.bridge.queue.ReactQueueConfiguration;
 import com.facebook.react.common.annotations.VisibleForTesting;
 import com.facebook.react.turbomodule.core.interfaces.CallInvokerHolder;
+import com.facebook.react.turbomodule.core.interfaces.NativeMethodCallInvokerHolder;
 import java.util.Collection;
 import java.util.List;
 
 /**
  * A higher level API on top of the asynchronous JSC bridge. This provides an environment allowing
- * the invocation of JavaScript methods and lets a set of Java APIs be invokable from JavaScript as
+ * the invocation of JavaScript methods and lets a set of Java APIs be invocable from JavaScript as
  * well.
  */
 @DoNotStrip
@@ -111,6 +112,8 @@ public interface CatalystInstance
 
   RuntimeExecutor getRuntimeExecutor();
 
+  RuntimeScheduler getRuntimeScheduler();
+
   void addJSIModules(List<JSIModuleSpec> jsiModules);
 
   /**
@@ -120,10 +123,10 @@ public interface CatalystInstance
   CallInvokerHolder getJSCallInvokerHolder();
 
   /**
-   * Returns a hybrid object that contains a pointer to a Native CallInvoker, which is used to
+   * Returns a hybrid object that contains a pointer to a NativeMethodCallInvoker, which is used to
    * schedule work on the NativeModules thread. Required for TurboModuleManager initialization.
    */
-  CallInvokerHolder getNativeCallInvokerHolder();
+  NativeMethodCallInvokerHolder getNativeMethodCallInvokerHolder();
 
   /**
    * For the time being, we want code relying on the old infra to also work with TurboModules.

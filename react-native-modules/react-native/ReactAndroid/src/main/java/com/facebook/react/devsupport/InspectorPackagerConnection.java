@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -157,7 +157,7 @@ public class InspectorPackagerConnection {
       jsonPage.put("title", page.getTitle());
       jsonPage.put("app", mPackageName);
       jsonPage.put("vm", page.getVM());
-      jsonPage.put("isLastBundleDownloadSuccess", bundleStatus.isLastDownloadSucess);
+      jsonPage.put("isLastBundleDownloadSuccess", bundleStatus.isLastDownloadSuccess);
       jsonPage.put("bundleUpdateTimestamp", bundleStatus.updateTimestamp);
       array.put(jsonPage);
     }
@@ -319,11 +319,11 @@ public class InspectorPackagerConnection {
   }
 
   public static class BundleStatus {
-    public Boolean isLastDownloadSucess;
+    public Boolean isLastDownloadSuccess;
     public long updateTimestamp = -1;
 
-    public BundleStatus(Boolean isLastDownloadSucess, long updateTimestamp) {
-      this.isLastDownloadSucess = isLastDownloadSucess;
+    public BundleStatus(Boolean isLastDownloadSuccess, long updateTimestamp) {
+      this.isLastDownloadSuccess = isLastDownloadSuccess;
       this.updateTimestamp = updateTimestamp;
     }
 
@@ -333,6 +333,6 @@ public class InspectorPackagerConnection {
   }
 
   public interface BundleStatusProvider {
-    public BundleStatus getBundleStatus();
+    BundleStatus getBundleStatus();
   }
 }

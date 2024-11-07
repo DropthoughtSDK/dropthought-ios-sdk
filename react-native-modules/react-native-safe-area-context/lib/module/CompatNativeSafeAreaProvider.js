@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { View } from 'react-native';
-import useWindowDimensions from './useWindowDimensions';
+import { useWindowDimensions, View } from 'react-native';
 export function CompatNativeSafeAreaProvider({
   children,
   style,
@@ -19,8 +18,8 @@ export function CompatNativeSafeAreaProvider({
       y: 0,
       width: window.width,
       height: window.height
-    }; // @ts-ignore: missing properties
-
+    };
+    // @ts-ignore: missing properties
     onInsetsChange({
       nativeEvent: {
         insets,

@@ -1,6 +1,10 @@
-import { Props as OptionWithHighlightProps } from './OptionWithHighlight';
+/**
+ * @description Option with a TextInput, this is for other option in multi-choice/single-choice question
+ */
+import * as React from 'react';
+import type { Props as OptionWithHighlightProps } from './OptionWithHighlight';
 import type { Question } from '../data';
-declare type Props = OptionWithHighlightProps & {
+type Props = OptionWithHighlightProps & {
     textValue: string | undefined;
     onChangeValue: (id: any, value: {
         checked: boolean;
@@ -8,5 +12,6 @@ declare type Props = OptionWithHighlightProps & {
     }) => void;
     question: Question;
 };
-declare function OtherOptionWithHighlightProps(props: Props): JSX.Element;
+declare function OtherOptionWithHighlightProps(props: Props): React.JSX.Element;
 export default OtherOptionWithHighlightProps;
+//# sourceMappingURL=OtherOptionWithHighlight.d.ts.map

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -13,10 +13,7 @@
 
 #include <react/renderer/components/view/Touch.h>
 
-namespace facebook {
-namespace react {
-
-using Touches = std::unordered_set<Touch, Touch::Hasher, Touch::Comparator>;
+namespace facebook::react {
 
 /*
  * Defines the `touchstart`, `touchend`, `touchmove`, and `touchcancel` event
@@ -44,12 +41,11 @@ struct TouchEvent {
 
 #if RN_DEBUG_STRING_CONVERTIBLE
 
-std::string getDebugName(TouchEvent const &touchEvent);
+std::string getDebugName(const TouchEvent& touchEvent);
 std::vector<DebugStringConvertibleObject> getDebugProps(
-    TouchEvent const &touchEvent,
+    const TouchEvent& touchEvent,
     DebugStringConvertibleOptions options);
 
 #endif
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

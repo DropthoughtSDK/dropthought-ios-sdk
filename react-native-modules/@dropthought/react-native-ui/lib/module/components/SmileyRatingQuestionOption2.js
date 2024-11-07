@@ -12,7 +12,6 @@ import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import MandatoryTitle from './MandatoryTitle';
 import { isNil } from 'ramda';
 const lotties = [require('../assets/animations/smiley_option1/option1_1.json'), require('../assets/animations/smiley_option1/option1_2.json'), require('../assets/animations/smiley_option1/option1_3.json'), require('../assets/animations/smiley_option1/option1_4.json'), require('../assets/animations/smiley_option1/option1_5.json')];
-
 const SmileyRatingQuestionOption2 = ({
   survey,
   pageIndex,
@@ -22,10 +21,11 @@ const SmileyRatingQuestionOption2 = ({
   onPrevPage,
   onNextPage,
   onFeedback,
-  feedback
+  feedback,
+  isLastPage
 }) => {
   const answered = feedback && feedback.answers && !isNil(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
-  const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
+  const answeredValue = answered && feedback.answers[0] ? parseInt(feedback.answers[0], 10) : 0;
   const {
     hexCode,
     backgroundColor: themeBackgroundColor,
@@ -40,7 +40,7 @@ const SmileyRatingQuestionOption2 = ({
   const [selectedIndex, setSelectedIndex] = React.useState(answered ? answeredValue : -1);
   const hasSelected = selectedIndex > -1;
   const scaleLogicList = scaleLogic[scale];
-  const lottieSelectedIndex = scaleLogicList[selectedIndex];
+  const lottieSelectedIndex = (scaleLogicList && scaleLogicList[selectedIndex]) ?? 0;
   const setSelectedAndFeedback = React.useCallback(index => {
     onFeedback({
       questionId,
@@ -48,13 +48,11 @@ const SmileyRatingQuestionOption2 = ({
       type: 'rating'
     });
   }, [onFeedback, questionId]);
-
   const handleSelected = index => {
     setSelectedIndex(index);
     setSelectedAndFeedback(index);
   };
-
-  const descriptions = scaleLogicList.map((_, index) => options[index]);
+  const descriptions = (scaleLogicList === null || scaleLogicList === void 0 ? void 0 : scaleLogicList.map((_, index) => options[index])) ?? [];
   const dummyDescroptions = ['Select', ...descriptions];
   const dimensionWidthType = useDimensionWidthType();
   const isPhone = dimensionWidthType === DimensionWidthType.phone;
@@ -86,15 +84,20 @@ const SmileyRatingQuestionOption2 = ({
     mandatoryErrorMessage: survey.mandatoryErrorMessage,
     forgot: forgot
   }), /*#__PURE__*/React.createElement(View, {
+    accessibilityLabel: `selected_custom_smilely2_${selectedIndex}`,
     style: commonStyles.centerContainer
   }, /*#__PURE__*/React.createElement(LottieView, {
     source: lotties[lottieSelectedIndex],
+    style: commonStyles.lottieContent,
     autoPlay: true,
+    loop: true,
     speed: 0.5
   })), /*#__PURE__*/React.createElement(View, {
     style: commonStyles.wheelContainer
   }, /*#__PURE__*/React.createElement(WheelPicker, {
-    selectedIndex: selectedIndex,
+    selectedIndex: selectedIndex
+    // @ts-ignore
+    ,
     options: descriptions,
     onChange: index => {
       if (index > -1) handleSelected(index);
@@ -112,11 +115,14 @@ const SmileyRatingQuestionOption2 = ({
   }), /*#__PURE__*/React.createElement(View, {
     style: commonStyles.centerContainer
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: `test:id/custom_smilely2_title_${colorScheme}`,
     style: hintTextStyle
-  }, i18n.t('option1HintDescription:title'))), /*#__PURE__*/React.createElement(View, {
+  }, `${i18n.t('option1HintDescription:title')}`)), /*#__PURE__*/React.createElement(View, {
     style: commonStyles.wheelContainer
   }, /*#__PURE__*/React.createElement(WheelPicker, {
-    selectedIndex: 0,
+    selectedIndex: 0
+    // @ts-ignore
+    ,
     options: dummyDescroptions,
     onChange: index => {
       handleSelected(index - 1);
@@ -129,13 +135,12 @@ const SmileyRatingQuestionOption2 = ({
     submitSurvey: survey.submitSurvey,
     surveyColor: hexCode,
     isFirstPage: pageIndex === 0,
-    isLastPage: pageIndex === survey.pageOrder.length - 1,
+    isLastPage: isLastPage,
     onPrevPage: onPrevPage,
     onNextPage: onNextPage,
     backgroundColor: backgroundColor
   }));
 };
-
 export default /*#__PURE__*/React.memo(SmileyRatingQuestionOption2);
 const commonStyles = StyleSheet.create({
   container: {
@@ -164,6 +169,10 @@ const commonStyles = StyleSheet.create({
     paddingVertical: 9,
     width: '100%',
     textAlign: 'center'
+  },
+  lottieContent: {
+    width: '100%',
+    height: '100%'
   }
 });
 const phoneStyles = StyleSheet.create({

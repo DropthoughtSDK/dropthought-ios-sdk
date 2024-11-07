@@ -4,7 +4,6 @@ import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDim
 import { opacity10, opacity60, Colors } from '../styles';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import i18n from '../translation';
-
 const SurveyPageIndicator = props => {
   const {
     survey,
@@ -28,10 +27,10 @@ const SurveyPageIndicator = props => {
       backgroundColor: opacity10(themeColor)
     }, isDarkMode && styles.darkModeContainer, rtl ? styles.rtl : {}]
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/preview_page_indicator",
     style: textStyle
-  }, currentPage.pageTitle));
+  }, currentPage === null || currentPage === void 0 ? void 0 : currentPage.pageTitle));
 };
-
 const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',

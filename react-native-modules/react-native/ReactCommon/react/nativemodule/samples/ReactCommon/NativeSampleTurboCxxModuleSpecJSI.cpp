@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,71 +9,80 @@
 
 // NOTE: This entire file should be codegen'ed.
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 static jsi::Value __hostFunction_NativeSampleTurboCxxModuleSpecJSI_voidFunc(
-    jsi::Runtime &rt,
-    TurboModule &turboModule,
-    const jsi::Value *args,
+    jsi::Runtime& rt,
+    TurboModule& turboModule,
+    const jsi::Value* args,
     size_t count) {
-  static_cast<NativeSampleTurboCxxModuleSpecJSI *>(&turboModule)->voidFunc(rt);
+  static_cast<NativeSampleTurboCxxModuleSpecJSI*>(&turboModule)->voidFunc(rt);
   return jsi::Value::undefined();
 }
 
 static jsi::Value __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getBool(
-    jsi::Runtime &rt,
-    TurboModule &turboModule,
-    const jsi::Value *args,
+    jsi::Runtime& rt,
+    TurboModule& turboModule,
+    const jsi::Value* args,
     size_t count) {
   return jsi::Value(
-      static_cast<NativeSampleTurboCxxModuleSpecJSI *>(&turboModule)
+      static_cast<NativeSampleTurboCxxModuleSpecJSI*>(&turboModule)
           ->getBool(rt, args[0].getBool()));
 }
 
-static jsi::Value __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getNumber(
-    jsi::Runtime &rt,
-    TurboModule &turboModule,
-    const jsi::Value *args,
+static jsi::Value __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getEnum(
+    jsi::Runtime& rt,
+    TurboModule& turboModule,
+    const jsi::Value* args,
     size_t count) {
   return jsi::Value(
-      static_cast<NativeSampleTurboCxxModuleSpecJSI *>(&turboModule)
+      static_cast<NativeSampleTurboCxxModuleSpecJSI*>(&turboModule)
+          ->getEnum(rt, args[0].getNumber()));
+}
+
+static jsi::Value __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getNumber(
+    jsi::Runtime& rt,
+    TurboModule& turboModule,
+    const jsi::Value* args,
+    size_t count) {
+  return jsi::Value(
+      static_cast<NativeSampleTurboCxxModuleSpecJSI*>(&turboModule)
           ->getNumber(rt, args[0].getNumber()));
 }
 
 static jsi::Value __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getString(
-    jsi::Runtime &rt,
-    TurboModule &turboModule,
-    const jsi::Value *args,
+    jsi::Runtime& rt,
+    TurboModule& turboModule,
+    const jsi::Value* args,
     size_t count) {
-  return static_cast<NativeSampleTurboCxxModuleSpecJSI *>(&turboModule)
+  return static_cast<NativeSampleTurboCxxModuleSpecJSI*>(&turboModule)
       ->getString(rt, args[0].getString(rt));
 }
 
 static jsi::Value __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getArray(
-    jsi::Runtime &rt,
-    TurboModule &turboModule,
-    const jsi::Value *args,
+    jsi::Runtime& rt,
+    TurboModule& turboModule,
+    const jsi::Value* args,
     size_t count) {
-  return static_cast<NativeSampleTurboCxxModuleSpecJSI *>(&turboModule)
+  return static_cast<NativeSampleTurboCxxModuleSpecJSI*>(&turboModule)
       ->getArray(rt, args[0].getObject(rt).getArray(rt));
 }
 
 static jsi::Value __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getObject(
-    jsi::Runtime &rt,
-    TurboModule &turboModule,
-    const jsi::Value *args,
+    jsi::Runtime& rt,
+    TurboModule& turboModule,
+    const jsi::Value* args,
     size_t count) {
-  return static_cast<NativeSampleTurboCxxModuleSpecJSI *>(&turboModule)
+  return static_cast<NativeSampleTurboCxxModuleSpecJSI*>(&turboModule)
       ->getObject(rt, args[0].getObject(rt));
 }
 
 static jsi::Value __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getValue(
-    jsi::Runtime &rt,
-    TurboModule &turboModule,
-    const jsi::Value *args,
+    jsi::Runtime& rt,
+    TurboModule& turboModule,
+    const jsi::Value* args,
     size_t count) {
-  return static_cast<NativeSampleTurboCxxModuleSpecJSI *>(&turboModule)
+  return static_cast<NativeSampleTurboCxxModuleSpecJSI*>(&turboModule)
       ->getValue(
           rt,
           args[0].getNumber(),
@@ -83,11 +92,11 @@ static jsi::Value __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getValue(
 
 static jsi::Value
 __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getValueWithCallback(
-    jsi::Runtime &rt,
-    TurboModule &turboModule,
-    const jsi::Value *args,
+    jsi::Runtime& rt,
+    TurboModule& turboModule,
+    const jsi::Value* args,
     size_t count) {
-  static_cast<NativeSampleTurboCxxModuleSpecJSI *>(&turboModule)
+  static_cast<NativeSampleTurboCxxModuleSpecJSI*>(&turboModule)
       ->getValueWithCallback(
           rt, std::move(args[0].getObject(rt).getFunction(rt)));
   return jsi::Value::undefined();
@@ -95,20 +104,20 @@ __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getValueWithCallback(
 
 static jsi::Value
 __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getValueWithPromise(
-    jsi::Runtime &rt,
-    TurboModule &turboModule,
-    const jsi::Value *args,
+    jsi::Runtime& rt,
+    TurboModule& turboModule,
+    const jsi::Value* args,
     size_t count) {
-  return static_cast<NativeSampleTurboCxxModuleSpecJSI *>(&turboModule)
+  return static_cast<NativeSampleTurboCxxModuleSpecJSI*>(&turboModule)
       ->getValueWithPromise(rt, args[0].getBool());
 }
 
 static jsi::Value __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getConstants(
-    jsi::Runtime &rt,
-    TurboModule &turboModule,
-    const jsi::Value *args,
+    jsi::Runtime& rt,
+    TurboModule& turboModule,
+    const jsi::Value* args,
     size_t count) {
-  return static_cast<NativeSampleTurboCxxModuleSpecJSI *>(&turboModule)
+  return static_cast<NativeSampleTurboCxxModuleSpecJSI*>(&turboModule)
       ->getConstants(rt);
 }
 
@@ -119,6 +128,8 @@ NativeSampleTurboCxxModuleSpecJSI::NativeSampleTurboCxxModuleSpecJSI(
       0, __hostFunction_NativeSampleTurboCxxModuleSpecJSI_voidFunc};
   methodMap_["getBool"] = MethodMetadata{
       1, __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getBool};
+  methodMap_["getEnum"] = MethodMetadata{
+      1, __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getEnum};
   methodMap_["getNumber"] = MethodMetadata{
       1, __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getNumber};
   methodMap_["getString"] = MethodMetadata{
@@ -137,5 +148,4 @@ NativeSampleTurboCxxModuleSpecJSI::NativeSampleTurboCxxModuleSpecJSI(
       0, __hostFunction_NativeSampleTurboCxxModuleSpecJSI_getConstants};
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

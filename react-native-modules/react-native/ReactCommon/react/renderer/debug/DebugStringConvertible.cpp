@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,8 +10,7 @@
 #include <folly/Conv.h>
 #include <folly/Format.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 #if RN_DEBUG_STRING_CONVERTIBLE
 
@@ -24,9 +23,9 @@ std::string DebugStringConvertible::getDebugChildrenDescription(
   options.depth++;
 
   auto trailing = options.format ? std::string{"\n"} : std::string{""};
-  auto childrenString = std::string{""};
+  std::string childrenString;
 
-  for (auto child : getDebugChildren()) {
+  for (const auto& child : getDebugChildren()) {
     if (!child) {
       continue;
     }
@@ -50,9 +49,9 @@ std::string DebugStringConvertible::getDebugPropsDescription(
 
   options.depth++;
 
-  auto propsString = std::string{""};
+  std::string propsString;
 
-  for (auto prop : getDebugProps()) {
+  for (const auto& prop : getDebugProps()) {
     if (!prop) {
       continue;
     }
@@ -116,32 +115,32 @@ std::string DebugStringConvertible::getDebugValue() const {
 
 SharedDebugStringConvertibleList DebugStringConvertible::getDebugChildren()
     const {
-  return SharedDebugStringConvertibleList();
+  return {};
 }
 
 SharedDebugStringConvertibleList DebugStringConvertible::getDebugProps() const {
-  return SharedDebugStringConvertibleList();
+  return {};
 }
 
 /*
  * `toString`-family implementation.
  */
-std::string toString(std::string const &value) {
+std::string toString(const std::string& value) {
   return value;
 }
-std::string toString(int const &value) {
+std::string toString(const int& value) {
   return folly::to<std::string>(value);
 }
-std::string toString(bool const &value) {
+std::string toString(const bool& value) {
   return folly::to<std::string>(value);
 }
-std::string toString(float const &value) {
+std::string toString(const float& value) {
   return folly::to<std::string>(value);
 }
-std::string toString(double const &value) {
+std::string toString(const double& value) {
   return folly::to<std::string>(value);
 }
-std::string toString(void const *value) {
+std::string toString(const void* value) {
   if (value == nullptr) {
     return "null";
   }
@@ -150,5 +149,4 @@ std::string toString(void const *value) {
 
 #endif
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

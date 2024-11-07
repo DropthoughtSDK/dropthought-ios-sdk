@@ -1,16 +1,16 @@
 import * as React from 'react';
-import { useColorScheme, ColorSchemeName } from 'react-native';
+import { useColorScheme } from 'react-native';
+import type { ColorSchemeName } from 'react-native';
 import { Colors } from '../../styles';
 import { ThemeContext } from './ThemeContext';
-import {
-  APPEARANCE,
-  COLOR_SCHEMES,
+import type { ThemeContextProps } from './ThemeContext';
+import { APPEARANCE, COLOR_SCHEMES, THEME_OPTION } from './theme.const';
+import type {
   IAppearanceType,
   IColorSchemesType,
   FontColor,
   BackgroundColor,
   IThemeOptionType,
-  THEME_OPTION,
 } from './theme.const';
 
 function getColorScheme(
@@ -54,19 +54,25 @@ function getBackgroundColor(
   return Colors.backgroundColorLight;
 }
 
+export interface useThemeProps {
+  themeOption: IThemeOptionType;
+  appearance: IAppearanceType;
+  hexCode: string;
+  fontColor: FontColor;
+  backgroundColor: BackgroundColor;
+  autoClose: boolean;
+  autoCloseCountdown: number;
+}
+
 function useTheme({
   themeOption,
   appearance,
   hexCode,
   fontColor: customFontColor,
   backgroundColor: customBackgroundColor,
-}: {
-  themeOption: IThemeOptionType;
-  appearance: IAppearanceType;
-  hexCode: string;
-  fontColor: FontColor;
-  backgroundColor: BackgroundColor;
-}) {
+  autoClose,
+  autoCloseCountdown,
+}: useThemeProps): ThemeContextProps {
   const systemColorScheme = useColorScheme();
   const colorScheme = getColorScheme(appearance, systemColorScheme);
   const fontColor = getFontColor(customFontColor, colorScheme);
@@ -84,6 +90,8 @@ function useTheme({
       backgroundColor,
       customFontColor,
       customBackgroundColor,
+      autoClose,
+      autoCloseCountdown,
     };
   }, [
     themeOption,
@@ -93,17 +101,14 @@ function useTheme({
     backgroundColor,
     customFontColor,
     customBackgroundColor,
+    autoClose,
+    autoCloseCountdown,
   ]);
 }
 
-type Props = {
+export interface ThemeProviderProps extends useThemeProps {
   children: React.ReactNode;
-  themeOption: IThemeOptionType;
-  appearance: IAppearanceType;
-  hexCode: string;
-  fontColor: FontColor;
-  backgroundColor: BackgroundColor;
-};
+}
 
 export function ThemeProvider({
   children,
@@ -112,7 +117,9 @@ export function ThemeProvider({
   hexCode,
   fontColor,
   backgroundColor,
-}: Props) {
+  autoClose,
+  autoCloseCountdown,
+}: ThemeProviderProps) {
   let transformedHexCode = hexCode;
 
   if (themeOption === THEME_OPTION.BIJLIRIDE) {
@@ -125,6 +132,8 @@ export function ThemeProvider({
     hexCode: transformedHexCode,
     fontColor,
     backgroundColor,
+    autoClose,
+    autoCloseCountdown,
   });
 
   return (

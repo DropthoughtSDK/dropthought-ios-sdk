@@ -19,6 +19,7 @@ type Props = {
   onPress: () => void;
   selected: boolean;
   label: string;
+  testID: string;
 };
 
 const SmileyIcon = (props: Props) => {
@@ -40,7 +41,11 @@ const SmileyIcon = (props: Props) => {
     },
   ];
   return (
-    <TouchableWithoutFeedback onPress={props.onPress}>
+    <TouchableWithoutFeedback
+      accessible={false}
+      testID={props.testID}
+      onPress={props.onPress}
+    >
       <View style={containerStyle}>
         {props.source ? (
           <>
@@ -49,7 +54,12 @@ const SmileyIcon = (props: Props) => {
               style={styles.emoji}
               source={props.source}
             />
-            <Text style={textStyle}>{props.label}</Text>
+            <Text
+              testID={`test:id/smiley_label_${fontColor}`}
+              style={textStyle}
+            >
+              {props.label}
+            </Text>
           </>
         ) : null}
       </View>

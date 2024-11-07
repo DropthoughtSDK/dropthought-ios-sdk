@@ -1,9 +1,9 @@
-import { PureComponent } from 'react';
+import React, { PureComponent } from 'react';
 import type { Question, Option, Feedback as OriginFeedback } from '../data';
-declare type Feedback = OriginFeedback & {
+type Feedback = OriginFeedback & {
     answers: (string | number)[];
 };
-declare type Props = {
+type Props = {
     mandatoryErrorMessage: string;
     question: Question;
     onFeedback: (feedback: Feedback) => void;
@@ -11,7 +11,7 @@ declare type Props = {
     feedback: Feedback;
     themeColor: string;
 };
-declare type State = {
+type State = {
     values: boolean[];
     options: Option[];
     otherText: string | undefined;
@@ -24,7 +24,8 @@ declare class ClassicMultiChoiceQuestion extends PureComponent<Props, State> {
         value: string | undefined;
         checked: boolean;
     }): void;
-    renderOptions(): JSX.Element[];
-    render(): JSX.Element;
+    renderOptions(): React.JSX.Element[];
+    render(): React.JSX.Element;
 }
 export default ClassicMultiChoiceQuestion;
+//# sourceMappingURL=ClassicMultiChoiceQuestion.d.ts.map

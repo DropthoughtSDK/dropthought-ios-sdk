@@ -8,7 +8,7 @@ import {
   useTheme,
   THEME_OPTION,
   Colors,
-} from '@dropthought/react-native-ui/src';
+} from '@dropthought/react-native-ui';
 import CloseButton, { ICON_SIZE } from '../components/CloseButton';
 
 /**

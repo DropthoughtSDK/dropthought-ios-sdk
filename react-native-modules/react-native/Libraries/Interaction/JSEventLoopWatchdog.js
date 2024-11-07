@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -14,11 +14,7 @@ const infoLog = require('../Utilities/infoLog');
 
 type Handler = {
   onIterate?: () => void,
-  onStall: (params: {
-    lastInterval: number,
-    busyTime: number,
-    ...
-  }) => ?string,
+  onStall: (params: {lastInterval: number, busyTime: number, ...}) => ?string,
   ...
 };
 
@@ -27,7 +23,7 @@ type Handler = {
  * other events from being processed in a timely manner.
  *
  * The "stall" time is defined as the amount of time in access of the acceptable
- * threshold, which is typically around 100-200ms. So if the treshold is set to
+ * threshold, which is typically around 100-200ms. So if the threshold is set to
  * 100 and a timer fires 150 ms later than it was scheduled because the event
  * loop was tied up, that would be considered a 50ms stall.
  *
@@ -35,20 +31,20 @@ type Handler = {
  * queried with `getStats`.
  */
 const JSEventLoopWatchdog = {
-  getStats: function(): Object {
+  getStats: function (): Object {
     return {stallCount, totalStallTime, longestStall, acceptableBusyTime};
   },
-  reset: function() {
+  reset: function () {
     infoLog('JSEventLoopWatchdog: reset');
     totalStallTime = 0;
     stallCount = 0;
     longestStall = 0;
     lastInterval = global.performance.now();
   },
-  addHandler: function(handler: Handler) {
+  addHandler: function (handler: Handler) {
     handlers.push(handler);
   },
-  install: function({thresholdMS}: {thresholdMS: number, ...}) {
+  install: function ({thresholdMS}: {thresholdMS: number, ...}) {
     acceptableBusyTime = thresholdMS;
     if (installed) {
       return;

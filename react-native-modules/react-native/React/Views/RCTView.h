@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,16 +7,14 @@
 
 #import <UIKit/UIKit.h>
 
+#import <React/RCTBorderCurve.h>
 #import <React/RCTBorderStyle.h>
 #import <React/RCTComponent.h>
 #import <React/RCTPointerEvents.h>
-#import <React/RCTView.h>
 
 extern const UIAccessibilityTraits SwitchAccessibilityTrait;
 
 @protocol RCTAutoInsetsProtocol;
-
-@class RCTView;
 
 @interface RCTView : UIView
 
@@ -36,11 +34,6 @@ extern const UIAccessibilityTraits SwitchAccessibilityTrait;
 + (void)autoAdjustInsetsForView:(UIView<RCTAutoInsetsProtocol> *)parentView
                  withScrollView:(UIScrollView *)scrollView
                    updateOffset:(BOOL)updateOffset;
-
-/**
- * Find the first view controller whose view, or any subview is the specified view.
- */
-+ (UIEdgeInsets)contentInsetsForView:(UIView *)curView;
 
 /**
  * Layout direction of the view.
@@ -78,17 +71,24 @@ extern const UIAccessibilityTraits SwitchAccessibilityTrait;
 @property (nonatomic, assign) CGFloat borderBottomRightRadius;
 @property (nonatomic, assign) CGFloat borderBottomStartRadius;
 @property (nonatomic, assign) CGFloat borderBottomEndRadius;
+@property (nonatomic, assign) CGFloat borderEndEndRadius;
+@property (nonatomic, assign) CGFloat borderEndStartRadius;
+@property (nonatomic, assign) CGFloat borderStartEndRadius;
+@property (nonatomic, assign) CGFloat borderStartStartRadius;
 
 /**
  * Border colors (actually retained).
  */
-@property (nonatomic, assign) CGColorRef borderTopColor;
-@property (nonatomic, assign) CGColorRef borderRightColor;
-@property (nonatomic, assign) CGColorRef borderBottomColor;
-@property (nonatomic, assign) CGColorRef borderLeftColor;
-@property (nonatomic, assign) CGColorRef borderStartColor;
-@property (nonatomic, assign) CGColorRef borderEndColor;
-@property (nonatomic, assign) CGColorRef borderColor;
+@property (nonatomic, strong) UIColor *borderTopColor;
+@property (nonatomic, strong) UIColor *borderRightColor;
+@property (nonatomic, strong) UIColor *borderBottomColor;
+@property (nonatomic, strong) UIColor *borderLeftColor;
+@property (nonatomic, strong) UIColor *borderStartColor;
+@property (nonatomic, strong) UIColor *borderEndColor;
+@property (nonatomic, strong) UIColor *borderColor;
+@property (nonatomic, strong) UIColor *borderBlockColor;
+@property (nonatomic, strong) UIColor *borderBlockEndColor;
+@property (nonatomic, strong) UIColor *borderBlockStartColor;
 
 /**
  * Border widths.
@@ -100,6 +100,15 @@ extern const UIAccessibilityTraits SwitchAccessibilityTrait;
 @property (nonatomic, assign) CGFloat borderStartWidth;
 @property (nonatomic, assign) CGFloat borderEndWidth;
 @property (nonatomic, assign) CGFloat borderWidth;
+// TODO: Implement logical border width logic
+@property (nonatomic, assign) CGFloat borderBlockWidth;
+@property (nonatomic, assign) CGFloat borderBlockEndWidth;
+@property (nonatomic, assign) CGFloat borderBlockStartWidth;
+
+/**
+ * Border curve.
+ */
+@property (nonatomic, assign) RCTBorderCurve borderCurve;
 
 /**
  * Border styles.
@@ -110,5 +119,20 @@ extern const UIAccessibilityTraits SwitchAccessibilityTrait;
  *  Insets used when hit testing inside this view.
  */
 @property (nonatomic, assign) UIEdgeInsets hitTestEdgeInsets;
+
+/**
+ * (Experimental and unused for Paper) Pointer event handlers.
+ */
+@property (nonatomic, assign) RCTBubblingEventBlock onClick;
+@property (nonatomic, assign) RCTBubblingEventBlock onPointerCancel;
+@property (nonatomic, assign) RCTBubblingEventBlock onPointerDown;
+@property (nonatomic, assign) RCTBubblingEventBlock onPointerMove;
+@property (nonatomic, assign) RCTBubblingEventBlock onPointerUp;
+@property (nonatomic, assign) RCTCapturingEventBlock onPointerEnter;
+@property (nonatomic, assign) RCTCapturingEventBlock onPointerLeave;
+@property (nonatomic, assign) RCTBubblingEventBlock onPointerOver;
+@property (nonatomic, assign) RCTBubblingEventBlock onPointerOut;
+@property (nonatomic, assign) RCTBubblingEventBlock onGotPointerCapture;
+@property (nonatomic, assign) RCTBubblingEventBlock onLostPointerCapture;
 
 @end

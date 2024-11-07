@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,9 +12,9 @@
 #include <react/renderer/imagemanager/ImageResponseObserverCoordinator.h>
 #include <react/renderer/imagemanager/ImageTelemetry.h>
 #include <react/renderer/imagemanager/primitives.h>
+#include <react/utils/SharedFunction.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * Represents ongoing request for an image resource.
@@ -29,52 +29,50 @@ class ImageRequest final {
    * The default constructor
    */
   ImageRequest(
-      const ImageSource &imageSource,
-      std::shared_ptr<const ImageTelemetry> telemetry);
+      ImageSource imageSource,
+      std::shared_ptr<const ImageTelemetry> telemetry,
+      SharedFunction<> cancelationFunction);
 
   /*
    * The move constructor.
    */
-  ImageRequest(ImageRequest &&other) noexcept;
+  ImageRequest(ImageRequest&& other) noexcept = default;
 
   /*
    * `ImageRequest` does not support copying by design.
    */
-  ImageRequest(const ImageRequest &other) = delete;
+  ImageRequest(const ImageRequest& other) = delete;
 
-  ~ImageRequest();
-
-  /**
-   * Set cancelation function.
+  /*
+   * Calls cancel function if one is defined. Should be when downloading
+   * image isn't needed anymore. E.g. <ImageView /> was removed.
    */
-  void setCancelationFunction(std::function<void(void)> cancelationFunction);
+  void cancel() const;
 
   /*
    * Returns the Image Source associated with the request.
    */
-  const ImageSource getImageSource() const {
-    return imageSource_;
-  }
+  const ImageSource& getImageSource() const;
 
   /*
    * Returns stored observer coordinator as a shared pointer.
    * Retain this *or* `ImageRequest` to ensure a correct lifetime of the object.
    */
-  const std::shared_ptr<const ImageResponseObserverCoordinator>
-      &getSharedObserverCoordinator() const;
+  const std::shared_ptr<const ImageResponseObserverCoordinator>&
+  getSharedObserverCoordinator() const;
 
   /*
    * Returns stored observer coordinator as a reference.
    * Use this if a correct lifetime of the object is ensured in some other way
    * (e.g. by retaining an `ImageRequest`).
    */
-  const ImageResponseObserverCoordinator &getObserverCoordinator() const;
+  const ImageResponseObserverCoordinator& getObserverCoordinator() const;
 
   /*
    * Returns stored image telemetry object as a shared pointer.
    * Retain this *or* `ImageRequest` to ensure a correct lifetime of the object.
    */
-  const std::shared_ptr<const ImageTelemetry> &getSharedTelemetry() const;
+  const std::shared_ptr<const ImageTelemetry>& getSharedTelemetry() const;
 
  private:
   /*
@@ -88,15 +86,14 @@ class ImageRequest final {
   std::shared_ptr<const ImageTelemetry> telemetry_{};
 
   /*
-   * Event coordinator associated with the reqest.
+   * Event coordinator associated with the request.
    */
   std::shared_ptr<const ImageResponseObserverCoordinator> coordinator_{};
 
   /*
-   * Function we can call to cancel image request (see destructor).
+   * Function we can call to cancel image request.
    */
-  std::function<void(void)> cancelRequest_;
+  SharedFunction<> cancelRequest_;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

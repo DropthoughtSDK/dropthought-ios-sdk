@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -37,49 +37,40 @@ static uint16_t RCTUniqueCoalescingKeyGenerator = 0;
   NSMutableArray<NSNumber *> *_eventQueue;
   BOOL _eventsDispatchScheduled;
   NSHashTable<id<RCTEventDispatcherObserver>> *_observers;
-  NSLock *_observersLock;
+  NSRecursiveLock *_observersLock;
 }
 
 @synthesize bridge = _bridge;
 @synthesize dispatchToJSThread = _dispatchToJSThread;
-@synthesize invokeJS = _invokeJS;
-@synthesize invokeJSWithModuleDotMethod = _invokeJSWithModuleDotMethod;
+@synthesize callableJSModules = _callableJSModules;
 
 RCT_EXPORT_MODULE()
 
-- (void)setBridge:(RCTBridge *)bridge
+- (void)initialize
 {
-  _bridge = bridge;
   _events = [NSMutableDictionary new];
   _eventQueue = [NSMutableArray new];
   _eventQueueLock = [NSLock new];
   _eventsDispatchScheduled = NO;
   _observers = [NSHashTable weakObjectsHashTable];
-  _observersLock = [NSLock new];
+  _observersLock = [NSRecursiveLock new];
+}
+
+- (void)sendViewEventWithName:(NSString *)name reactTag:(NSNumber *)reactTag
+{
+  [_callableJSModules invokeModule:@"RCTViewEventEmitter" method:@"emit" withArgs:@[ name, RCTNullIfNil(reactTag) ]];
 }
 
 - (void)sendAppEventWithName:(NSString *)name body:(id)body
 {
-  if (_bridge) {
-    [_bridge enqueueJSCall:@"RCTNativeAppEventEmitter"
-                    method:@"emit"
-                      args:body ? @[ name, body ] : @[ name ]
-                completion:NULL];
-  } else if (_invokeJS) {
-    _invokeJS(@"RCTNativeAppEventEmitter", @"emit", body ? @[ name, body ] : @[ name ]);
-  }
+  [_callableJSModules invokeModule:@"RCTNativeAppEventEmitter"
+                            method:@"emit"
+                          withArgs:body ? @[ name, body ] : @[ name ]];
 }
 
 - (void)sendDeviceEventWithName:(NSString *)name body:(id)body
 {
-  if (_bridge) {
-    [_bridge enqueueJSCall:@"RCTDeviceEventEmitter"
-                    method:@"emit"
-                      args:body ? @[ name, body ] : @[ name ]
-                completion:NULL];
-  } else if (_invokeJS) {
-    _invokeJS(@"RCTDeviceEventEmitter", @"emit", body ? @[ name, body ] : @[ name ]);
-  }
+  [_callableJSModules invokeModule:@"RCTDeviceEventEmitter" method:@"emit" withArgs:body ? @[ name, body ] : @[ name ]];
 }
 
 - (void)sendTextEventWithType:(RCTTextEventType)type
@@ -95,7 +86,9 @@ RCT_EXPORT_MODULE()
   }];
 
   if (text) {
-    body[@"text"] = text;
+    // We copy the string here because if it's a mutable string it may get released before we dispatch the event on a
+    // different thread, causing a crash.
+    body[@"text"] = [text copy];
   }
 
   if (key) {
@@ -112,14 +105,16 @@ RCT_EXPORT_MODULE()
           break;
       }
     }
-    body[@"key"] = key;
+    // We copy the string here because if it's a mutable string it may get released before we dispatch the event on a
+    // different thread, causing a crash.
+    body[@"key"] = [key copy];
   }
 
   RCTComponentEvent *event = [[RCTComponentEvent alloc] initWithName:events[type] viewTag:reactTag body:body];
   [self sendEvent:event];
 }
 
-- (void)sendEvent:(id<RCTEvent>)event
+- (void)notifyObserversOfEvent:(id<RCTEvent>)event
 {
   [_observersLock lock];
 
@@ -128,6 +123,11 @@ RCT_EXPORT_MODULE()
   }
 
   [_observersLock unlock];
+}
+
+- (void)sendEvent:(id<RCTEvent>)event
+{
+  [self notifyObserversOfEvent:event];
 
   [_eventQueueLock lock];
 
@@ -196,11 +196,12 @@ RCT_EXPORT_MODULE()
 
 - (void)dispatchEvent:(id<RCTEvent>)event
 {
-  if (_bridge) {
-    [_bridge enqueueJSCall:[[event class] moduleDotMethod] args:[event arguments]];
-  } else if (_invokeJSWithModuleDotMethod) {
-    _invokeJSWithModuleDotMethod([[event class] moduleDotMethod], [event arguments]);
-  }
+  NSString *moduleDotMethod = [[event class] moduleDotMethod];
+  NSArray<NSString *> *const components = [moduleDotMethod componentsSeparatedByString:@"."];
+  NSString *const moduleName = components[0];
+  NSString *const methodName = components[1];
+
+  [_callableJSModules invokeModule:moduleName method:methodName withArgs:[event arguments]];
 }
 
 - (dispatch_queue_t)methodQueue
@@ -222,6 +223,12 @@ RCT_EXPORT_MODULE()
   for (NSNumber *eventId in eventQueue) {
     [self dispatchEvent:events[eventId]];
   }
+}
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params
+{
+  return nullptr;
 }
 
 @end

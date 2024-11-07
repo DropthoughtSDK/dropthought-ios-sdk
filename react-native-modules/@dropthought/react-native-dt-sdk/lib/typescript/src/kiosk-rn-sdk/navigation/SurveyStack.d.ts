@@ -1,6 +1,7 @@
 import React from 'react';
-declare type SurveyStackProps = {
+type SurveyStackProps = {
     preview: boolean;
 };
 declare const SurveyStack: React.FunctionComponent<SurveyStackProps>;
 export default SurveyStack;
+//# sourceMappingURL=SurveyStack.d.ts.map

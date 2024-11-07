@@ -10,6 +10,7 @@ import {
   getIcons,
   getSelectedIcons,
   RatingIconType,
+  // @ts-ignore
 } from '../constants/RatingQuestionConstants';
 import type { Feedback as OriginFeedback, Question, Survey } from '../data';
 import {
@@ -40,7 +41,14 @@ type Props = {
 };
 
 const FakeSmiley = () => {
-  return <SmileyIcon selected={false} onPress={() => {}} label="" />;
+  return (
+    <SmileyIcon
+      testID="test:id/smiley_icon_fake"
+      selected={false}
+      onPress={() => {}}
+      label=""
+    />
+  );
 };
 
 const ClassicIconRatingQuestion = ({
@@ -119,6 +127,7 @@ const ClassicIconRatingQuestion = ({
         }
         return (
           <SmileyIcon
+            testID={`test:id/smiley_icon_${index}`}
             selected={isSelected}
             source={source}
             label={option}

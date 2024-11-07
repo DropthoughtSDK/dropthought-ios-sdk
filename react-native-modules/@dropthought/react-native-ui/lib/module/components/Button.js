@@ -1,9 +1,7 @@
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 import * as React from 'react';
 import { StyleSheet, TouchableOpacity, View, Text } from 'react-native';
 import { Colors } from '../styles';
-
 const Button = ({
   title,
   disabled = false,
@@ -27,7 +25,6 @@ const Button = ({
     style: styles.title
   }, title))));
 };
-
 export default Button;
 const styles = StyleSheet.create({
   container: {

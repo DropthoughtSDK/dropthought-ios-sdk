@@ -1,8 +1,10 @@
-import i18n from 'i18next'; // translations i18n
+import i18n from 'i18next';
 
+// translations i18n
 import en from './en.json';
-import ar from './ar.json'; // init i18n
+import ar from './ar.json';
 
+// init i18n
 i18n.init({
   debug: false,
   fallbackLng: 'en',
@@ -14,10 +16,6 @@ i18n.init({
   },
   interpolation: {
     escapeValue: false // not needed for react
-
-  },
-  react: {
-    wait: true
   }
 });
 export default i18n;

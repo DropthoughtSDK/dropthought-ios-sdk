@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Text, TextInput, Image, TouchableOpacity, Dimensions, FlatList, Platform, ScrollView as RNScrollView } from 'react-native';
+// @ts-ignore
 import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import GlobalStyle, { Colors, addOpacityToColor } from '../styles';
 import MandatoryTitle from './MandatoryTitle';
@@ -14,7 +15,6 @@ const radioIconSource = {
   ic_radio_selected: require('../assets/radio-on.png'),
   ic_radio_unselected: require('../assets/radio-off.png')
 };
-
 const DropdownQuestion = ({
   survey,
   question,
@@ -25,7 +25,7 @@ const DropdownQuestion = ({
 }) => {
   const rtl = i18n.dir() === 'rtl';
   const {
-    questionTitle
+    questionTitlePlain
   } = question;
   const {
     fontColor,
@@ -48,7 +48,6 @@ const DropdownQuestion = ({
     onConfirm,
     onCancel
   } = useDropdown(question, feedback, onFeedback);
-
   const renderItem = ({
     item
   }) => {
@@ -83,7 +82,6 @@ const DropdownQuestion = ({
       source: radioIconSource[icon]
     }), /*#__PURE__*/React.createElement(View, null)));
   };
-
   const buttonContainerStyle = colorScheme === COLOR_SCHEMES.light ? {
     borderWidth: 1
   } : {
@@ -143,7 +141,7 @@ const DropdownQuestion = ({
       style: subTitleContainerStyle
     }, /*#__PURE__*/React.createElement(Text, {
       style: subTitleTextStyle
-    }, questionTitle)), /*#__PURE__*/React.createElement(View, {
+    }, questionTitlePlain)), /*#__PURE__*/React.createElement(View, {
       style: bottomSheetStyles.content
     }, /*#__PURE__*/React.createElement(View, {
       style: [bottomSheetStyles.searchContainer, rtl && GlobalStyle.flexRowReverse]
@@ -166,7 +164,6 @@ const DropdownQuestion = ({
     visible: bottomSheetVisible
   }));
 };
-
 export default /*#__PURE__*/React.memo(DropdownQuestion);
 const styles = StyleSheet.create({
   container: {

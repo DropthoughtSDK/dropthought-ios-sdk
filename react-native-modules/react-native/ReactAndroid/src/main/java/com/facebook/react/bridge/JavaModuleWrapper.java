@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -15,6 +15,7 @@ import static com.facebook.systrace.Systrace.TRACE_TAG_REACT_JAVA_BRIDGE;
 
 import androidx.annotation.Nullable;
 import com.facebook.proguard.annotations.DoNotStrip;
+import com.facebook.react.turbomodule.core.interfaces.TurboModule;
 import com.facebook.systrace.Systrace;
 import com.facebook.systrace.SystraceMessage;
 import java.lang.reflect.Method;
@@ -30,7 +31,7 @@ import java.util.Set;
  * read and means fewer JNI calls.
  */
 @DoNotStrip
-public class JavaModuleWrapper {
+class JavaModuleWrapper {
   @DoNotStrip
   public class MethodDescriptor {
     @DoNotStrip Method method;
@@ -43,6 +44,7 @@ public class JavaModuleWrapper {
   private final ModuleHolder mModuleHolder;
   private final ArrayList<NativeModule.NativeMethod> mMethods;
   private final ArrayList<MethodDescriptor> mDescs;
+  private static final String TAG = JavaModuleWrapper.class.getSimpleName();
 
   public JavaModuleWrapper(JSInstance jsInstance, ModuleHolder moduleHolder) {
     mJSInstance = jsInstance;
@@ -69,7 +71,7 @@ public class JavaModuleWrapper {
     Class<? extends NativeModule> classForMethods = mModuleHolder.getModule().getClass();
     Class<? extends NativeModule> superClass =
         (Class<? extends NativeModule>) classForMethods.getSuperclass();
-    if (ReactModuleWithSpec.class.isAssignableFrom(superClass)) {
+    if (TurboModule.class.isAssignableFrom(superClass)) {
       // For java module that is based on generated flow-type spec, inspect the
       // spec abstract class instead, which is the super class of the given java
       // module.
@@ -113,10 +115,6 @@ public class JavaModuleWrapper {
 
   @DoNotStrip
   public @Nullable NativeMap getConstants() {
-    if (!mModuleHolder.getHasConstants()) {
-      return null;
-    }
-
     final String moduleName = getName();
     SystraceMessage.beginSection(TRACE_TAG_REACT_JAVA_BRIDGE, "JavaModuleWrapper.getConstants")
         .arg("moduleName", moduleName)

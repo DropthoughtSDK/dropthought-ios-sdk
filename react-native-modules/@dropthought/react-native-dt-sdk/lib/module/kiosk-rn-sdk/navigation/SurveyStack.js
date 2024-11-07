@@ -1,18 +1,31 @@
 import React, { useCallback, useState } from 'react';
 import { View, StyleSheet, NativeModules } from 'react-native';
 import { isEmpty, isNil } from 'ramda';
-import { PlaceholderImageTypes, PlaceholderScreen, i18n, SurveyScreenLayout, ActivityIndicatorMask } from '@dropthought/react-native-ui/src';
+import { PlaceholderImageTypes, PlaceholderScreen, i18n, SurveyScreenLayout, ActivityIndicatorMask } from '@dropthought/react-native-ui';
 import { useAsync } from 'react-async';
-import { useMetadata } from '../contexts/custom-props';
+// @ts-ignore
+import { useMetadata } from '../contexts/custom-props/CustomPropsContext';
+// @ts-ignore
 import StartScreen from '../screens/StartScreen';
+// @ts-ignore
 import EndScreen from '../screens/EndScreen';
+// @ts-ignore
 import ErrorHintScreen from '../screens/ErrorHintScreen';
-import { useSurveyContext } from '../contexts/survey';
-import { submitFeedback } from '../../lib/Feedback';
+// @ts-ignore
+import { useSurveyContext } from '../contexts/survey/SurveyContext';
+// @ts-ignore
+import { submitFeedback, finalizeSubmitedFeedback } from '../../lib/Feedback';
 import ScreenWrapper from './ScreenWrapper';
+// @ts-ignore
 import Header from './Header';
+// @ts-ignore
 import { fromJSToAPIDateStr } from '../../lib/DateTimerParser';
-import { uploadPicture } from '../../lib/UploadPicture';
+// @ts-ignore
+import { uploadFile } from '../../lib/UploadFile';
+// @ts-ignore
+
+// @ts-ignore
+import { postPollChoice } from '../../lib/Poll';
 const noData = a => isNil(a) || isEmpty(a);
 const Stack = ({
   preview
@@ -31,6 +44,7 @@ const Stack = ({
     run,
     isPending: loading
   } = useAsync({
+    // @ts-ignore
     deferFn: submitFeedback,
     onResolve: () => {
       setEndScreenvisible(true);
@@ -42,6 +56,7 @@ const Stack = ({
   });
   const handleNextPage = useCallback(nextPageIndex => {
     if (nextPageIndex < survey.pageOrder.length) {
+      // @ts-ignore
       setVisiblePageIds(prevPageIds => {
         const nextPageId = survey.pageOrder[nextPageIndex];
         return [...prevPageIds.filter(prevPageId => prevPageId !== nextPageId), nextPageId];
@@ -61,6 +76,8 @@ const Stack = ({
       const {
         timeZone
       } = NativeModules.DtSdk.getConstants();
+      const finalFeedbacks = finalizeSubmitedFeedback(feedback.feedbacks, survey);
+      feedback.feedbacks = finalFeedbacks;
       setSurveyFeedback(feedback);
       run({
         ...feedback,
@@ -69,15 +86,15 @@ const Stack = ({
         timeZone
       });
     }
-  }, [metadata, preview, run]);
+  }, [metadata, preview, run, survey]);
   const [isUploading, setIsUploading] = useState(false);
-  const handleUpload = async file => {
+  const handleUpload = async (file, questionType, requestConfig) => {
     if (file) {
       setIsUploading(true);
       try {
         const {
           url
-        } = await uploadPicture(file);
+        } = await uploadFile(file, questionType, requestConfig);
         setIsUploading(false);
         return url;
       } catch (reason) {
@@ -86,6 +103,21 @@ const Stack = ({
       }
     } else {
       return undefined;
+    }
+  };
+  const [isPostingPollChoice, setIsPostingPollChoice] = useState(false);
+  const handlePostingPollChoice = async data => {
+    setIsPostingPollChoice(true);
+    try {
+      const response = await postPollChoice({
+        programToken: survey.token,
+        ...data
+      });
+      setIsPostingPollChoice(false);
+      return response.result;
+    } catch (reason) {
+      setIsPostingPollChoice(false);
+      return reason;
     }
   };
   return /*#__PURE__*/React.createElement(View, {
@@ -109,7 +141,9 @@ const Stack = ({
       visible: visiblePageIds.includes(pageId),
       isOnTop: visiblePageIds[visiblePageIds.length - 1] === pageId,
       rtl: survey.language === 'ar'
-    }, /*#__PURE__*/React.createElement(SurveyScreenLayout, {
+    }, /*#__PURE__*/React.createElement(SurveyScreenLayout
+    // @ts-ignore
+    , {
       survey: survey,
       pageIndex: pageIndex,
       onClose: onClose,
@@ -118,6 +152,8 @@ const Stack = ({
       onSubmit: handleSubmit,
       onUpload: handleUpload,
       isUploading: isUploading,
+      onPostPollChoice: handlePostingPollChoice,
+      isPostingPollChoice: isPostingPollChoice,
       preview: preview
     }));
   }), /*#__PURE__*/React.createElement(ScreenWrapper, {

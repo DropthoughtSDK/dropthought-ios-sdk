@@ -46,8 +46,14 @@ const ProgressBar = ({ value, maxValue, themeColor, color, rtl }: Props) => {
   return (
     <View style={styles.container}>
       <View style={trackStyle} />
-      <View style={progressBarStyle} />
-      <Text style={textStyle}>{`${value}/${maxValue}`}</Text>
+      <View
+        // @ts-ignore
+        style={progressBarStyle}
+      />
+      <Text
+        testID="test:id/custom_preview_progress_bar"
+        style={textStyle}
+      >{`${value}/${maxValue}`}</Text>
     </View>
   );
 };

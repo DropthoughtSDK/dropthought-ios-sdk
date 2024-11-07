@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,6 +7,7 @@
 
 #include "jsireact/JSIExecutor.h"
 
+#include <cxxreact/ErrorUtils.h>
 #include <cxxreact/JSBigString.h>
 #include <cxxreact/ModuleRegistry.h>
 #include <cxxreact/ReactMarker.h>
@@ -23,15 +24,14 @@
 
 using namespace facebook::jsi;
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 class JSIExecutor::NativeModuleProxy : public jsi::HostObject {
  public:
   NativeModuleProxy(std::shared_ptr<JSINativeModules> nativeModules)
       : weakNativeModules_(nativeModules) {}
 
-  Value get(Runtime &rt, const PropNameID &name) override {
+  Value get(Runtime& rt, const PropNameID& name) override {
     if (name.utf8(rt) == "name") {
       return jsi::String::createFromAscii(rt, "NativeModules");
     }
@@ -44,7 +44,7 @@ class JSIExecutor::NativeModuleProxy : public jsi::HostObject {
     return nativeModules->getModule(rt, name);
   }
 
-  void set(Runtime &, const PropNameID &, const Value &) override {
+  void set(Runtime&, const PropNameID&, const Value&) override {
     throw std::runtime_error(
         "Unable to put on NativeModules: Operation unsupported");
   }
@@ -56,7 +56,7 @@ class JSIExecutor::NativeModuleProxy : public jsi::HostObject {
 namespace {
 
 // basename_r isn't in all iOS SDKs, so use this simple version instead.
-std::string simpleBasename(const std::string &path) {
+std::string simpleBasename(const std::string& path) {
   size_t pos = path.rfind("/");
   return (pos != std::string::npos) ? path.substr(pos) : path;
 }
@@ -66,7 +66,7 @@ std::string simpleBasename(const std::string &path) {
 JSIExecutor::JSIExecutor(
     std::shared_ptr<jsi::Runtime> runtime,
     std::shared_ptr<ExecutorDelegate> delegate,
-    const JSIScopedTimeoutInvoker &scopedTimeoutInvoker,
+    const JSIScopedTimeoutInvoker& scopedTimeoutInvoker,
     RuntimeInstaller runtimeInstaller)
     : runtime_(runtime),
       delegate_(delegate),
@@ -81,6 +81,9 @@ JSIExecutor::JSIExecutor(
 
 void JSIExecutor::initializeRuntime() {
   SystraceSection s("JSIExecutor::initializeRuntime");
+
+  bindNativePerformanceNow(*runtime_);
+
   runtime_->global().setProperty(
       *runtime_,
       "nativeModuleProxy",
@@ -95,9 +98,9 @@ void JSIExecutor::initializeRuntime() {
           PropNameID::forAscii(*runtime_, "nativeFlushQueueImmediate"),
           1,
           [this](
-              jsi::Runtime &,
-              const jsi::Value &,
-              const jsi::Value *args,
+              jsi::Runtime&,
+              const jsi::Value&,
+              const jsi::Value* args,
               size_t count) {
             if (count != 1) {
               throw std::invalid_argument(
@@ -115,12 +118,11 @@ void JSIExecutor::initializeRuntime() {
           PropNameID::forAscii(*runtime_, "nativeCallSyncHook"),
           1,
           [this](
-              jsi::Runtime &,
-              const jsi::Value &,
-              const jsi::Value *args,
+              jsi::Runtime&,
+              const jsi::Value&,
+              const jsi::Value* args,
               size_t count) { return nativeCallSyncHook(args, count); }));
 
-#if DEBUG
   runtime_->global().setProperty(
       *runtime_,
       "globalEvalWithSourceUrl",
@@ -129,16 +131,16 @@ void JSIExecutor::initializeRuntime() {
           PropNameID::forAscii(*runtime_, "globalEvalWithSourceUrl"),
           1,
           [this](
-              jsi::Runtime &,
-              const jsi::Value &,
-              const jsi::Value *args,
+              jsi::Runtime&,
+              const jsi::Value&,
+              const jsi::Value* args,
               size_t count) { return globalEvalWithSourceUrl(args, count); }));
-#endif
 
   if (runtimeInstaller_) {
     runtimeInstaller_(*runtime_);
   }
-  bool hasLogger(ReactMarker::logTaggedMarker);
+
+  bool hasLogger(ReactMarker::logTaggedMarkerImpl);
   if (hasLogger) {
     ReactMarker::logMarker(ReactMarker::CREATE_REACT_CONTEXT_STOP);
   }
@@ -149,7 +151,7 @@ void JSIExecutor::loadBundle(
     std::string sourceURL) {
   SystraceSection s("JSIExecutor::loadBundle");
 
-  bool hasLogger(ReactMarker::logTaggedMarker);
+  bool hasLogger(ReactMarker::logTaggedMarkerImpl);
   std::string scriptName = simpleBasename(sourceURL);
   if (hasLogger) {
     ReactMarker::logTaggedMarker(
@@ -161,6 +163,8 @@ void JSIExecutor::loadBundle(
   if (hasLogger) {
     ReactMarker::logTaggedMarker(
         ReactMarker::RUN_JS_BUNDLE_STOP, scriptName.c_str());
+    ReactMarker::logMarker(ReactMarker::INIT_REACT_RUNTIME_STOP);
+    ReactMarker::logMarker(ReactMarker::APP_STARTUP_STOP);
   }
 }
 
@@ -174,9 +178,9 @@ void JSIExecutor::setBundleRegistry(std::unique_ptr<RAMBundleRegistry> r) {
             PropNameID::forAscii(*runtime_, "nativeRequire"),
             2,
             [this](
-                __unused Runtime &rt,
-                const facebook::jsi::Value &,
-                const facebook::jsi::Value *args,
+                [[maybe_unused]] Runtime& rt,
+                const facebook::jsi::Value&,
+                const facebook::jsi::Value* args,
                 size_t count) { return nativeRequire(args, count); }));
   }
   bundleRegistry_ = std::move(r);
@@ -184,7 +188,7 @@ void JSIExecutor::setBundleRegistry(std::unique_ptr<RAMBundleRegistry> r) {
 
 void JSIExecutor::registerBundle(
     uint32_t bundleId,
-    const std::string &bundlePath) {
+    const std::string& bundlePath) {
   const auto tag = folly::to<std::string>(bundleId);
   ReactMarker::logTaggedMarker(
       ReactMarker::REGISTER_JS_SEGMENT_START, tag.c_str());
@@ -204,10 +208,34 @@ void JSIExecutor::registerBundle(
       ReactMarker::REGISTER_JS_SEGMENT_STOP, tag.c_str());
 }
 
+// Looping on \c drainMicrotasks until it completes or hits the retries bound.
+static void performMicrotaskCheckpoint(jsi::Runtime& runtime) {
+  uint8_t retries = 0;
+  // A heuristic number to guard infinite or absurd numbers of retries.
+  const static unsigned int kRetriesBound = 255;
+
+  while (retries < kRetriesBound) {
+    try {
+      // The default behavior of \c drainMicrotasks is unbounded execution.
+      // We may want to make it bounded in the future.
+      if (runtime.drainMicrotasks()) {
+        break;
+      }
+    } catch (jsi::JSError& error) {
+      handleJSError(runtime, error, true);
+    }
+    retries++;
+  }
+
+  if (retries == kRetriesBound) {
+    throw std::runtime_error("Hits microtasks retries bound.");
+  }
+}
+
 void JSIExecutor::callFunction(
-    const std::string &moduleId,
-    const std::string &methodId,
-    const folly::dynamic &arguments) {
+    const std::string& moduleId,
+    const std::string& methodId,
+    const folly::dynamic& arguments) {
   SystraceSection s(
       "JSIExecutor::callFunction", "moduleId", moduleId, "methodId", methodId);
   if (!callFunctionReturnFlushedQueue_) {
@@ -219,8 +247,7 @@ void JSIExecutor::callFunction(
   // by value.
   auto errorProducer = [=] {
     std::stringstream ss;
-    ss << "moduleID: " << moduleId << " methodID: " << methodId
-       << " arguments: " << folly::toJson(arguments);
+    ss << "moduleID: " << moduleId << " methodID: " << methodId;
     return ss.str();
   };
 
@@ -240,12 +267,14 @@ void JSIExecutor::callFunction(
         std::runtime_error("Error calling " + moduleId + "." + methodId));
   }
 
+  performMicrotaskCheckpoint(*runtime_);
+
   callNativeModules(ret, true);
 }
 
 void JSIExecutor::invokeCallback(
     const double callbackId,
-    const folly::dynamic &arguments) {
+    const folly::dynamic& arguments) {
   SystraceSection s("JSIExecutor::invokeCallback", "callbackId", callbackId);
   if (!invokeCallbackAndReturnFlushedQueue_) {
     bindBridge();
@@ -259,6 +288,8 @@ void JSIExecutor::invokeCallback(
         folly::to<std::string>("Error invoking callback ", callbackId)));
   }
 
+  performMicrotaskCheckpoint(*runtime_);
+
   callNativeModules(ret, true);
 }
 
@@ -271,7 +302,7 @@ void JSIExecutor::setGlobalVariable(
       propName.c_str(),
       Value::createFromJsonUtf8(
           *runtime_,
-          reinterpret_cast<const uint8_t *>(jsonValue->c_str()),
+          reinterpret_cast<const uint8_t*>(jsonValue->c_str()),
           jsonValue->size()));
 }
 
@@ -279,7 +310,7 @@ std::string JSIExecutor::getDescription() {
   return "JSI (" + runtime_->description() + ")";
 }
 
-void *JSIExecutor::getJavaScriptContext() {
+void* JSIExecutor::getJavaScriptContext() {
   return runtime_.get();
 }
 
@@ -299,7 +330,7 @@ void JSIExecutor::handleMemoryPressure(int pressureLevel) {
     TRIM_MEMORY_RUNNING_MODERATE = 5,
     TRIM_MEMORY_UI_HIDDEN = 20,
   };
-  const char *levelName;
+  const char* levelName;
   switch (pressureLevel) {
     case TRIM_MEMORY_BACKGROUND:
       levelName = "TRIM_MEMORY_BACKGROUND";
@@ -375,7 +406,7 @@ void JSIExecutor::bindBridge() {
   });
 }
 
-void JSIExecutor::callNativeModules(const Value &queue, bool isEndOfBatch) {
+void JSIExecutor::callNativeModules(const Value& queue, bool isEndOfBatch) {
   SystraceSection s("JSIExecutor::callNativeModules");
   // If this fails, you need to pass a fully functional delegate with a
   // module registry to the factory/ctor.
@@ -394,7 +425,9 @@ void JSIExecutor::callNativeModules(const Value &queue, bool isEndOfBatch) {
 void JSIExecutor::flush() {
   SystraceSection s("JSIExecutor::flush");
   if (flushedQueue_) {
-    callNativeModules(flushedQueue_->call(*runtime_), true);
+    Value ret = flushedQueue_->call(*runtime_);
+    performMicrotaskCheckpoint(*runtime_);
+    callNativeModules(ret, true);
     return;
   }
 
@@ -410,7 +443,9 @@ void JSIExecutor::flush() {
     // If calls were made, we bind to the JS bridge methods, and use them to
     // get the pending queue of native calls.
     bindBridge();
-    callNativeModules(flushedQueue_->call(*runtime_), true);
+    Value ret = flushedQueue_->call(*runtime_);
+    performMicrotaskCheckpoint(*runtime_);
+    callNativeModules(ret, true);
   } else if (delegate_) {
     // If we have a delegate, we need to call it; we pass a null list to
     // callNativeModules, since we know there are no native calls, without
@@ -420,7 +455,7 @@ void JSIExecutor::flush() {
   }
 }
 
-Value JSIExecutor::nativeRequire(const Value *args, size_t count) {
+Value JSIExecutor::nativeRequire(const Value* args, size_t count) {
   if (count > 2 || count == 0) {
     throw std::invalid_argument("Got wrong number of args");
   }
@@ -434,12 +469,12 @@ Value JSIExecutor::nativeRequire(const Value *args, size_t count) {
   return facebook::jsi::Value();
 }
 
-Value JSIExecutor::nativeCallSyncHook(const Value *args, size_t count) {
+Value JSIExecutor::nativeCallSyncHook(const Value* args, size_t count) {
   if (count != 3) {
     throw std::invalid_argument("nativeCallSyncHook arg count must be 3");
   }
 
-  if (!args[2].asObject(*runtime_).isArray(*runtime_)) {
+  if (!args[2].isObject() || !args[2].asObject(*runtime_).isArray(*runtime_)) {
     throw std::invalid_argument(
         folly::to<std::string>("method parameters should be array"));
   }
@@ -465,20 +500,21 @@ Value JSIExecutor::nativeCallSyncHook(const Value *args, size_t count) {
 
   /**
    * Note:
-   * In RCTNativeModule, folly::none is returned from callSerializableNativeHook
-   * when executing a NativeModule method fails. Therefore, it's safe to not
-   * terminate the syncMethodCall when folly::none is returned.
+   * In RCTNativeModule, std::nullopt is returned from
+   * callSerializableNativeHook when executing a NativeModule method fails.
+   * Therefore, it's safe to not terminate the syncMethodCall when std::nullopt
+   * is returned.
    *
-   * TODO: In JavaNativeModule, folly::none is returned when the synchronous
+   * TODO: In JavaNativeModule, std::nullopt is returned when the synchronous
    * NativeModule method has the void return type. Change this to return
-   * folly::dynamic(nullptr) instead, so that folly::none is reserved for
+   * folly::dynamic(nullptr) instead, so that std::nullopt is reserved for
    * exceptional scenarios.
    *
-   * TODO: Investigate CxxModule infra to see if folly::none is used for
+   * TODO: Investigate CxxModule infra to see if std::nullopt is used for
    * returns in exceptional scenarios.
    **/
 
-  if (!result.hasValue()) {
+  if (!result.has_value()) {
     return Value::undefined();
   }
 
@@ -494,8 +530,7 @@ Value JSIExecutor::nativeCallSyncHook(const Value *args, size_t count) {
   return returnValue;
 }
 
-#if DEBUG
-Value JSIExecutor::globalEvalWithSourceUrl(const Value *args, size_t count) {
+Value JSIExecutor::globalEvalWithSourceUrl(const Value* args, size_t count) {
   if (count != 1 && count != 2) {
     throw std::invalid_argument(
         "globalEvalWithSourceUrl arg count must be 1 or 2");
@@ -510,9 +545,8 @@ Value JSIExecutor::globalEvalWithSourceUrl(const Value *args, size_t count) {
   return runtime_->evaluateJavaScript(
       std::make_unique<StringBuffer>(std::move(code)), url);
 }
-#endif
 
-void bindNativeLogger(Runtime &runtime, Logger logger) {
+void bindNativeLogger(Runtime& runtime, Logger logger) {
   runtime.global().setProperty(
       runtime,
       "nativeLoggingHook",
@@ -521,9 +555,9 @@ void bindNativeLogger(Runtime &runtime, Logger logger) {
           PropNameID::forAscii(runtime, "nativeLoggingHook"),
           2,
           [logger = std::move(logger)](
-              jsi::Runtime &runtime,
-              const jsi::Value &,
-              const jsi::Value *args,
+              jsi::Runtime& runtime,
+              const jsi::Value&,
+              const jsi::Value* args,
               size_t count) {
             if (count != 2) {
               throw std::invalid_argument(
@@ -536,7 +570,7 @@ void bindNativeLogger(Runtime &runtime, Logger logger) {
           }));
 }
 
-void bindNativePerformanceNow(Runtime &runtime, PerformanceNow performanceNow) {
+void bindNativePerformanceNow(Runtime& runtime) {
   runtime.global().setProperty(
       runtime,
       "nativePerformanceNow",
@@ -544,12 +578,10 @@ void bindNativePerformanceNow(Runtime &runtime, PerformanceNow performanceNow) {
           runtime,
           PropNameID::forAscii(runtime, "nativePerformanceNow"),
           0,
-          [performanceNow = std::move(performanceNow)](
-              jsi::Runtime &runtime,
-              const jsi::Value &,
-              const jsi::Value *args,
-              size_t count) { return Value(performanceNow()); }));
+          [](jsi::Runtime& runtime,
+             const jsi::Value&,
+             const jsi::Value* args,
+             size_t count) { return Value(JSExecutor::performanceNow()); }));
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

@@ -170,13 +170,21 @@ const PictureChoiceItem = ({
         ? [styles.optionText, { color: fontColor ?? Colors.appearanceSubBlack }]
         : [styles.optionText, { color: fontColor }];
     return (
-      <View style={containerStyle}>
+      <View
+        accessibilityLabel={`test:id/picture_choice_selected_${selected}`}
+        style={containerStyle}
+      >
         <ChooseIcon
           isMultipleChoice={isMultipleChoice}
           selected={selected}
           themeColor={themeColor}
         />
-        <Text style={textStyle}>{title}</Text>
+        <Text
+          testID={`test:id/picture_choice_item_${fontColor}`}
+          style={textStyle}
+        >
+          {title}
+        </Text>
       </View>
     );
   }, [
@@ -191,6 +199,8 @@ const PictureChoiceItem = ({
 
   return (
     <TouchableOpacity
+      accessible={false}
+      testID={`test:id/picture_choice_loading_${loadingImage}`}
       style={itemGapStyle}
       onPress={() => {
         if (imageLoadError) {

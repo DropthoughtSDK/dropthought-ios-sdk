@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -43,15 +43,13 @@ void RCTCopyBackedTextInput(
   toTextInput.secureTextEntry = fromTextInput.secureTextEntry;
   toTextInput.keyboardType = fromTextInput.keyboardType;
   toTextInput.textContentType = fromTextInput.textContentType;
-
-  if (@available(iOS 12.0, *)) {
-    toTextInput.passwordRules = fromTextInput.passwordRules;
-  }
+  toTextInput.smartInsertDeleteType = fromTextInput.smartInsertDeleteType;
+  toTextInput.passwordRules = fromTextInput.passwordRules;
 
   [toTextInput setSelectedTextRange:fromTextInput.selectedTextRange notifyDelegate:NO];
 }
 
-UITextAutocorrectionType RCTUITextAutocorrectionTypeFromOptionalBool(facebook::better::optional<bool> autoCorrect)
+UITextAutocorrectionType RCTUITextAutocorrectionTypeFromOptionalBool(std::optional<bool> autoCorrect)
 {
   return autoCorrect.has_value() ? (*autoCorrect ? UITextAutocorrectionTypeYes : UITextAutocorrectionTypeNo)
                                  : UITextAutocorrectionTypeDefault;
@@ -84,7 +82,7 @@ UIKeyboardAppearance RCTUIKeyboardAppearanceFromKeyboardAppearance(KeyboardAppea
   }
 }
 
-UITextSpellCheckingType RCTUITextSpellCheckingTypeFromOptionalBool(facebook::better::optional<bool> spellCheck)
+UITextSpellCheckingType RCTUITextSpellCheckingTypeFromOptionalBool(std::optional<bool> spellCheck)
 {
   return spellCheck.has_value() ? (*spellCheck ? UITextSpellCheckingTypeYes : UITextSpellCheckingTypeNo)
                                 : UITextSpellCheckingTypeDefault;
@@ -177,15 +175,79 @@ UIReturnKeyType RCTUIReturnKeyTypeFromReturnKeyType(ReturnKeyType returnKeyType)
   }
 }
 
-API_AVAILABLE(ios(10.0))
-UITextContentType RCTUITextContentTypeFromString(std::string const &contentType)
+UITextContentType RCTUITextContentTypeFromString(const std::string &contentType)
 {
-  // TODO: Implement properly (T26519801).
-  return RCTNSStringFromStringNilIfEmpty(contentType);
+  static dispatch_once_t onceToken;
+  static NSDictionary<NSString *, NSString *> *contentTypeMap;
+
+  dispatch_once(&onceToken, ^{
+    NSMutableDictionary<NSString *, NSString *> *mutableContentTypeMap = [NSMutableDictionary new];
+    [mutableContentTypeMap addEntriesFromDictionary:@{
+      @"" : @"",
+      @"none" : @"",
+      @"URL" : UITextContentTypeURL,
+      @"addressCity" : UITextContentTypeAddressCity,
+      @"addressCityAndState" : UITextContentTypeAddressCityAndState,
+      @"addressState" : UITextContentTypeAddressState,
+      @"countryName" : UITextContentTypeCountryName,
+      @"creditCardNumber" : UITextContentTypeCreditCardNumber,
+      @"emailAddress" : UITextContentTypeEmailAddress,
+      @"familyName" : UITextContentTypeFamilyName,
+      @"fullStreetAddress" : UITextContentTypeFullStreetAddress,
+      @"givenName" : UITextContentTypeGivenName,
+      @"jobTitle" : UITextContentTypeJobTitle,
+      @"location" : UITextContentTypeLocation,
+      @"middleName" : UITextContentTypeMiddleName,
+      @"name" : UITextContentTypeName,
+      @"namePrefix" : UITextContentTypeNamePrefix,
+      @"nameSuffix" : UITextContentTypeNameSuffix,
+      @"nickname" : UITextContentTypeNickname,
+      @"organizationName" : UITextContentTypeOrganizationName,
+      @"postalCode" : UITextContentTypePostalCode,
+      @"streetAddressLine1" : UITextContentTypeStreetAddressLine1,
+      @"streetAddressLine2" : UITextContentTypeStreetAddressLine2,
+      @"sublocality" : UITextContentTypeSublocality,
+      @"telephoneNumber" : UITextContentTypeTelephoneNumber,
+      @"username" : UITextContentTypeUsername,
+      @"password" : UITextContentTypePassword,
+      @"newPassword" : UITextContentTypeNewPassword,
+      @"oneTimeCode" : UITextContentTypeOneTimeCode,
+    }];
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 170000 /* __IPHONE_17_0 */
+    if (@available(iOS 17.0, *)) {
+      [mutableContentTypeMap addEntriesFromDictionary:@{
+        @"creditCardExpiration" : UITextContentTypeCreditCardExpiration,
+        @"creditCardExpirationMonth" : UITextContentTypeCreditCardExpirationMonth,
+        @"creditCardExpirationYear" : UITextContentTypeCreditCardExpirationYear,
+        @"creditCardSecurityCode" : UITextContentTypeCreditCardSecurityCode,
+        @"creditCardType" : UITextContentTypeCreditCardType,
+        @"creditCardName" : UITextContentTypeCreditCardName,
+        @"creditCardGivenName" : UITextContentTypeCreditCardGivenName,
+        @"creditCardMiddleName" : UITextContentTypeCreditCardMiddleName,
+        @"creditCardFamilyName" : UITextContentTypeCreditCardFamilyName,
+        @"birthdate" : UITextContentTypeBirthdate,
+        @"birthdateDay" : UITextContentTypeBirthdateDay,
+        @"birthdateMonth" : UITextContentTypeBirthdateMonth,
+        @"birthdateYear" : UITextContentTypeBirthdateYear,
+      }];
+    }
+#endif
+
+    contentTypeMap = mutableContentTypeMap;
+  });
+
+  return contentTypeMap[RCTNSStringFromString(contentType)] ?: @"";
 }
 
-API_AVAILABLE(ios(12.0))
-UITextInputPasswordRules *RCTUITextInputPasswordRulesFromString(std::string const &passwordRules)
+UITextInputPasswordRules *RCTUITextInputPasswordRulesFromString(const std::string &passwordRules)
 {
   return [UITextInputPasswordRules passwordRulesWithDescriptor:RCTNSStringFromStringNilIfEmpty(passwordRules)];
+}
+
+UITextSmartInsertDeleteType RCTUITextSmartInsertDeleteTypeFromOptionalBool(std::optional<bool> smartInsertDelete)
+{
+  return smartInsertDelete.has_value()
+      ? (*smartInsertDelete ? UITextSmartInsertDeleteTypeYes : UITextSmartInsertDeleteTypeNo)
+      : UITextSmartInsertDeleteTypeDefault;
 }

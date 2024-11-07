@@ -1,10 +1,11 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
 
+#import <React/RCTBridgeProxy.h>
 #import <React/RCTEventEmitter.h>
 #import <React/RCTNetworkTask.h>
 #import <React/RCTURLRequestHandler.h>
@@ -31,7 +32,7 @@
  * Allows RCTNetworking instances to be initialized with handlers.
  * The handlers will be requested via the bridge's moduleForName method when required.
  */
-- (instancetype)initWithHandlersProvider:(NSArray<id<RCTURLRequestHandler>> * (^)(void))getHandlers;
+- (instancetype)initWithHandlersProvider:(NSArray<id<RCTURLRequestHandler>> * (^)(RCTModuleRegistry *))getHandlers;
 
 /**
  * Does a handler exist for the specified request?
@@ -56,6 +57,12 @@
 @end
 
 @interface RCTBridge (RCTNetworking)
+
+@property (nonatomic, readonly) RCTNetworking *networking;
+
+@end
+
+@interface RCTBridgeProxy (RCTNetworking)
 
 @property (nonatomic, readonly) RCTNetworking *networking;
 

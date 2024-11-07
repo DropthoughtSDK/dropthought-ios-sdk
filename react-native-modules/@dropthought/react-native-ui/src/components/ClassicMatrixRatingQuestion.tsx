@@ -81,6 +81,7 @@ const MatrixColoum = ({
   return (
     <View style={optionContainerStyle}>
       <TouchableOpacity
+        accessible={false}
         style={styles.coloumButton}
         onPress={() => onColoumPress(rowIndex, coloumIndex)}
       >
@@ -88,7 +89,11 @@ const MatrixColoum = ({
           <Text>{coloumIndex + 1}</Text>
         </View>
         <View style={GlobalStyle.flex1}>
-          <Text numberOfLines={2} style={textStyle}>
+          <Text
+            testID="test:id/matrix_rating_option"
+            numberOfLines={2}
+            style={textStyle}
+          >
             {title}
           </Text>
         </View>
@@ -137,7 +142,7 @@ const MatrixRow = ({
   };
 
   const optionsList = !isCollapse
-    ? optionsForMatrix[0].map((value, index) => (
+    ? optionsForMatrix[0]?.map((value, index) => (
         <MatrixColoum
           title={value}
           rowIndex={rowIndex}
@@ -150,15 +155,25 @@ const MatrixRow = ({
       ))
     : null;
 
+  const answer = selectedAnswer[rowIndex];
   const optionSelectedText =
-    selectedAnswer[rowIndex] !== -1 ? (
+    answer !== undefined && answer !== -1 ? (
       <View style={styles.titleButtonSelected}>
         <View style={optionSelectedIndexStyle}>
-          <Text style={indexTextStyle}>{selectedAnswer[rowIndex] + 1}</Text>
+          <Text
+            testID="test:id/matrix_rating_selected_index"
+            style={indexTextStyle}
+          >
+            {answer + 1}
+          </Text>
         </View>
         <View style={GlobalStyle.flexShrink1}>
-          <Text numberOfLines={2} style={textStyle}>
-            {optionsForMatrix[0][selectedAnswer[rowIndex]]}
+          <Text
+            testID="test:id/matrix_rating_selected_option"
+            numberOfLines={2}
+            style={textStyle}
+          >
+            {optionsForMatrix[0] && optionsForMatrix[0][answer]}
           </Text>
         </View>
       </View>
@@ -167,11 +182,17 @@ const MatrixRow = ({
   return (
     <View style={containerStyle}>
       <TouchableOpacity
+        accessible={false}
         style={styles.titleButton}
         onPress={() => onRowPress(rowIndex)}
       >
         <View style={styles.titleButtonText}>
-          <Text style={textStyle}>{title}</Text>
+          <Text
+            testID={`test:id/matrix_rating_title_${fontColor}`}
+            style={textStyle}
+          >
+            {title}
+          </Text>
         </View>
         <View style={styles.titleButtonContent}>
           {optionSelectedText}

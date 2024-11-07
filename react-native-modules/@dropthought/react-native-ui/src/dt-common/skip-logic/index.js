@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 'use strict';
 Object.defineProperty(exports, '__esModule', { value: true });
 // dummy integration test
@@ -14,14 +15,15 @@ exports.EvaluateRuleSet = (ruleSet, pageFeedback) => {
   for (const rule of ruleSet) {
     if (rule.condition.indexOf('&&') > -1) {
       const andArr = rule.condition.split('&&');
-      let evalCond = '';
+      /** @type {boolean[]} */
+      const evalCond = [];
       for (const andCond of andArr) {
         const filteredFeedback = filterFeedback(
           pageFeedback,
           andCond.split('.')[0]
         );
-        const conditionArr = handleSplit(andCond, filteredFeedback[0].type);
         if (filteredFeedback.length > 0) {
+          const conditionArr = handleSplit(andCond, filteredFeedback[0].type);
           logDetails(conditionArr, filteredFeedback);
           if (
             evaluateCondition(
@@ -31,18 +33,21 @@ exports.EvaluateRuleSet = (ruleSet, pageFeedback) => {
               filteredFeedback[0]
             )
           ) {
-            evalCond =
-              evalCond.length > 0 ? evalCond + ' && ' + true : evalCond + true;
+            evalCond.push(true);
           } else {
-            evalCond =
-              evalCond.length > 0
-                ? evalCond + ' && ' + false
-                : evalCond + false;
+            evalCond.push(false);
           }
+        } else if (rule.condition.includes('.nasr')) {
+          evalCond.push(true);
+        } else if (rule.condition.includes('.nasw.')) {
+          evalCond.push(true);
+        } else if (rule.condition.includes('.nmtch.')) {
+          evalCond.push(true);
+        } else {
+          evalCond.push(false);
         }
       }
-      const e = eval;
-      result = e(evalCond) ? rule.toPageId : '';
+      result = evalCond.every((value) => value === true) ? rule.toPageId : '';
     } else if (rule.condition.indexOf('||') > -1) {
       const orArr = rule.condition.split('||');
       for (const orCond of orArr) {
@@ -50,8 +55,8 @@ exports.EvaluateRuleSet = (ruleSet, pageFeedback) => {
           pageFeedback,
           orCond.split('.')[0]
         );
-        const conditionArr = handleSplit(orCond, filteredFeedback[0].type);
         if (filteredFeedback.length > 0) {
+          const conditionArr = handleSplit(orCond, filteredFeedback[0].type);
           logDetails(conditionArr, filteredFeedback);
           if (
             evaluateCondition(
@@ -63,6 +68,12 @@ exports.EvaluateRuleSet = (ruleSet, pageFeedback) => {
           ) {
             result = rule.toPageId;
           }
+        } else if (rule.condition.includes('.nasr')) {
+          result = rule.toPageId;
+        } else if (rule.condition.includes('.nasw.')) {
+          result = rule.toPageId;
+        } else if (rule.condition.includes('.nmtch.')) {
+          result = rule.toPageId;
         }
       }
     } else {
@@ -70,11 +81,11 @@ exports.EvaluateRuleSet = (ruleSet, pageFeedback) => {
         pageFeedback,
         rule.condition.split('.')[0]
       );
-      const conditionArr = handleSplit(
-        rule.condition,
-        filteredFeedback[0].type
-      );
       if (filteredFeedback.length > 0) {
+        const conditionArr = handleSplit(
+          rule.condition,
+          filteredFeedback[0].type
+        );
         logDetails(conditionArr, filteredFeedback);
         if (
           evaluateCondition(
@@ -86,6 +97,12 @@ exports.EvaluateRuleSet = (ruleSet, pageFeedback) => {
         ) {
           result = rule.toPageId;
         }
+      } else if (rule.condition.includes('.nasr')) {
+        result = rule.toPageId;
+      } else if (rule.condition.includes('.nasw.')) {
+        result = rule.toPageId;
+      } else if (rule.condition.includes('.nmtch.')) {
+        result = rule.toPageId;
       }
     }
     if (result.length > 0) {
@@ -218,9 +235,10 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
         case 'mtch':
           //['5e3480b2-6e4b-475c-a916-1f0bab87033b','5','mtch','amazon.com',]
           // If the answer to this question Contains the text "logic test"
-          result = feedback.textOrIndexArr[conditionArr[1]].includes(
-            conditionArr[lastIndex]
-          );
+          result =
+            feedback.textOrIndexArr[conditionArr[1]]?.toLowerCase() ===
+            conditionArr[lastIndex].toLowerCase();
+
           break;
         case 'nmtch': {
           //['5e3480b2-6e4b-475c-a916-1f0bab87033b','5','nmtch','amazon.com',]
@@ -228,9 +246,9 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
           if (feedback.textOrIndexArr[conditionArr[1]] === '') {
             result = true;
           } else {
-            result = !feedback.textOrIndexArr[conditionArr[1]].includes(
-              conditionArr[lastIndex]
-            );
+            result =
+              feedback.textOrIndexArr[conditionArr[1]]?.toLowerCase() !==
+              conditionArr[lastIndex].toLowerCase();
           }
           break;
         }
@@ -258,14 +276,10 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
           //If the answer to this question is Timeliness of Service and is Answered
           switch (type) {
             case 'matrixChoice':
-              {
-                result = selectedMatrix[0] !== -1;
-              }
+              result = selectedMatrix[0] !== -1;
               break;
             default:
-              {
-                result = selectedAnswer !== -1;
-              }
+              result = selectedAnswer !== -1;
               break;
           }
           break;
@@ -275,14 +289,10 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
           result = selectedAnswer === -1;
           switch (type) {
             case 'matrixChoice':
-              {
-                result = selectedMatrix[0] === -1;
-              }
+              result = selectedMatrix[0] === -1;
               break;
             default:
-              {
-                result = selectedAnswer === -1;
-              }
+              result = selectedAnswer === -1;
               break;
           }
           break;
@@ -357,7 +367,9 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
           //['8ce47319-7ea2-423b-b322-cac316384314', 'mtch', 'logic test']
           // If the answer to this question Contains the text "logic test"
           const textOrIndexArr = `${feedback.textOrIndexArr[0]}`;
-          result = textOrIndexArr.includes(conditionArr[lastIndex]);
+          result =
+            textOrIndexArr.toLowerCase() ===
+            conditionArr[lastIndex].toLowerCase();
           break;
         }
         case 'nmtch': {
@@ -367,7 +379,9 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
           if (textOrIndexArr === '') {
             result = true;
           } else {
-            result = !textOrIndexArr.includes(conditionArr[lastIndex]);
+            result =
+              textOrIndexArr.toLowerCase() !==
+              conditionArr[lastIndex].toLowerCase();
           }
           break;
         }
@@ -477,7 +491,9 @@ export const evaluateCondition = (conditionArr, questionId, type, feedback) => {
             selectedAnswer < conditionValueArr[1];
           break;
         }
-
+        case 'viewed':
+          result = true;
+          break;
         //ratingSlider
         case 'eq':
           result = selectedAnswer === condition;

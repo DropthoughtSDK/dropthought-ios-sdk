@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -13,7 +13,12 @@ import java.nio.charset.Charset;
  * Not all versions of Android SDK have this class in nio package. This is the reason to have it
  * around.
  */
-public class StandardCharsets {
+@Deprecated(
+    since = "Deprecated class since v0.73.0, please use java.nio.charset.StandardCharsets instead.",
+    forRemoval = true)
+public final class StandardCharsets {
+
+  private StandardCharsets() {}
 
   /** Eight-bit UCS Transformation Format */
   public static final Charset UTF_8 = Charset.forName("UTF-8");

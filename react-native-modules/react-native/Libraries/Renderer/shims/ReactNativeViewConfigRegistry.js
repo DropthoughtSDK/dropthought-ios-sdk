@@ -1,50 +1,45 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @format
+ * @noformat
  * @flow strict-local
+ * @nolint
+ * @generated SignedSource<<1b39316520f5af25f0a141d7d78b0809>>
  */
-
-/* eslint-disable react-internal/invariant-args */
 
 'use strict';
 
-import type {
-  ReactNativeBaseComponentViewConfig,
-  ViewConfigGetter,
-} from './ReactNativeTypes';
-
-const invariant = require('invariant');
+import {type ViewConfig} from './ReactNativeTypes';
+import invariant from 'invariant';
 
 // Event configs
 const customBubblingEventTypes: {
-  [eventName: string]: $ReadOnly<{|
-    phasedRegistrationNames: $ReadOnly<{|
+  [eventName: string]: $ReadOnly<{
+    phasedRegistrationNames: $ReadOnly<{
       captured: string,
       bubbled: string,
-    |}>,
-  |}>,
-  ...,
+      skipBubbling?: ?boolean,
+    }>,
+  }>,
+  ...
 } = {};
 const customDirectEventTypes: {
-  [eventName: string]: $ReadOnly<{|
+  [eventName: string]: $ReadOnly<{
     registrationName: string,
-  |}>,
-  ...,
+  }>,
+  ...
 } = {};
 
 exports.customBubblingEventTypes = customBubblingEventTypes;
 exports.customDirectEventTypes = customDirectEventTypes;
 
-const viewConfigCallbacks = new Map();
-const viewConfigs = new Map();
+const viewConfigCallbacks = new Map<string, ?() => ViewConfig>();
+const viewConfigs = new Map<string, ViewConfig>();
 
-function processEventTypes(
-  viewConfig: ReactNativeBaseComponentViewConfig<>,
-): void {
+function processEventTypes(viewConfig: ViewConfig): void {
   const {bubblingEventTypes, directEventTypes} = viewConfig;
 
   if (__DEV__) {
@@ -82,7 +77,7 @@ function processEventTypes(
  * A callback is provided to load the view config from UIManager.
  * The callback is deferred until the view is actually rendered.
  */
-exports.register = function(name: string, callback: ViewConfigGetter): string {
+exports.register = function (name: string, callback: () => ViewConfig): string {
   invariant(
     !viewConfigCallbacks.has(name),
     'Tried to register two views with the same name %s',
@@ -103,7 +98,7 @@ exports.register = function(name: string, callback: ViewConfigGetter): string {
  * If this is the first time the view has been used,
  * This configuration will be lazy-loaded from UIManager.
  */
-exports.get = function(name: string): ReactNativeBaseComponentViewConfig<> {
+exports.get = function (name: string): ViewConfig {
   let viewConfig;
   if (!viewConfigs.has(name)) {
     const callback = viewConfigCallbacks.get(name);
@@ -113,6 +108,7 @@ exports.get = function(name: string): ReactNativeBaseComponentViewConfig<> {
         'View config getter callback for component `%s` must be a function (received `%s`).%s',
         name,
         callback === null ? 'null' : typeof callback,
+        // $FlowFixMe[recursive-definition]
         typeof name[0] === 'string' && /[a-z]/.test(name[0])
           ? ' Make sure to start component names with a capital letter.'
           : '',

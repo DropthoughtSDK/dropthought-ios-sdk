@@ -10,16 +10,13 @@ export const metadataTypeKeyboard = metadataType => {
   switch (metadataType === null || metadataType === void 0 ? void 0 : metadataType.toLocaleLowerCase()) {
     case QuestionMetaDataType.Email:
       return 'default';
-
     case QuestionMetaDataType.Phone:
       return 'phone-pad';
-
     case QuestionMetaDataType.Number:
       return Platform.select({
         ios: 'numbers-and-punctuation',
         default: 'default'
       });
-
     case QuestionMetaDataType.Date:
     default:
       return 'default';
@@ -29,18 +26,15 @@ export const metadataTypeAutoCapitalize = metadataType => {
   switch (metadataType === null || metadataType === void 0 ? void 0 : metadataType.toLocaleLowerCase()) {
     case QuestionMetaDataType.Name:
       return 'words';
-
     case QuestionMetaDataType.Email:
     case QuestionMetaDataType.Phone:
     case QuestionMetaDataType.Date:
     case QuestionMetaDataType.Number:
       return 'none';
-
     default:
       return 'sentences';
   }
 };
-
 const MultiLineTextInput = ({
   onEndEditingHandler,
   onChangeTextHandler,
@@ -68,8 +62,8 @@ const MultiLineTextInput = ({
   const MAX_CHARACTER = type === 'open' ? Number(scale) : 100;
   const appearanceTextColorStyle = {
     color: fontColor
-  }; // to keep answer always select the last one
-
+  };
+  // to keep answer always select the last one
   const answersIndex = (feedback === null || feedback === void 0 ? void 0 : feedback.answers.length) - 1;
   const [text, setText] = React.useState(typeof (feedback === null || feedback === void 0 ? void 0 : feedback.answers[answersIndex]) === 'string' ? `${feedback === null || feedback === void 0 ? void 0 : feedback.answers[answersIndex]}` : '');
   const [focus, setFocus] = React.useState(false);
@@ -81,27 +75,23 @@ const MultiLineTextInput = ({
     });
     return () => {
       hideSubscription.remove();
-    }; // eslint-disable-next-line react-hooks/exhaustive-deps
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   const onChangeText = t => {
     // [DK-3756] if the text is close to the maxLength it will be rendered twice in the iOS, so we add the focus to prevent the issue.
     if (focus) {
       setText(t);
     }
-
     onChangeTextHandler && onChangeTextHandler(t);
   };
-
   const characterLeft = MAX_CHARACTER - text.length;
   let bottomText = '';
   let bottomTextColor = Colors.warningRed;
-
   if (showAnonymousWarning) {
     bottomText = i18n.t('survey:metadata-anonymous-warning');
     bottomTextColor = Colors.openQuestionSubTitle;
   }
-
   const appearanceSubBackgroundColorStyle = {
     backgroundColor: addOpacityToColor(colorScheme === COLOR_SCHEMES.dark ? Colors.appearanceSubBlack : themeColor, 0.08)
   };
@@ -146,6 +136,5 @@ const MultiLineTextInput = ({
   }, characterLeft + ' / ' + MAX_CHARACTER));
   return /*#__PURE__*/React.createElement(React.Fragment, null, checked ? /*#__PURE__*/React.createElement(View, null, inputView, bottomView) : null);
 };
-
 export default MultiLineTextInput;
 //# sourceMappingURL=MultiLineTextInput.js.map

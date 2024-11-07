@@ -9,8 +9,8 @@ var react_native_1 = require("react-native");
  * @returns original image dimensions (width, height and aspect ratio).
  */
 function useImageDimensions(source, headers) {
-    var _a = react_1.useState({ loading: true }), result = _a[0], setResult = _a[1];
-    react_1.useEffect(function () {
+    var _a = (0, react_1.useState)({ loading: true }), result = _a[0], setResult = _a[1];
+    (0, react_1.useEffect)(function () {
         try {
             if (typeof source === 'number') {
                 var _a = react_native_1.Image.resolveAssetSource(source), width = _a.width, height = _a.height;
@@ -45,7 +45,7 @@ function useImageDimensions(source, headers) {
         catch (error) {
             setResult({ error: error, loading: false });
         }
-        // eslint-disable-next-line
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [typeof source === 'object' ? source.uri : source, headers]);
     return result;
 }

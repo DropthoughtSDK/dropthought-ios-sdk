@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,15 +7,22 @@
 
 #import "RCTView.h"
 
+#import <QuartzCore/QuartzCore.h>
+#import <React/RCTMockDef.h>
+
 #import "RCTAutoInsetsProtocol.h"
+#import "RCTBorderCurve.h"
 #import "RCTBorderDrawing.h"
-#import "RCTConvert.h"
 #import "RCTI18nUtil.h"
+#import "RCTLocalizedString.h"
 #import "RCTLog.h"
-#import "RCTUtils.h"
+#import "RCTViewUtils.h"
 #import "UIView+React.h"
 
-UIAccessibilityTraits const SwitchAccessibilityTrait = 0x20000000000001;
+RCT_MOCK_DEF(RCTView, RCTContentInsets);
+#define RCTContentInsets RCT_MOCK_USE(RCTView, RCTContentInsets)
+
+const UIAccessibilityTraits SwitchAccessibilityTrait = 0x20000000000001;
 
 @implementation UIView (RCTViewUnmounting)
 
@@ -122,6 +129,11 @@ static NSString *RCTRecursiveAccessibilityLabel(UIView *view)
     _borderBottomRightRadius = -1;
     _borderBottomStartRadius = -1;
     _borderBottomEndRadius = -1;
+    _borderEndEndRadius = -1;
+    _borderEndStartRadius = -1;
+    _borderStartEndRadius = -1;
+    _borderStartStartRadius = -1;
+    _borderCurve = RCTBorderCurveCircular;
     _borderStyle = RCTBorderStyleSolid;
     _hitTestEdgeInsets = UIEdgeInsetsZero;
 
@@ -201,7 +213,7 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithCoder : unused)
     case RCTPointerEventsBoxNone:
       return hitSubview;
     default:
-      RCTLogError(@"Invalid pointer-events specified %lld on %@", (long long)_pointerEvents, self);
+      RCTLogInfo(@"Invalid pointer-events specified %lld on %@", (long long)_pointerEvents, self);
       return hitSubview ?: hitView;
   }
 }
@@ -232,8 +244,8 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithCoder : unused)
     return nil;
   }
 
-  accessibilityActionsNameMap = [[NSMutableDictionary alloc] init];
-  accessibilityActionsLabelMap = [[NSMutableDictionary alloc] init];
+  accessibilityActionsNameMap = [NSMutableDictionary new];
+  accessibilityActionsLabelMap = [NSMutableDictionary new];
   NSMutableArray *actions = [NSMutableArray array];
   for (NSDictionary *action in self.accessibilityActions) {
     if (action[@"name"]) {
@@ -271,46 +283,44 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithCoder : unused)
   static NSDictionary<NSString *, NSString *> *rolesAndStatesDescription = nil;
 
   dispatch_once(&onceToken, ^{
-    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"AccessibilityResources" ofType:@"bundle"];
-    NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
-
-    if (bundle) {
-      NSURL *url = [bundle URLForResource:@"Localizable" withExtension:@"strings"];
-      if (@available(iOS 11.0, *)) {
-        rolesAndStatesDescription = [NSDictionary dictionaryWithContentsOfURL:url error:nil];
-      } else {
-        // Fallback on earlier versions
-        rolesAndStatesDescription = [NSDictionary dictionaryWithContentsOfURL:url];
-      }
-    }
-    if (rolesAndStatesDescription == nil) {
-      // Falling back to hardcoded English list.
-      NSLog(@"Cannot load localized accessibility strings.");
-      rolesAndStatesDescription = @{
-        @"alert" : @"alert",
-        @"checkbox" : @"checkbox",
-        @"combobox" : @"combo box",
-        @"menu" : @"menu",
-        @"menubar" : @"menu bar",
-        @"menuitem" : @"menu item",
-        @"progressbar" : @"progress bar",
-        @"radio" : @"radio button",
-        @"radiogroup" : @"radio group",
-        @"scrollbar" : @"scroll bar",
-        @"spinbutton" : @"spin button",
-        @"switch" : @"switch",
-        @"tab" : @"tab",
-        @"tablist" : @"tab list",
-        @"timer" : @"timer",
-        @"toolbar" : @"tool bar",
-        @"checked" : @"checked",
-        @"unchecked" : @"not checked",
-        @"busy" : @"busy",
-        @"expanded" : @"expanded",
-        @"collapsed" : @"collapsed",
-        @"mixed" : @"mixed",
-      };
-    }
+    rolesAndStatesDescription = @{
+      @"alert" : RCTLocalizedString("alert", "important, and usually time-sensitive, information"),
+      @"busy" : RCTLocalizedString("busy", "an element currently being updated or modified"),
+      @"checkbox" : RCTLocalizedString("checkbox", "checkable interactive control"),
+      @"combobox" : RCTLocalizedString(
+          "combo box",
+          "input that controls another element that can pop up to help the user set the value of that input"),
+      @"menu" : RCTLocalizedString("menu", "offers a list of choices to the user"),
+      @"menubar" : RCTLocalizedString(
+          "menu bar", "presentation of menu that usually remains visible and is usually presented horizontally"),
+      @"menuitem" : RCTLocalizedString("menu item", "an option in a set of choices contained by a menu or menubar"),
+      @"progressbar" :
+          RCTLocalizedString("progress bar", "displays the progress status for tasks that take a long time"),
+      @"radio" : RCTLocalizedString(
+          "radio button",
+          "a checkable input that when associated with other radio buttons, only one of which can be checked at a time"),
+      @"radiogroup" : RCTLocalizedString("radio group", "a group of radio buttons"),
+      @"scrollbar" : RCTLocalizedString("scroll bar", "controls the scrolling of content within a viewing area"),
+      @"spinbutton" : RCTLocalizedString(
+          "spin button", "defines a type of range that expects the user to select a value from among discrete choices"),
+      @"switch" : RCTLocalizedString("switch", "represents the states 'on' and 'off'"),
+      @"tab" : RCTLocalizedString("tab", "an interactive element inside a tablist"),
+      @"tablist" : RCTLocalizedString("tab list", "container for a set of tabs"),
+      @"timer" : RCTLocalizedString(
+          "timer",
+          "a numerical counter listing the amount of elapsed time from a starting point or the remaining time until an end point"),
+      @"toolbar" : RCTLocalizedString(
+          "tool bar",
+          "a collection of commonly used function buttons or controls represented in a compact visual form"),
+      @"checked" : RCTLocalizedString("checked", "a checkbox, radio button, or other widget which is checked"),
+      @"unchecked" : RCTLocalizedString("unchecked", "a checkbox, radio button, or other widget which is unchecked"),
+      @"expanded" :
+          RCTLocalizedString("expanded", "a menu, dialog, accordian panel, or other widget which is expanded"),
+      @"collapsed" :
+          RCTLocalizedString("collapsed", "a menu, dialog, accordian panel, or other widget which is collapsed"),
+      @"mixed" :
+          RCTLocalizedString("mixed", "a checkbox, radio button, or other widget which is both checked and unchecked"),
+    };
   });
 
   // Handle Switch.
@@ -326,7 +336,11 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithCoder : unused)
     }
   }
   NSMutableArray *valueComponents = [NSMutableArray new];
-  NSString *roleDescription = self.accessibilityRole ? rolesAndStatesDescription[self.accessibilityRole] : nil;
+
+  // TODO: This logic makes VoiceOver describe some AccessibilityRole which do not have a backing UIAccessibilityTrait.
+  // It does not run on Fabric.
+  NSString *role = self.role ?: self.accessibilityRole;
+  NSString *roleDescription = role ? rolesAndStatesDescription[role] : nil;
   if (roleDescription) {
     [valueComponents addObject:roleDescription];
   }
@@ -446,10 +460,10 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithCoder : unused)
 
 - (NSString *)description
 {
-  NSString *superDescription = super.description;
-  NSRange semicolonRange = [superDescription rangeOfString:@";"];
-  NSString *replacement = [NSString stringWithFormat:@"; reactTag: %@;", self.reactTag];
-  return [superDescription stringByReplacingCharactersInRange:semicolonRange withString:replacement];
+  return [[super description] stringByAppendingFormat:@" reactTag: %@; frame = %@; layer = %@",
+                                                      self.reactTag,
+                                                      NSStringFromCGRect(self.frame),
+                                                      self.layer];
 }
 
 #pragma mark - Statics for dealing with layoutGuides
@@ -463,7 +477,7 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithCoder : unused)
   CGPoint contentOffset = scrollView.contentOffset;
 
   if (parentView.automaticallyAdjustContentInsets) {
-    UIEdgeInsets autoInset = [self contentInsetsForView:parentView];
+    UIEdgeInsets autoInset = RCTContentInsets(parentView);
     baseInset.top += autoInset.top;
     baseInset.bottom += autoInset.bottom;
     baseInset.left += autoInset.left;
@@ -483,18 +497,6 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithCoder : unused)
       scrollView.contentOffset = contentOffset;
     }
   }
-}
-
-+ (UIEdgeInsets)contentInsetsForView:(UIView *)view
-{
-  while (view) {
-    UIViewController *controller = view.reactViewController;
-    if (controller) {
-      return (UIEdgeInsets){controller.topLayoutGuide.length, 0, controller.bottomLayoutGuide.length, 0};
-    }
-    view = view.superview;
-  }
-  return UIEdgeInsetsZero;
 }
 
 #pragma mark - View Unmounting
@@ -605,13 +607,10 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithCoder : unused)
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
 {
   [super traitCollectionDidChange:previousTraitCollection];
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
-  if (@available(iOS 13.0, *)) {
-    if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
-      [self.layer setNeedsDisplay];
-    }
+
+  if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+    [self.layer setNeedsDisplay];
   }
-#endif
 }
 
 #pragma mark - Borders
@@ -677,11 +676,16 @@ static CGFloat RCTDefaultIfNegativeTo(CGFloat defaultValue, CGFloat x)
   CGFloat bottomLeftRadius;
   CGFloat bottomRightRadius;
 
+  const CGFloat logicalTopStartRadius = RCTDefaultIfNegativeTo(_borderStartStartRadius, _borderTopStartRadius);
+  const CGFloat logicalTopEndRadius = RCTDefaultIfNegativeTo(_borderStartEndRadius, _borderTopEndRadius);
+  const CGFloat logicalBottomStartRadius = RCTDefaultIfNegativeTo(_borderEndStartRadius, _borderBottomStartRadius);
+  const CGFloat logicalBottomEndRadius = RCTDefaultIfNegativeTo(_borderEndEndRadius, _borderBottomEndRadius);
+
   if ([[RCTI18nUtil sharedInstance] doLeftAndRightSwapInRTL]) {
-    const CGFloat topStartRadius = RCTDefaultIfNegativeTo(_borderTopLeftRadius, _borderTopStartRadius);
-    const CGFloat topEndRadius = RCTDefaultIfNegativeTo(_borderTopRightRadius, _borderTopEndRadius);
-    const CGFloat bottomStartRadius = RCTDefaultIfNegativeTo(_borderBottomLeftRadius, _borderBottomStartRadius);
-    const CGFloat bottomEndRadius = RCTDefaultIfNegativeTo(_borderBottomRightRadius, _borderBottomEndRadius);
+    const CGFloat topStartRadius = RCTDefaultIfNegativeTo(_borderTopLeftRadius, logicalTopStartRadius);
+    const CGFloat topEndRadius = RCTDefaultIfNegativeTo(_borderTopRightRadius, logicalTopEndRadius);
+    const CGFloat bottomStartRadius = RCTDefaultIfNegativeTo(_borderBottomLeftRadius, logicalBottomStartRadius);
+    const CGFloat bottomEndRadius = RCTDefaultIfNegativeTo(_borderBottomRightRadius, logicalBottomEndRadius);
 
     const CGFloat directionAwareTopLeftRadius = isRTL ? topEndRadius : topStartRadius;
     const CGFloat directionAwareTopRightRadius = isRTL ? topStartRadius : topEndRadius;
@@ -693,10 +697,10 @@ static CGFloat RCTDefaultIfNegativeTo(CGFloat defaultValue, CGFloat x)
     bottomLeftRadius = RCTDefaultIfNegativeTo(radius, directionAwareBottomLeftRadius);
     bottomRightRadius = RCTDefaultIfNegativeTo(radius, directionAwareBottomRightRadius);
   } else {
-    const CGFloat directionAwareTopLeftRadius = isRTL ? _borderTopEndRadius : _borderTopStartRadius;
-    const CGFloat directionAwareTopRightRadius = isRTL ? _borderTopStartRadius : _borderTopEndRadius;
-    const CGFloat directionAwareBottomLeftRadius = isRTL ? _borderBottomEndRadius : _borderBottomStartRadius;
-    const CGFloat directionAwareBottomRightRadius = isRTL ? _borderBottomStartRadius : _borderBottomEndRadius;
+    const CGFloat directionAwareTopLeftRadius = isRTL ? logicalTopEndRadius : logicalTopStartRadius;
+    const CGFloat directionAwareTopRightRadius = isRTL ? logicalTopStartRadius : logicalTopEndRadius;
+    const CGFloat directionAwareBottomLeftRadius = isRTL ? logicalBottomEndRadius : logicalBottomStartRadius;
+    const CGFloat directionAwareBottomRightRadius = isRTL ? logicalBottomStartRadius : logicalBottomEndRadius;
 
     topLeftRadius =
         RCTDefaultIfNegativeTo(radius, RCTDefaultIfNegativeTo(_borderTopLeftRadius, directionAwareTopLeftRadius));
@@ -724,33 +728,51 @@ static CGFloat RCTDefaultIfNegativeTo(CGFloat defaultValue, CGFloat x)
   };
 }
 
-- (RCTBorderColors)borderColors
+- (RCTBorderColors)borderColorsWithTraitCollection:(UITraitCollection *)traitCollection
 {
   const BOOL isRTL = _reactLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
 
+  UIColor *directionAwareBorderLeftColor = nil;
+  UIColor *directionAwareBorderRightColor = nil;
+
   if ([[RCTI18nUtil sharedInstance] doLeftAndRightSwapInRTL]) {
-    const CGColorRef borderStartColor = _borderStartColor ?: _borderLeftColor;
-    const CGColorRef borderEndColor = _borderEndColor ?: _borderRightColor;
+    UIColor *borderStartColor = _borderStartColor ?: _borderLeftColor;
+    UIColor *borderEndColor = _borderEndColor ?: _borderRightColor;
 
-    const CGColorRef directionAwareBorderLeftColor = isRTL ? borderEndColor : borderStartColor;
-    const CGColorRef directionAwareBorderRightColor = isRTL ? borderStartColor : borderEndColor;
-
-    return (RCTBorderColors){
-        _borderTopColor ?: _borderColor,
-        directionAwareBorderLeftColor ?: _borderColor,
-        _borderBottomColor ?: _borderColor,
-        directionAwareBorderRightColor ?: _borderColor,
-    };
+    directionAwareBorderLeftColor = isRTL ? borderEndColor : borderStartColor;
+    directionAwareBorderRightColor = isRTL ? borderStartColor : borderEndColor;
+  } else {
+    directionAwareBorderLeftColor = (isRTL ? _borderEndColor : _borderStartColor) ?: _borderLeftColor;
+    directionAwareBorderRightColor = (isRTL ? _borderStartColor : _borderEndColor) ?: _borderRightColor;
   }
 
-  const CGColorRef directionAwareBorderLeftColor = isRTL ? _borderEndColor : _borderStartColor;
-  const CGColorRef directionAwareBorderRightColor = isRTL ? _borderStartColor : _borderEndColor;
+  UIColor *borderColor = _borderColor;
+  UIColor *borderTopColor = _borderTopColor;
+  UIColor *borderBottomColor = _borderBottomColor;
+
+  if (_borderBlockColor) {
+    borderTopColor = _borderBlockColor;
+    borderBottomColor = _borderBlockColor;
+  }
+  if (_borderBlockEndColor) {
+    borderBottomColor = _borderBlockEndColor;
+  }
+  if (_borderBlockStartColor) {
+    borderTopColor = _borderBlockStartColor;
+  }
+
+  borderColor = [borderColor resolvedColorWithTraitCollection:self.traitCollection];
+  borderTopColor = [borderTopColor resolvedColorWithTraitCollection:self.traitCollection];
+  directionAwareBorderLeftColor = [directionAwareBorderLeftColor resolvedColorWithTraitCollection:self.traitCollection];
+  borderBottomColor = [borderBottomColor resolvedColorWithTraitCollection:self.traitCollection];
+  directionAwareBorderRightColor =
+      [directionAwareBorderRightColor resolvedColorWithTraitCollection:self.traitCollection];
 
   return (RCTBorderColors){
-      _borderTopColor ?: _borderColor,
-      directionAwareBorderLeftColor ?: _borderLeftColor ?: _borderColor,
-      _borderBottomColor ?: _borderColor,
-      directionAwareBorderRightColor ?: _borderRightColor ?: _borderColor,
+      (borderTopColor ?: borderColor).CGColor,
+      (directionAwareBorderLeftColor ?: borderColor).CGColor,
+      (borderBottomColor ?: borderColor).CGColor,
+      (directionAwareBorderRightColor ?: borderColor).CGColor,
   };
 }
 
@@ -776,7 +798,7 @@ static CGFloat RCTDefaultIfNegativeTo(CGFloat defaultValue, CGFloat x)
 
   const RCTCornerRadii cornerRadii = [self cornerRadii];
   const UIEdgeInsets borderInsets = [self bordersAsInsets];
-  const RCTBorderColors borderColors = [self borderColors];
+  const RCTBorderColors borderColors = [self borderColorsWithTraitCollection:self.traitCollection];
 
   BOOL useIOSBorderRendering = RCTCornerRadiiAreEqual(cornerRadii) && RCTBorderInsetsAreEqual(borderInsets) &&
       RCTBorderColorsAreEqual(borderColors) && _borderStyle == RCTBorderStyleSolid &&
@@ -792,15 +814,8 @@ static CGFloat RCTDefaultIfNegativeTo(CGFloat defaultValue, CGFloat x)
   // correctly clip the subviews.
 
   CGColorRef backgroundColor;
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
-  if (@available(iOS 13.0, *)) {
-    backgroundColor = [_backgroundColor resolvedColorWithTraitCollection:self.traitCollection].CGColor;
-  } else {
-    backgroundColor = _backgroundColor.CGColor;
-  }
-#else
-  backgroundColor = _backgroundColor.CGColor;
-#endif
+
+  backgroundColor = [_backgroundColor resolvedColorWithTraitCollection:self.traitCollection].CGColor;
 
   if (useIOSBorderRendering) {
     layer.cornerRadius = cornerRadii.topLeft;
@@ -902,19 +917,18 @@ static void RCTUpdateShadowPathForView(RCTView *view)
 
 #pragma mark Border Color
 
-#define setBorderColor(side)                                \
-  -(void)setBorder##side##Color : (CGColorRef)color         \
-  {                                                         \
-    if (CGColorEqualToColor(_border##side##Color, color)) { \
-      return;                                               \
-    }                                                       \
-    CGColorRelease(_border##side##Color);                   \
-    _border##side##Color = CGColorRetain(color);            \
-    [self.layer setNeedsDisplay];                           \
+#define setBorderColor(side)                       \
+  -(void)setBorder##side##Color : (UIColor *)color \
+  {                                                \
+    if ([_border##side##Color isEqual:color]) {    \
+      return;                                      \
+    }                                              \
+    _border##side##Color = color;                  \
+    [self.layer setNeedsDisplay];                  \
   }
 
 setBorderColor() setBorderColor(Top) setBorderColor(Right) setBorderColor(Bottom) setBorderColor(Left)
-        setBorderColor(Start) setBorderColor(End)
+    setBorderColor(Start) setBorderColor(End) setBorderColor(Block) setBorderColor(BlockEnd) setBorderColor(BlockStart)
 
 #pragma mark - Border Width
 
@@ -928,8 +942,8 @@ setBorderColor() setBorderColor(Top) setBorderColor(Right) setBorderColor(Bottom
     [self.layer setNeedsDisplay];                \
   }
 
-            setBorderWidth() setBorderWidth(Top) setBorderWidth(Right) setBorderWidth(Bottom) setBorderWidth(Left)
-                setBorderWidth(Start) setBorderWidth(End)
+        setBorderWidth() setBorderWidth(Top) setBorderWidth(Right) setBorderWidth(Bottom) setBorderWidth(Left)
+            setBorderWidth(Start) setBorderWidth(End)
 
 #pragma mark - Border Radius
 
@@ -943,9 +957,24 @@ setBorderColor() setBorderColor(Top) setBorderColor(Right) setBorderColor(Bottom
     [self.layer setNeedsDisplay];                  \
   }
 
-                    setBorderRadius() setBorderRadius(TopLeft) setBorderRadius(TopRight) setBorderRadius(TopStart)
-                        setBorderRadius(TopEnd) setBorderRadius(BottomLeft) setBorderRadius(BottomRight)
-                            setBorderRadius(BottomStart) setBorderRadius(BottomEnd)
+                setBorderRadius() setBorderRadius(TopLeft) setBorderRadius(TopRight) setBorderRadius(TopStart)
+                    setBorderRadius(TopEnd) setBorderRadius(BottomLeft) setBorderRadius(BottomRight)
+                        setBorderRadius(BottomStart) setBorderRadius(BottomEnd) setBorderRadius(EndEnd)
+                            setBorderRadius(EndStart) setBorderRadius(StartEnd) setBorderRadius(StartStart)
+
+#pragma mark - Border Curve
+
+#define setBorderCurve(side)                            \
+  -(void)setBorder##side##Curve : (RCTBorderCurve)curve \
+  {                                                     \
+    if (_border##side##Curve == curve) {                \
+      return;                                           \
+    }                                                   \
+    _border##side##Curve = curve;                       \
+    [self.layer setNeedsDisplay];                       \
+  }
+
+                                setBorderCurve()
 
 #pragma mark - Border Style
 
@@ -959,17 +988,6 @@ setBorderColor() setBorderColor(Top) setBorderColor(Right) setBorderColor(Bottom
     [self.layer setNeedsDisplay];                       \
   }
 
-                                setBorderStyle()
+                                    setBorderStyle()
 
-    - (void)dealloc
-{
-  CGColorRelease(_borderColor);
-  CGColorRelease(_borderTopColor);
-  CGColorRelease(_borderRightColor);
-  CGColorRelease(_borderBottomColor);
-  CGColorRelease(_borderLeftColor);
-  CGColorRelease(_borderStartColor);
-  CGColorRelease(_borderEndColor);
-}
-
-@end
+                                        @end

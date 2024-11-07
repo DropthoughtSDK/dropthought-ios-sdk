@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   Dimensions,
   FlatList,
-  ListRenderItem,
 } from 'react-native';
+import type { ListRenderItem } from 'react-native';
 import type { TransformOptionType } from '../utils/data';
 import GlobalStyle, { Colors, addOpacityToColor } from '../styles';
 import ClassicMandatoryTitle from './ClassicMandatoryTitle';
@@ -19,6 +19,8 @@ import BottomSheet, { NavigationComponent } from './BottomSheet';
 import ClassicDropdownOtherOptionInput from './ClassicDropdownOtherOptionInput';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import useDropdown from '../hooks/useDropdown';
+import HtmlText from './HtmlText';
+import { htmlTrim, toHtml } from '../utils/htmlHelper';
 
 const windowHeight = Dimensions.get('window').height * 0.8;
 
@@ -89,11 +91,16 @@ const ClassicDropdownQuestion = ({
       },
     ];
     return (
-      <TouchableOpacity onPress={() => setSelectedOptionIndexCache(index)}>
+      <TouchableOpacity
+        accessible={false}
+        onPress={() => setSelectedOptionIndexCache(index)}
+      >
         <View style={containerStyle}>
           <Image style={iconStyle} source={radioIconSource[icon]} />
           <View style={bottomSheetStyles.optionLabel}>
-            <Text style={{ color: fontColor }}>{title}</Text>
+            <Text testID="test:id/dropdown_item" style={{ color: fontColor }}>
+              {title}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -108,12 +115,6 @@ const ClassicDropdownQuestion = ({
         colorScheme === COLOR_SCHEMES.light
           ? Colors.contentBackground
           : Colors.rankingContainerBgDark,
-    },
-  ];
-  const subTitleTextStyle = [
-    bottomSheetStyles.subTitleText,
-    {
-      color: fontColor,
     },
   ];
   const flatListContainerStyle = { paddingBottom: 200 };
@@ -133,11 +134,17 @@ const ClassicDropdownQuestion = ({
         style={styles.title}
       />
       <TouchableOpacity
+        accessible={false}
         style={styles.buttonContainer}
         onPress={onOpenBottomSheet}
       >
         <View style={styles.buttonContent}>
-          <Text style={labelStyle}>{optionLabel}</Text>
+          <Text
+            testID={`test:id/dropdown_selected_item_${fontColor}`}
+            style={labelStyle}
+          >
+            {optionLabel}
+          </Text>
           <Image source={require('../assets/ic-expand-more-24-px.png')} />
         </View>
       </TouchableOpacity>
@@ -168,7 +175,7 @@ const ClassicDropdownQuestion = ({
         componentInside={
           <>
             <View style={subTitleContainerStyle}>
-              <Text style={subTitleTextStyle}>{questionTitle}</Text>
+              <HtmlText html={htmlTrim(toHtml(questionTitle))} />
             </View>
             <View style={bottomSheetStyles.content}>
               <View
@@ -179,6 +186,7 @@ const ClassicDropdownQuestion = ({
               >
                 <Image source={require('../assets/ic_search.png')} />
                 <TextInput
+                  testID="test:id/field_dropdown_search"
                   onChangeText={onChangeSearchText}
                   placeholder={i18n.t('survey:find-Option')}
                   placeholderTextColor={Colors.inputPlaceholder}
@@ -237,10 +245,6 @@ const bottomSheetStyles = StyleSheet.create({
   subTitleContainer: {
     paddingVertical: 10,
     paddingHorizontal: 24,
-  },
-  subTitleText: {
-    fontSize: 16,
-    fontWeight: '500',
   },
   optionContainer: {
     flexDirection: 'row',

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,20 +9,21 @@
 
 using namespace facebook::jni;
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
-void ReadableNativeMap::mapException(const std::exception &ex) {
-  if (dynamic_cast<const folly::TypeError *>(&ex) != nullptr) {
+void ReadableNativeMap::mapException(std::exception_ptr ex) {
+  try {
+    std::rethrow_exception(ex);
+  } catch (const folly::TypeError& err) {
     throwNewJavaException(
-        exceptions::gUnexpectedNativeTypeExceptionClass, ex.what());
+        exceptions::gUnexpectedNativeTypeExceptionClass, err.what());
   }
 }
 
 void addDynamicToJArray(
     local_ref<JArrayClass<jobject>> jarray,
     jint index,
-    const folly::dynamic &dyn) {
+    const folly::dynamic& dyn) {
   switch (dyn.type()) {
     case folly::dynamic::Type::NULLT: {
       jarray->setElement(index, nullptr);
@@ -59,44 +60,49 @@ void addDynamicToJArray(
 }
 
 local_ref<JArrayClass<jstring>> ReadableNativeMap::importKeys() {
+  throwIfConsumed();
+
   keys_ = folly::dynamic::array();
   if (map_ == nullptr) {
     return JArrayClass<jstring>::newArray(0);
   }
-  auto pairs = map_.items();
-  for (auto &pair : pairs) {
-    keys_.value().push_back(pair.first.asString());
+  auto jarray = JArrayClass<jstring>::newArray(map_.size());
+  jint i = 0;
+  for (auto& pair : map_.items()) {
+    auto value = pair.first.asString();
+    (*keys_).push_back(value);
+    (*jarray)[i++] = make_jstring(value);
   }
-  jint size = keys_.value().size();
-  auto jarray = JArrayClass<jstring>::newArray(size);
-  for (jint ii = 0; ii < size; ii++) {
-    (*jarray)[ii] = make_jstring(keys_.value()[ii].getString());
-  }
+
   return jarray;
 }
 
 local_ref<JArrayClass<jobject>> ReadableNativeMap::importValues() {
+  throwIfConsumed();
+
   jint size = keys_.value().size();
   auto jarray = JArrayClass<jobject>::newArray(size);
   for (jint ii = 0; ii < size; ii++) {
-    const std::string &key = keys_.value()[ii].getString();
+    const std::string& key = (*keys_)[ii].getString();
     addDynamicToJArray(jarray, ii, map_.at(key));
   }
   return jarray;
 }
 
 local_ref<JArrayClass<jobject>> ReadableNativeMap::importTypes() {
+  throwIfConsumed();
+
   jint size = keys_.value().size();
   auto jarray = JArrayClass<jobject>::newArray(size);
   for (jint ii = 0; ii < size; ii++) {
-    const std::string &key = keys_.value()[ii].getString();
+    const std::string& key = (*keys_)[ii].getString();
     (*jarray)[ii] = ReadableType::getType(map_.at(key).type());
   }
   return jarray;
 }
 
 local_ref<ReadableNativeMap::jhybridobject>
-ReadableNativeMap::createWithContents(folly::dynamic &&map) {
+ReadableNativeMap::createWithContents(folly::dynamic&& map) {
   if (map.isNull()) {
     return local_ref<jhybridobject>(nullptr);
   }
@@ -119,5 +125,4 @@ void ReadableNativeMap::registerNatives() {
   });
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

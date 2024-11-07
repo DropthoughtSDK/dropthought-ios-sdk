@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,9 +8,9 @@
  * @format
  */
 
-'use strict';
-
+import type {RootTag} from '../TurboModule/RCTExport';
 import type {TurboModule} from '../TurboModule/RCTExport';
+
 import * as TurboModuleRegistry from '../TurboModule/TurboModuleRegistry';
 
 export interface Spec extends TurboModule {
@@ -21,7 +21,7 @@ export interface Spec extends TurboModule {
   +createView: (
     reactTag: ?number,
     viewName: string,
-    rootTag: number,
+    rootTag: RootTag,
     props: Object,
   ) => void;
   +updateView: (reactTag: number, viewName: string, props: Object) => void;
@@ -44,7 +44,7 @@ export interface Spec extends TurboModule {
     commandArgs: ?Array<any>,
   ) => void;
   +measure: (
-    reactTag: ?number,
+    reactTag: number,
     callback: (
       left: number,
       top: number,
@@ -55,7 +55,7 @@ export interface Spec extends TurboModule {
     ) => void,
   ) => void;
   +measureInWindow: (
-    reactTag: ?number,
+    reactTag: number,
     callback: (x: number, y: number, width: number, height: number) => void,
   ) => void;
   +viewIsDescendantOf: (
@@ -64,8 +64,8 @@ export interface Spec extends TurboModule {
     callback: (result: Array<boolean>) => void,
   ) => void;
   +measureLayout: (
-    reactTag: ?number,
-    ancestorReactTag: ?number,
+    reactTag: number,
+    ancestorReactTag: number,
     errorCallback: (error: Object) => void,
     callback: (
       left: number,
@@ -75,7 +75,7 @@ export interface Spec extends TurboModule {
     ) => void,
   ) => void;
   +measureLayoutRelativeToParent: (
-    reactTag: ?number,
+    reactTag: number,
     errorCallback: (error: Object) => void,
     callback: (
       left: number,

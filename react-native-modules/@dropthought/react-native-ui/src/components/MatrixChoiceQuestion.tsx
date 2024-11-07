@@ -53,7 +53,7 @@ const MatrixColoum = ({
   onColoumPress,
 }: ColoumProps) => {
   const { colorScheme, fontColor } = useTheme();
-  const isSelected = selectedAnswer[rowIndex].some(
+  const isSelected = selectedAnswer[rowIndex]?.some(
     (value) => value === coloumIndex
   );
   const isDark = colorScheme === COLOR_SCHEMES.dark;
@@ -159,7 +159,7 @@ const MatrixRow = ({
   };
 
   const optionsList = !isCollapse
-    ? optionsMatrix.map((value, index) => (
+    ? optionsMatrix?.map((value, index) => (
         <MatrixColoum
           title={value}
           rowIndex={rowIndex}
@@ -174,8 +174,8 @@ const MatrixRow = ({
 
   let optionSelectedText = '';
   let optionOtherText = '';
-  if (rowSelectedAnswer[0] !== -1) {
-    if (rowSelectedAnswer.length > 1) {
+  if (rowSelectedAnswer && rowSelectedAnswer[0] !== -1 && optionsMatrix) {
+    if (rowSelectedAnswer.length > 1 && rowSelectedAnswer[0] !== undefined) {
       optionSelectedText = `${optionsMatrix[rowSelectedAnswer[0]]}`;
       optionOtherText = ` +${rowSelectedAnswer.length - 1} Other`;
     } else {

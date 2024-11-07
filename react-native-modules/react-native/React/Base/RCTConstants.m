@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,50 +7,93 @@
 
 #import "RCTConstants.h"
 
+NSString *const RCTPlatformName = @"ios";
+
 NSString *const RCTUserInterfaceStyleDidChangeNotification = @"RCTUserInterfaceStyleDidChangeNotification";
 NSString *const RCTUserInterfaceStyleDidChangeNotificationTraitCollectionKey = @"traitCollection";
 
-/*
- * On-demand view mounting
- */
-static BOOL RCTExperimentOnDemandViewMounting = NO;
+NSString *const RCTWindowFrameDidChangeNotification = @"RCTWindowFrameDidChangeNotification";
 
-BOOL RCTExperimentGetOnDemandViewMounting()
-{
-  return RCTExperimentOnDemandViewMounting;
-}
+NSString *const RCTJavaScriptDidFailToLoadNotification = @"RCTJavaScriptDidFailToLoadNotification";
+NSString *const RCTJavaScriptDidLoadNotification = @"RCTJavaScriptDidLoadNotification";
+NSString *const RCTJavaScriptWillStartExecutingNotification = @"RCTJavaScriptWillStartExecutingNotification";
+NSString *const RCTJavaScriptWillStartLoadingNotification = @"RCTJavaScriptWillStartLoadingNotification";
 
-void RCTExperimentSetOnDemandViewMounting(BOOL value)
-{
-  RCTExperimentOnDemandViewMounting = value;
-}
+NSString *const RCTDidInitializeModuleNotification = @"RCTDidInitializeModuleNotification";
 
 /*
- * Optimized hit-testing
+ * W3C Pointer Events
  */
-static BOOL RCTExperimentOptimizedHitTesting = NO;
+static BOOL RCTDispatchW3CPointerEvents = NO;
 
-BOOL RCTExperimentGetOptimizedHitTesting()
+BOOL RCTGetDispatchW3CPointerEvents(void)
 {
-  return RCTExperimentOptimizedHitTesting;
+  return RCTDispatchW3CPointerEvents;
 }
 
-void RCTExperimentSetOptimizedHitTesting(BOOL value)
+void RCTSetDispatchW3CPointerEvents(BOOL value)
 {
-  RCTExperimentOptimizedHitTesting = value;
+  RCTDispatchW3CPointerEvents = value;
 }
 
 /*
- * Preemptive View Allocation
+ * Validate RCTEventEmitter. For experimentation only.
  */
-static BOOL RCTExperimentPreemptiveViewAllocationDisabled = NO;
+static BOOL RCTValidateCanSendEventInRCTEventEmitter = NO;
 
-BOOL RCTExperimentGetPreemptiveViewAllocationDisabled()
+BOOL RCTGetValidateCanSendEventInRCTEventEmitter(void)
 {
-  return RCTExperimentPreemptiveViewAllocationDisabled;
+  return RCTValidateCanSendEventInRCTEventEmitter;
 }
 
-void RCTExperimentSetPreemptiveViewAllocationDisabled(BOOL value)
+void RCTSetValidateCanSendEventInRCTEventEmitter(BOOL value)
 {
-  RCTExperimentPreemptiveViewAllocationDisabled = value;
+  RCTValidateCanSendEventInRCTEventEmitter = value;
+}
+
+/*
+ * Memory Pressure Unloading Level for experimentation only.
+ * Default is 15, which is TRIM_MEMORY_RUNNING_CRITICAL.
+ */
+static int RCTMemoryPressureUnloadLevel = 15;
+
+int RCTGetMemoryPressureUnloadLevel(void)
+{
+  return RCTMemoryPressureUnloadLevel;
+}
+
+void RCTSetMemoryPressureUnloadLevel(int value)
+{
+  RCTMemoryPressureUnloadLevel = value;
+}
+
+/*
+ * In Bridge mode, parse the JS stack for unhandled JS errors, to display in RedBox.
+ * When false (previous default behavior), a native stack is displayed in the RedBox.
+ */
+static BOOL RCTParseUnhandledJSErrorStackNatively = NO;
+
+BOOL RCTGetParseUnhandledJSErrorStackNatively(void)
+{
+  return RCTParseUnhandledJSErrorStackNatively;
+}
+
+void RCTSetParseUnhandledJSErrorStackNatively(BOOL value)
+{
+  RCTParseUnhandledJSErrorStackNatively = value;
+}
+
+/*
+ * Use native view configs in bridgeless mode
+ */
+static BOOL RCTUseNativeViewConfigsInBridgelessMode = NO;
+
+BOOL RCTGetUseNativeViewConfigsInBridgelessMode(void)
+{
+  return RCTUseNativeViewConfigsInBridgelessMode;
+}
+
+void RCTSetUseNativeViewConfigsInBridgelessMode(BOOL value)
+{
+  RCTUseNativeViewConfigsInBridgelessMode = value;
 }

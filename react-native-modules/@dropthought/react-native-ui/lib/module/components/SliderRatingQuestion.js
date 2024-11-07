@@ -7,15 +7,12 @@ import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import { isNil } from 'ramda';
 const MIN_VALUE = 1;
 const NPS_MIN_VALUE = 0;
-
 const getInitialSelectedValue = feedback => {
   if (feedback && feedback.answers && !isNil(feedback.answers[0])) {
     return parseInt(feedback.answers[0], 10);
   }
-
   return undefined;
 };
-
 const getLabelText = ({
   isPhone,
   question,
@@ -23,20 +20,16 @@ const getLabelText = ({
   valueData
 }) => {
   const labelText = `${valueData + (question.type === 'nps' ? NPS_MIN_VALUE : MIN_VALUE)}`;
-
   if (isPhone) {
     if (valueData === 0) {
       return `${labelText} - ${question.options[0]}`;
     }
-
     if (valueData === maximumValue - 1) {
       return `${labelText} - ${question.options[question.options.length - 1]}`;
     }
   }
-
   return labelText;
 };
-
 const SliderRatingQuestion = ({
   survey,
   question,
@@ -70,7 +63,6 @@ const SliderRatingQuestion = ({
     color: fontColor
   };
   const [value, setValue] = useState(getInitialSelectedValue(feedback));
-
   const onSelected = index => {
     onFeedback({
       questionId,
@@ -79,9 +71,7 @@ const SliderRatingQuestion = ({
     });
     setValue(index);
   };
-
   const maximumValue = parseInt(scale, 10);
-
   const getSliderIndicator = () => {
     return [...Array(maximumValue).keys()].map((valueData, index) => {
       const textStyle = value === index ? [styles.buttonText, buttonTextStyle, buttonTextSelected] : [styles.buttonText, buttonTextStyle];
@@ -98,7 +88,6 @@ const SliderRatingQuestion = ({
       })));
     });
   };
-
   return /*#__PURE__*/React.createElement(ScrollView, {
     style: commonStyles.container
   }, /*#__PURE__*/React.createElement(MandatoryTitle, {
@@ -107,7 +96,6 @@ const SliderRatingQuestion = ({
     question: question
   }), getSliderIndicator());
 };
-
 export default /*#__PURE__*/React.memo(SliderRatingQuestion);
 const commonStyles = StyleSheet.create({
   container: {

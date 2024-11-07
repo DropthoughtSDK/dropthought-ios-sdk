@@ -1,15 +1,15 @@
 import React from 'react';
 import type { Feedback as OriginFeedback, Question as OriginQuestion } from '../data';
 import type { TransformedOption } from '../utils/react-native-draggable-list/DraggableList';
-declare type Feedback = OriginFeedback & {
+type Feedback = OriginFeedback & {
     listForRankingQuestion: TransformedOption[];
 };
-declare type Question = OriginQuestion & {
+type Question = OriginQuestion & {
     options: string[];
     scale: string;
     allowNAForRanking: boolean;
 };
-declare type Props = {
+type Props = {
     mandatoryErrorMessage: string;
     question: Question;
     onFeedback: (feedback: Feedback) => void;
@@ -19,5 +19,6 @@ declare type Props = {
     onDragGrant: () => void;
     onDragEnd: () => void;
 };
-declare const _default: React.MemoExoticComponent<({ mandatoryErrorMessage, question, onFeedback, forgot, feedback, themeColor, onDragGrant, onDragEnd, }: Props) => JSX.Element>;
+declare const _default: React.MemoExoticComponent<({ mandatoryErrorMessage, question, onFeedback, forgot, feedback, themeColor, onDragGrant, onDragEnd, }: Props) => React.JSX.Element>;
 export default _default;
+//# sourceMappingURL=ClassicRankingQuestion.d.ts.map

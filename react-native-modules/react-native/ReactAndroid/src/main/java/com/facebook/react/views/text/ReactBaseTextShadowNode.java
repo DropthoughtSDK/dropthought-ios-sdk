@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -17,14 +17,18 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.view.Gravity;
 import androidx.annotation.Nullable;
+import com.facebook.common.logging.FLog;
 import com.facebook.infer.annotation.Assertions;
-import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.common.ReactConstants;
+import com.facebook.react.common.assets.ReactFontManager;
 import com.facebook.react.uimanager.IllegalViewOperationException;
 import com.facebook.react.uimanager.LayoutShadowNode;
 import com.facebook.react.uimanager.NativeViewHierarchyOptimizer;
 import com.facebook.react.uimanager.PixelUtil;
+import com.facebook.react.uimanager.ReactAccessibilityDelegate.AccessibilityRole;
+import com.facebook.react.uimanager.ReactAccessibilityDelegate.Role;
 import com.facebook.react.uimanager.ReactShadowNode;
 import com.facebook.react.uimanager.ViewProps;
 import com.facebook.react.uimanager.annotations.ReactProp;
@@ -53,7 +57,7 @@ public abstract class ReactBaseTextShadowNode extends LayoutShadowNode {
   // character.
   // https://en.wikipedia.org/wiki/Bi-directional_text#weak_characters
   private static final String INLINE_VIEW_PLACEHOLDER = "0";
-  public static final int UNSET = -1;
+  public static final int UNSET = ReactFontManager.TypefaceStyle.UNSET;
 
   public static final String PROP_SHADOW_OFFSET = "textShadowOffset";
   public static final String PROP_SHADOW_OFFSET_WIDTH = "width";
@@ -66,31 +70,6 @@ public abstract class ReactBaseTextShadowNode extends LayoutShadowNode {
   public static final int DEFAULT_TEXT_SHADOW_COLOR = 0x55000000;
 
   protected @Nullable ReactTextViewManagerCallback mReactTextViewManagerCallback;
-
-  private static class SetSpanOperation {
-    protected int start, end;
-    protected ReactSpan what;
-
-    SetSpanOperation(int start, int end, ReactSpan what) {
-      this.start = start;
-      this.end = end;
-      this.what = what;
-    }
-
-    public void execute(SpannableStringBuilder sb, int priority) {
-      // All spans will automatically extend to the right of the text, but not the left - except
-      // for spans that start at the beginning of the text.
-      int spanFlags = Spannable.SPAN_EXCLUSIVE_INCLUSIVE;
-      if (start == 0) {
-        spanFlags = Spannable.SPAN_INCLUSIVE_INCLUSIVE;
-      }
-
-      spanFlags &= ~Spannable.SPAN_PRIORITY;
-      spanFlags |= (priority << Spannable.SPAN_PRIORITY_SHIFT) & Spannable.SPAN_PRIORITY;
-
-      sb.setSpan(what, start, end, spanFlags);
-    }
-  }
 
   private static void buildSpannedFromShadowNode(
       ReactBaseTextShadowNode textShadowNode,
@@ -178,15 +157,20 @@ public abstract class ReactBaseTextShadowNode extends LayoutShadowNode {
             new SetSpanOperation(
                 start, end, new ReactBackgroundColorSpan(textShadowNode.mBackgroundColor)));
       }
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        float effectiveLetterSpacing = textAttributes.getEffectiveLetterSpacing();
-        if (!Float.isNaN(effectiveLetterSpacing)
-            && (parentTextAttributes == null
-                || parentTextAttributes.getEffectiveLetterSpacing() != effectiveLetterSpacing)) {
-          ops.add(
-              new SetSpanOperation(
-                  start, end, new CustomLetterSpacingSpan(effectiveLetterSpacing)));
-        }
+      boolean roleIsLink =
+          textShadowNode.mRole != null
+              ? textShadowNode.mRole == Role.LINK
+              : textShadowNode.mAccessibilityRole == AccessibilityRole.LINK;
+      if (roleIsLink) {
+        ops.add(
+            new SetSpanOperation(start, end, new ReactClickableSpan(textShadowNode.getReactTag())));
+      }
+      float effectiveLetterSpacing = textAttributes.getEffectiveLetterSpacing();
+      if (!Float.isNaN(effectiveLetterSpacing)
+          && (parentTextAttributes == null
+              || parentTextAttributes.getEffectiveLetterSpacing() != effectiveLetterSpacing)) {
+        ops.add(
+            new SetSpanOperation(start, end, new CustomLetterSpacingSpan(effectiveLetterSpacing)));
       }
       int effectiveFontSize = textAttributes.getEffectiveFontSize();
       if ( // `getEffectiveFontSize` always returns a value so don't need to check for anything like
@@ -273,8 +257,9 @@ public abstract class ReactBaseTextShadowNode extends LayoutShadowNode {
 
     // While setting the Spans on the final text, we also check whether any of them are inline views
     // or images.
-    int priority = 0;
-    for (SetSpanOperation op : ops) {
+    for (int priorityIndex = 0; priorityIndex < ops.size(); priorityIndex++) {
+      final SetSpanOperation op = ops.get(ops.size() - priorityIndex - 1);
+
       boolean isInlineImage = op.what instanceof TextInlineImageSpan;
       if (isInlineImage || op.what instanceof TextInlineViewPlaceholderSpan) {
         int height;
@@ -301,9 +286,8 @@ public abstract class ReactBaseTextShadowNode extends LayoutShadowNode {
       }
 
       // Actual order of calling {@code execute} does NOT matter,
-      // but the {@code priority} DOES matter.
-      op.execute(sb, priority);
-      priority++;
+      // but the {@code priorityIndex} DOES matter.
+      op.execute(sb, priorityIndex);
     }
 
     textShadowNode.mTextAttributes.setHeightOfTallestInlineViewOrImage(
@@ -322,6 +306,9 @@ public abstract class ReactBaseTextShadowNode extends LayoutShadowNode {
   protected int mColor;
   protected boolean mIsBackgroundColorSet = false;
   protected int mBackgroundColor;
+
+  protected @Nullable AccessibilityRole mAccessibilityRole = null;
+  protected @Nullable Role mRole = null;
 
   protected int mNumberOfLines = UNSET;
   protected int mTextAlign = Gravity.NO_GRAVITY;
@@ -457,7 +444,8 @@ public abstract class ReactBaseTextShadowNode extends LayoutShadowNode {
       } else if ("center".equals(textAlign)) {
         mTextAlign = Gravity.CENTER_HORIZONTAL;
       } else {
-        throw new JSApplicationIllegalArgumentException("Invalid textAlign: " + textAlign);
+        FLog.w(ReactConstants.TAG, "Invalid textAlign: " + textAlign);
+        mTextAlign = Gravity.NO_GRAVITY;
       }
     }
     markUpdated();
@@ -489,6 +477,22 @@ public abstract class ReactBaseTextShadowNode extends LayoutShadowNode {
       if (mIsBackgroundColorSet) {
         mBackgroundColor = color;
       }
+      markUpdated();
+    }
+  }
+
+  @ReactProp(name = ViewProps.ACCESSIBILITY_ROLE)
+  public void setAccessibilityRole(@Nullable String accessibilityRole) {
+    if (isVirtual()) {
+      mAccessibilityRole = AccessibilityRole.fromValue(accessibilityRole);
+      markUpdated();
+    }
+  }
+
+  @ReactProp(name = ViewProps.ROLE)
+  public void setRole(@Nullable String role) {
+    if (isVirtual()) {
+      mRole = Role.fromValue(role);
       markUpdated();
     }
   }
@@ -561,8 +565,8 @@ public abstract class ReactBaseTextShadowNode extends LayoutShadowNode {
     } else if ("balanced".equals(textBreakStrategy)) {
       mTextBreakStrategy = Layout.BREAK_STRATEGY_BALANCED;
     } else {
-      throw new JSApplicationIllegalArgumentException(
-          "Invalid textBreakStrategy: " + textBreakStrategy);
+      FLog.w(ReactConstants.TAG, "Invalid textBreakStrategy: " + textBreakStrategy);
+      mTextBreakStrategy = Layout.BREAK_STRATEGY_HIGH_QUALITY;
     }
 
     markUpdated();
@@ -618,7 +622,8 @@ public abstract class ReactBaseTextShadowNode extends LayoutShadowNode {
     } else if ("capitalize".equals(textTransform)) {
       mTextAttributes.setTextTransform(TextTransform.CAPITALIZE);
     } else {
-      throw new JSApplicationIllegalArgumentException("Invalid textTransform: " + textTransform);
+      FLog.w(ReactConstants.TAG, "Invalid textTransform: " + textTransform);
+      mTextAttributes.setTextTransform(TextTransform.UNSET);
     }
     markUpdated();
   }

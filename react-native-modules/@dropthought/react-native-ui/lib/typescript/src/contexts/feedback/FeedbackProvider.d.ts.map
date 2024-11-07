@@ -1,0 +1,1 @@
+{"version":3,"file":"FeedbackProvider.d.ts","sourceRoot":"","sources":["../../../../../src/contexts/feedback/FeedbackProvider.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,KAAK,MAAM,OAAO,CAAC;AAQ/B,KAAK,KAAK,GAAG;IACX,QAAQ,EAAE,KAAK,CAAC,SAAS,CAAC;CAC3B,CAAC;AAEF,wBAAgB,gBAAgB,CAAC,EAAE,QAAQ,EAAE,EAAE,KAAK,qBAWnD"}

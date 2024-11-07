@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity, Image, TouchableWithoutFeedback, Animated, Easing, Modal, Text } from 'react-native'; //@ts-ignore
-
+import { StyleSheet, View, TouchableOpacity, Image, TouchableWithoutFeedback, Animated, Easing, Modal, Text } from 'react-native';
+//@ts-ignore
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../contexts/theme';
 import { Colors, GlobalStyle } from '../styles';
@@ -21,6 +21,7 @@ export const NavigationComponent = ({
   }, /*#__PURE__*/React.createElement(View, {
     style: navStyles.content
   }, /*#__PURE__*/React.createElement(TouchableOpacity, {
+    testID: "test:id/icon_cancel",
     style: navStyles.buttonContainer,
     onPress: onCancel
   }, /*#__PURE__*/React.createElement(Text, {
@@ -30,6 +31,7 @@ export const NavigationComponent = ({
   }, /*#__PURE__*/React.createElement(Text, {
     style: navStyles.label
   }, "Select your option")), /*#__PURE__*/React.createElement(TouchableOpacity, {
+    testID: "test:id/icon_check_image",
     disabled: disableOnConfirm,
     style: buttonRightStyle,
     onPress: onConfirm
@@ -38,7 +40,6 @@ export const NavigationComponent = ({
     source: require('../assets/ic-check.png')
   }))));
 };
-
 const BottomSheet = ({
   coverScreen = false,
   title,
@@ -60,18 +61,15 @@ const BottomSheet = ({
   const [modalVisible, setModalVisible] = React.useState(false);
   React.useEffect(() => {
     let toValue = 0;
-
     if (visible) {
       let titleBarHeight = 48;
       toValue = titleBarHeight + componentHeight + bottom;
       if (coverScreen) setModalVisible(true);
     }
-
     if (heightValueRef.current === toValue) {
       // when current height value is the same as toValue, skip animation
       return;
     }
-
     heightValueRef.current = toValue;
     Animated.timing(animatedHeightRef.current, {
       toValue: toValue,
@@ -94,15 +92,14 @@ const BottomSheet = ({
   }, navigationComponent ? navigationComponent : /*#__PURE__*/React.createElement(View, {
     style: styles.divider
   }), children || componentInside);
-
   if (!coverScreen) {
     return contentView;
   }
-
   return /*#__PURE__*/React.createElement(Modal, {
     onRequestClose: onBackdropPress,
     animationType: "none",
-    transparent: true //@ts-ignore
+    transparent: true
+    //@ts-ignore
     ,
     statusBarTranslucent: true,
     visible: modalVisible
@@ -114,7 +111,6 @@ const BottomSheet = ({
     style: GlobalStyle.flex1
   })), contentView));
 };
-
 export default BottomSheet;
 const styles = StyleSheet.create({
   container: {

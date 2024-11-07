@@ -1,1 +1,1 @@
-{"version":3,"sources":["index.js"],"names":[],"mappings":"AAAA,cAAc,cAAd;AACA,cAAc,cAAd","sourcesContent":["export * from './skip-logic';\nexport * from './types/data';\n"]}
+{"version":3,"names":[],"sourceRoot":"../../../src","sources":["dt-common/index.js"],"mappings":"AAAA,cAAc,cAAc;AAC5B,cAAc,cAAc"}

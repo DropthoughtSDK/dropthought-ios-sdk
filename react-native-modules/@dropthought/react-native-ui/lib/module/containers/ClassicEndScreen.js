@@ -1,32 +1,32 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 import { Colors } from '../styles';
 import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
 import { useTheme } from '../contexts/theme';
 import { GlobalStyle } from '../styles';
-
+import HtmlText from '../components/HtmlText';
 const logoSource = require('../assets/ic_dtlogo.png');
-
 const defaultIconSource = require('../assets/rating.png');
-
 const defaultIconSize = {
   [DimensionWidthType.phone]: 65,
   [DimensionWidthType.tablet]: 72
 };
-
 const ClassicEndScreen = ({
-  survey
+  survey,
+  onClose
 }) => {
   const dimensionWidthType = useDimensionWidthType();
   const {
     fontColor,
-    backgroundColor
+    backgroundColor,
+    autoClose,
+    autoCloseCountdown
   } = useTheme();
   const isPhone = dimensionWidthType === DimensionWidthType.phone;
   const styles = isPhone ? phoneStyles : tabletStyles;
   const {
     surveyProperty,
-    thankYouTextPlain
+    thankYouText
   } = survey;
   const {
     image
@@ -37,11 +37,18 @@ const ClassicEndScreen = ({
     height: imageHeight
   };
   useEffect(() => {
+    let timer;
+    if (autoClose) {
+      timer = setTimeout(onClose, autoCloseCountdown);
+    }
     Image.getSize(image, (_, height) => {
       if (height < defaultIconSize[dimensionWidthType]) {
         setImageHeight(height);
       }
-    }, _ => {}); // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, _ => {});
+    return () => clearTimeout(timer);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const iconSource = image === undefined ? defaultIconSource : {
     uri: image
@@ -49,7 +56,9 @@ const ClassicEndScreen = ({
   const iconView = /*#__PURE__*/React.createElement(View, {
     style: GlobalStyle.row
   }, /*#__PURE__*/React.createElement(Image, {
-    resizeMode: "contain",
+    resizeMode: "contain"
+    // @ts-ignore
+    ,
     style: iconStyle,
     source: iconSource
   }));
@@ -59,11 +68,14 @@ const ClassicEndScreen = ({
     }]
   }, /*#__PURE__*/React.createElement(View, {
     style: styles.main
-  }, iconView, /*#__PURE__*/React.createElement(Text, {
-    style: [styles.subtitle, {
-      color: fontColor
-    }]
-  }, thankYouTextPlain)), /*#__PURE__*/React.createElement(View, {
+  }, iconView, thankYouText && /*#__PURE__*/React.createElement(View, {
+    style: styles.subtitle
+  }, /*#__PURE__*/React.createElement(HtmlText, {
+    accessibilityLabel: `thankful_${thankYouText}`,
+    html: thankYouText,
+    width: Dimensions.get('window').width - 76,
+    maxHeight: Dimensions.get('window').height * 0.4
+  }))), /*#__PURE__*/React.createElement(View, {
     style: styles.vertical
   }, /*#__PURE__*/React.createElement(View, {
     style: styles.horizontal
@@ -78,7 +90,6 @@ const ClassicEndScreen = ({
     }]
   }, "dropthought")));
 };
-
 export default ClassicEndScreen;
 const shareStyles = StyleSheet.create({
   container: {
@@ -101,11 +112,7 @@ const phoneStyles = StyleSheet.create({
     opacity: 0.9
   },
   subtitle: {
-    marginTop: 17,
-    fontSize: 19,
-    textAlign: 'center',
-    opacity: 0.72,
-    paddingBottom: 10
+    marginTop: 17
   },
   vertical: {
     alignItems: 'center',
@@ -150,11 +157,7 @@ const tabletStyles = StyleSheet.create({
     opacity: 0.9
   },
   subtitle: {
-    lineHeight: 25,
-    marginTop: 17,
-    fontSize: 21,
-    textAlign: 'center',
-    opacity: 0.72
+    marginTop: 17
   },
   vertical: {
     alignItems: 'center',

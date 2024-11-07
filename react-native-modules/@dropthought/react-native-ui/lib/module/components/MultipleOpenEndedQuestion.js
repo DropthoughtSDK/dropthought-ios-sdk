@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, StyleSheet, Text, TextInput, Platform, ScrollView as RNScrollView } from 'react-native';
+// @ts-ignore
 import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import GlobalStyle, { Colors, addOpacityToColor } from '../styles';
 import MandatoryTitle from './MandatoryTitle';
@@ -9,7 +10,6 @@ import { metaDataFormatValidator } from '../utils/data';
 import i18n from '../translation';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 const ScrollView = Platform.OS === 'ios' ? KeyboardAvoidingScrollView : RNScrollView;
-
 const RowComponent = ({
   question,
   questionRow,
@@ -20,7 +20,6 @@ const RowComponent = ({
   index
 }) => {
   var _question$metaDataTyp;
-
   const {
     questionTitle,
     exampleMetadataText,
@@ -48,9 +47,8 @@ const RowComponent = ({
   } = useTheme();
   const opacityThemeColor = addOpacityToColor(themeColor, 0.1);
   const isDark = colorScheme === COLOR_SCHEMES.dark;
-  const isValid = metaDataFormatValidator(text, question === null || question === void 0 ? void 0 : (_question$metaDataTyp = question.metaDataTypeList) === null || _question$metaDataTyp === void 0 ? void 0 : _question$metaDataTyp[index]);
+  const isValid = metaDataFormatValidator(text, question === null || question === void 0 || (_question$metaDataTyp = question.metaDataTypeList) === null || _question$metaDataTyp === void 0 ? void 0 : _question$metaDataTyp[index]);
   const isFoucsAndInValid = useMemo(() => isFocus || !isValid && hasEdited, [hasEdited, isFocus, isValid]);
-
   const onChangeText = textInput => {
     onChangeTextHandler(textInput);
     setSelectedAnswer(previous => {
@@ -59,7 +57,6 @@ const RowComponent = ({
       return answers;
     });
   };
-
   const rowContainerStyle = [styles.rowContainer, {
     backgroundColor: isFocus ? isDark ? Colors.rankingContainerBgDark : addOpacityToColor(themeColor || Colors.white, 0.1) : backgroundColor
   }];
@@ -120,7 +117,6 @@ const RowComponent = ({
     style: [styles.inputLengthText, GlobalStyle.textAlignRight]
   }, `${scale - text.length}/${scale}`) : null)));
 };
-
 const MultipleOpenEndedQuestion = ({
   survey,
   question,
@@ -156,7 +152,6 @@ const MultipleOpenEndedQuestion = ({
     invalidMessage: handleErrorHint(forgot)
   }), rowList);
 };
-
 export default /*#__PURE__*/React.memo(MultipleOpenEndedQuestion);
 const styles = StyleSheet.create({
   container: {

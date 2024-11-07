@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -15,8 +15,7 @@
 
 #include "ComponentDescriptorRegistry.h"
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /**
  * A factory to provide hosting app specific set of ComponentDescriptor's.
@@ -25,10 +24,9 @@ namespace react {
  */
 using ComponentRegistryFactory =
     std::function<SharedComponentDescriptorRegistry(
-        EventDispatcher::Weak const &eventDispatcher,
-        ContextContainer::Shared const &contextContainer)>;
+        const EventDispatcher::Weak& eventDispatcher,
+        const ContextContainer::Shared& contextContainer)>;
 
 ComponentRegistryFactory getDefaultComponentRegistryFactory();
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

@@ -4,12 +4,13 @@ import { throwRequestError } from './Fetcher';
 const UPLOAD_PATH = '/api/event/storage/file';
 
 /**
- * @param {ImageFormData} file
- * @param {AxiosRequestConfig} axiosConfig
+ * @param {FormData} file
  * @param {Fetcher=} fetcher
+ * @param {QuestionType} questionType
+ * @param {AxiosRequestConfig=} axiosConfig
  * @returns {Promise<UploadFileResult>}
  */
-export async function uploadFile(file, axiosConfig = {}, fetcher = fetcherInstance) {
+export async function uploadFile(file, questionType, axiosConfig, fetcher = fetcherInstance) {
   let formData = new FormData();
   // @ts-ignore
   formData.append('file', file);
@@ -22,7 +23,7 @@ export async function uploadFile(file, axiosConfig = {}, fetcher = fetcherInstan
       'Content-Type': 'multipart/form-data'
     },
     params: {
-      questionType: 'pictureChoice'
+      questionType: questionType
     },
     body: formData,
     ...axiosConfig
@@ -37,10 +38,16 @@ export async function uploadFile(file, axiosConfig = {}, fetcher = fetcherInstan
 }
 
 /**
- * @typedef {Object} ImageFormData
+ * @typedef {import('axios').AxiosRequestConfig} AxiosRequestConfig
+ * @typedef {import('@dropthought/react-native-ui').QuestionType} QuestionType
+ */
+
+/**
+ * @typedef {Object} FormData
  * @property {string} uri
  * @property {string} name
  * @property {string} type
+ * @property {string=} base64
  */
 
 /**

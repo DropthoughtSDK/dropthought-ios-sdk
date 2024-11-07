@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.addOpacityToColor = exports.Option1BackgroundColorDark = exports.Option1BackgroundColor = exports.Colors = void 0;
 exports.addOpacityToHex = addOpacityToHex;
 exports.opacity60 = exports.opacity30 = exports.opacity15 = exports.opacity10 = void 0;
-const Colors = {
+const Colors = exports.Colors = {
   purple: '#4c3794',
   border: '#9b9b9b',
   secondary: '#ECEFF4',
@@ -68,50 +68,33 @@ const Colors = {
   lightActionText: '#121212',
   darkActionText: '#e1e1e1',
   bijlirideBackgroundColor: '#32cbf1',
-  bijlirideHexCode: '#407d37'
+  bijlirideHexCode: '#407d37',
+  lightActionBackground: 'rgba(249, 249, 249, 0.78)',
+  urlBlue: '#218ddd'
 };
-exports.Colors = Colors;
-
 const addOpacityToColor = (hexColor, opacity) => {
   const o = Math.max(0, Math.min(1, opacity)); // bound opacity from 0 to 1
-
   const intValue = Math.round(o * 255); // map percent to nearest integer (0 - 255)
-
   const hexValue = intValue.toString(16); // get hexadecimal representation
-
   return `${hexColor}${hexValue.padStart(2, '0').toUpperCase()}`; // format with leading 0 and upper case characters
-}; // https://css-tricks.com/8-digit-hex-codes/
+};
 
-
+// https://css-tricks.com/8-digit-hex-codes/
 exports.addOpacityToColor = addOpacityToColor;
-
 const opacity10 = color => `${color}1a`;
-
 exports.opacity10 = opacity10;
-
 const opacity15 = color => `${color}26`;
-
 exports.opacity15 = opacity15;
-
 const opacity30 = color => `${color}4d`;
-
 exports.opacity30 = opacity30;
-
 const opacity60 = color => `${color}99`;
-
 exports.opacity60 = opacity60;
-const Option1BackgroundColor = ['#ff8d8d', '#ffca8d', '#8de0ff', '#dbffb1', '#feed8d'];
-exports.Option1BackgroundColor = Option1BackgroundColor;
-const Option1BackgroundColorDark = ['#b2706d', '#b5976e', '#76a3bb', '#a4b986', '#b8af6e'];
-exports.Option1BackgroundColorDark = Option1BackgroundColorDark;
-
+const Option1BackgroundColor = exports.Option1BackgroundColor = ['#ff8d8d', '#ffca8d', '#8de0ff', '#dbffb1', '#feed8d'];
+const Option1BackgroundColorDark = exports.Option1BackgroundColorDark = ['#b2706d', '#b5976e', '#76a3bb', '#a4b986', '#b8af6e'];
 function addOpacityToHex(hexColor, opacity) {
   const o = Math.max(0, Math.min(1, opacity)); // bound opacity from 0 to 1
-
   const intValue = Math.round(o * 255); // map percent to nearest integer (0 - 255)
-
   const hexValue = intValue.toString(16); // get hexadecimal representation
-
   return `${hexColor}${hexValue.padStart(2, '0').toUpperCase()}`; // format with leading 0 and upper case characters
 }
 //# sourceMappingURL=Colors.js.map

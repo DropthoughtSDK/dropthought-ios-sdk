@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,7 +12,7 @@
 using namespace facebook::react;
 
 void RCTMountingTransactionObserverCoordinator::registerViewComponentDescriptor(
-    RCTComponentViewDescriptor const &componentViewDescriptor,
+    const RCTComponentViewDescriptor &componentViewDescriptor,
     SurfaceId surfaceId)
 {
   if (!componentViewDescriptor.observesMountingTransactionWillMount &&
@@ -26,7 +26,7 @@ void RCTMountingTransactionObserverCoordinator::registerViewComponentDescriptor(
 }
 
 void RCTMountingTransactionObserverCoordinator::unregisterViewComponentDescriptor(
-    RCTComponentViewDescriptor const &componentViewDescriptor,
+    const RCTComponentViewDescriptor &componentViewDescriptor,
     SurfaceId surfaceId)
 {
   if (!componentViewDescriptor.observesMountingTransactionWillMount &&
@@ -40,35 +40,37 @@ void RCTMountingTransactionObserverCoordinator::unregisterViewComponentDescripto
 }
 
 void RCTMountingTransactionObserverCoordinator::notifyObserversMountingTransactionWillMount(
-    MountingTransactionMetadata const &metadata) const
+    const MountingTransaction &transaction,
+    const SurfaceTelemetry &surfaceTelemetry) const
 {
-  auto surfaceId = metadata.surfaceId;
+  auto surfaceId = transaction.getSurfaceId();
   auto surfaceRegistryIterator = registry_.find(surfaceId);
   if (surfaceRegistryIterator == registry_.end()) {
     return;
   }
   auto &surfaceRegistry = surfaceRegistryIterator->second;
-  for (auto const &componentViewDescriptor : surfaceRegistry) {
+  for (const auto &componentViewDescriptor : surfaceRegistry) {
     if (componentViewDescriptor.observesMountingTransactionWillMount) {
-      [(id<RCTMountingTransactionObserving>)componentViewDescriptor.view
-          mountingTransactionWillMountWithMetadata:metadata];
+      [(id<RCTMountingTransactionObserving>)componentViewDescriptor.view mountingTransactionWillMount:transaction
+                                                                                 withSurfaceTelemetry:surfaceTelemetry];
     }
   }
 }
 
 void RCTMountingTransactionObserverCoordinator::notifyObserversMountingTransactionDidMount(
-    MountingTransactionMetadata const &metadata) const
+    const MountingTransaction &transaction,
+    const SurfaceTelemetry &surfaceTelemetry) const
 {
-  auto surfaceId = metadata.surfaceId;
+  auto surfaceId = transaction.getSurfaceId();
   auto surfaceRegistryIterator = registry_.find(surfaceId);
   if (surfaceRegistryIterator == registry_.end()) {
     return;
   }
   auto &surfaceRegistry = surfaceRegistryIterator->second;
-  for (auto const &componentViewDescriptor : surfaceRegistry) {
+  for (const auto &componentViewDescriptor : surfaceRegistry) {
     if (componentViewDescriptor.observesMountingTransactionDidMount) {
-      [(id<RCTMountingTransactionObserving>)componentViewDescriptor.view
-          mountingTransactionDidMountWithMetadata:metadata];
+      [(id<RCTMountingTransactionObserving>)componentViewDescriptor.view mountingTransactionDidMount:transaction
+                                                                                withSurfaceTelemetry:surfaceTelemetry];
     }
   }
 }

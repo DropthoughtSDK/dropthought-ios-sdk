@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,6 +9,7 @@
 
 #import <React/RCTLog.h>
 #import <React/RCTSurface.h>
+#import <React/RCTSurfaceHostingView.h>
 
 @implementation RCTLogBoxView {
   RCTSurface *_surface;
@@ -32,24 +33,44 @@
   self.rootViewController = _rootViewController;
 }
 
-- (instancetype)initWithFrame:(CGRect)frame bridge:(RCTBridge *)bridge
+- (instancetype)initWithWindow:(UIWindow *)window bridge:(RCTBridge *)bridge
 {
-  if ((self = [super initWithFrame:frame])) {
-    self.windowLevel = UIWindowLevelStatusBar - 1;
-    self.backgroundColor = [UIColor clearColor];
+  RCTErrorNewArchitectureValidation(RCTNotAllowedInFabricWithoutLegacy, @"RCTLogBoxView", nil);
 
-    _surface = [[RCTSurface alloc] initWithBridge:bridge moduleName:@"LogBox" initialProperties:@{}];
+  self = [super initWithWindowScene:window.windowScene];
 
-    [_surface start];
-    [_surface setSize:frame.size];
+  self.windowLevel = UIWindowLevelStatusBar - 1;
+  self.backgroundColor = [UIColor clearColor];
 
-    if (![_surface synchronouslyWaitForStage:RCTSurfaceStageSurfaceDidInitialMounting timeout:1]) {
-      RCTLogInfo(@"Failed to mount LogBox within 1s");
-    }
+  _surface = [[RCTSurface alloc] initWithBridge:bridge moduleName:@"LogBox" initialProperties:@{}];
+  [_surface start];
 
-    [self createRootViewController:(UIView *)_surface.view];
+  if (![_surface synchronouslyWaitForStage:RCTSurfaceStageSurfaceDidInitialMounting timeout:1]) {
+    RCTLogInfo(@"Failed to mount LogBox within 1s");
   }
+  [self createRootViewController:(UIView *)_surface.view];
+
   return self;
+}
+
+- (instancetype)initWithWindow:(UIWindow *)window surfacePresenter:(id<RCTSurfacePresenterStub>)surfacePresenter
+{
+  self = [super initWithWindowScene:window.windowScene];
+
+  id<RCTSurfaceProtocol> surface = [surfacePresenter createFabricSurfaceForModuleName:@"LogBox" initialProperties:@{}];
+  [surface start];
+  RCTSurfaceHostingView *rootView = [[RCTSurfaceHostingView alloc]
+      initWithSurface:surface
+      sizeMeasureMode:RCTSurfaceSizeMeasureModeWidthExact | RCTSurfaceSizeMeasureModeHeightExact];
+  [self createRootViewController:rootView];
+
+  return self;
+}
+
+- (void)layoutSubviews
+{
+  [super layoutSubviews];
+  [_surface setSize:self.frame.size];
 }
 
 - (void)dealloc

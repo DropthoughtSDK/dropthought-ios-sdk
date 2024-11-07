@@ -1,4 +1,2 @@
-import { AppStateStatus } from 'react-native';
-export declare function useAppState(): AppStateStatus;
-export { AppStateStatus };
+export declare function useAppState(): "active" | "background" | "inactive" | "unknown" | "extension";
 //# sourceMappingURL=useAppState.d.ts.map

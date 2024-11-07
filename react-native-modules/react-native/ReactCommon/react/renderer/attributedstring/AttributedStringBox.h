@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -11,8 +11,7 @@
 
 #include <react/renderer/attributedstring/AttributedString.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * Represents an object storing a shared `AttributedString` or a shared pointer
@@ -34,40 +33,39 @@ class AttributedStringBox final {
   /*
    * Custom explicit constructors.
    */
-  explicit AttributedStringBox(AttributedString const &value);
-  explicit AttributedStringBox(std::shared_ptr<void> const &opaquePointer);
+  explicit AttributedStringBox(const AttributedString& value);
+  explicit AttributedStringBox(std::shared_ptr<void> opaquePointer);
 
   /*
    * Movable, Copyable, Assignable.
    */
-  AttributedStringBox(AttributedStringBox const &other) = default;
-  AttributedStringBox(AttributedStringBox &&other) noexcept = default;
-  AttributedStringBox &operator=(AttributedStringBox const &other) = default;
-  AttributedStringBox &operator=(AttributedStringBox &&other) = default;
+  AttributedStringBox(const AttributedStringBox& other) = default;
+  AttributedStringBox(AttributedStringBox&& other) noexcept;
+  AttributedStringBox& operator=(const AttributedStringBox& other) = default;
+  AttributedStringBox& operator=(AttributedStringBox&& other) noexcept;
 
   /*
    * Getters.
    */
   Mode getMode() const;
-  AttributedString const &getValue() const;
+  const AttributedString& getValue() const;
   std::shared_ptr<void> getOpaquePointer() const;
 
  private:
   Mode mode_;
-  std::shared_ptr<AttributedString const> value_;
+  std::shared_ptr<const AttributedString> value_;
   std::shared_ptr<void> opaquePointer_;
 };
 
-bool operator==(AttributedStringBox const &lhs, AttributedStringBox const &rhs);
-bool operator!=(AttributedStringBox const &lhs, AttributedStringBox const &rhs);
+bool operator==(const AttributedStringBox& lhs, const AttributedStringBox& rhs);
+bool operator!=(const AttributedStringBox& lhs, const AttributedStringBox& rhs);
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react
 
 template <>
 struct std::hash<facebook::react::AttributedStringBox> {
   size_t operator()(
-      facebook::react::AttributedStringBox const &attributedStringBox) const {
+      const facebook::react::AttributedStringBox& attributedStringBox) const {
     switch (attributedStringBox.getMode()) {
       case facebook::react::AttributedStringBox::Mode::Value:
         return std::hash<facebook::react::AttributedString>()(

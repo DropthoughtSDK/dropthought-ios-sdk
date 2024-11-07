@@ -4,29 +4,21 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireDefault(require("react"));
-
 var _reactNative = require("react-native");
-
 var _styles = _interopRequireDefault(require("../styles"));
-
 var _PictureChoiceItem = _interopRequireDefault(require("./PictureChoiceItem"));
-
 var _PictureChoiceOtherItem = _interopRequireDefault(require("./PictureChoiceOtherItem"));
-
 var _usePictureChoice = require("../hooks/usePictureChoice");
-
 var _MandatoryTitle = _interopRequireDefault(require("./MandatoryTitle"));
-
 var _KeyboardAvoidingView = require("./KeyboardAvoidingView");
-
 var _translation = _interopRequireDefault(require("../translation"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+// @ts-ignore
+
+// @ts-ignore
 
 const ScrollView = _reactNative.Platform.OS === 'ios' ? _KeyboardAvoidingView.KeyboardAvoidingScrollView : _reactNative.ScrollView;
-
 const PictureChoiceQuestion = ({
   survey,
   question,
@@ -62,10 +54,8 @@ const PictureChoiceQuestion = ({
     option
   }, index) => {
     const selected = selectIndex.includes(index);
-
     const onPress = () => {
       setInvalidMessage(undefined);
-
       if (isMultipleChoice) {
         onSelectIndex(index);
       } else {
@@ -73,7 +63,6 @@ const PictureChoiceQuestion = ({
         resetOtherPicture();
       }
     };
-
     return /*#__PURE__*/_react.default.createElement(_PictureChoiceItem.default, {
       title: option,
       uri: uri,
@@ -96,7 +85,6 @@ const PictureChoiceQuestion = ({
       if (!isMultipleChoice) {
         replaceSelectIndex([]);
       }
-
       setOtherPictureSelected(true);
     },
     onSelect: () => {
@@ -107,14 +95,12 @@ const PictureChoiceQuestion = ({
         if (!isMultipleChoice) {
           replaceSelectIndex([]);
         }
-
         setOtherPictureSelected(true);
       }
     },
     onUpload: async file => {
       setInvalidMessage(undefined);
-      const url = await onUpload(file);
-
+      const url = await onUpload(file, 'pictureChoice');
       if (typeof url !== 'string') {
         setInvalidMessage(`${_translation.default.t('picture-choice:uploadFailed')}`);
       } else if (url) {
@@ -143,11 +129,7 @@ const PictureChoiceQuestion = ({
     style: [styles.pictureGridContainer, rtl && _styles.default.flexRowReverse]
   }, imageItems, otherImageItem));
 };
-
-var _default = /*#__PURE__*/_react.default.memo(PictureChoiceQuestion);
-
-exports.default = _default;
-
+var _default = exports.default = /*#__PURE__*/_react.default.memo(PictureChoiceQuestion);
 const styles = _reactNative.StyleSheet.create({
   container: {
     paddingHorizontal: 30,

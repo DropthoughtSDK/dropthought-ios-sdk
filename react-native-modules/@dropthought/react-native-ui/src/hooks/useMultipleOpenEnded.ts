@@ -69,7 +69,7 @@ const useMultipleOpenEnded = (
         metaDataType: metaDataTypeList?.[index],
         exampleMetadataText: exampleMetadataTextList?.[index],
         scale: Number(scale),
-        phiData: phiDataList[index],
+        phiData: phiDataList[index] ?? false,
       })) || [],
     [
       exampleMetadataTextList,

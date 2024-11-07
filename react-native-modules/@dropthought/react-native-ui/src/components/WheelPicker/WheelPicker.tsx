@@ -1,15 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import {
+import { Animated, View, FlatList } from 'react-native';
+import type {
   StyleProp,
   TextStyle,
   NativeSyntheticEvent,
   NativeScrollEvent,
-  Animated,
   ViewStyle,
-  View,
   ViewProps,
-  FlatList,
 } from 'react-native';
+
 import styles from './WheelPicker.styles';
 import WheelPickerItem from './WheelPickerItem';
 
@@ -118,6 +117,7 @@ const WheelPicker: React.FC<Props> = ({
         snapToOffsets={offsets}
         decelerationRate={decelerationRate}
         initialScrollIndex={selectedIndex}
+        // @ts-ignore
         getItemLayout={(_: string, index: number) => ({
           length: itemHeight,
           offset: itemHeight * index,
@@ -126,18 +126,22 @@ const WheelPicker: React.FC<Props> = ({
         data={paddedOptions}
         keyExtractor={(_: string, index: number) => index.toString()}
         renderItem={({ item, index }: { item: string; index: number }) => (
-          <WheelPickerItem
-            key={`option-${index}`}
-            index={index}
-            option={item}
-            style={itemStyle}
-            textStyle={itemTextStyle}
-            height={itemHeight}
-            currentScrollIndex={currentScrollIndex}
-            rotationFunction={rotationFunction}
-            opacityFunction={opacityFunction}
-            visibleRest={visibleRest}
-          />
+          <View
+            accessibilityLabel={`selected_${options[selectedIndex] === item}`}
+          >
+            <WheelPickerItem
+              key={`option-${index}`}
+              index={index}
+              option={item}
+              style={itemStyle}
+              textStyle={itemTextStyle}
+              height={itemHeight}
+              currentScrollIndex={currentScrollIndex}
+              rotationFunction={rotationFunction}
+              opacityFunction={opacityFunction}
+              visibleRest={visibleRest}
+            />
+          </View>
         )}
       />
     </View>

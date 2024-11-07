@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,30 +12,37 @@
 #include <functional>
 #include <utility>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 class HermesExecutorFactory : public JSExecutorFactory {
  public:
   explicit HermesExecutorFactory(
       JSIExecutor::RuntimeInstaller runtimeInstaller,
-      const JSIScopedTimeoutInvoker &timeoutInvoker =
+      const JSIScopedTimeoutInvoker& timeoutInvoker =
           JSIExecutor::defaultTimeoutInvoker,
-      ::hermes::vm::RuntimeConfig runtimeConfig = ::hermes::vm::RuntimeConfig())
+      ::hermes::vm::RuntimeConfig runtimeConfig = defaultRuntimeConfig())
       : runtimeInstaller_(runtimeInstaller),
         timeoutInvoker_(timeoutInvoker),
         runtimeConfig_(std::move(runtimeConfig)) {
     assert(timeoutInvoker_ && "Should not have empty timeoutInvoker");
   }
 
+  void setEnableDebugger(bool enableDebugger);
+
+  void setDebuggerName(const std::string& debuggerName);
+
   std::unique_ptr<JSExecutor> createJSExecutor(
       std::shared_ptr<ExecutorDelegate> delegate,
       std::shared_ptr<MessageQueueThread> jsQueue) override;
 
  private:
+  static ::hermes::vm::RuntimeConfig defaultRuntimeConfig();
+
   JSIExecutor::RuntimeInstaller runtimeInstaller_;
   JSIScopedTimeoutInvoker timeoutInvoker_;
   ::hermes::vm::RuntimeConfig runtimeConfig_;
+  bool enableDebugger_ = true;
+  std::string debuggerName_ = "Hermes React Native";
 };
 
 class HermesExecutor : public JSIExecutor {
@@ -44,12 +51,11 @@ class HermesExecutor : public JSIExecutor {
       std::shared_ptr<jsi::Runtime> runtime,
       std::shared_ptr<ExecutorDelegate> delegate,
       std::shared_ptr<MessageQueueThread> jsQueue,
-      const JSIScopedTimeoutInvoker &timeoutInvoker,
+      const JSIScopedTimeoutInvoker& timeoutInvoker,
       RuntimeInstaller runtimeInstaller);
 
  private:
   JSIScopedTimeoutInvoker timeoutInvoker_;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

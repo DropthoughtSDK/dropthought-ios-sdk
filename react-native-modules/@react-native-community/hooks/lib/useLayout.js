@@ -14,13 +14,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.useLayout = void 0;
 var react_1 = require("react");
 function useLayout() {
-    var _a = react_1.useState({
+    var _a = (0, react_1.useState)({
         x: 0,
         y: 0,
         width: 0,
         height: 0,
     }), layout = _a[0], setLayout = _a[1];
-    var onLayout = react_1.useCallback(function (e) { return setLayout(e.nativeEvent.layout); }, []);
+    var onLayout = (0, react_1.useCallback)(function (e) { return setLayout(e.nativeEvent.layout); }, []);
     return __assign({ onLayout: onLayout }, layout);
 }
 exports.useLayout = useLayout;

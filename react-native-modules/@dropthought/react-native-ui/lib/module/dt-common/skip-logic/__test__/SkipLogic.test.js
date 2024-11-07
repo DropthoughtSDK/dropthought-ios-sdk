@@ -129,7 +129,6 @@ describe('rule set for page 1, conditions with &&', () => {
       answers: [0],
       questionId: '43c8f71b-4613-4b77-bd99-90cdfacb7f00'
     }]];
-
     for (const feedbacks of testFeedbacksSets) {
       const nextPageIndex = nextPage(0, feedbacks, surveyWithRules);
       expect(nextPageIndex).toBe(-1);
@@ -175,7 +174,6 @@ describe('rule set for page 2, condifionts with ||', () => {
       answers: [0],
       questionId: '6ab17499-9316-49cf-9d70-20827aa20fe3'
     }]];
-
     for (const feedbacks of testFeedbacksSets) {
       const nextPageIndex = nextPage(1, feedbacks, surveyWithRules);
       expect(nextPageIndex).toBe(-1);
@@ -223,7 +221,6 @@ describe('rule set for page 2, condifionts with ||', () => {
       answers: [''],
       questionId: '6ab17499-9316-49cf-9d70-20827aa20fe3'
     }]];
-
     for (const feedbacks of testFeedbacksSets) {
       const nextPageIndex = nextPage(1, feedbacks, surveyWithRules);
       expect(nextPageIndex).toBe(2);

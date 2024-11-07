@@ -28,7 +28,10 @@ export declare type QuestionType =
   | 'dropdown'
   | 'matrixRating'
   | 'matrixChoice'
-  | 'pictureChoice';
+  | 'pictureChoice'
+  | 'poll'
+  | 'file'
+  | 'statement';
 
 export type ProgramStateType = 'expired' | 'drafts' | 'active' | 'scheduled';
 
@@ -36,8 +39,10 @@ export interface Question {
   category: string;
   mandatory: boolean;
   options: string[];
+  optionIds: string[];
   questionId: string;
   questionTitle: string;
+  questionTitlePlain: string;
   type: QuestionType;
   questionBrand?: QuestionBrandType | string;
   metaDataType?: QuestionMetaDataType;
@@ -58,6 +63,11 @@ export interface Question {
   phiDataList: boolean[];
   optionImages: string[];
   otherTextLabel: string;
+  allowMultipleFiles: boolean;
+  supportedFileTypes: string[];
+  statementProperty: StatementProperty;
+  displayLogics?: DisplayLogics;
+  respondentTracker?: boolean;
 }
 
 export interface Page {
@@ -89,6 +99,14 @@ export interface SurveyProperty {
   width?: number;
   height?: number;
   themeName?: string;
+}
+
+export interface StatementProperty {
+  addImage: boolean;
+  addQuotes: boolean;
+  addUrl: boolean;
+  logo?: string;
+  url?: string;
 }
 
 export interface ProgramContent {
@@ -130,11 +148,18 @@ export interface Survey {
   surveyStartDate: string;
   surveyEndDate: string;
   mandatoryErrorMessage: string;
+  uploadMaxFilesErrorMessage: string;
+  uploadOneFileErrorMessage: string;
+  uploadSizeErrorMessage: string;
+  pleaseUploadText: string;
   contents?: ProgramContent[];
   surveyType: number;
   pageOrder: string[];
   state: ProgramStateType;
   takeSurvey: string;
+  fileFormatErrorText: string;
+  fileFormatsOnlyText: string;
+  token: string;
 }
 
 export interface TransformedOption {
@@ -154,4 +179,43 @@ export interface Feedback {
   subType?: string;
   otherFlag?: boolean;
   listForRankingQuestion?: TransformedOption[];
+}
+
+export interface ImageFileProps {
+  uri: string;
+  name: string;
+  type: string;
+  base64?: string;
+}
+
+export type onUploadType = (
+  file: ImageFileProps,
+  questionType: QuestionType,
+  requestConfig?: any
+) => Promise<string | undefined>;
+
+export interface DisplayLogics {
+  queryCondition: string;
+  displayLogicArray: DisplayLogicProperty[];
+}
+
+export interface DisplayLogicProperty {
+  quesNo: number;
+  questionId: string;
+  queryOptions: any;
+  isMetadataSelectAll: boolean;
+  operator: string;
+  questionLabel: string;
+  mode: string;
+  btwnTo: string;
+  optionLabel: string;
+  condition: string;
+  logicType: string;
+  btwnFrom: string;
+  operatorLabel: string;
+  textMatch: string;
+  disableQuestionId: string;
+  questionType: string;
+  option: string;
+  arrayOfChoiceNumbers: string[];
 }

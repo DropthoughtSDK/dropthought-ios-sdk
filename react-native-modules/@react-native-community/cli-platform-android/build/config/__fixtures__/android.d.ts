@@ -6,6 +6,7 @@
  *
  */
 export declare const valid: {
+    'build.gradle': any;
     src: {
         'AndroidManifest.xml': any;
         main: {
@@ -21,6 +22,7 @@ export declare const valid: {
     };
 };
 export declare const validKotlin: {
+    'build.gradle': any;
     src: {
         'AndroidManifest.xml': any;
         main: {
@@ -33,6 +35,15 @@ export declare const validKotlin: {
                 };
             };
         };
+    };
+};
+export declare const validApp: {
+    'build.gradle': any;
+    app: {
+        'build.gradle': any;
+    };
+    src: {
+        'AndroidManifest.xml': any;
     };
 };
 export declare const userConfigManifest: {
@@ -83,4 +94,24 @@ export declare const findPackagesClassNameKotlinValid: string[];
 export declare const findPackagesClassNameKotlinNotValid: string[];
 export declare const findPackagesClassNameJavaValid: string[];
 export declare const findPackagesClassNameJavaNotValid: string[];
+export declare const fewActivities: {
+    src: {
+        'AndroidManifest.xml': any;
+    };
+};
+export declare const className: {
+    src: {
+        'AndroidManifest.xml': any;
+    };
+};
+export declare const customFlavor: {
+    src: {
+        e2e: {
+            'AndroidManifest.xml': any;
+        };
+        main: {
+            'AndroidManifest.xml': any;
+        };
+    };
+};
 //# sourceMappingURL=android.d.ts.map

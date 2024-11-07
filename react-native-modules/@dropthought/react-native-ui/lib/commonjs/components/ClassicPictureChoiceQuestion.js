@@ -4,24 +4,16 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireDefault(require("react"));
-
 var _reactNative = require("react-native");
-
 var _styles = _interopRequireDefault(require("../styles"));
-
 var _PictureChoiceItem = _interopRequireDefault(require("./PictureChoiceItem"));
-
 var _PictureChoiceOtherItem = _interopRequireDefault(require("./PictureChoiceOtherItem"));
-
 var _usePictureChoice = require("../hooks/usePictureChoice");
-
 var _ClassicMandatoryTitle = _interopRequireDefault(require("./ClassicMandatoryTitle"));
-
 var _translation = _interopRequireDefault(require("../translation"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+// @ts-ignore
 
 const ClassicPictureChoiceQuestion = ({
   mandatoryErrorMessage,
@@ -58,10 +50,8 @@ const ClassicPictureChoiceQuestion = ({
     option
   }, index) => {
     const selected = selectIndex.includes(index);
-
     const onPress = () => {
       setInvalidMessage(undefined);
-
       if (isMultipleChoice) {
         onSelectIndex(index);
       } else {
@@ -69,7 +59,6 @@ const ClassicPictureChoiceQuestion = ({
         resetOtherPicture();
       }
     };
-
     return /*#__PURE__*/_react.default.createElement(_PictureChoiceItem.default, {
       title: option,
       uri: uri,
@@ -92,7 +81,6 @@ const ClassicPictureChoiceQuestion = ({
       if (!isMultipleChoice) {
         replaceSelectIndex([]);
       }
-
       setOtherPictureSelected(true);
     },
     onSelect: () => {
@@ -103,14 +91,12 @@ const ClassicPictureChoiceQuestion = ({
         if (!isMultipleChoice) {
           replaceSelectIndex([]);
         }
-
         setOtherPictureSelected(true);
       }
     },
     onUpload: async file => {
       setInvalidMessage(undefined);
-      const url = await onUpload(file);
-
+      const url = await onUpload(file, 'pictureChoice');
       if (typeof url !== 'string') {
         setInvalidMessage(`${_translation.default.t('picture-choice:uploadFailed')}`);
       } else if (url) {
@@ -138,11 +124,7 @@ const ClassicPictureChoiceQuestion = ({
     style: [styles.pictureGridContainer, rtl && _styles.default.flexRowReverse]
   }, imageItems, otherImageItem));
 };
-
-var _default = /*#__PURE__*/_react.default.memo(ClassicPictureChoiceQuestion);
-
-exports.default = _default;
-
+var _default = exports.default = /*#__PURE__*/_react.default.memo(ClassicPictureChoiceQuestion);
 const styles = _reactNative.StyleSheet.create({
   mandatoryTitle: {
     marginBottom: 12

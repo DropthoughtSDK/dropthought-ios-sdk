@@ -7,12 +7,13 @@ import BottomSheet, { NavigationComponent } from './BottomSheet';
 import ClassicDropdownOtherOptionInput from './ClassicDropdownOtherOptionInput';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import useDropdown from '../hooks/useDropdown';
+import HtmlText from './HtmlText';
+import { htmlTrim, toHtml } from '../utils/htmlHelper';
 const windowHeight = Dimensions.get('window').height * 0.8;
 const radioIconSource = {
   ic_radio_selected: require('../assets/radio-on.png'),
   ic_radio_unselected: require('../assets/radio-off.png')
 };
-
 const ClassicDropdownQuestion = ({
   mandatoryErrorMessage,
   question,
@@ -46,7 +47,6 @@ const ClassicDropdownQuestion = ({
     onConfirm,
     onCancel
   } = useDropdown(question, feedback, onFeedback);
-
   const renderItem = ({
     item
   }) => {
@@ -64,6 +64,7 @@ const ClassicDropdownQuestion = ({
       backgroundColor: isSelected ? addOpacityToColor(themeColor, 0.1) : undefined
     }];
     return /*#__PURE__*/React.createElement(TouchableOpacity, {
+      accessible: false,
       onPress: () => setSelectedOptionIndexCache(index)
     }, /*#__PURE__*/React.createElement(View, {
       style: containerStyle
@@ -73,20 +74,17 @@ const ClassicDropdownQuestion = ({
     }), /*#__PURE__*/React.createElement(View, {
       style: bottomSheetStyles.optionLabel
     }, /*#__PURE__*/React.createElement(Text, {
+      testID: "test:id/dropdown_item",
       style: {
         color: fontColor
       }
     }, title))));
   };
-
   const labelStyle = [styles.optionLabel, {
     color: fontColor
   }];
   const subTitleContainerStyle = [bottomSheetStyles.subTitleContainer, {
     backgroundColor: colorScheme === COLOR_SCHEMES.light ? Colors.contentBackground : Colors.rankingContainerBgDark
-  }];
-  const subTitleTextStyle = [bottomSheetStyles.subTitleText, {
-    color: fontColor
   }];
   const flatListContainerStyle = {
     paddingBottom: 200
@@ -103,11 +101,13 @@ const ClassicDropdownQuestion = ({
     question: question,
     style: styles.title
   }), /*#__PURE__*/React.createElement(TouchableOpacity, {
+    accessible: false,
     style: styles.buttonContainer,
     onPress: onOpenBottomSheet
   }, /*#__PURE__*/React.createElement(View, {
     style: styles.buttonContent
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: `test:id/dropdown_selected_item_${fontColor}`,
     style: labelStyle
   }, optionLabel), /*#__PURE__*/React.createElement(Image, {
     source: require('../assets/ic-expand-more-24-px.png')
@@ -128,15 +128,16 @@ const ClassicDropdownQuestion = ({
     }),
     componentInside: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(View, {
       style: subTitleContainerStyle
-    }, /*#__PURE__*/React.createElement(Text, {
-      style: subTitleTextStyle
-    }, questionTitle)), /*#__PURE__*/React.createElement(View, {
+    }, /*#__PURE__*/React.createElement(HtmlText, {
+      html: htmlTrim(toHtml(questionTitle))
+    })), /*#__PURE__*/React.createElement(View, {
       style: bottomSheetStyles.content
     }, /*#__PURE__*/React.createElement(View, {
       style: [bottomSheetStyles.searchContainer, rtl && GlobalStyle.flexRowReverse]
     }, /*#__PURE__*/React.createElement(Image, {
       source: require('../assets/ic_search.png')
     }), /*#__PURE__*/React.createElement(TextInput, {
+      testID: "test:id/field_dropdown_search",
       onChangeText: onChangeSearchText,
       placeholder: i18n.t('survey:find-Option'),
       placeholderTextColor: Colors.inputPlaceholder,
@@ -153,7 +154,6 @@ const ClassicDropdownQuestion = ({
     visible: bottomSheetVisible
   }));
 };
-
 export default /*#__PURE__*/React.memo(ClassicDropdownQuestion);
 const styles = StyleSheet.create({
   title: {
@@ -186,10 +186,6 @@ const bottomSheetStyles = StyleSheet.create({
   subTitleContainer: {
     paddingVertical: 10,
     paddingHorizontal: 24
-  },
-  subTitleText: {
-    fontSize: 16,
-    fontWeight: '500'
   },
   optionContainer: {
     flexDirection: 'row',

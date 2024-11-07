@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,9 +12,11 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.text.TextPaint;
 import android.text.style.MetricAffectingSpan;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.facebook.infer.annotation.Nullsafe;
+import com.facebook.react.common.assets.ReactFontManager;
 
+@Nullsafe(Nullsafe.Mode.LOCAL)
 public class CustomStyleSpan extends MetricAffectingSpan implements ReactSpan {
 
   /**
@@ -40,7 +42,7 @@ public class CustomStyleSpan extends MetricAffectingSpan implements ReactSpan {
       int fontWeight,
       @Nullable String fontFeatureSettings,
       @Nullable String fontFamily,
-      @NonNull AssetManager assetManager) {
+      AssetManager assetManager) {
     mStyle = fontStyle;
     mWeight = fontWeight;
     mFeatureSettings = fontFeatureSettings;
@@ -54,23 +56,26 @@ public class CustomStyleSpan extends MetricAffectingSpan implements ReactSpan {
   }
 
   @Override
-  public void updateMeasureState(@NonNull TextPaint paint) {
+  public void updateMeasureState(TextPaint paint) {
     apply(paint, mStyle, mWeight, mFeatureSettings, mFontFamily, mAssetManager);
   }
 
-  /** Returns {@link Typeface#NORMAL} or {@link Typeface#ITALIC}. */
   public int getStyle() {
-    return (mStyle == ReactTextShadowNode.UNSET ? 0 : mStyle);
+    return mStyle == ReactFontManager.TypefaceStyle.UNSET ? Typeface.NORMAL : mStyle;
   }
 
-  /** Returns {@link Typeface#NORMAL} or {@link Typeface#BOLD}. */
   public int getWeight() {
-    return (mWeight == ReactTextShadowNode.UNSET ? 0 : mWeight);
+    return mWeight == ReactFontManager.TypefaceStyle.UNSET
+        ? ReactFontManager.TypefaceStyle.NORMAL
+        : mWeight;
   }
 
-  /** Returns the font family set for this StyleSpan. */
   public @Nullable String getFontFamily() {
     return mFontFamily;
+  }
+
+  public @Nullable String getFontFeatureSettings() {
+    return mFeatureSettings;
   }
 
   private static void apply(

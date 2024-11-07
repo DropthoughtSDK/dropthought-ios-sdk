@@ -9,10 +9,13 @@ import GlobalStyle from '../styles';
 import PictureChoiceItem from './PictureChoiceItem';
 import PictureChoiceOtherItem from './PictureChoiceOtherItem';
 import { usePictureChoice } from '../hooks/usePictureChoice';
-import type { Question, Feedback, ImageFileProps, Survey } from '../data';
+import type { Question, Feedback, Survey } from '../data';
 import MandatoryTitle from './MandatoryTitle';
+// @ts-ignore
 import { KeyboardAvoidingScrollView } from './KeyboardAvoidingView';
 import i18n from '../translation';
+// @ts-ignore
+import type { onUploadType } from '../dt-common';
 
 const ScrollView =
   Platform.OS === 'ios' ? KeyboardAvoidingScrollView : RNScrollView;
@@ -21,7 +24,7 @@ type Props = {
   survey: Survey;
   question: Question;
   onFeedback: (feedback: Feedback) => void;
-  onUpload: (file: ImageFileProps) => Promise<string | undefined>;
+  onUpload: onUploadType;
   isUploading: boolean;
   feedback?: Feedback;
   forgot: boolean;
@@ -114,7 +117,7 @@ const PictureChoiceQuestion = ({
       }}
       onUpload={async (file) => {
         setInvalidMessage(undefined);
-        const url = await onUpload(file);
+        const url = await onUpload(file, 'pictureChoice');
         if (typeof url !== 'string') {
           setInvalidMessage(`${i18n.t('picture-choice:uploadFailed')}`);
         } else if (url) {

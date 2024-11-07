@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -13,8 +13,7 @@
 #include "NativeModule.h"
 #include "SystraceSection.h"
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 namespace {
 
@@ -48,6 +47,11 @@ void ModuleRegistry::updateModuleNamesFromIndex(size_t index) {
 void ModuleRegistry::registerModules(
     std::vector<std::unique_ptr<NativeModule>> modules) {
   SystraceSection s_("ModuleRegistry::registerModules");
+  // Noop if there are no NativeModules to add
+  if (modules.empty()) {
+    return;
+  }
+
   if (modules_.empty() && unknownModules_.empty()) {
     modules_ = std::move(modules);
   } else {
@@ -87,8 +91,7 @@ std::vector<std::string> ModuleRegistry::moduleNames() {
   return names;
 }
 
-folly::Optional<ModuleConfig> ModuleRegistry::getConfig(
-    const std::string &name) {
+std::optional<ModuleConfig> ModuleRegistry::getConfig(const std::string& name) {
   SystraceSection s("ModuleRegistry::getConfig", "module", name);
 
   // Initialize modulesByName_
@@ -102,14 +105,14 @@ folly::Optional<ModuleConfig> ModuleRegistry::getConfig(
     if (unknownModules_.find(name) != unknownModules_.end()) {
       BridgeNativeModulePerfLogger::moduleJSRequireBeginningFail(name.c_str());
       BridgeNativeModulePerfLogger::moduleJSRequireEndingStart(name.c_str());
-      return folly::none;
+      return std::nullopt;
     }
 
     if (!moduleNotFoundCallback_) {
       unknownModules_.insert(name);
       BridgeNativeModulePerfLogger::moduleJSRequireBeginningFail(name.c_str());
       BridgeNativeModulePerfLogger::moduleJSRequireEndingStart(name.c_str());
-      return folly::none;
+      return std::nullopt;
     }
 
     BridgeNativeModulePerfLogger::moduleJSRequireBeginningEnd(name.c_str());
@@ -123,7 +126,7 @@ folly::Optional<ModuleConfig> ModuleRegistry::getConfig(
     if (!wasModuleRegisteredWithRegistry) {
       BridgeNativeModulePerfLogger::moduleJSRequireEndingStart(name.c_str());
       unknownModules_.insert(name);
-      return folly::none;
+      return std::nullopt;
     }
   } else {
     BridgeNativeModulePerfLogger::moduleJSRequireBeginningEnd(name.c_str());
@@ -134,7 +137,7 @@ folly::Optional<ModuleConfig> ModuleRegistry::getConfig(
   size_t index = it->second;
 
   CHECK(index < modules_.size());
-  NativeModule *module = modules_[index].get();
+  NativeModule* module = modules_[index].get();
 
   // string name, object constants, array methodNames (methodId is index),
   // [array promiseMethodIds], [array syncMethodIds]
@@ -159,7 +162,7 @@ folly::Optional<ModuleConfig> ModuleRegistry::getConfig(
     folly::dynamic promiseMethodIds = folly::dynamic::array;
     folly::dynamic syncMethodIds = folly::dynamic::array;
 
-    for (auto &descriptor : methods) {
+    for (auto& descriptor : methods) {
       // TODO: #10487027 compare tags instead of doing string comparison?
       methodNames.push_back(std::move(descriptor.name));
       if (descriptor.type == "promise") {
@@ -182,9 +185,9 @@ folly::Optional<ModuleConfig> ModuleRegistry::getConfig(
 
   if (config.size() == 2 && config[1].empty()) {
     // no constants or methods
-    return folly::none;
+    return std::nullopt;
   } else {
-    return ModuleConfig{index, config};
+    return ModuleConfig{index, std::move(config)};
   }
 }
 
@@ -211,7 +214,7 @@ std::string ModuleRegistry::getModuleSyncMethodName(
 void ModuleRegistry::callNativeMethod(
     unsigned int moduleId,
     unsigned int methodId,
-    folly::dynamic &&params,
+    folly::dynamic&& params,
     int callId) {
   if (moduleId >= modules_.size()) {
     throw std::runtime_error(folly::to<std::string>(
@@ -223,7 +226,7 @@ void ModuleRegistry::callNativeMethod(
 MethodCallResult ModuleRegistry::callSerializableNativeHook(
     unsigned int moduleId,
     unsigned int methodId,
-    folly::dynamic &&params) {
+    folly::dynamic&& params) {
   if (moduleId >= modules_.size()) {
     throw std::runtime_error(folly::to<std::string>(
         "moduleId ", moduleId, "out of range [0..", modules_.size(), ")"));
@@ -232,5 +235,4 @@ MethodCallResult ModuleRegistry::callSerializableNativeHook(
       methodId, std::move(params));
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,9 +8,9 @@
 #include "RCTJSIExecutorRuntimeInstaller.h"
 
 #import <React/RCTLog.h>
+#include <chrono>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 JSIExecutor::RuntimeInstaller RCTJSIExecutorRuntimeInstaller(JSIExecutor::RuntimeInstaller runtimeInstallerToWrap)
 {
@@ -20,12 +20,6 @@ JSIExecutor::RuntimeInstaller RCTJSIExecutorRuntimeInstaller(JSIExecutor::Runtim
     };
     bindNativeLogger(runtime, iosLoggingBinder);
 
-    PerformanceNow iosPerformanceNowBinder = []() {
-      // CACurrentMediaTime() returns the current absolute time, in seconds
-      return CACurrentMediaTime() * 1000;
-    };
-    bindNativePerformanceNow(runtime, iosPerformanceNowBinder);
-
     // Wrap over the original runtimeInstaller
     if (runtimeInstaller) {
       runtimeInstaller(runtime);
@@ -33,5 +27,4 @@ JSIExecutor::RuntimeInstaller RCTJSIExecutorRuntimeInstaller(JSIExecutor::Runtim
   };
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

@@ -7,14 +7,13 @@
  * When "Back" is pressed, call props.onPrevPage
  * When "Next" or "Submit" is pressed, call props.onNextPage
  */
-import * as React from 'react';
+import React, { memo, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
 import { useKeyboard } from '@react-native-community/hooks';
 import { Colors, GlobalStyle } from '../styles';
 import i18n from '../translation';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 const isAndroid = Platform.OS === 'android';
-
 const SurveyFooter = props => {
   const rtl = i18n.dir() === 'rtl';
   const {
@@ -29,7 +28,7 @@ const SurveyFooter = props => {
   const {
     keyboardShown
   } = useKeyboard();
-  const containerStyle = [styles.container, rtl && GlobalStyle.flexRowReverse, {
+  const containerStyle = [styles.container, {
     backgroundColor
   }];
   const {
@@ -43,8 +42,9 @@ const SurveyFooter = props => {
     tintColor: surveyColor,
     opacity: isDarkMode ? 1 : 0.1
   }];
-  const [submitDisabled, setSubmitDisabled] = React.useState(false);
+  const [submitDisabled, setSubmitDisabled] = useState(false);
   const leftIcon = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Image, {
+    accessibilityLabel: "test:id/custom_preview_back",
     style: iconBgStyle,
     source: require('../assets/icPreviousButtonBg.png')
   }), /*#__PURE__*/React.createElement(Image, {
@@ -52,6 +52,7 @@ const SurveyFooter = props => {
     source: require('../assets/icPreviousButton.png')
   }));
   const rightIcon = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Image, {
+    accessibilityLabel: "test:id/custom_preview_next",
     style: iconBgStyle,
     source: require('../assets/icNextButtonBg.png')
   }), /*#__PURE__*/React.createElement(Image, {
@@ -76,23 +77,24 @@ const SurveyFooter = props => {
       onNextPage();
     }
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/button_custom_preview_submit",
     style: textStyle
   }, submitSurvey)));
   const leftButton = /*#__PURE__*/React.createElement(TouchableOpacity, {
     style: styles.leftButtonContainer,
-    onPress: onPrevPage
-  }, rtl ? rightIcon : leftIcon);
+    onPress: rtl ? onNextPage : onPrevPage
+  }, leftIcon);
   const rightButton = /*#__PURE__*/React.createElement(TouchableOpacity, {
     style: styles.rightButtonContainer,
-    onPress: onNextPage
-  }, rtl ? leftIcon : rightIcon); // hide this bar when it is android and keyboard is shown
+    onPress: rtl ? onPrevPage : onNextPage
+  }, rightIcon);
 
+  // hide this bar when it is android and keyboard is shown
   if (isAndroid && keyboardShown) return null;
   return /*#__PURE__*/React.createElement(View, {
     style: containerStyle
-  }, isFirstPage ? null : leftButton, isLastPage ? submitButton : rightButton);
+  }, isFirstPage ? null : rtl ? rightButton : leftButton, isLastPage ? submitButton : rtl ? leftButton : rightButton);
 };
-
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
@@ -117,7 +119,8 @@ const styles = StyleSheet.create({
   submitText: {
     color: Colors.white,
     fontSize: 16,
-    fontWeight: '600'
+    fontWeight: '600',
+    textAlign: 'center'
   },
   icon: {
     position: 'absolute',
@@ -128,5 +131,5 @@ const styles = StyleSheet.create({
     opacity: 0.5
   }
 });
-export default /*#__PURE__*/React.memo(SurveyFooter);
+export default /*#__PURE__*/memo(SurveyFooter);
 //# sourceMappingURL=SurveyFooter.js.map

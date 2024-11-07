@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,17 +10,16 @@
 #include <folly/json.h>
 #include <stdexcept>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 #define REQUEST_MODULE_IDS 0
 #define REQUEST_METHOD_IDS 1
-#define REQUEST_PARAMSS 2
+#define REQUEST_PARAMS 2
 #define REQUEST_CALLID 3
 
-static const char *errorPrefix = "Malformed calls from JS: ";
+static const char* errorPrefix = "Malformed calls from JS: ";
 
-std::vector<MethodCall> parseMethodCalls(folly::dynamic &&jsonData) {
+std::vector<MethodCall> parseMethodCalls(folly::dynamic&& jsonData) {
   if (jsonData.isNull()) {
     return {};
   }
@@ -30,14 +29,14 @@ std::vector<MethodCall> parseMethodCalls(folly::dynamic &&jsonData) {
         errorPrefix, "input isn't array but ", jsonData.typeName()));
   }
 
-  if (jsonData.size() < REQUEST_PARAMSS + 1) {
+  if (jsonData.size() < REQUEST_PARAMS + 1) {
     throw std::invalid_argument(
         folly::to<std::string>(errorPrefix, "size == ", jsonData.size()));
   }
 
-  auto &moduleIds = jsonData[REQUEST_MODULE_IDS];
-  auto &methodIds = jsonData[REQUEST_METHOD_IDS];
-  auto &params = jsonData[REQUEST_PARAMSS];
+  auto& moduleIds = jsonData[REQUEST_MODULE_IDS];
+  auto& methodIds = jsonData[REQUEST_METHOD_IDS];
+  auto& params = jsonData[REQUEST_PARAMS];
   int callId = -1;
 
   if (!moduleIds.isArray() || !methodIds.isArray() || !params.isArray()) {
@@ -73,8 +72,8 @@ std::vector<MethodCall> parseMethodCalls(folly::dynamic &&jsonData) {
     }
 
     methodCalls.emplace_back(
-        moduleIds[i].asInt(),
-        methodIds[i].asInt(),
+        static_cast<int>(moduleIds[i].asInt()),
+        static_cast<int>(methodIds[i].asInt()),
         std::move(params[i]),
         callId);
 
@@ -85,5 +84,4 @@ std::vector<MethodCall> parseMethodCalls(folly::dynamic &&jsonData) {
   return methodCalls;
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

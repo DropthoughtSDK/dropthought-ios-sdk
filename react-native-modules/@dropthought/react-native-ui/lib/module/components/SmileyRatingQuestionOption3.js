@@ -1,5 +1,4 @@
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 import React, { useEffect } from 'react';
 import { View, StyleSheet, Text, Animated, Dimensions, PanResponder, Platform } from 'react-native';
 import { Colors } from '../styles';
@@ -12,7 +11,6 @@ import MandatoryTitle from './MandatoryTitle';
 import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import { scaleLogic, option3LoopFaceTable as loopFaceTable } from '../utils/data';
 import { isNil } from 'ramda';
-
 const SmileyRatingQuestionOption3 = ({
   survey,
   pageIndex,
@@ -22,10 +20,11 @@ const SmileyRatingQuestionOption3 = ({
   onPrevPage,
   onNextPage,
   onFeedback,
-  feedback
+  feedback,
+  isLastPage
 }) => {
   const answered = feedback && feedback.answers && !isNil(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
-  const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
+  const answeredValue = answered && feedback.answers[0] ? parseInt(feedback.answers[0], 10) : 0;
   const {
     hexCode,
     backgroundColor: themeBackgroundColor,
@@ -43,16 +42,21 @@ const SmileyRatingQuestionOption3 = ({
   const [loopLotties, setLoopLotties] = React.useState([]);
   const scoreContainerOpacity = React.useRef(new Animated.Value(answered ? 1 : 0)).current;
   const scoreOpacity = React.useRef(new Animated.Value(answered ? 1 : 0)).current;
-  const descriptionYAxis = React.useRef(new Animated.Value(answered ? 1 : windowHeight / 2 - 246 + 37)).current; // 37 -> one text line height
+  const descriptionYAxis = React.useRef(new Animated.Value(answered ? 1 : windowHeight / 2 - 246 + 37)).current;
+  // 37 -> one text line height
   // 246 -> Padding Vertical 123
 
   const lottieRef = React.useRef();
   const totalScore = Number(scale);
   const renderScore = score + 1;
-  const backgroundColorList = ['#fef6f6', //red
-  '#fff9f9', //red
-  '#f3f9fe', //blue
-  '#f5fdfb', //green
+  const backgroundColorList = ['#fef6f6',
+  //red
+  '#fff9f9',
+  //red
+  '#f3f9fe',
+  //blue
+  '#f5fdfb',
+  //green
   '#f3fcfa' //green
   ];
   const panResponder = PanResponder.create({
@@ -63,7 +67,6 @@ const SmileyRatingQuestionOption3 = ({
     }) => {
       const direction = Math.sign(dy);
       const isActionActive = Math.abs(dy) > 100;
-
       if (isActionActive) {
         if (direction === 1 && score > 0) {
           updateScore(-1);
@@ -72,29 +75,29 @@ const SmileyRatingQuestionOption3 = ({
         }
       }
     }
-  }); // choose which scale logic we want to use.
-
+  });
+  // choose which scale logic we want to use.
   const scaleLogicList = scaleLogic[scale];
-  const scaledIndex = scaleLogicList[selectedIndex];
+  const scaledIndex = (scaleLogicList && scaleLogicList[selectedIndex]) ?? 0;
   useEffect(() => {
-    const loopList = scaleLogicList.map(value => {
-      const scaleKey = String(value + 1);
-      return loopFaceTable.get(scaleKey);
-    });
-    setLoopLotties(loopList);
+    if (scaleLogicList) {
+      const loopList = scaleLogicList.map(value => {
+        const scaleKey = String(value + 1);
+        return loopFaceTable.get(scaleKey);
+      });
+      setLoopLotties(loopList);
+    }
   }, [scaleLogicList]);
   const updateScore = React.useCallback(number => {
     const isAtCoverScreen = score === -1;
     const newScore = score + number;
     setScore(newScore);
-
     if (!isAtCoverScreen) {
       setSelectedIndex(newScore);
-    } //animtaion--
+    }
 
-
+    //animtaion--
     scoreOpacity.setValue(0);
-
     if (isAtCoverScreen) {
       Animated.sequence([Animated.timing(descriptionYAxis, {
         toValue: 0,
@@ -115,8 +118,8 @@ const SmileyRatingQuestionOption3 = ({
         duration: 500,
         useNativeDriver: true
       }).start();
-    } //animtaion--
-
+    }
+    //animtaion--
 
     onFeedback({
       questionId,
@@ -157,26 +160,32 @@ const SmileyRatingQuestionOption3 = ({
     color: fontColor
   }];
   const lottieContainer = /*#__PURE__*/React.createElement(View, {
+    accessibilityLabel: `selected_custom_smilely1_${selectedIndex}`,
     style: commonStyles.lottieContainer
-  }, /*#__PURE__*/React.createElement(LottieView // @ts-ignore
-  , {
+  }, loopLotties[selectedIndex] ? /*#__PURE__*/React.createElement(LottieView
+  /* @ts-ignore */, {
     ref: lottieRef,
     source: loopLotties[selectedIndex],
     autoPlay: true,
     loop: true,
+    style: commonStyles.lottieContent,
     speed: 0.5
-  }));
+  }) : null);
   const scoreContainer = /*#__PURE__*/React.createElement(View, {
     style: commonStyles.scoreContainer
   }, /*#__PURE__*/React.createElement(View, {
+    testID: "test:id/custom_smilely1_score_value",
     style: commonStyles.scoreText
   }, /*#__PURE__*/React.createElement(Animated.Text, {
+    testID: "test:id/custom_smilely1_render_score",
     style: scoreSelectedStyle
   }, renderScore), /*#__PURE__*/React.createElement(Animated.Text, {
     style: slashStyle
   }, '/'), /*#__PURE__*/React.createElement(Animated.Text, {
+    testID: "test:id/custom_smilely1_total_score",
     style: scoreTotalStyle
   }, totalScore)), /*#__PURE__*/React.createElement(Animated.Text, {
+    testID: "test:id/custom_smilely1_score_desc",
     style: descStyle
   }, options[selectedIndex]));
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SurveyHeader, {
@@ -195,18 +204,18 @@ const SmileyRatingQuestionOption3 = ({
   }), score >= 0 ? /*#__PURE__*/React.createElement(React.Fragment, null, lottieContainer, scoreContainer) : null, /*#__PURE__*/React.createElement(View, {
     style: hintContainerStyle
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: `test:id/custom_smilely1_title_${colorScheme}`,
     style: hintTextStyle
-  }, i18n.t('option3HintDescription:title'))))), /*#__PURE__*/React.createElement(SurveyFooter, {
+  }, `${i18n.t('option3HintDescription:title')}`)))), /*#__PURE__*/React.createElement(SurveyFooter, {
     submitSurvey: survey.submitSurvey,
     surveyColor: hexCode,
     isFirstPage: pageIndex === 0,
-    isLastPage: pageIndex === survey.pageOrder.length - 1,
+    isLastPage: isLastPage,
     onPrevPage: onPrevPage,
     onNextPage: onNextPage,
     backgroundColor: backgroundColor
   }));
 };
-
 export default SmileyRatingQuestionOption3;
 const commonStyles = StyleSheet.create({
   container: {
@@ -256,6 +265,10 @@ const commonStyles = StyleSheet.create({
     alignItems: 'flex-end',
     height: 61,
     marginBottom: 10
+  },
+  lottieContent: {
+    width: '100%',
+    height: '100%'
   }
 });
 const phoneStyles = StyleSheet.create({

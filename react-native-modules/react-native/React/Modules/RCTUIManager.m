@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -81,6 +81,7 @@ NSString *const RCTUIManagerWillUpdateViewsDueToContentSizeMultiplierChangeNotif
 }
 
 @synthesize bridge = _bridge;
+@synthesize moduleRegistry = _moduleRegistry;
 
 RCT_EXPORT_MODULE()
 
@@ -100,8 +101,11 @@ RCT_EXPORT_MODULE()
 
   RCTExecuteOnMainQueue(^{
     RCT_PROFILE_BEGIN_EVENT(RCTProfileTagAlways, @"UIManager invalidate", nil);
+    NSMutableDictionary<NSNumber *, id<RCTComponent>> *viewRegistry =
+        (NSMutableDictionary<NSNumber *, id<RCTComponent>> *)self->_viewRegistry;
     for (NSNumber *rootViewTag in self->_rootViewTags) {
-      UIView *rootView = self->_viewRegistry[rootViewTag];
+      id<RCTComponent> rootView = viewRegistry[rootViewTag];
+      [self _purgeChildren:[rootView reactSubviews] fromRegistry:viewRegistry];
       if ([rootView conformsToProtocol:@protocol(RCTInvalidating)]) {
         [(id<RCTInvalidating>)rootView invalidate];
       }
@@ -146,6 +150,9 @@ RCT_EXPORT_MODULE()
 
 - (void)setBridge:(RCTBridge *)bridge
 {
+  RCTEnforceNewArchitectureValidation(
+      RCTNotAllowedInBridgeless, self, @"RCTUIManager must not be initialized for the new architecture");
+
   RCTAssert(_bridge == nil, @"Should not re-use same UIManager instance");
   _bridge = bridge;
 
@@ -166,7 +173,9 @@ RCT_EXPORT_MODULE()
   _componentDataByName = [NSMutableDictionary new];
   for (Class moduleClass in _bridge.moduleClasses) {
     if ([moduleClass isSubclassOfClass:[RCTViewManager class]]) {
-      RCTComponentData *componentData = [[RCTComponentData alloc] initWithManagerClass:moduleClass bridge:_bridge];
+      RCTComponentData *componentData = [[RCTComponentData alloc] initWithManagerClass:moduleClass
+                                                                                bridge:_bridge
+                                                                       eventDispatcher:_bridge.eventDispatcher];
       _componentDataByName[componentData.name] = componentData;
     }
   }
@@ -196,7 +205,8 @@ RCT_EXPORT_MODULE()
   id multiplier = [[self->_bridge moduleForName:@"AccessibilityManager"
                           lazilyLoadIfNecessary:YES] valueForKey:@"multiplier"];
   if (multiplier) {
-    [_bridge.eventDispatcher sendDeviceEventWithName:@"didUpdateContentSizeMultiplier" body:multiplier];
+    [[_moduleRegistry moduleForName:"EventDispatcher"] sendDeviceEventWithName:@"didUpdateContentSizeMultiplier"
+                                                                          body:multiplier];
   }
 #pragma clang diagnostic pop
 
@@ -256,7 +266,8 @@ static NSDictionary *deviceOrientationEventBody(UIDeviceOrientation orientation)
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  [_bridge.eventDispatcher sendDeviceEventWithName:@"namedOrientationDidChange" body:orientationEvent];
+  [[_moduleRegistry moduleForName:"EventDispatcher"] sendDeviceEventWithName:@"namedOrientationDidChange"
+                                                                        body:orientationEvent];
 #pragma clang diagnostic pop
 }
 
@@ -526,7 +537,7 @@ static NSDictionary *deviceOrientationEventBody(UIDeviceOrientation orientation)
 {
   RCTAssertUIManagerQueue();
 
-  NSHashTable<RCTShadowView *> *affectedShadowViews = [NSHashTable weakObjectsHashTable];
+  NSPointerArray *affectedShadowViews = [NSPointerArray weakObjectsPointerArray];
   [rootShadowView layoutWithAffectedShadowViews:affectedShadowViews];
 
   if (!affectedShadowViews.count) {
@@ -552,11 +563,12 @@ static NSDictionary *deviceOrientationEventBody(UIDeviceOrientation orientation)
     for (RCTShadowView *shadowView in affectedShadowViews) {
       reactTags[index] = shadowView.reactTag;
       RCTLayoutMetrics layoutMetrics = shadowView.layoutMetrics;
-      frameDataArray[index++] = (RCTFrameData){layoutMetrics.frame,
-                                               layoutMetrics.layoutDirection,
-                                               shadowView.isNewView,
-                                               shadowView.superview.isNewView,
-                                               layoutMetrics.displayType};
+      frameDataArray[index++] = (RCTFrameData){
+          layoutMetrics.frame,
+          layoutMetrics.layoutDirection,
+          shadowView.isNewView,
+          shadowView.superview.isNewView,
+          layoutMetrics.displayType};
     }
   }
 
@@ -1454,10 +1466,12 @@ RCT_EXPORT_METHOD(clearJSResponder)
   }];
 }
 
-static NSMutableDictionary<NSString *, id> *moduleConstantsForComponent(
+NSMutableDictionary<NSString *, id> *RCTModuleConstantsForDestructuredComponent(
     NSMutableDictionary<NSString *, NSDictionary *> *directEvents,
     NSMutableDictionary<NSString *, NSDictionary *> *bubblingEvents,
-    RCTComponentData *componentData)
+    Class managerClass,
+    NSString *name,
+    NSDictionary<NSString *, id> *viewConfig)
 {
   NSMutableDictionary<NSString *, id> *moduleConstants = [NSMutableDictionary new];
 
@@ -1467,15 +1481,21 @@ static NSMutableDictionary<NSString *, id> *moduleConstantsForComponent(
   NSMutableDictionary<NSString *, NSDictionary *> *directEventTypes = [NSMutableDictionary new];
 
   // Add manager class
-  moduleConstants[@"Manager"] = RCTBridgeModuleNameForClass(componentData.managerClass);
+  moduleConstants[@"Manager"] = RCTBridgeModuleNameForClass(managerClass);
 
   // Add native props
-  NSDictionary<NSString *, id> *viewConfig = [componentData viewConfig];
   moduleConstants[@"NativeProps"] = viewConfig[@"propTypes"];
   moduleConstants[@"baseModuleName"] = viewConfig[@"baseModuleName"];
   moduleConstants[@"bubblingEventTypes"] = bubblingEventTypes;
   moduleConstants[@"directEventTypes"] = directEventTypes;
-
+  // In the Old Architecture the "Commands" and "Constants" properties of view manager config are populated by
+  // lazifyViewManagerConfig function in JS. This fuction uses NativeModules global object that is not available in the
+  // New Architecture. To make native view configs work in the New Architecture we will populate these properties in
+  // native.
+  if (RCTGetUseNativeViewConfigsInBridgelessMode()) {
+    moduleConstants[@"Commands"] = viewConfig[@"Commands"];
+    moduleConstants[@"Constants"] = viewConfig[@"Constants"];
+  }
   // Add direct events
   for (NSString *eventName in viewConfig[@"directEvents"]) {
     if (!directEvents[eventName]) {
@@ -1488,7 +1508,7 @@ static NSMutableDictionary<NSString *, id> *moduleConstantsForComponent(
       RCTLogError(
           @"Component '%@' re-registered bubbling event '%@' as a "
            "direct event",
-          componentData.name,
+          name,
           eventName);
     }
   }
@@ -1509,12 +1529,43 @@ static NSMutableDictionary<NSString *, id> *moduleConstantsForComponent(
       RCTLogError(
           @"Component '%@' re-registered direct event '%@' as a "
            "bubbling event",
-          componentData.name,
+          name,
+          eventName);
+    }
+  }
+
+  // Add capturing events (added as bubbling events but with the 'skipBubbling' flag)
+  for (NSString *eventName in viewConfig[@"capturingEvents"]) {
+    if (!bubblingEvents[eventName]) {
+      NSString *bubbleName = [eventName stringByReplacingCharactersInRange:(NSRange){0, 3} withString:@"on"];
+      bubblingEvents[eventName] = @{
+        @"phasedRegistrationNames" : @{
+          @"bubbled" : bubbleName,
+          @"captured" : [bubbleName stringByAppendingString:@"Capture"],
+          @"skipBubbling" : @YES
+        }
+      };
+    }
+    bubblingEventTypes[eventName] = bubblingEvents[eventName];
+    if (RCT_DEBUG && directEvents[eventName]) {
+      RCTLogError(
+          @"Component '%@' re-registered direct event '%@' as a "
+           "bubbling event",
+          name,
           eventName);
     }
   }
 
   return moduleConstants;
+}
+
+static NSMutableDictionary<NSString *, id> *moduleConstantsForComponentData(
+    NSMutableDictionary<NSString *, NSDictionary *> *directEvents,
+    NSMutableDictionary<NSString *, NSDictionary *> *bubblingEvents,
+    RCTComponentData *componentData)
+{
+  return RCTModuleConstantsForDestructuredComponent(
+      directEvents, bubblingEvents, componentData.managerClass, componentData.name, componentData.viewConfig);
 }
 
 - (NSDictionary<NSString *, id> *)constantsToExport
@@ -1532,7 +1583,7 @@ static NSMutableDictionary<NSString *, id> *moduleConstantsForComponent(
       enumerateKeysAndObjectsUsingBlock:^(NSString *name, RCTComponentData *componentData, __unused BOOL *stop) {
         RCTAssert(!constants[name], @"UIManager already has constants for %@", componentData.name);
         NSMutableDictionary<NSString *, id> *moduleConstants =
-            moduleConstantsForComponent(directEvents, bubblingEvents, componentData);
+            moduleConstantsForComponentData(directEvents, bubblingEvents, componentData);
         constants[name] = moduleConstants;
       }];
 
@@ -1573,12 +1624,14 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(lazilyLoadView : (NSString *)name)
     return @{};
   }
 
-  RCTComponentData *componentData = [[RCTComponentData alloc] initWithManagerClass:[module class] bridge:self.bridge];
+  RCTComponentData *componentData = [[RCTComponentData alloc] initWithManagerClass:[module class]
+                                                                            bridge:self.bridge
+                                                                   eventDispatcher:self.bridge.eventDispatcher];
   _componentDataByName[componentData.name] = componentData;
   NSMutableDictionary *directEvents = [NSMutableDictionary new];
   NSMutableDictionary *bubblingEvents = [NSMutableDictionary new];
   NSMutableDictionary<NSString *, id> *moduleConstants =
-      moduleConstantsForComponent(directEvents, bubblingEvents, componentData);
+      moduleConstantsForComponentData(directEvents, bubblingEvents, componentData);
   return @{
     @"viewConfig" : moduleConstants,
   };
@@ -1623,6 +1676,8 @@ static UIView *_jsResponder;
 
 + (UIView *)JSResponder
 {
+  RCTErrorNewArchitectureValidation(
+      RCTNotAllowedInFabricWithoutLegacy, @"RCTUIManager", @"Please migrate this legacy surface to Fabric.");
   return _jsResponder;
 }
 

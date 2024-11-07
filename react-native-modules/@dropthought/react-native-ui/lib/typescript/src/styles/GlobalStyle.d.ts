@@ -1,5 +1,8 @@
 export declare const QuestionContentTextSize: {
-    [x: string]: {
+    phone: {
+        fontSize: number;
+    };
+    tablet: {
         fontSize: number;
     };
 };
@@ -95,7 +98,8 @@ export declare const GlobalStyle: {
         top: number;
         right: number;
         left: number;
-        width: string;
-        height: string;
+        width: "100%";
+        height: "100%";
     };
 };
+//# sourceMappingURL=GlobalStyle.d.ts.map

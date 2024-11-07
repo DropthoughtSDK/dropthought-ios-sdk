@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -21,9 +21,9 @@ static UIActivityIndicatorViewStyle convertActivityIndicatorViewStyle(const Acti
 {
   switch (size) {
     case ActivityIndicatorViewSize::Small:
-      return UIActivityIndicatorViewStyleWhite;
+      return UIActivityIndicatorViewStyleMedium;
     case ActivityIndicatorViewSize::Large:
-      return UIActivityIndicatorViewStyleWhiteLarge;
+      return UIActivityIndicatorViewStyleLarge;
   }
 }
 
@@ -62,10 +62,10 @@ static UIActivityIndicatorViewStyle convertActivityIndicatorViewStyle(const Acti
   return self;
 }
 
-- (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
+- (void)updateProps:(const Props::Shared &)props oldProps:(const Props::Shared &)oldProps
 {
-  const auto &oldViewProps = *std::static_pointer_cast<const ActivityIndicatorViewProps>(_props);
-  const auto &newViewProps = *std::static_pointer_cast<const ActivityIndicatorViewProps>(props);
+  const auto &oldViewProps = static_cast<const ActivityIndicatorViewProps &>(*_props);
+  const auto &newViewProps = static_cast<const ActivityIndicatorViewProps &>(*props);
 
   if (oldViewProps.animating != newViewProps.animating) {
     if (newViewProps.animating) {

@@ -1,11 +1,6 @@
 import React, { useState, useRef } from 'react';
-import {
-  View,
-  PanResponder,
-  Animated,
-  LayoutChangeEvent,
-  Image,
-} from 'react-native';
+import { View, PanResponder, Animated, Image } from 'react-native';
+import type { LayoutChangeEvent } from 'react-native';
 import styles from './RotaryPhonePicker.styles';
 import LottieView from 'lottie-react-native';
 
@@ -127,9 +122,17 @@ const RotaryPhonePicker = ({
       >
         {list.map((value, index) => {
           return (
-            <View style={[styles.item, itemStyle(index)]} key={index}>
+            <View
+              accessibilityLabel="dialer_icon"
+              style={[styles.item, itemStyle(index)]}
+              key={index}
+            >
               {value !== '' && index <= numberScale ? (
-                <LottieView source={value} autoPlay />
+                <LottieView
+                  source={value}
+                  autoPlay
+                  style={styles.lottieContent}
+                />
               ) : null}
             </View>
           );

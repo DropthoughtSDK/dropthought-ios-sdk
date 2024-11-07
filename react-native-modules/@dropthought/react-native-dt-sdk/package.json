@@ -1,42 +1,51 @@
 {
   "name": "@dropthought/react-native-dt-sdk",
-  "version": "5.6.0-beta.9",
+  "version": "5.12.0",
   "description": "dropthought sdk for react-native app",
-  "main": "lib/commonjs/index.js",
-  "module": "lib/module/index.js",
-  "types": "lib/typescript/index.d.ts",
-  "react-native": "src/index.tsx",
-  "source": "src/index.tsx",
+  "main": "lib/commonjs/index",
+  "module": "lib/module/index",
+  "types": "lib/typescript/src/index.d.ts",
+  "react-native": "src/index",
+  "source": "src/index",
   "files": [
     "src",
     "lib",
     "android",
     "ios",
     "cpp",
-    "react-native-dt-sdk.podspec",
-    "!lib/typescript/example",
-    "!android/build",
+    "*.podspec",
     "!ios/build",
+    "!android/build",
+    "!android/gradle",
+    "!android/gradlew",
+    "!android/gradlew.bat",
+    "!android/local.properties",
     "!**/__tests__",
     "!**/__fixtures__",
-    "!**/__mocks__"
+    "!**/__mocks__",
+    "!**/.*"
   ],
   "scripts": {
+    "example": "yarn workspace @dropthought/react-native-dt-sdk-example",
     "test": "jest",
-    "typescript": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "prepare": "bob build",
     "release": "release-it",
-    "example": "yarn --cwd example",
     "pods": "cd example && pod-install --quiet",
-    "bootstrap": "yarn example && yarn && yarn pods"
+    "bootstrap": "yarn example && yarn && yarn pods",
+    "update": "yarn && cd example && yarn && cd ios && pod install"
   },
   "keywords": [
     "react-native",
     "ios",
     "android"
   ],
-  "repository": "https://gitlab.com/bct-taipei/react-native-dt-sdk",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/bct-taipei/react-native-dt-sdk.git"
+  },
   "author": "Taipei BCT <taipei-bct@bahwancybertek.com> (https://gitlab.com/taipei-bct)",
   "license": "MIT",
   "bugs": {
@@ -47,36 +56,35 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9",
-    "@babel/preset-env": "^7.1.6",
-    "@babel/runtime": "^7.12.5",
-    "@commitlint/config-conventional": "^11.0.0",
-    "@react-native-community/eslint-config": "^2.0.0",
-    "@release-it/conventional-changelog": "^2.0.0",
-    "@types/jest": "^26.0.0",
-    "@types/ramda": "^0.27.45",
-    "@types/react": "^16.9.19",
-    "axios": "^0.19.2",
-    "commitlint": "^11.0.0",
-    "eslint": "^7.2.0",
-    "eslint-config-prettier": "^7.0.0",
-    "eslint-plugin-prettier": "^3.1.3",
-    "husky": "^6.0.0",
-    "jest": "^26.0.1",
+    "@commitlint/config-conventional": "^17.0.2",
+    "@evilmartians/lefthook": "^1.5.0",
+    "@react-native/eslint-config": "^0.72.2",
+    "@release-it/conventional-changelog": "^5.0.0",
+    "@types/jest": "^28.1.2",
+    "@types/ramda": "^0.29.11",
+    "@types/react": "~17.0.21",
+    "@types/react-native": "0.70.0",
+    "commitlint": "^17.0.2",
+    "del-cli": "^5.0.0",
+    "eslint": "^8.4.1",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^28.1.1",
     "pod-install": "^0.1.0",
     "prettier": "^2.0.5",
-    "react": "17.0.1",
-    "react-native": "0.64.1",
-    "react-native-builder-bob": "^0.18.0",
-    "release-it": "^14.2.2",
-    "typescript": "^4.1.3"
+    "react": "18.2.0",
+    "react-native": "0.73.1",
+    "react-native-builder-bob": "^0.20.0",
+    "release-it": "^15.0.0",
+    "turbo": "^1.10.7",
+    "typescript": "^5.0.2"
   },
-  "peerDependencies": {
-    "react": "*",
-    "react-native": ">=0.64.0",
-    "react-native-aes-crypto": "^3.0.1",
-    "react-native-safe-area-context": "^3.0.2",
-    "react-native-secure-key-store": "^2.0.10"
+  "resolutions": {
+    "@types/react": "17.0.21"
+  },
+  "packageManager": "yarn@3.6.1",
+  "engines": {
+    "node": ">= 18.0.0"
   },
   "jest": {
     "preset": "react-native",
@@ -111,7 +119,7 @@
   "eslintConfig": {
     "root": true,
     "extends": [
-      "@react-native-community",
+      "@react-native",
       "prettier"
     ],
     "rules": {
@@ -152,14 +160,22 @@
       ]
     ]
   },
+  "peerDependencies": {
+    "@dropthought/react-native-ui": "^5.12.0",
+    "react": "*",
+    "react-native": "*",
+    "react-native-safe-area-context": "^4.8.2"
+  },
   "dependencies": {
-    "@bct-taipei/dt-rn-encrypted-storage": "^2.2.0",
-    "@dropthought/react-native-ui": "5.6.0-beta.6",
-    "jwt-decode": "^3.1.2",
+    "@dropthought/dt-rn-encrypted-storage": "^2.3.0",
+    "@dropthought/react-native-ui": "^5.12.0",
+    "axios": "^1.6.5",
+    "jwt-decode": "^4.0.0",
+    "ramda": "^0.29.1",
     "react-async": "^10.0.1",
     "react-native-aes-crypto": "^3.0.1",
-    "react-native-safe-area-context": "^3.0.2",
+    "react-native-safe-area-context": "^4.8.2",
     "react-native-secure-key-store": "^2.0.10",
-    "uuid": "^3.3.2"
+    "uuid": "^9.0.1"
   }
 }

@@ -1,21 +1,15 @@
-export let APPEARANCE;
-
-(function (APPEARANCE) {
+export let APPEARANCE = /*#__PURE__*/function (APPEARANCE) {
   APPEARANCE["SYSTEM"] = "system";
   APPEARANCE["LIGHT"] = "light";
   APPEARANCE["DARK"] = "dark";
-})(APPEARANCE || (APPEARANCE = {}));
-
-export let COLOR_SCHEMES;
-
-(function (COLOR_SCHEMES) {
+  return APPEARANCE;
+}({});
+export let COLOR_SCHEMES = /*#__PURE__*/function (COLOR_SCHEMES) {
   COLOR_SCHEMES["light"] = "light";
   COLOR_SCHEMES["dark"] = "dark";
-})(COLOR_SCHEMES || (COLOR_SCHEMES = {}));
-
-export let THEME_OPTION;
-
-(function (THEME_OPTION) {
+  return COLOR_SCHEMES;
+}({});
+export let THEME_OPTION = /*#__PURE__*/function (THEME_OPTION) {
   THEME_OPTION["CLASSIC"] = "classic";
   THEME_OPTION["OPTION1"] = "option1";
   THEME_OPTION["OPTION2"] = "option2";
@@ -23,5 +17,6 @@ export let THEME_OPTION;
   THEME_OPTION["OPTION4"] = "option4";
   THEME_OPTION["OPTION6"] = "option6";
   THEME_OPTION["BIJLIRIDE"] = "bijliride";
-})(THEME_OPTION || (THEME_OPTION = {}));
+  return THEME_OPTION;
+}({});
 //# sourceMappingURL=theme.const.js.map

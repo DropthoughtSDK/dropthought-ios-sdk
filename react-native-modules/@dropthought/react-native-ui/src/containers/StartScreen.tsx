@@ -19,16 +19,17 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getLanguageBy } from '../utils/LanguageUtils';
 import i18n from '../translation';
+import { usePollingRecord } from '../hooks/usePollingRecord';
 
 type Survey = OriginSurvey & {
   languages: string[];
 };
 
 const defaultIconSource = require('../assets/rating.png');
-const defaultIconSize = {
+const defaultIconSize = Object.freeze({
   [DimensionWidthType.phone]: 65,
   [DimensionWidthType.tablet]: 72,
-};
+});
 
 type Props = {
   onLanguageSelect: (language: string) => void;
@@ -65,10 +66,21 @@ const StartScreen = ({ onLanguageSelect, onClose, onStart, survey }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const { resetRecord } = usePollingRecord();
+  useEffect(() => {
+    resetRecord();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const iconSource = image === undefined ? defaultIconSource : { uri: image };
 
   const iconView = (
-    <Image resizeMode="contain" style={iconStyle} source={iconSource} />
+    <Image
+      resizeMode="contain"
+      // @ts-ignore
+      style={iconStyle}
+      source={iconSource}
+    />
   );
 
   const languagesView = () => {
@@ -113,8 +125,10 @@ const StartScreen = ({ onLanguageSelect, onClose, onStart, survey }: Props) => {
       backgroundColor,
     },
   ];
-  const titleStyle = [styles.headerTitle, { color: fontColor }];
+  const headerStyle = [styles.headerTitle, { color: fontColor }];
   const headerIconStyle = { tintColor: hexCode };
+  const titleStyle = [styles.title, { color: fontColor }];
+  const subTitleStyle = [styles.subtitle, { color: fontColor }];
   const startTextStyle = [
     styles.buttonTitle,
     {
@@ -131,21 +145,35 @@ const StartScreen = ({ onLanguageSelect, onClose, onStart, survey }: Props) => {
               source={require('../assets/icClose24Px.png')}
             />
           </TouchableOpacity>
-          <Text style={titleStyle} numberOfLines={1}>
+          <Text
+            testID="test:id/custom_survey_name_nav"
+            style={headerStyle}
+            numberOfLines={1}
+          >
             {surveyName}
           </Text>
         </View>
       </View>
       <View style={styles.main}>
         {iconView}
-        <Text style={[styles.title, { color: fontColor }]}>{surveyName}</Text>
+        <Text testID="test:id/custom_take_survey_name" style={titleStyle}>
+          {surveyName}
+        </Text>
         {!!welcomeTextPlain && (
-          <Text style={[styles.subtitle, { color: fontColor }]}>
+          <Text
+            testID="test:id/custom_take_survey_welcome_msg"
+            style={subTitleStyle}
+          >
             {welcomeTextPlain}
           </Text>
         )}
         <TouchableOpacity style={buttonStyle} onPress={onStart}>
-          <Text style={startTextStyle}>{takeSurvey}</Text>
+          <Text
+            testID="test:id/button_custom_take_survey"
+            style={startTextStyle}
+          >
+            {takeSurvey}
+          </Text>
         </TouchableOpacity>
       </View>
       {languagesView()}

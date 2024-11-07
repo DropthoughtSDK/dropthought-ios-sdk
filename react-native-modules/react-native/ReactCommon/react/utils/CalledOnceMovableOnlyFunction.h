@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,8 +7,9 @@
 
 #include <functional>
 
-namespace facebook {
-namespace react {
+#include <react/debug/react_native_assert.h>
+
+namespace facebook::react {
 
 /*
  * Implements a moveable-only function that asserts if called more than once
@@ -24,14 +25,14 @@ class CalledOnceMovableOnlyFunction {
   bool wasMovedFrom_;
 
  public:
-  CalledOnceMovableOnlyFunction(std::function<T> &&function)
+  explicit CalledOnceMovableOnlyFunction(std::function<T>&& function)
       : function_(std::move(function)) {
     wasCalled_ = false;
     wasMovedFrom_ = false;
   }
 
   ~CalledOnceMovableOnlyFunction() {
-    assert(
+    react_native_assert(
         (wasCalled_ || wasMovedFrom_) &&
         "`CalledOnceMovableOnlyFunction` is destroyed before being called.");
   }
@@ -39,25 +40,25 @@ class CalledOnceMovableOnlyFunction {
   /*
    * Not copyable.
    */
-  CalledOnceMovableOnlyFunction(CalledOnceMovableOnlyFunction const &other) =
+  CalledOnceMovableOnlyFunction(const CalledOnceMovableOnlyFunction& other) =
       delete;
-  CalledOnceMovableOnlyFunction &operator=(
-      CalledOnceMovableOnlyFunction const &other) = delete;
+  CalledOnceMovableOnlyFunction& operator=(
+      const CalledOnceMovableOnlyFunction& other) = delete;
 
   /*
    * Movable.
    */
   CalledOnceMovableOnlyFunction(
-      CalledOnceMovableOnlyFunction &&other) noexcept {
+      CalledOnceMovableOnlyFunction&& other) noexcept {
     wasCalled_ = false;
     wasMovedFrom_ = false;
     other.wasMovedFrom_ = true;
     function_ = std::move(other.function_);
   };
 
-  CalledOnceMovableOnlyFunction &operator=(
-      CalledOnceMovableOnlyFunction &&other) noexcept {
-    assert(
+  CalledOnceMovableOnlyFunction& operator=(
+      CalledOnceMovableOnlyFunction&& other) noexcept {
+    react_native_assert(
         (wasCalled_ || wasMovedFrom_) &&
         "`CalledOnceMovableOnlyFunction` is re-assigned before being called.");
     wasCalled_ = false;
@@ -71,10 +72,10 @@ class CalledOnceMovableOnlyFunction {
    * Callable.
    */
   ReturnT operator()(ArgumentT... args) {
-    assert(
+    react_native_assert(
         !wasMovedFrom_ &&
         "`CalledOnceMovableOnlyFunction` is called after being moved from.");
-    assert(
+    react_native_assert(
         !wasCalled_ &&
         "`CalledOnceMovableOnlyFunction` is called more than once.");
 
@@ -83,5 +84,4 @@ class CalledOnceMovableOnlyFunction {
   }
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

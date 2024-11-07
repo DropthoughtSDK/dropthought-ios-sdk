@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -17,9 +17,10 @@ import com.facebook.infer.annotation.ThreadConfined;
 
 public interface UIManager extends JSIModule, PerformanceCounter {
 
-  /** Registers a new root view. */
+  /** Registers a new root view. @Deprecated call startSurface instead */
   @UiThread
   @ThreadConfined(UI)
+  @Deprecated
   <T extends View> int addRootView(
       final T rootView, WritableMap initialProps, @Nullable String initialUITemplate);
 
@@ -83,7 +84,7 @@ public interface UIManager extends JSIModule, PerformanceCounter {
    * layout-related propertied won't be handled properly. Make sure you know what you're doing
    * before calling this method :)
    *
-   * @param tag {@link int} that identifies the view that will be updated
+   * @param reactTag {@link int} that identifies the view that will be updated
    * @param props {@link ReadableMap} props that should be immediately updated in view
    */
   @UiThread
@@ -116,6 +117,16 @@ public interface UIManager extends JSIModule, PerformanceCounter {
   void removeUIManagerEventListener(UIManagerListener listener);
 
   /**
+   * Resolves a view based on its reactTag. Do not mutate properties on this view that are already
+   * managed by React, as there are no guarantees this changes will be preserved.
+   *
+   * @throws IllegalViewOperationException if tag could not be resolved.
+   * @param reactTag tag
+   * @return view if found
+   */
+  View resolveView(int reactTag);
+
+  /**
    * This method dispatches events from RN Android code to JS. The delivery of this event will not
    * be queued in EventDispatcher class.
    *
@@ -123,7 +134,19 @@ public interface UIManager extends JSIModule, PerformanceCounter {
    * @param eventName name of the event
    * @param event parameters
    */
+  @Deprecated
   void receiveEvent(int reactTag, String eventName, @Nullable WritableMap event);
+
+  /**
+   * This method dispatches events from RN Android code to JS. The delivery of this event will not
+   * be queued in EventDispatcher class.
+   *
+   * @param surfaceId
+   * @param reactTag tag
+   * @param eventName name of the event
+   * @param event parameters
+   */
+  void receiveEvent(int surfaceId, int reactTag, String eventName, @Nullable WritableMap event);
 
   /** Resolves Direct Event name exposed to JS from the one known to the Native side. */
   @Deprecated

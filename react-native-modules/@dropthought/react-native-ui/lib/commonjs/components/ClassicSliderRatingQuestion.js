@@ -4,40 +4,25 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireDefault(require("react"));
-
 var _reactNative = require("react-native");
-
 var _ClassicMandatoryTitle = _interopRequireDefault(require("./ClassicMandatoryTitle"));
-
 var _styles = _interopRequireWildcard(require("../styles"));
-
 var _ramda = require("ramda");
-
 var _translation = _interopRequireDefault(require("../translation"));
-
 var _useWindowDimensions = require("../hooks/useWindowDimensions");
-
 var _theme = require("../contexts/theme");
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 const MIN_VALUE = 1;
 const NPS_MIN_VALUE = 0;
-
 const getInitialSelectedValue = feedback => {
   if (feedback && feedback.answers && !(0, _ramda.isNil)(feedback.answers[0])) {
     return parseInt(feedback.answers[0], 10);
   }
-
   return undefined;
 };
-
 const getLabelText = ({
   isPhone,
   question,
@@ -45,20 +30,16 @@ const getLabelText = ({
   valueData
 }) => {
   const labelText = `${valueData + (question.type === 'nps' ? NPS_MIN_VALUE : MIN_VALUE)}`;
-
   if (isPhone) {
     if (valueData === 0) {
       return `${labelText} - ${question.options[0]}`;
     }
-
     if (valueData === maximumValue - 1) {
       return `${labelText} - ${question.options[question.options.length - 1]}`;
     }
   }
-
   return labelText;
 };
-
 const ClassicSliderRatingQuestion = ({
   mandatoryErrorMessage,
   question,
@@ -72,13 +53,10 @@ const ClassicSliderRatingQuestion = ({
     fontColor,
     backgroundColor: themeBackgroundColor
   } = (0, _theme.useTheme)();
-
   const [value, setValue] = _react.default.useState(getInitialSelectedValue(feedback));
-
   const maximumValue = parseInt(question.scale, 10);
   const dimensionWidthType = (0, _useWindowDimensions.useDimensionWidthType)();
   const isPhone = dimensionWidthType === _useWindowDimensions.DimensionWidthType.phone;
-
   const getBackgroundColorStyle = ({
     selected,
     darkMode
@@ -89,16 +67,13 @@ const ClassicSliderRatingQuestion = ({
         resizeMode: 'contain'
       };
     }
-
     if (darkMode) {
       return styles.backgroundDark;
     }
-
     return {
       backgroundColor: themeBackgroundColor
     };
   };
-
   const getSliderIndicator = () => {
     const textStyle = [styles.label, {
       color: fontColor,
@@ -107,6 +82,8 @@ const ClassicSliderRatingQuestion = ({
       marginBottom: _translation.default.language === 'te' ? 2 : 0
     }];
     return [...Array(maximumValue).keys()].map((valueData, index) => /*#__PURE__*/_react.default.createElement(_reactNative.TouchableHighlight, {
+      accessible: false,
+      testID: `test:id/scale_option_${index === value}`,
       underlayColor: themeBackgroundColor,
       key: index.toString(),
       onPress: () => {
@@ -123,6 +100,7 @@ const ClassicSliderRatingQuestion = ({
         darkMode: colorScheme === _theme.COLOR_SCHEMES.dark
       })]
     }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+      testID: `test:id/scale_label_${fontColor}`,
       style: [textStyle, index === value ? styles.selectedLabel : {}]
     }, getLabelText({
       isPhone,
@@ -131,7 +109,6 @@ const ClassicSliderRatingQuestion = ({
       valueData
     })))));
   };
-
   const getWidthStyle = () => {
     let width = maximumValue / 10.0 * 100 > 100 ? 100 : maximumValue / 10.0 * 100;
     return {
@@ -140,7 +117,6 @@ const ClassicSliderRatingQuestion = ({
       paddingHorizontal: 10
     };
   };
-
   const rtl = _translation.default.dir() === 'rtl';
   return /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: _styles.default.questionContainer
@@ -153,7 +129,9 @@ const ClassicSliderRatingQuestion = ({
     style: [styles.vertical]
   }, getSliderIndicator()) : /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: rtl && _styles.default.flexRowReverse
-  }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+  }, /*#__PURE__*/_react.default.createElement(_reactNative.View
+  // @ts-ignore
+  , {
     style: getWidthStyle()
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: styles.line
@@ -169,11 +147,7 @@ const ClassicSliderRatingQuestion = ({
     style: styles.options
   }, question.options[question.options.length - 1])))));
 };
-
-var _default = /*#__PURE__*/_react.default.memo(ClassicSliderRatingQuestion);
-
-exports.default = _default;
-
+var _default = exports.default = /*#__PURE__*/_react.default.memo(ClassicSliderRatingQuestion);
 const styles = _reactNative.StyleSheet.create({
   backgroundPhone: {
     backgroundColor: _styles.Colors.white,

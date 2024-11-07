@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -18,6 +18,7 @@ import com.facebook.yoga.YogaDirection;
 import com.facebook.yoga.YogaDisplay;
 import com.facebook.yoga.YogaEdge;
 import com.facebook.yoga.YogaFlexDirection;
+import com.facebook.yoga.YogaGutter;
 import com.facebook.yoga.YogaJustify;
 import com.facebook.yoga.YogaMeasureFunction;
 import com.facebook.yoga.YogaNode;
@@ -336,9 +337,32 @@ public class ReactShadowNodeImpl implements ReactShadowNode<ReactShadowNodeImpl>
   @Override
   public void onCollectExtraUpdates(UIViewOperationQueue uiViewOperationQueue) {}
 
-  /** @return true if layout (position or dimensions) changed, false otherwise. */
   @Override
-  public boolean dispatchUpdates(
+  public boolean dispatchUpdatesWillChangeLayout(float absoluteX, float absoluteY) {
+    if (!hasNewLayout()) {
+      return false;
+    }
+
+    float layoutX = getLayoutX();
+    float layoutY = getLayoutY();
+    int newAbsoluteLeft = Math.round(absoluteX + layoutX);
+    int newAbsoluteTop = Math.round(absoluteY + layoutY);
+    int newAbsoluteRight = Math.round(absoluteX + layoutX + getLayoutWidth());
+    int newAbsoluteBottom = Math.round(absoluteY + layoutY + getLayoutHeight());
+
+    int newScreenX = Math.round(layoutX);
+    int newScreenY = Math.round(layoutY);
+    int newScreenWidth = newAbsoluteRight - newAbsoluteLeft;
+    int newScreenHeight = newAbsoluteBottom - newAbsoluteTop;
+
+    return newScreenX != mScreenX
+        || newScreenY != mScreenY
+        || newScreenWidth != mScreenWidth
+        || newScreenHeight != mScreenHeight;
+  }
+
+  @Override
+  public void dispatchUpdates(
       float absoluteX,
       float absoluteY,
       UIViewOperationQueue uiViewOperationQueue,
@@ -385,10 +409,6 @@ public class ReactShadowNodeImpl implements ReactShadowNode<ReactShadowNodeImpl>
               getScreenHeight());
         }
       }
-
-      return layoutHasChanged;
-    } else {
-      return false;
     }
   }
 
@@ -792,6 +812,21 @@ public class ReactShadowNodeImpl implements ReactShadowNode<ReactShadowNodeImpl>
   @Override
   public void setFlexGrow(float flexGrow) {
     mYogaNode.setFlexGrow(flexGrow);
+  }
+
+  @Override
+  public void setRowGap(float rowGap) {
+    mYogaNode.setGap(YogaGutter.ROW, rowGap);
+  }
+
+  @Override
+  public void setColumnGap(float columnGap) {
+    mYogaNode.setGap(YogaGutter.COLUMN, columnGap);
+  }
+
+  @Override
+  public void setGap(float gap) {
+    mYogaNode.setGap(YogaGutter.ALL, gap);
   }
 
   @Override

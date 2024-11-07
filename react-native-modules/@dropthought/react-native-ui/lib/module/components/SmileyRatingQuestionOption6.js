@@ -12,7 +12,6 @@ import { useTheme, COLOR_SCHEMES } from '../contexts/theme';
 import MandatoryTitle from './MandatoryTitle';
 import { isNil, repeat } from 'ramda';
 const animations = [require('../assets/animations/smiley_option6/option6_1.json'), require('../assets/animations/smiley_option6/option6_2.json'), require('../assets/animations/smiley_option6/option6_3.json'), require('../assets/animations/smiley_option6/option6_4.json'), require('../assets/animations/smiley_option6/option6_5.json')];
-
 const SmileyRatingQuestionOption6 = ({
   survey,
   pageIndex,
@@ -22,10 +21,11 @@ const SmileyRatingQuestionOption6 = ({
   onPrevPage,
   onNextPage,
   onFeedback,
-  feedback
+  feedback,
+  isLastPage
 }) => {
   const answered = feedback && feedback.answers && !isNil(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
-  const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
+  const answeredValue = answered && feedback.answers[0] ? parseInt(feedback.answers[0], 10) : 0;
   const [selectedIndex, setSelectedIndex] = useState(answered ? answeredValue : -1);
   const {
     questionId,
@@ -33,15 +33,18 @@ const SmileyRatingQuestionOption6 = ({
     options
   } = question;
   const scaleLogicList = scaleLogic[scale];
-  const descriptions = scaleLogicList.map((_, index) => options[index]); // We through the null text string to keep blank to make it as same as the rotary dial design.
+  const descriptions = scaleLogicList === null || scaleLogicList === void 0 ? void 0 : scaleLogicList.map((_, index) => options[index]);
 
+  // We through the null text string to keep blank to make it as same as the rotary dial design.
   const lotties = useMemo(() => {
     let result = [''];
-    scaleLogicList.forEach(scaleIndex => {
-      result = [...result, animations[scaleIndex]];
-    });
-    const remainDummy = 7 - scaleLogicList.length;
-    result = [...result, ...repeat('', remainDummy)];
+    if (scaleLogicList) {
+      scaleLogicList.forEach(scaleIndex => {
+        result = [...result, animations[scaleIndex]];
+      });
+      const remainDummy = 7 - scaleLogicList.length;
+      result = [...result, ...repeat('', remainDummy)];
+    }
     return result;
   }, [scaleLogicList]);
   const {
@@ -76,17 +79,19 @@ const SmileyRatingQuestionOption6 = ({
   const hintTextStyle = [commonStyles.hintText, {
     color: textColor
   }];
-
   const backgroundImage = require('../assets/bg-option6.png');
-
   const imageStyle = {
     opacity: colorScheme === COLOR_SCHEMES.light ? 0.6 : 0
   };
   const lottieContainer = /*#__PURE__*/React.createElement(View, {
+    accessibilityLabel: `selected_custom_dialer_${selectedIndex}`,
     style: commonStyles.lottieContainer
-  }, selectedIndex > -1 && lotties[selectedIndex + 1] !== '' ? /*#__PURE__*/React.createElement(LottieView, {
+  }, selectedIndex > -1 && lotties[selectedIndex + 1] !== '' ? /*#__PURE__*/React.createElement(LottieView
+  // @ts-ignore
+  , {
     source: lotties[selectedIndex + 1],
-    autoPlay: true
+    autoPlay: true,
+    style: commonStyles.lottieContent
   }) : null);
   const scoreContainer = /*#__PURE__*/React.createElement(View, {
     style: commonStyles.scoreContainer
@@ -95,12 +100,15 @@ const SmileyRatingQuestionOption6 = ({
   }, /*#__PURE__*/React.createElement(View, {
     style: commonStyles.scoreText
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/custom_dialer_render_score",
     style: scoreSelectedStyle
   }, selectedIndex + 1), /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/custom_dialer_total_score",
     style: scoreTotalStyle
   }, '/' + totalScore)), /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/custom_dialer_score_desc",
     style: descStyle
-  }, descriptions[selectedIndex])));
+  }, descriptions && descriptions[selectedIndex])));
   return /*#__PURE__*/React.createElement(ImageBackground, {
     source: backgroundImage,
     resizeMethod: "auto",
@@ -122,12 +130,13 @@ const SmileyRatingQuestionOption6 = ({
   }, isAtCoverScreen ? /*#__PURE__*/React.createElement(View, {
     style: commonStyles.hintContainer
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: `test:id/custom_dialer_title_${colorScheme}`,
     style: hintTextStyle
-  }, i18n.t('option6HintDescription:title'))) : /*#__PURE__*/React.createElement(React.Fragment, null, lottieContainer, scoreContainer))), /*#__PURE__*/React.createElement(SurveyFooter, {
+  }, `${i18n.t('option6HintDescription:title')}`)) : /*#__PURE__*/React.createElement(React.Fragment, null, lottieContainer, scoreContainer))), /*#__PURE__*/React.createElement(SurveyFooter, {
     submitSurvey: survey.submitSurvey,
     surveyColor: hexCode,
     isFirstPage: pageIndex === 0,
-    isLastPage: pageIndex === survey.pageOrder.length - 1,
+    isLastPage: isLastPage,
     onPrevPage: onPrevPage,
     onNextPage: onNextPage
   }), /*#__PURE__*/React.createElement(View, {
@@ -139,7 +148,6 @@ const SmileyRatingQuestionOption6 = ({
     updateScore: updateScore
   })));
 };
-
 export default SmileyRatingQuestionOption6;
 const commonStyles = StyleSheet.create({
   imageBackground: {
@@ -192,6 +200,10 @@ const commonStyles = StyleSheet.create({
   picker: {
     alignItems: 'center',
     height: 120
+  },
+  lottieContent: {
+    width: '100%',
+    height: '100%'
   }
 });
 const phoneStyles = StyleSheet.create({

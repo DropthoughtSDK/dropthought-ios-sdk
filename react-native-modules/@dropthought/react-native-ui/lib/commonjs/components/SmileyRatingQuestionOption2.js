@@ -4,37 +4,21 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireDefault(require("react"));
-
 var _reactNative = require("react-native");
-
 var _styles = require("../styles");
-
 var _translation = _interopRequireDefault(require("../translation"));
-
 var _useWindowDimensions = require("../hooks/useWindowDimensions");
-
 var _data = require("../utils/data");
-
 var _WheelPicker = _interopRequireDefault(require("./WheelPicker"));
-
 var _SurveyFooter = _interopRequireDefault(require("../containers/SurveyFooter"));
-
 var _SurveyHeader = _interopRequireDefault(require("../containers/SurveyHeader"));
-
 var _lottieReactNative = _interopRequireDefault(require("lottie-react-native"));
-
 var _theme = require("../contexts/theme");
-
 var _MandatoryTitle = _interopRequireDefault(require("./MandatoryTitle"));
-
 var _ramda = require("ramda");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 const lotties = [require('../assets/animations/smiley_option1/option1_1.json'), require('../assets/animations/smiley_option1/option1_2.json'), require('../assets/animations/smiley_option1/option1_3.json'), require('../assets/animations/smiley_option1/option1_4.json'), require('../assets/animations/smiley_option1/option1_5.json')];
-
 const SmileyRatingQuestionOption2 = ({
   survey,
   pageIndex,
@@ -44,10 +28,11 @@ const SmileyRatingQuestionOption2 = ({
   onPrevPage,
   onNextPage,
   onFeedback,
-  feedback
+  feedback,
+  isLastPage
 }) => {
   const answered = feedback && feedback.answers && !(0, _ramda.isNil)(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
-  const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
+  const answeredValue = answered && feedback.answers[0] ? parseInt(feedback.answers[0], 10) : 0;
   const {
     hexCode,
     backgroundColor: themeBackgroundColor,
@@ -59,13 +44,10 @@ const SmileyRatingQuestionOption2 = ({
     options,
     scale
   } = question;
-
   const [selectedIndex, setSelectedIndex] = _react.default.useState(answered ? answeredValue : -1);
-
   const hasSelected = selectedIndex > -1;
   const scaleLogicList = _data.scaleLogic[scale];
-  const lottieSelectedIndex = scaleLogicList[selectedIndex];
-
+  const lottieSelectedIndex = (scaleLogicList && scaleLogicList[selectedIndex]) ?? 0;
   const setSelectedAndFeedback = _react.default.useCallback(index => {
     onFeedback({
       questionId,
@@ -73,13 +55,11 @@ const SmileyRatingQuestionOption2 = ({
       type: 'rating'
     });
   }, [onFeedback, questionId]);
-
   const handleSelected = index => {
     setSelectedIndex(index);
     setSelectedAndFeedback(index);
   };
-
-  const descriptions = scaleLogicList.map((_, index) => options[index]);
+  const descriptions = (scaleLogicList === null || scaleLogicList === void 0 ? void 0 : scaleLogicList.map((_, index) => options[index])) ?? [];
   const dummyDescroptions = ['Select', ...descriptions];
   const dimensionWidthType = (0, _useWindowDimensions.useDimensionWidthType)();
   const isPhone = dimensionWidthType === _useWindowDimensions.DimensionWidthType.phone;
@@ -111,15 +91,20 @@ const SmileyRatingQuestionOption2 = ({
     mandatoryErrorMessage: survey.mandatoryErrorMessage,
     forgot: forgot
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+    accessibilityLabel: `selected_custom_smilely2_${selectedIndex}`,
     style: commonStyles.centerContainer
   }, /*#__PURE__*/_react.default.createElement(_lottieReactNative.default, {
     source: lotties[lottieSelectedIndex],
+    style: commonStyles.lottieContent,
     autoPlay: true,
+    loop: true,
     speed: 0.5
   })), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: commonStyles.wheelContainer
   }, /*#__PURE__*/_react.default.createElement(_WheelPicker.default, {
-    selectedIndex: selectedIndex,
+    selectedIndex: selectedIndex
+    // @ts-ignore
+    ,
     options: descriptions,
     onChange: index => {
       if (index > -1) handleSelected(index);
@@ -137,11 +122,14 @@ const SmileyRatingQuestionOption2 = ({
   }), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: commonStyles.centerContainer
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    testID: `test:id/custom_smilely2_title_${colorScheme}`,
     style: hintTextStyle
-  }, _translation.default.t('option1HintDescription:title'))), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+  }, `${_translation.default.t('option1HintDescription:title')}`)), /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: commonStyles.wheelContainer
   }, /*#__PURE__*/_react.default.createElement(_WheelPicker.default, {
-    selectedIndex: 0,
+    selectedIndex: 0
+    // @ts-ignore
+    ,
     options: dummyDescroptions,
     onChange: index => {
       handleSelected(index - 1);
@@ -154,17 +142,13 @@ const SmileyRatingQuestionOption2 = ({
     submitSurvey: survey.submitSurvey,
     surveyColor: hexCode,
     isFirstPage: pageIndex === 0,
-    isLastPage: pageIndex === survey.pageOrder.length - 1,
+    isLastPage: isLastPage,
     onPrevPage: onPrevPage,
     onNextPage: onNextPage,
     backgroundColor: backgroundColor
   }));
 };
-
-var _default = /*#__PURE__*/_react.default.memo(SmileyRatingQuestionOption2);
-
-exports.default = _default;
-
+var _default = exports.default = /*#__PURE__*/_react.default.memo(SmileyRatingQuestionOption2);
 const commonStyles = _reactNative.StyleSheet.create({
   container: {
     flex: 1,
@@ -192,16 +176,18 @@ const commonStyles = _reactNative.StyleSheet.create({
     paddingVertical: 9,
     width: '100%',
     textAlign: 'center'
+  },
+  lottieContent: {
+    width: '100%',
+    height: '100%'
   }
 });
-
 const phoneStyles = _reactNative.StyleSheet.create({
   hintText: {
     fontSize: 16,
     fontWeight: '500'
   }
 });
-
 const tabletStyles = _reactNative.StyleSheet.create({
   hintText: {
     fontSize: 16,

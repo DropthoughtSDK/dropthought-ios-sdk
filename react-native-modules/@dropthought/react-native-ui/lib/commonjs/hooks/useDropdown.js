@@ -4,17 +4,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = require("react");
-
 var _data = require("../utils/data");
-
 var _translation = _interopRequireDefault(require("../translation"));
-
 var _ramda = require("ramda");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 const useDropdown = (question, feedback, onFeedback) => {
   const {
     questionId,
@@ -22,13 +16,13 @@ const useDropdown = (question, feedback, onFeedback) => {
   } = question;
   const options = (0, _react.useMemo)(() => {
     let result = (0, _data.getOptionsFromQuestion)(question);
-
     if (question.questionBrand === _data.QuestionBrandType.Other) {
       const lastOption = result[result.length - 1];
-      lastOption.title = _translation.default.t('common:others');
-      lastOption.placeholder = (0, _ramda.isNil)(question.otherText) || question.otherText === '' ? _translation.default.t('survey:other-placeholder') : question.otherText;
+      if (lastOption) {
+        lastOption.title = _translation.default.t('common:others');
+        lastOption.placeholder = (0, _ramda.isNil)(question.otherText) || question.otherText === '' ? _translation.default.t('survey:other-placeholder') : question.otherText;
+      }
     }
-
     return result;
   }, [question]);
   const [bottomSheetVisible, setBottomSheetVisible] = (0, _react.useState)(false);
@@ -51,14 +45,11 @@ const useDropdown = (question, feedback, onFeedback) => {
     return selectedOptionIndex !== undefined ? options[selectedOptionIndex] : undefined;
   }, [options, selectedOptionIndex]);
   const optionLabel = (0, _react.useMemo)(() => {
-    var _currentSelectedOptio;
-
-    return (_currentSelectedOptio = currentSelectedOption === null || currentSelectedOption === void 0 ? void 0 : currentSelectedOption.title) !== null && _currentSelectedOptio !== void 0 ? _currentSelectedOptio : _translation.default.t('survey:select-Your-Option');
+    return (currentSelectedOption === null || currentSelectedOption === void 0 ? void 0 : currentSelectedOption.title) ?? _translation.default.t('survey:select-Your-Option');
   }, [currentSelectedOption]);
   (0, _react.useEffect)(() => {
     if (feedback && feedback.answers && !(0, _ramda.isNil)(feedback.answers[0])) {
       const answer = feedback.answers[0];
-
       if (typeof answer === 'number') {
         setSelectedOptionIndex(answer);
       } else if (typeof answer === 'string') {
@@ -72,7 +63,6 @@ const useDropdown = (question, feedback, onFeedback) => {
   }, [feedback, options.length]);
   (0, _react.useEffect)(() => {
     if (currentSelectedOption === undefined) return;
-
     if (!currentSelectedOption.isOther) {
       setOtherText('');
       onFeedback({
@@ -99,37 +89,30 @@ const useDropdown = (question, feedback, onFeedback) => {
       });
     }
   }, [currentSelectedOption, onFeedback, otherText, questionId]);
-
   const onChangeOtherText = text => {
     setHasEdited(true);
     setOtherText(text);
   };
-
   const onChangeSearchText = text => {
     setSearchText(text);
   };
-
   const onCloseBottomSheet = () => {
     setBottomSheetVisible(false);
   };
-
   const onOpenBottomSheet = () => {
     setSelectedOptionIndexCache(selectedOptionIndex);
     setBottomSheetVisible(true);
   };
-
   const onConfirm = () => {
     setSelectedOptionIndex(selectedOptionIndexCache);
     setSearchText('');
     onCloseBottomSheet();
   };
-
   const onCancel = () => {
     setSelectedOptionIndexCache(undefined);
     setSearchText('');
     onCloseBottomSheet();
   };
-
   return {
     selectedOptionIndexCache,
     setSelectedOptionIndexCache,
@@ -147,7 +130,5 @@ const useDropdown = (question, feedback, onFeedback) => {
     onCancel
   };
 };
-
-var _default = useDropdown;
-exports.default = _default;
+var _default = exports.default = useDropdown;
 //# sourceMappingURL=useDropdown.js.map

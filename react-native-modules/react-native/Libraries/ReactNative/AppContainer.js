@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,60 +8,63 @@
  * @flow
  */
 
-'use strict';
+import type {RootTag} from './RootTag';
 
 import View from '../Components/View/View';
 import RCTDeviceEventEmitter from '../EventEmitter/RCTDeviceEventEmitter';
 import StyleSheet from '../StyleSheet/StyleSheet';
 import {type EventSubscription} from '../vendor/emitter/EventEmitter';
 import {RootTagContext, createRootTag} from './RootTag';
-import PropTypes from 'prop-types';
 import * as React from 'react';
 
-type Context = {rootTag: number, ...};
+const reactDevToolsHook = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
 type Props = $ReadOnly<{|
   children?: React.Node,
   fabric?: boolean,
-  rootTag: number,
+  useConcurrentRoot?: boolean,
+  rootTag: number | RootTag,
   initialProps?: {...},
   showArchitectureIndicator?: boolean,
   WrapperComponent?: ?React.ComponentType<any>,
   internal_excludeLogBox?: ?boolean,
+  internal_excludeInspector?: ?boolean,
 |}>;
 
 type State = {|
   inspector: ?React.Node,
+  devtoolsOverlay: ?React.Node,
+  traceUpdateOverlay: ?React.Node,
   mainKey: number,
-  hasError: boolean,
 |};
 
 class AppContainer extends React.Component<Props, State> {
   state: State = {
     inspector: null,
+    devtoolsOverlay: null,
+    traceUpdateOverlay: null,
     mainKey: 1,
-    hasError: false,
   };
   _mainRef: ?React.ElementRef<typeof View>;
   _subscription: ?EventSubscription = null;
+  _reactDevToolsAgentListener: ?() => void = null;
 
   static getDerivedStateFromError: any = undefined;
 
-  static childContextTypes:
-    | any
-    | {|rootTag: React$PropType$Primitive<number>|} = {
-    rootTag: PropTypes.number,
-  };
+  mountReactDevToolsOverlays(): void {
+    const DevtoolsOverlay = require('../Inspector/DevtoolsOverlay').default;
+    const devtoolsOverlay = <DevtoolsOverlay inspectedView={this._mainRef} />;
 
-  getChildContext(): Context {
-    return {
-      rootTag: this.props.rootTag,
-    };
+    const TraceUpdateOverlay =
+      require('../Components/TraceUpdateOverlay/TraceUpdateOverlay').default;
+    const traceUpdateOverlay = <TraceUpdateOverlay />;
+
+    this.setState({devtoolsOverlay, traceUpdateOverlay});
   }
 
   componentDidMount(): void {
     if (__DEV__) {
-      if (!global.__RCTProfileIsProfiling) {
+      if (!this.props.internal_excludeInspector) {
         this._subscription = RCTDeviceEventEmitter.addListener(
           'toggleElementInspector',
           () => {
@@ -80,6 +83,22 @@ class AppContainer extends React.Component<Props, State> {
             this.setState({inspector});
           },
         );
+
+        if (reactDevToolsHook != null) {
+          if (reactDevToolsHook.reactDevtoolsAgent) {
+            // In case if this is not the first AppContainer rendered and React DevTools are already attached
+            this.mountReactDevToolsOverlays();
+            return;
+          }
+
+          this._reactDevToolsAgentListener = () =>
+            this.mountReactDevToolsOverlays();
+
+          reactDevToolsHook.on(
+            'react-devtools',
+            this._reactDevToolsAgentListener,
+          );
+        }
       }
     }
   }
@@ -88,24 +107,25 @@ class AppContainer extends React.Component<Props, State> {
     if (this._subscription != null) {
       this._subscription.remove();
     }
+
+    if (reactDevToolsHook != null && this._reactDevToolsAgentListener != null) {
+      reactDevToolsHook.off('react-devtools', this._reactDevToolsAgentListener);
+    }
   }
 
   render(): React.Node {
     let logBox = null;
     if (__DEV__) {
-      if (
-        !global.__RCTProfileIsProfiling &&
-        !this.props.internal_excludeLogBox
-      ) {
-        const LogBoxNotificationContainer = require('../LogBox/LogBoxNotificationContainer')
-          .default;
+      if (!this.props.internal_excludeLogBox) {
+        const LogBoxNotificationContainer =
+          require('../LogBox/LogBoxNotificationContainer').default;
         logBox = <LogBoxNotificationContainer />;
       }
     }
 
-    let innerView = (
+    let innerView: React.Node = (
       <View
-        collapsable={!this.state.inspector}
+        collapsable={!this.state.inspector && !this.state.devtoolsOverlay}
         key={this.state.mainKey}
         pointerEvents="box-none"
         style={styles.appContainer}
@@ -129,10 +149,13 @@ class AppContainer extends React.Component<Props, State> {
         </Wrapper>
       );
     }
+
     return (
       <RootTagContext.Provider value={createRootTag(this.props.rootTag)}>
         <View style={styles.appContainer} pointerEvents="box-none">
-          {!this.state.hasError && innerView}
+          {innerView}
+          {this.state.traceUpdateOverlay}
+          {this.state.devtoolsOverlay}
           {this.state.inspector}
           {logBox}
         </View>
@@ -146,12 +169,5 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-
-if (__DEV__) {
-  if (!global.__RCTProfileIsProfiling) {
-    const LogBox = require('../LogBox/LogBox');
-    LogBox.install();
-  }
-}
 
 module.exports = AppContainer;

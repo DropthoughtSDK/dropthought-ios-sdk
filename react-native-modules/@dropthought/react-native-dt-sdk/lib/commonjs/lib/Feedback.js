@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.submitFeedback = exports.saveFeedback = void 0;
+exports.submitFeedback = exports.saveFeedback = exports.finalizeSubmitedFeedback = void 0;
 var _API = require("./API");
 var _FeedbacksUploader = require("./FeedbacksUploader");
 /**
@@ -36,7 +36,40 @@ const saveFeedback = async surveyFeedback => {
   return _FeedbacksUploader.FeedbacksQueue.enqueue(surveyFeedback);
 };
 
+/**
+ * @param {Feedback[]} feedbacks
+ * @param {Survey} survey
+ * @returns {Feedback[]}
+ */
+exports.saveFeedback = saveFeedback;
+const finalizeSubmitedFeedback = (feedbacks, survey) => {
+  const {
+    pages
+  } = survey;
+  const result = [...feedbacks];
+  pages.forEach(page => {
+    const {
+      questions
+    } = page;
+    questions.forEach(question => {
+      const {
+        questionId,
+        type
+      } = question;
+      const hasAnswered = feedbacks.find(feedback => feedback.questionId === questionId);
+      if (type === 'statement' && !hasAnswered) {
+        result.push({
+          questionId: questionId,
+          answers: [-1],
+          type: 'statement'
+        });
+      }
+    });
+  });
+  return result;
+};
+
 /**@typedef {import('../data').Feedback} Feedback */
 /**@typedef {import('../data').SurveyFeedback} SurveyFeedback */
-exports.saveFeedback = saveFeedback;
+exports.finalizeSubmitedFeedback = finalizeSubmitedFeedback;
 //# sourceMappingURL=Feedback.js.map

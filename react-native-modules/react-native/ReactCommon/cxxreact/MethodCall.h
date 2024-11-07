@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -13,8 +13,7 @@
 
 #include <folly/dynamic.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 struct MethodCall {
   int moduleId;
@@ -22,7 +21,7 @@ struct MethodCall {
   folly::dynamic arguments;
   int callId;
 
-  MethodCall(int mod, int meth, folly::dynamic &&args, int cid)
+  MethodCall(int mod, int meth, folly::dynamic&& args, int cid)
       : moduleId(mod),
         methodId(meth),
         arguments(std::move(args)),
@@ -30,7 +29,6 @@ struct MethodCall {
 };
 
 /// \throws std::invalid_argument
-std::vector<MethodCall> parseMethodCalls(folly::dynamic &&calls);
+std::vector<MethodCall> parseMethodCalls(folly::dynamic&& calls);
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

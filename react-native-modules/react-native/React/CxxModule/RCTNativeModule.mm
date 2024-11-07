@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,6 +7,7 @@
 
 #import "RCTNativeModule.h"
 
+#import <Foundation/Foundation.h>
 #import <React/RCTBridge.h>
 #import <React/RCTBridgeMethod.h>
 #import <React/RCTBridgeModule.h>
@@ -25,8 +26,7 @@ namespace {
 enum SchedulingContext { Sync, Async };
 }
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 static MethodCallResult invokeInner(
     RCTBridge *bridge,
@@ -73,6 +73,15 @@ folly::dynamic RCTNativeModule::getConstants()
 
 void RCTNativeModule::invoke(unsigned int methodId, folly::dynamic &&params, int callId)
 {
+  id<RCTBridgeMethod> method = m_moduleData.methods[methodId];
+  if (method) {
+    RCT_PROFILE_BEGIN_EVENT(
+        RCTProfileTagAlways,
+        @"[RCTNativeModule invoke]",
+        @{@"method" : [NSString stringWithUTF8String:method.JSMethodName]});
+    RCT_PROFILE_END_EVENT(RCTProfileTagAlways, @"");
+  }
+
   const char *moduleName = [m_moduleData.name UTF8String];
   const char *methodName = m_moduleData.methods[methodId].JSMethodName;
 
@@ -100,7 +109,9 @@ void RCTNativeModule::invoke(unsigned int methodId, folly::dynamic &&params, int
 #else
     (void)(callId);
 #endif
-    invokeInner(weakBridge, weakModuleData, methodId, std::move(params), callId, isSyncModule ? Sync : Async);
+    @autoreleasepool {
+      invokeInner(weakBridge, weakModuleData, methodId, std::move(params), callId, isSyncModule ? Sync : Async);
+    }
   };
 
   if (isSyncModule) {
@@ -149,7 +160,7 @@ static MethodCallResult invokeInner(
        */
       BridgeNativeModulePerfLogger::syncMethodCallFail("N/A", "N/A");
     }
-    return folly::none;
+    return std::nullopt;
   }
 
   id<RCTBridgeMethod> method = moduleData.methods[methodId];
@@ -171,6 +182,10 @@ static MethodCallResult invokeInner(
     BridgeNativeModulePerfLogger::syncMethodCallArgConversionEnd(moduleName, methodName);
   }
 
+  RCT_PROFILE_BEGIN_EVENT(
+      RCTProfileTagAlways,
+      @"[RCTNativeModule invokeInner]",
+      @{@"method" : [NSString stringWithUTF8String:method.JSMethodName]});
   @try {
     if (context == Sync) {
       BridgeNativeModulePerfLogger::syncMethodCallExecutionStart(moduleName, methodName);
@@ -212,10 +227,11 @@ static MethodCallResult invokeInner(
 #else
     RCTFatalException(exception);
 #endif
+  } @finally {
+    RCT_PROFILE_END_EVENT(RCTProfileTagAlways, @"");
   }
 
-  return folly::none;
+  return std::nullopt;
 }
 
-}
-}
+} // namespace facebook::react

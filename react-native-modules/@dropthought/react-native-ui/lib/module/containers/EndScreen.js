@@ -10,14 +10,11 @@ const logoSource = {
   [COLOR_SCHEMES.light]: require('../assets/ic_dtlogo.png'),
   [COLOR_SCHEMES.dark]: require('../assets/ic_dtlogo_dark.png')
 };
-
 const defaultIconSource = require('../assets/rating.png');
-
 const defaultIconSize = {
   [DimensionWidthType.phone]: 65,
   [DimensionWidthType.tablet]: 72
 };
-
 const EndScreen = ({
   survey,
   onClose
@@ -27,7 +24,9 @@ const EndScreen = ({
     hexCode,
     colorScheme,
     fontColor,
-    backgroundColor
+    backgroundColor,
+    autoClose,
+    autoCloseCountdown
   } = useTheme();
   const rtl = i18n.dir() === 'rtl';
   const dimensionWidthType = useDimensionWidthType();
@@ -44,11 +43,18 @@ const EndScreen = ({
     height: imageHeight
   };
   useEffect(() => {
+    let timer;
+    if (autoClose) {
+      timer = setTimeout(onClose, autoCloseCountdown);
+    }
     Image.getSize(image, (_, height) => {
       if (height < defaultIconSize[dimensionWidthType]) {
         setImageHeight(height);
       }
-    }, _ => {}); // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, _ => {});
+    return () => clearTimeout(timer);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const iconSource = image === undefined ? defaultIconSource : {
     uri: image
@@ -56,7 +62,9 @@ const EndScreen = ({
   const iconView = /*#__PURE__*/React.createElement(View, {
     style: GlobalStyle.row
   }, /*#__PURE__*/React.createElement(Image, {
-    resizeMode: "contain",
+    resizeMode: "contain"
+    // @ts-ignore
+    ,
     style: iconStyle,
     source: iconSource
   }));
@@ -71,7 +79,10 @@ const EndScreen = ({
   }, rtl && GlobalStyle.flexRowReverse, {
     backgroundColor
   }];
-  const titleStyle = [styles.headerTitle, {
+  const headerStyle = [styles.headerTitle, {
+    color: fontColor
+  }];
+  const subTitleStyle = [styles.subtitle, {
     color: fontColor
   }];
   const headerIconStyle = {
@@ -89,17 +100,17 @@ const EndScreen = ({
     style: styles.closeButton,
     onPress: onClose
   }, /*#__PURE__*/React.createElement(Image, {
+    testID: "test:id/icon_custom_close_preview",
     style: headerIconStyle,
     source: require('../assets/icClose24Px.png')
   })), /*#__PURE__*/React.createElement(Text, {
-    style: titleStyle,
+    style: headerStyle,
     numberOfLines: 1
   }, survey.surveyName))), /*#__PURE__*/React.createElement(View, {
     style: styles.main
   }, iconView, /*#__PURE__*/React.createElement(Text, {
-    style: [styles.subtitle, {
-      color: fontColor
-    }]
+    testID: "test:id/take_survey_thankful_msg",
+    style: subTitleStyle
   }, thankYouTextPlain)), /*#__PURE__*/React.createElement(View, {
     style: styles.vertical
   }, /*#__PURE__*/React.createElement(View, {
@@ -113,7 +124,6 @@ const EndScreen = ({
     style: powerByBoldStyle
   }, "dropthought")));
 };
-
 export default EndScreen;
 const styles = StyleSheet.create({
   container: {

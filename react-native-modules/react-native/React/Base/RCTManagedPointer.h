@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -24,8 +24,7 @@
 
 @end
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 template <typename T, typename P>
 RCTManagedPointer *managedPointer(P initializer)
@@ -34,7 +33,6 @@ RCTManagedPointer *managedPointer(P initializer)
   return [[RCTManagedPointer alloc] initWithPointer:std::move(ptr)];
 }
 
-}
-}
+} // namespace facebook::react
 
 #endif

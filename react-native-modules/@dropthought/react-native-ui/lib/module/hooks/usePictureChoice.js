@@ -7,9 +7,8 @@ const DefaultPictureAnswer = {
 export const multiplePictureChoiceValidator = (question, feedback) => {
   const {
     answers
-  } = feedback !== null && feedback !== void 0 ? feedback : {};
+  } = feedback ?? {};
   const lastItem = answers && answers.length > 0 ? answers[answers.length - 1] : undefined;
-
   if (answers && answers.length > 0) {
     if (lastItem && typeof lastItem !== 'number' && typeof lastItem !== 'string') {
       return lastItem.image.length > 0 && lastItem.value.length > 0;
@@ -30,20 +29,17 @@ export const usePictureChoice = (question, onFeedback, feedback) => {
     options
   } = question;
   const images = optionImages.map((uri, index) => {
-    var _options$index;
-
     return {
       uri,
-      option: (_options$index = options === null || options === void 0 ? void 0 : options[index]) !== null && _options$index !== void 0 ? _options$index : ''
+      option: (options === null || options === void 0 ? void 0 : options[index]) ?? ''
     };
   });
   const otherPictureEnable = questionBrand === QuestionBrandType.Other;
   const [otherPictureAnswer, setOtherPictureAnswer] = useState(() => {
     const {
       answers
-    } = feedback !== null && feedback !== void 0 ? feedback : {};
+    } = feedback ?? {};
     const lastItem = answers && answers.length > 0 ? answers[answers.length - 1] : undefined;
-
     if (lastItem && typeof lastItem !== 'number' && typeof lastItem !== 'string') {
       return {
         image: lastItem.image,
@@ -60,11 +56,9 @@ export const usePictureChoice = (question, onFeedback, feedback) => {
   const [selectIndex, setSelectIndex] = useState(() => {
     const {
       answers
-    } = feedback !== null && feedback !== void 0 ? feedback : {};
-
+    } = feedback ?? {};
     if (answers && answers.length > 0) {
       if (otherPictureSelected) {
-        answers.splice(-1);
         return answers.filter(answer => typeof answer === 'number');
       } else {
         return answers.filter(answer => typeof answer === 'number');
@@ -85,19 +79,16 @@ export const usePictureChoice = (question, onFeedback, feedback) => {
         type: 'pictureChoice',
         subType,
         otherFlag: otherPictureSelected
-      }; // @ts-ignore
-
+      };
+      // @ts-ignore
       onFeedback(result);
     }
   }, [selectIndex, otherPictureSelected, otherPictureAnswer, questionId, onFeedback, subType, hasEdit]);
-
   const resetOtherPicture = () => {
     setOtherPictureSelected(false);
     setOtherPictureAnswer(DefaultPictureAnswer);
   };
-
   const [invalidMessage, setInvalidMessage] = useState(undefined);
-
   const onSelectIndex = selected => {
     setHasEdit(true);
     setSelectIndex(prev => {
@@ -108,26 +99,24 @@ export const usePictureChoice = (question, onFeedback, feedback) => {
       }
     });
   };
-
   const replaceSelectIndex = selectedList => {
     setHasEdit(true);
     setSelectIndex(selectedList);
   };
-
   const setOtherPictureAnswerText = text => {
     setHasEdit(true);
-    setOtherPictureAnswer(prev => ({ ...prev,
+    setOtherPictureAnswer(prev => ({
+      ...prev,
       value: text
     }));
   };
-
   const setOtherPictureAnswerUrl = url => {
     setHasEdit(true);
-    setOtherPictureAnswer(prev => ({ ...prev,
+    setOtherPictureAnswer(prev => ({
+      ...prev,
       image: url
     }));
   };
-
   return {
     images,
     otherPictureEnable,

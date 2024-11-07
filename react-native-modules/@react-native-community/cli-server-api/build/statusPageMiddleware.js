@@ -4,7 +4,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = statusPageMiddleware;
-
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -17,7 +16,8 @@ exports.default = statusPageMiddleware;
  * running on 8081 and not another program / service.
  */
 function statusPageMiddleware(_req, res) {
+  res.setHeader('X-React-Native-Project-Root', process.cwd());
   res.end('packager-status:running');
 }
 
-//# sourceMappingURL=statusPageMiddleware.js.map
+//# sourceMappingURL=statusPageMiddleware.ts.map

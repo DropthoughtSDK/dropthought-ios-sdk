@@ -5,3 +5,4 @@ export declare const FeedbackStateContext: import("react").Context<import("./Fee
 export declare const FeedbackDispatchContext: import("react").Context<() => undefined>;
 /** @typedef {import('./FeedbackReducer').FeedbackReducerState} FeedbackReducerState */
 /** @typedef {import('./FeedbackReducer').FeedbackReducerDispatch} FeedbackReducerDispatch */
+//# sourceMappingURL=FeedbackContext.d.ts.map

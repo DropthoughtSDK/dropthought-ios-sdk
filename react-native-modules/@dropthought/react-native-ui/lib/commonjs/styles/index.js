@@ -5,9 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 var _exportNames = {};
 exports.default = void 0;
-
 var _Colors = require("./Colors");
-
 Object.keys(_Colors).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
@@ -19,9 +17,7 @@ Object.keys(_Colors).forEach(function (key) {
     }
   });
 });
-
 var _GlobalStyle = require("./GlobalStyle");
-
 Object.keys(_GlobalStyle).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
@@ -33,6 +29,5 @@ Object.keys(_GlobalStyle).forEach(function (key) {
     }
   });
 });
-var _default = _GlobalStyle.GlobalStyle;
-exports.default = _default;
+var _default = exports.default = _GlobalStyle.GlobalStyle;
 //# sourceMappingURL=index.js.map

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -13,11 +13,14 @@ import android.os.Build;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.facebook.common.logging.FLog;
+import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
+import com.facebook.react.common.ReactConstants;
 import com.facebook.react.common.annotations.VisibleForTesting;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.PixelUtil;
@@ -30,7 +33,6 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.annotations.ReactPropGroup;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.yoga.YogaConstants;
-import java.util.Locale;
 import java.util.Map;
 
 /** View manager for AndroidViews (plain React Views). */
@@ -47,10 +49,30 @@ public class ReactViewManager extends ReactClippingViewManager<ReactViewGroup> {
     Spacing.BOTTOM,
     Spacing.START,
     Spacing.END,
+    Spacing.BLOCK,
+    Spacing.BLOCK_END,
+    Spacing.BLOCK_START
   };
   private static final int CMD_HOTSPOT_UPDATE = 1;
   private static final int CMD_SET_PRESSED = 2;
   private static final String HOTSPOT_UPDATE_KEY = "hotspotUpdate";
+
+  public ReactViewManager() {
+    super();
+
+    setupViewRecycling();
+  }
+
+  @Override
+  protected ReactViewGroup prepareToRecycleView(
+      @NonNull ThemedReactContext reactContext, ReactViewGroup view) {
+    // BaseViewManager
+    super.prepareToRecycleView(reactContext, view);
+
+    view.recycleView();
+
+    return view;
+  }
 
   @ReactProp(name = "accessible")
   public void setAccessible(ReactViewGroup view, boolean accessible) {
@@ -102,6 +124,10 @@ public class ReactViewManager extends ReactClippingViewManager<ReactViewGroup> {
         ViewProps.BORDER_TOP_END_RADIUS,
         ViewProps.BORDER_BOTTOM_START_RADIUS,
         ViewProps.BORDER_BOTTOM_END_RADIUS,
+        ViewProps.BORDER_END_END_RADIUS,
+        ViewProps.BORDER_END_START_RADIUS,
+        ViewProps.BORDER_START_END_RADIUS,
+        ViewProps.BORDER_START_START_RADIUS,
       },
       defaultFloat = YogaConstants.UNDEFINED)
   public void setBorderRadius(ReactViewGroup view, int index, float borderRadius) {
@@ -125,35 +151,48 @@ public class ReactViewManager extends ReactClippingViewManager<ReactViewGroup> {
     view.setBorderStyle(borderStyle);
   }
 
+  // This is unused by the view manager, and not wired to be sent to Java, but
+  // must be present for the prop to show up in the view config.
+  @ReactProp(name = "experimental_layoutConformance")
+  public void setexperimental_layoutConformance(
+      ReactViewGroup view, @Nullable String layoutConformance) {}
+
   @ReactProp(name = "hitSlop")
-  public void setHitSlop(final ReactViewGroup view, @Nullable ReadableMap hitSlop) {
-    if (hitSlop == null) {
-      view.setHitSlopRect(null);
-    } else {
-      view.setHitSlopRect(
-          new Rect(
-              hitSlop.hasKey("left")
-                  ? (int) PixelUtil.toPixelFromDIP(hitSlop.getDouble("left"))
-                  : 0,
-              hitSlop.hasKey("top") ? (int) PixelUtil.toPixelFromDIP(hitSlop.getDouble("top")) : 0,
-              hitSlop.hasKey("right")
-                  ? (int) PixelUtil.toPixelFromDIP(hitSlop.getDouble("right"))
-                  : 0,
-              hitSlop.hasKey("bottom")
-                  ? (int) PixelUtil.toPixelFromDIP(hitSlop.getDouble("bottom"))
-                  : 0));
+  public void setHitSlop(final ReactViewGroup view, Dynamic hitSlop) {
+    switch (hitSlop.getType()) {
+      case Map:
+        ReadableMap hitSlopMap = hitSlop.asMap();
+        view.setHitSlopRect(
+            new Rect(
+                hitSlopMap.hasKey("left")
+                    ? (int) PixelUtil.toPixelFromDIP(hitSlopMap.getDouble("left"))
+                    : 0,
+                hitSlopMap.hasKey("top")
+                    ? (int) PixelUtil.toPixelFromDIP(hitSlopMap.getDouble("top"))
+                    : 0,
+                hitSlopMap.hasKey("right")
+                    ? (int) PixelUtil.toPixelFromDIP(hitSlopMap.getDouble("right"))
+                    : 0,
+                hitSlopMap.hasKey("bottom")
+                    ? (int) PixelUtil.toPixelFromDIP(hitSlopMap.getDouble("bottom"))
+                    : 0));
+        break;
+      case Number:
+        int hitSlopValue = (int) PixelUtil.toPixelFromDIP(hitSlop.asDouble());
+        view.setHitSlopRect(new Rect(hitSlopValue, hitSlopValue, hitSlopValue, hitSlopValue));
+        break;
+      default:
+        FLog.w(ReactConstants.TAG, "Invalid type for 'hitSlop' value " + hitSlop.getType());
+        /* falls through */
+      case Null:
+        view.setHitSlopRect(null);
+        break;
     }
   }
 
   @ReactProp(name = ViewProps.POINTER_EVENTS)
   public void setPointerEvents(ReactViewGroup view, @Nullable String pointerEventsStr) {
-    if (pointerEventsStr == null) {
-      view.setPointerEvents(PointerEvents.AUTO);
-    } else {
-      PointerEvents pointerEvents =
-          PointerEvents.valueOf(pointerEventsStr.toUpperCase(Locale.US).replace("-", "_"));
-      view.setPointerEvents(pointerEvents);
-    }
+    view.setPointerEvents(PointerEvents.parsePointerEvents(pointerEventsStr));
   }
 
   @ReactProp(name = "nativeBackgroundAndroid")
@@ -210,7 +249,10 @@ public class ReactViewManager extends ReactClippingViewManager<ReactViewGroup> {
         ViewProps.BORDER_TOP_COLOR,
         ViewProps.BORDER_BOTTOM_COLOR,
         ViewProps.BORDER_START_COLOR,
-        ViewProps.BORDER_END_COLOR
+        ViewProps.BORDER_END_COLOR,
+        ViewProps.BORDER_BLOCK_COLOR,
+        ViewProps.BORDER_BLOCK_END_COLOR,
+        ViewProps.BORDER_BLOCK_START_COLOR
       },
       customType = "Color")
   public void setBorderColor(ReactViewGroup view, int index, Integer color) {
@@ -239,7 +281,9 @@ public class ReactViewManager extends ReactClippingViewManager<ReactViewGroup> {
               if (mEventDispatcher == null) {
                 return;
               }
-              mEventDispatcher.dispatchEvent(new ViewGroupClickEvent(view.getId()));
+              mEventDispatcher.dispatchEvent(
+                  new ViewGroupClickEvent(
+                      UIManagerHelper.getSurfaceId(view.getContext()), view.getId()));
             }
           });
 
@@ -270,8 +314,11 @@ public class ReactViewManager extends ReactClippingViewManager<ReactViewGroup> {
   }
 
   @Override
-  public void setTransform(@NonNull ReactViewGroup view, @Nullable ReadableArray matrix) {
-    super.setTransform(view, matrix);
+  protected void setTransformProperty(
+      @NonNull ReactViewGroup view,
+      @Nullable ReadableArray transforms,
+      @Nullable ReadableArray transformOrigin) {
+    super.setTransformProperty(view, transforms, transformOrigin);
     view.setBackfaceVisibilityDependantOpacity();
   }
 

@@ -4,9 +4,9 @@ import {
   PlaceholderImageTypes,
   PlaceholderScreen,
   i18n,
-} from '@dropthought/react-native-ui/src';
+} from '@dropthought/react-native-ui';
 import ErrorHintScreen from './ErrorHintScreen';
-import { useSurveyContext } from '../contexts/survey';
+import { useSurveyContext } from '../contexts/survey/SurveyContext';
 import { fromAPIDateStrToJS } from '../../lib/DateTimerParser';
 
 /**

@@ -4,37 +4,21 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
 var _react = _interopRequireWildcard(require("react"));
-
 var _reactNative = require("react-native");
-
 var _styles = require("../styles");
-
 var _translation = _interopRequireDefault(require("../translation"));
-
 var _useWindowDimensions = require("../hooks/useWindowDimensions");
-
 var _lottieReactNative = _interopRequireDefault(require("lottie-react-native"));
-
 var _SurveyFooter = _interopRequireDefault(require("../containers/SurveyFooter"));
-
 var _SurveyHeader = _interopRequireDefault(require("../containers/SurveyHeader"));
-
 var _theme = require("../contexts/theme");
-
 var _MandatoryTitle = _interopRequireDefault(require("./MandatoryTitle"));
-
 var _data = require("../utils/data");
-
 var _ramda = require("ramda");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 const SmileyRatingQuestionOption4 = ({
   survey,
   pageIndex,
@@ -44,91 +28,74 @@ const SmileyRatingQuestionOption4 = ({
   onPrevPage,
   onNextPage,
   onFeedback,
-  feedback
+  feedback,
+  isLastPage
 }) => {
   const answered = feedback && feedback.answers && !(0, _ramda.isNil)(feedback.answers[0]) && typeof feedback.answers[0] === 'number';
-  const answeredValue = answered ? parseInt(feedback.answers[0], 10) : 0;
-
+  const answeredValue = answered && feedback.answers[0] ? parseInt(feedback.answers[0], 10) : 0;
   const windowHeight = _reactNative.Dimensions.get('window').height;
-
   const {
     questionId,
     scale,
     options
   } = question;
-
   const [selectedIndex, setSelectedIndex] = _react.default.useState(answered ? answeredValue : 0);
-
   const [score, setScore] = _react.default.useState(answered ? answeredValue : -1);
-
   const [isLoop, setIsLoop] = _react.default.useState(true);
-
   const [loopLotties, setLoopLotties] = _react.default.useState([]);
-
   const [transformLotties, setTransformLotties] = _react.default.useState([]);
-
   const scoreContainerOpacity = _react.default.useRef(new _reactNative.Animated.Value(answered ? 1 : 0)).current;
-
   const scoreOpacity = _react.default.useRef(new _reactNative.Animated.Value(answered ? 1 : 0)).current;
-
-  const descriptionYAxis = _react.default.useRef(new _reactNative.Animated.Value(answered ? 1 : windowHeight / 2 - 246 + 37)).current; // 37 -> one text line height
+  const descriptionYAxis = _react.default.useRef(new _reactNative.Animated.Value(answered ? 1 : windowHeight / 2 - 246 + 37)).current;
+  // 37 -> one text line height
   // 246 -> Padding Vertical 123
 
-
   const lottieRef = _react.default.useRef();
-
   const totalScore = Number(scale);
   const renderScore = score + 1;
-  const hasEdited = score >= 0; // choose which scale logic we want to use.
+  const hasEdited = score >= 0;
 
+  // choose which scale logic we want to use.
   const scaleLogicList = _data.scaleLogic[scale];
   (0, _react.useEffect)(() => {
-    const loopList = scaleLogicList.map((value, index) => {
-      const scaleKey = String(index + 1) + _data.option4FaceTable[value];
-
-      return _data.option4LoopFaceTable.get(scaleKey);
-    });
-    const transformList = scaleLogicList.map((value, index, array) => {
-      if (index === 0) return '';
-
-      const fromScale = String(index) + _data.option4FaceTable[array[index - 1]];
-
-      const toScale = String(index + 1) + _data.option4FaceTable[value];
-
-      const key = `${fromScale}-${toScale}`;
-      return _data.option4TransformTable.get(key);
-    });
-    setLoopLotties(loopList);
-    setTransformLotties(transformList);
+    if (scaleLogicList) {
+      const loopList = scaleLogicList.map((value, index) => {
+        const scaleKey = String(index + 1) + _data.option4FaceTable[value];
+        return _data.option4LoopFaceTable.get(scaleKey);
+      });
+      const transformList = scaleLogicList.map((value, index, array) => {
+        if (index === 0) return '';
+        // @ts-ignore
+        const fromScale = String(index) + _data.option4FaceTable[array[index - 1]];
+        const toScale = String(index + 1) + _data.option4FaceTable[value];
+        const key = `${fromScale}-${toScale}`;
+        return _data.option4TransformTable.get(key);
+      });
+      setLoopLotties(loopList);
+      setTransformLotties(transformList);
+    }
   }, [scaleLogicList]);
-
   const imageLignt = require('../assets/icOption4Info.png');
-
   const imageDark = require('../assets/icOption4InfoDark.png');
-
   const updateScore = _react.default.useCallback(number => {
     const isAtCoverScreen = score === -1;
     const newScore = score + number;
     setScore(newScore);
-
     if (!isAtCoverScreen) {
       setSelectedIndex(newScore);
-
       if (number > 0) {
         setIsLoop(false);
       } else {
         setIsLoop(true);
         setTimeout(() => {
           var _lottieRef$current;
-
-          (_lottieRef$current = lottieRef.current) === null || _lottieRef$current === void 0 ? void 0 : _lottieRef$current.play();
+          (_lottieRef$current = lottieRef.current) === null || _lottieRef$current === void 0 || _lottieRef$current.play();
         }, 100);
       }
-    } //animtaion--
+    }
 
-
+    //animtaion--
     scoreOpacity.setValue(0);
-
     if (isAtCoverScreen) {
       _reactNative.Animated.sequence([_reactNative.Animated.timing(descriptionYAxis, {
         toValue: 0,
@@ -149,8 +116,8 @@ const SmileyRatingQuestionOption4 = ({
         duration: 500,
         useNativeDriver: true
       }).start();
-    } //animtaion--
-
+    }
+    //animtaion--
 
     onFeedback({
       questionId,
@@ -158,7 +125,6 @@ const SmileyRatingQuestionOption4 = ({
       type: 'rating'
     });
   }, [score, scoreOpacity, onFeedback, questionId, descriptionYAxis, scoreContainerOpacity]);
-
   const {
     hexCode,
     backgroundColor,
@@ -202,44 +168,44 @@ const SmileyRatingQuestionOption4 = ({
     if (isLoop) {
       setTimeout(() => {
         var _lottieRef$current2;
-
-        (_lottieRef$current2 = lottieRef.current) === null || _lottieRef$current2 === void 0 ? void 0 : _lottieRef$current2.play();
+        (_lottieRef$current2 = lottieRef.current) === null || _lottieRef$current2 === void 0 || _lottieRef$current2.play();
       }, 100);
     }
   }, [isLoop]);
-
   const handleDecreaseScore = () => {
     if (score > 0) updateScore(-1);
   };
-
   const lottieContainer = isLoop ? /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+    accessibilityLabel: `selected_custom_star_${selectedIndex}`,
     style: commonStyles.lottieContainer
   }, /*#__PURE__*/_react.default.createElement(_reactNative.TouchableWithoutFeedback, {
     onPress: handleDecreaseScore
-  }, /*#__PURE__*/_react.default.createElement(_lottieReactNative.default // @ts-ignore
-  , {
+  }, loopLotties[selectedIndex] ? /*#__PURE__*/_react.default.createElement(_lottieReactNative.default
+  /* @ts-ignore */, {
     ref: lottieRef,
     source: loopLotties[selectedIndex],
+    style: commonStyles.lottieContent,
     autoPlay: true,
     loop: true
-  }))) : /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+  }) : /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null))) : /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: commonStyles.lottieContainer
   }, /*#__PURE__*/_react.default.createElement(_reactNative.TouchableWithoutFeedback, {
     onPress: handleDecreaseScore
-  }, /*#__PURE__*/_react.default.createElement(_lottieReactNative.default, {
+  }, transformLotties[selectedIndex] ? /*#__PURE__*/_react.default.createElement(_lottieReactNative.default, {
     source: transformLotties[selectedIndex],
+    style: commonStyles.lottieContent,
     autoPlay: true,
     loop: false,
     onAnimationFinish: isCancel => {
-      if (!isCancel) setIsLoop(true);
+      setTimeout(() => {
+        if (!isCancel) setIsLoop(true);
+      }, 500);
     }
-  })));
-
+  }) : /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null)));
   const infoImage = /*#__PURE__*/_react.default.createElement(_reactNative.Image, {
     style: commonStyles.infoImage,
     source: colorScheme === _theme.COLOR_SCHEMES.dark ? imageDark : imageLignt
   });
-
   const scoreContainer = /*#__PURE__*/_react.default.createElement(_reactNative.TouchableWithoutFeedback, {
     onPress: () => {
       if (renderScore < totalScore) updateScore(1);
@@ -247,17 +213,20 @@ const SmileyRatingQuestionOption4 = ({
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
     style: commonStyles.scoreContainer
   }, /*#__PURE__*/_react.default.createElement(_reactNative.View, {
+    testID: "test:id/custom_star_score_value",
     style: commonStyles.scoreText
   }, /*#__PURE__*/_react.default.createElement(_reactNative.Animated.Text, {
+    testID: "test:id/custom_star_render_score",
     style: scoreSelectedStyle
   }, renderScore), /*#__PURE__*/_react.default.createElement(_reactNative.Animated.Text, {
     style: slashStyle
   }, '/'), /*#__PURE__*/_react.default.createElement(_reactNative.Animated.Text, {
+    testID: "test:id/custom_star_total_score",
     style: scoreTotalStyle
   }, totalScore)), /*#__PURE__*/_react.default.createElement(_reactNative.Animated.Text, {
+    testID: "test:id/custom_star_score_desc",
     style: descStyle
   }, options[selectedIndex])));
-
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_SurveyHeader.default, {
     survey: survey,
     pageIndex: pageIndex,
@@ -276,25 +245,24 @@ const SmileyRatingQuestionOption4 = ({
     disabled: score > -1,
     onPress: () => updateScore(1)
   }, /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, hasEdited ? null : infoImage, /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    testID: `test:id/custom_star_title_${colorScheme}`,
     style: hintTextStyle
-  }, _translation.default.t('option4HintDescription:title')), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+  }, `${_translation.default.t('option4HintDescription:title')}`), /*#__PURE__*/_react.default.createElement(_reactNative.Text, {
+    testID: "test:id/custom_star_subtitle",
     style: hintSubTextStyle
-  }, _translation.default.t('option4HintDescription:subTitle', {
+  }, `${_translation.default.t('option4HintDescription:subTitle', {
     count: totalScore
-  })))))), /*#__PURE__*/_react.default.createElement(_SurveyFooter.default, {
+  })}`))))), /*#__PURE__*/_react.default.createElement(_SurveyFooter.default, {
     submitSurvey: survey.submitSurvey,
     surveyColor: hexCode,
     isFirstPage: pageIndex === 0,
-    isLastPage: pageIndex === survey.pageOrder.length - 1,
+    isLastPage: isLastPage,
     onPrevPage: onPrevPage,
     onNextPage: onNextPage,
     backgroundColor: backgroundColor
   }));
 };
-
-var _default = SmileyRatingQuestionOption4;
-exports.default = _default;
-
+var _default = exports.default = SmileyRatingQuestionOption4;
 const commonStyles = _reactNative.StyleSheet.create({
   container: {
     flex: 1,
@@ -344,9 +312,12 @@ const commonStyles = _reactNative.StyleSheet.create({
   scoreText: {
     flexDirection: 'row',
     alignItems: 'flex-end'
+  },
+  lottieContent: {
+    width: '100%',
+    height: '100%'
   }
 });
-
 const phoneStyles = _reactNative.StyleSheet.create({
   desc: {
     fontSize: 20,
@@ -367,7 +338,6 @@ const phoneStyles = _reactNative.StyleSheet.create({
     color: _styles.Colors.smileyRatingScoreGray
   }
 });
-
 const tabletStyles = _reactNative.StyleSheet.create({
   desc: {
     fontSize: 20,

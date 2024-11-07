@@ -12,4 +12,12 @@ export function clearFeedbacks(dispatch) {
     type: FeedbackReducerActionType.Clear
   });
 }
+export function removeSingleFeedback(dispatch, questionId) {
+  dispatch({
+    type: FeedbackReducerActionType.RemoveSingle,
+    payload: {
+      questionId
+    }
+  });
+}
 //# sourceMappingURL=FeedbackHelpers.js.map

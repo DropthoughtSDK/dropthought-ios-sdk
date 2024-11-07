@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -19,9 +19,11 @@
 #endif
 
 /**
- RCTRequired<T> uses the compiler to enforce definition of a struct member (primitives, pointers, or objects).
+ RCTRequired<T> uses the compiler to enforce definition of a struct member
+ (primitives, pointers, or objects).
 
- Internally, we use an implicit constructor without a default, so there has to be an initial value.
+ Internally, we use an implicit constructor without a default, so there has to
+ be an initial value.
 
  Usage:
  @code
@@ -39,11 +41,14 @@
  */
 template <typename T>
 struct RCTRequired {
-  /// Pass-through constructor (allows for implicit conversion) for wrapped type T
-  template<typename... Args>
-  RCTREQUIRED_INLINE
-  RCTRequired(Args&&... args): _t(std::forward<Args>(args)...) {
-    static_assert(sizeof...(Args) > 0, "Required struct member not initialized. Expand assert trace to see where this was triggered.");
+  /// Pass-through constructor (allows for implicit conversion) for wrapped type
+  /// T
+  template <typename... Args>
+  RCTREQUIRED_INLINE RCTRequired(Args&&... args)
+      : _t(std::forward<Args>(args)...) {
+    static_assert(
+        sizeof...(Args) > 0,
+        "Required struct member not initialized. Expand assert trace to see where this was triggered.");
   }
 
   RCTREQUIRED_INLINE
@@ -59,19 +64,27 @@ struct RCTRequired {
   RCTREQUIRED_INLINE
   ~RCTRequired() = default;
 
-  /// Public accessor for private storage (Use when implicit conversion is impracticable)
+  /// Public accessor for private storage (Use when implicit conversion is
+  /// impracticable)
   RCTREQUIRED_INLINE
-  const T &get() const { return _t; }
+  const T& get() const {
+    return _t;
+  }
   RCTREQUIRED_INLINE
-  T &get() { return _t; }
-
+  T& get() {
+    return _t;
+  }
 
   // Implicit conversion
   RCTREQUIRED_INLINE
-  operator T() const { return _t; }
+  operator T() const {
+    return _t;
+  }
   RCTREQUIRED_INLINE
-  operator T&() { return _t; }
+  operator T&() {
+    return _t;
+  }
 
-private:
+ private:
   T _t;
 };

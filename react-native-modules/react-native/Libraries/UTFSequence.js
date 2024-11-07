@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -16,7 +16,7 @@ const deepFreezeAndThrowOnMutationInDev = require('./Utilities/deepFreezeAndThro
  * A collection of Unicode sequences for various characters and emoji.
  *
  *  - More explicit than using the sequences directly in code.
- *  - Source code should be limitted to ASCII.
+ *  - Source code should be limited to ASCII.
  *  - Less chance of typos.
  */
 const UTFSequence: {|
@@ -31,6 +31,7 @@ const UTFSequence: {|
   NBSP: string,
   NDASH: string,
   NDASH_SP: string,
+  NEWLINE: string,
   PIZZA: string,
   TRIANGLE_LEFT: string,
   TRIANGLE_RIGHT: string,
@@ -45,10 +46,11 @@ const UTFSequence: {|
   MDASH_SP: '\u00A0\u2014\u00A0', // &nbsp;&mdash;&nbsp;
   NDASH: '\u2013', // en dash: &ndash;
   NDASH_SP: '\u00A0\u2013\u00A0', // &nbsp;&ndash;&nbsp;
+  NEWLINE: '\u000A',
   NBSP: '\u00A0', // non-breaking space: &nbsp;
   PIZZA: '\uD83C\uDF55',
   TRIANGLE_LEFT: '\u25c0', // black left-pointing triangle
   TRIANGLE_RIGHT: '\u25b6', // black right-pointing triangle
 });
 
-module.exports = UTFSequence;
+export default UTFSequence;

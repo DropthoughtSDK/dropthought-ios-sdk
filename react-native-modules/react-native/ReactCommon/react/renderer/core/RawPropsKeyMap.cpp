@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,22 +7,24 @@
 
 #include "RawPropsKeyMap.h"
 
+#include <react/debug/react_native_assert.h>
+
+#include <glog/logging.h>
 #include <algorithm>
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
-bool RawPropsKeyMap::hasSameName(Item const &lhs, Item const &rhs) noexcept {
+bool RawPropsKeyMap::hasSameName(const Item& lhs, const Item& rhs) noexcept {
   return lhs.length == rhs.length &&
       (std::memcmp(lhs.name, rhs.name, lhs.length) == 0);
 }
 
 bool RawPropsKeyMap::shouldFirstOneBeBeforeSecondOne(
-    Item const &lhs,
-    Item const &rhs) noexcept {
+    const Item& lhs,
+    const Item& rhs) noexcept {
   if (lhs.length != rhs.length) {
     return lhs.length < rhs.length;
   }
@@ -31,12 +33,14 @@ bool RawPropsKeyMap::shouldFirstOneBeBeforeSecondOne(
 }
 
 void RawPropsKeyMap::insert(
-    RawPropsKey const &key,
+    const RawPropsKey& key,
     RawPropsValueIndex value) noexcept {
   auto item = Item{};
   item.value = value;
   key.render(item.name, &item.length);
   items_.push_back(item);
+  react_native_assert(
+      items_.size() < std::numeric_limits<RawPropsPropNameLength>::max());
 }
 
 void RawPropsKeyMap::reindex() noexcept {
@@ -48,43 +52,54 @@ void RawPropsKeyMap::reindex() noexcept {
       &RawPropsKeyMap::shouldFirstOneBeBeforeSecondOne);
 
   // Filtering out duplicating keys.
-  // If some `*Props` object requests a prop more than once, only the first
-  // request will be fulfilled. E.g. `TextInputProps` class has a sub-property
-  // `backgroundColor` twice, the first time as part of `ViewProps` base-class
-  // and the second as part of `BaseTextProps` base-class. In this
-  // configuration, the only one which comes first (from `ViewProps`, which
-  // appear first) will be assigned.
-  items_.erase(
-      std::unique(items_.begin(), items_.end(), &RawPropsKeyMap::hasSameName),
-      items_.end());
+  // Accessing the same key twice is supported by RawPropsPorser, but the
+  // RawPropsKey used must be identical, and if not, lookup will be
+  // inconsistent.
+  auto it = items_.begin();
+  auto end = items_.end();
+  // Implements std::unique with additional logging
+  if (it != end) {
+    auto result = it;
+    while (++it != end) {
+      if (hasSameName(*result, *it)) {
+        LOG(ERROR)
+            << "Component property map contains multiple entries for '"
+            << std::string_view(it->name, it->length)
+            << "'. Ensure all calls to convertRawProp use a consistent prefix, name and suffix.";
+      } else if (++result != it) {
+        *result = *it;
+      }
+    }
+    items_.erase(++result, items_.end());
+  }
 
   buckets_.resize(kPropNameLengthHardCap);
 
   auto length = RawPropsPropNameLength{0};
-  for (auto i = 0; i < items_.size(); i++) {
-    auto &item = items_[i];
+  for (size_t i = 0; i < items_.size(); i++) {
+    auto& item = items_[i];
     if (item.length != length) {
       for (auto j = length; j < item.length; j++) {
-        buckets_[j] = i;
+        buckets_[j] = static_cast<RawPropsPropNameLength>(i);
       }
       length = item.length;
     }
   }
 
   for (auto j = length; j < buckets_.size(); j++) {
-    buckets_[j] = items_.size();
+    buckets_[j] = static_cast<RawPropsPropNameLength>(items_.size());
   }
 }
 
 RawPropsValueIndex RawPropsKeyMap::at(
-    char const *name,
+    const char* name,
     RawPropsPropNameLength length) noexcept {
-  assert(length > 0);
-  assert(length < kPropNameLengthHardCap);
+  react_native_assert(length > 0);
+  react_native_assert(length < kPropNameLengthHardCap);
   // 1. Find the bucket.
   auto lower = int{buckets_[length - 1]};
   auto upper = int{buckets_[length]} - 1;
-  assert(lower - 1 <= upper);
+  react_native_assert(lower - 1 <= upper);
 
   // 2. Binary search in the bucket.
   while (lower <= upper) {
@@ -102,5 +117,4 @@ RawPropsValueIndex RawPropsKeyMap::at(
   return kRawPropsValueIndexEmpty;
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

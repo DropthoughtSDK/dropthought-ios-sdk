@@ -3,8 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.inlineString = exports.CLIError = void 0;
-
+exports.inlineString = exports.UnknownProjectError = exports.CLIError = void 0;
 /**
  * A custom Error that creates a single-lined message to match current styling inside CLI.
  * Uses original stack trace when `originalError` is passed or erase the stack if it's not defined.
@@ -12,7 +11,6 @@ exports.inlineString = exports.CLIError = void 0;
 class CLIError extends Error {
   constructor(msg, originalError) {
     super(inlineString(msg));
-
     if (originalError) {
       this.stack = typeof originalError === 'string' ? originalError : originalError.stack || ''.split('\n').slice(0, 2).join('\n');
     } else {
@@ -22,13 +20,15 @@ class CLIError extends Error {
       delete this.stack;
     }
   }
-
 }
 
+/**
+ * Raised when we're unable to find a package.json
+ */
 exports.CLIError = CLIError;
-
-const inlineString = str => str.replace(/(\s{2,})/gm, ' ').trim();
-
+class UnknownProjectError extends Error {}
+exports.UnknownProjectError = UnknownProjectError;
+const inlineString = (str = '') => str.replace(/(\s{2,})/gm, ' ').trim();
 exports.inlineString = inlineString;
 
-//# sourceMappingURL=errors.js.map
+//# sourceMappingURL=errors.ts.map

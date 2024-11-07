@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,6 +7,8 @@
 
 package com.facebook.react;
 
+import androidx.annotation.Nullable;
+import com.facebook.react.bridge.ModuleSpec;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.devsupport.JSCHeapCapture;
@@ -15,8 +17,15 @@ import com.facebook.react.module.annotations.ReactModuleList;
 import com.facebook.react.module.model.ReactModuleInfo;
 import com.facebook.react.module.model.ReactModuleInfoProvider;
 import com.facebook.react.turbomodule.core.interfaces.TurboModule;
+import com.facebook.react.uimanager.UIManagerModule;
+import com.facebook.react.uimanager.ViewManager;
+import com.facebook.react.views.traceupdateoverlay.TraceUpdateOverlayManager;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import javax.inject.Provider;
 
 /**
  * Package defining core framework modules (e.g. UIManager). It should be used for modules that
@@ -27,13 +36,15 @@ import java.util.Map;
     nativeModules = {
       JSCHeapCapture.class,
     })
-public class DebugCorePackage extends TurboReactPackage {
+public class DebugCorePackage extends TurboReactPackage implements ViewManagerOnDemandReactPackage {
+  private @Nullable Map<String, ModuleSpec> mViewManagers;
+
   public DebugCorePackage() {}
 
   @Override
   public NativeModule getModule(String name, ReactApplicationContext reactContext) {
     switch (name) {
-      case JSCHeapCapture.TAG:
+      case JSCHeapCapture.NAME:
         return new JSCHeapCapture(reactContext);
       default:
         throw new IllegalArgumentException(
@@ -62,17 +73,11 @@ public class DebugCorePackage extends TurboReactPackage {
                 moduleClass.getName(),
                 reactModule.canOverrideExistingModule(),
                 reactModule.needsEagerInit(),
-                reactModule.hasConstants(),
                 reactModule.isCxxModule(),
                 TurboModule.class.isAssignableFrom(moduleClass)));
       }
 
-      return new ReactModuleInfoProvider() {
-        @Override
-        public Map<String, ReactModuleInfo> getReactModuleInfos() {
-          return reactModuleInfoMap;
-        }
-      };
+      return () -> reactModuleInfoMap;
     } catch (InstantiationException e) {
       throw new RuntimeException(
           "No ReactModuleInfoProvider for DebugCorePackage$$ReactModuleInfoProvider", e);
@@ -80,5 +85,39 @@ public class DebugCorePackage extends TurboReactPackage {
       throw new RuntimeException(
           "No ReactModuleInfoProvider for DebugCorePackage$$ReactModuleInfoProvider", e);
     }
+  }
+
+  private static void appendMap(
+      Map<String, ModuleSpec> map, String name, Provider<? extends NativeModule> provider) {
+    map.put(name, ModuleSpec.viewManagerSpec(provider));
+  }
+
+  /** @return a map of view managers that should be registered with {@link UIManagerModule} */
+  private Map<String, ModuleSpec> getViewManagersMap() {
+    if (mViewManagers == null) {
+      Map<String, ModuleSpec> viewManagers = new HashMap<>();
+      appendMap(
+          viewManagers, TraceUpdateOverlayManager.REACT_CLASS, TraceUpdateOverlayManager::new);
+
+      mViewManagers = viewManagers;
+    }
+    return mViewManagers;
+  }
+
+  @Override
+  public List<ModuleSpec> getViewManagers(ReactApplicationContext reactContext) {
+    return new ArrayList<>(getViewManagersMap().values());
+  }
+
+  @Override
+  public Collection<String> getViewManagerNames(ReactApplicationContext reactContext) {
+    return getViewManagersMap().keySet();
+  }
+
+  @Override
+  public @Nullable ViewManager createViewManager(
+      ReactApplicationContext reactContext, String viewManagerName) {
+    ModuleSpec spec = getViewManagersMap().get(viewManagerName);
+    return spec != null ? (ViewManager) spec.getProvider().get() : null;
   }
 }

@@ -6,8 +6,8 @@
  *
  */
 import { Config } from '@react-native-community/cli-types';
-import { Flags } from '.';
-declare type AndroidProject = NonNullable<Config['project']['android']>;
-declare function runOnAllDevices(args: Flags, cmd: string, packageName: string, adbPath: string, androidProject: AndroidProject): Promise<void>;
+import type { Flags } from '.';
+type AndroidProject = NonNullable<Config['project']['android']>;
+declare function runOnAllDevices(args: Flags, cmd: string, adbPath: string, androidProject: AndroidProject): Promise<void>;
 export default runOnAllDevices;
 //# sourceMappingURL=runOnAllDevices.d.ts.map

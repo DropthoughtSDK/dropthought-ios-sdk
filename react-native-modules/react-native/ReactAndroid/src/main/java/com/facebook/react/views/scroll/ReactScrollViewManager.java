@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,7 +8,6 @@
 package com.facebook.react.views.scroll;
 
 import android.graphics.Color;
-import android.util.DisplayMetrics;
 import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
@@ -17,8 +16,8 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.RetryableMountingLayerException;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.module.annotations.ReactModule;
-import com.facebook.react.uimanager.DisplayMetricsHolder;
 import com.facebook.react.uimanager.PixelUtil;
+import com.facebook.react.uimanager.PointerEvents;
 import com.facebook.react.uimanager.ReactClippingViewGroupHelper;
 import com.facebook.react.uimanager.ReactStylesDiffMap;
 import com.facebook.react.uimanager.Spacing;
@@ -30,6 +29,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.annotations.ReactPropGroup;
 import com.facebook.yoga.YogaConstants;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -89,25 +89,35 @@ public class ReactScrollViewManager extends ViewGroupManager<ReactScrollView>
   }
 
   @ReactProp(name = "disableIntervalMomentum")
-  public void setDisableIntervalMomentum(ReactScrollView view, boolean disbaleIntervalMomentum) {
-    view.setDisableIntervalMomentum(disbaleIntervalMomentum);
+  public void setDisableIntervalMomentum(ReactScrollView view, boolean disableIntervalMomentum) {
+    view.setDisableIntervalMomentum(disableIntervalMomentum);
   }
 
   @ReactProp(name = "snapToInterval")
   public void setSnapToInterval(ReactScrollView view, float snapToInterval) {
     // snapToInterval needs to be exposed as a float because of the Javascript interface.
-    DisplayMetrics screenDisplayMetrics = DisplayMetricsHolder.getScreenDisplayMetrics();
-    view.setSnapInterval((int) (snapToInterval * screenDisplayMetrics.density));
+    float density = PixelUtil.getDisplayMetricDensity();
+    view.setSnapInterval((int) (snapToInterval * density));
   }
 
   @ReactProp(name = "snapToOffsets")
   public void setSnapToOffsets(ReactScrollView view, @Nullable ReadableArray snapToOffsets) {
-    DisplayMetrics screenDisplayMetrics = DisplayMetricsHolder.getScreenDisplayMetrics();
+    if (snapToOffsets == null || snapToOffsets.size() == 0) {
+      view.setSnapOffsets(null);
+      return;
+    }
+
+    float density = PixelUtil.getDisplayMetricDensity();
     List<Integer> offsets = new ArrayList<Integer>();
     for (int i = 0; i < snapToOffsets.size(); i++) {
-      offsets.add((int) (snapToOffsets.getDouble(i) * screenDisplayMetrics.density));
+      offsets.add((int) (snapToOffsets.getDouble(i) * density));
     }
     view.setSnapOffsets(offsets);
+  }
+
+  @ReactProp(name = "snapToAlignment")
+  public void setSnapToAlignment(ReactScrollView view, String alignment) {
+    view.setSnapToAlignment(ReactScrollViewHelper.parseSnapToAlignment(alignment));
   }
 
   @ReactProp(name = "snapToStart")
@@ -203,10 +213,11 @@ public class ReactScrollViewManager extends ViewGroupManager<ReactScrollView>
   @Override
   public void scrollTo(
       ReactScrollView scrollView, ReactScrollViewCommandHelper.ScrollToCommandData data) {
+    scrollView.abortAnimation();
     if (data.mAnimated) {
       scrollView.reactSmoothScrollTo(data.mDestX, data.mDestY);
     } else {
-      scrollView.reactScrollTo(data.mDestX, data.mDestY);
+      scrollView.scrollTo(data.mDestX, data.mDestY);
     }
   }
 
@@ -275,6 +286,9 @@ public class ReactScrollViewManager extends ViewGroupManager<ReactScrollView>
   @Override
   public void scrollToEnd(
       ReactScrollView scrollView, ReactScrollViewCommandHelper.ScrollToEndCommandData data) {
+    // ScrollView always has one child - the scrollable area. However, it's possible today that we
+    // execute this method as view command before the child view is mounted. Here we will retry the
+    // view commands as a workaround.
     View child = scrollView.getChildAt(0);
     if (child == null) {
       throw new RetryableMountingLayerException("scrollToEnd called on ScrollView without child");
@@ -282,10 +296,11 @@ public class ReactScrollViewManager extends ViewGroupManager<ReactScrollView>
 
     // ScrollView always has one child - the scrollable area
     int bottom = child.getHeight() + scrollView.getPaddingBottom();
+    scrollView.abortAnimation();
     if (data.mAnimated) {
       scrollView.reactSmoothScrollTo(scrollView.getScrollX(), bottom);
     } else {
-      scrollView.reactScrollTo(scrollView.getScrollX(), bottom);
+      scrollView.scrollTo(scrollView.getScrollX(), bottom);
     }
   }
 
@@ -305,27 +320,36 @@ public class ReactScrollViewManager extends ViewGroupManager<ReactScrollView>
     }
   }
 
-  @ReactProp(name = "contentOffset")
+  @ReactProp(name = "contentOffset", customType = "Point")
   public void setContentOffset(ReactScrollView view, ReadableMap value) {
+    view.setContentOffset(value);
+  }
+
+  @ReactProp(name = "maintainVisibleContentPosition")
+  public void setMaintainVisibleContentPosition(ReactScrollView view, ReadableMap value) {
     if (value != null) {
-      double x = value.hasKey("x") ? value.getDouble("x") : 0;
-      double y = value.hasKey("y") ? value.getDouble("y") : 0;
-      view.reactScrollTo((int) PixelUtil.toPixelFromDIP(x), (int) PixelUtil.toPixelFromDIP(y));
+      view.setMaintainVisibleContentPosition(
+          MaintainVisibleScrollPositionHelper.Config.fromReadableMap(value));
     } else {
-      view.reactScrollTo(0, 0);
+      view.setMaintainVisibleContentPosition(null);
     }
   }
 
   @Override
   public Object updateState(
-      ReactScrollView view, ReactStylesDiffMap props, @Nullable StateWrapper stateWrapper) {
-    view.getFabricViewStateManager().setStateWrapper(stateWrapper);
+      ReactScrollView view, ReactStylesDiffMap props, StateWrapper stateWrapper) {
+    view.setStateWrapper(stateWrapper);
     return null;
   }
 
   @Override
   public @Nullable Map<String, Object> getExportedCustomDirectEventTypeConstants() {
-    return createExportedCustomDirectEventTypeConstants();
+    @Nullable
+    Map<String, Object> baseEventTypeConstants = super.getExportedCustomDirectEventTypeConstants();
+    Map<String, Object> eventTypeConstants =
+        baseEventTypeConstants == null ? new HashMap<String, Object>() : baseEventTypeConstants;
+    eventTypeConstants.putAll(createExportedCustomDirectEventTypeConstants());
+    return eventTypeConstants;
   }
 
   public static Map<String, Object> createExportedCustomDirectEventTypeConstants() {
@@ -346,5 +370,33 @@ public class ReactScrollViewManager extends ViewGroupManager<ReactScrollView>
             ScrollEventType.getJSEventName(ScrollEventType.MOMENTUM_END),
             MapBuilder.of("registrationName", "onMomentumScrollEnd"))
         .build();
+  }
+
+  @ReactProp(name = ViewProps.POINTER_EVENTS)
+  public void setPointerEvents(ReactScrollView view, @Nullable String pointerEventsStr) {
+    view.setPointerEvents(PointerEvents.parsePointerEvents(pointerEventsStr));
+  }
+
+  @ReactProp(name = "scrollEventThrottle")
+  public void setScrollEventThrottle(ReactScrollView view, int scrollEventThrottle) {
+    view.setScrollEventThrottle(scrollEventThrottle);
+  }
+
+  @ReactProp(name = "isInvertedVirtualizedList")
+  public void setIsInvertedVirtualizedList(ReactScrollView view, boolean applyFix) {
+    // Usually when inverting the scroll view we are using scaleY: -1 on the list
+    // and on the parent container. HOWEVER, starting from android API 33 there is
+    // a bug that can cause an ANR due to that. Thus we are using different transform
+    // commands to circumvent the ANR. This however causes the vertical scrollbar to
+    // be on the wrong side. Thus we are moving it to the other side, when the list
+    // is inverted.
+    // See also:
+    //  - https://github.com/facebook/react-native/issues/35350
+    //  - https://issuetracker.google.com/issues/287304310
+    if (applyFix) {
+      view.setVerticalScrollbarPosition(View.SCROLLBAR_POSITION_LEFT);
+    } else {
+      view.setVerticalScrollbarPosition(View.SCROLLBAR_POSITION_DEFAULT);
+    }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,17 +7,16 @@
 
 #include "TouchEvent.h"
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 #if RN_DEBUG_STRING_CONVERTIBLE
 
-std::string getDebugName(TouchEvent const &touchEvent) {
+std::string getDebugName(const TouchEvent& /*touchEvent*/) {
   return "TouchEvent";
 }
 
 std::vector<DebugStringConvertibleObject> getDebugProps(
-    TouchEvent const &touchEvent,
+    const TouchEvent& touchEvent,
     DebugStringConvertibleOptions options) {
   return {
       {"touches", getDebugDescription(touchEvent.touches, options)},
@@ -29,5 +28,4 @@ std::vector<DebugStringConvertibleObject> getDebugProps(
 
 #endif
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

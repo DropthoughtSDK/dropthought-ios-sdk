@@ -1,1 +1,1 @@
-{"version":3,"names":["default","SDKEntry"],"sources":["index.js"],"sourcesContent":["export * from './SurveyModal';\nexport { default as SDKEntry } from './SDKEntry';\n"],"mappings":"AAAA,cAAc,eAAe;AAC7B,SAASA,OAAO,IAAIC,QAAQ,QAAQ,YAAY"}
+{"version":3,"names":["default","SDKEntry"],"sourceRoot":"../../../src","sources":["kiosk-rn-sdk/index.tsx"],"mappings":"AAAA,cAAc,eAAe;AAC7B,SAASA,OAAO,IAAIC,QAAQ,QAAQ,YAAY"}

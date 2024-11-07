@@ -4,14 +4,11 @@ import { useDimensionWidthType } from '../hooks/useWindowDimensions';
 import GlobalStyle, { Colors, QuestionContentTextSize, opacity15 } from '../styles';
 import i18n from '../translation';
 import { useTheme } from '../contexts/theme';
-
 const noop = _id => undefined;
-
 const iconSource = {
   radio: require('../assets/radio-on.png'),
   checkbox: require('../assets/checkbox-on.png')
 };
-
 const CheckBoxIcon = ({
   type,
   checkedColor
@@ -24,7 +21,6 @@ const CheckBoxIcon = ({
     source: iconSource[type]
   });
 };
-
 function OptionWithHighlight({
   type = 'radio',
   id: value,
@@ -39,11 +35,9 @@ function OptionWithHighlight({
     backgroundColor
   } = useTheme();
   const dimensionWidthType = useDimensionWidthType();
-
   const onPressHandler = () => {
     onPress && onPress(value);
   };
-
   const rtl = i18n.dir() === 'rtl';
   const containerStyle = [GlobalStyle.row, styles.container, {
     // if checked, background color add opacity
@@ -51,23 +45,24 @@ function OptionWithHighlight({
     backgroundColor: checked ? opacity15(checkedColor) : backgroundColor
   }, containerStyleFromProps, rtl && GlobalStyle.flexRowReverse];
   let content;
-
   if (typeof title === 'string') {
     const textStyle = [styles.text, {
       color: fontColor,
       minHeight: i18n.language === 'te' ? 30 : undefined
     }, checked ? styles.checkedText : {}, QuestionContentTextSize[dimensionWidthType]];
     content = /*#__PURE__*/React.createElement(Text, {
+      testID: `test:id/choice_option_${fontColor}`,
       style: textStyle
     }, title);
   } else {
     content = title;
   }
-
   const checkboxPlaceholderStyle = [styles.checkboxPlaceholder, {
     borderRadius: type === 'radio' ? 10 : 3
   }];
   return /*#__PURE__*/React.createElement(TouchableOpacity, {
+    accessible: false,
+    testID: `test:id/choice_selected_${checked}`,
     onPress: onPressHandler
   }, /*#__PURE__*/React.createElement(View, {
     style: containerStyle
@@ -80,7 +75,6 @@ function OptionWithHighlight({
     style: checkboxPlaceholderStyle
   })), content));
 }
-
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.white,

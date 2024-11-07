@@ -1,1 +1,1 @@
-{"version":3,"sources":["index.ts"],"names":["RotaryPhonePicker"],"mappings":"AAAA,OAAOA,iBAAP,MAA8B,qBAA9B;AAEA,eAAeA,iBAAf","sourcesContent":["import RotaryPhonePicker from './RotaryPhonePicker';\n\nexport default RotaryPhonePicker;\n"]}
+{"version":3,"names":["RotaryPhonePicker"],"sourceRoot":"../../../../src","sources":["components/RotaryPhonePicker/index.ts"],"mappings":"AAAA,OAAOA,iBAAiB,MAAM,qBAAqB;AAEnD,eAAeA,iBAAiB"}

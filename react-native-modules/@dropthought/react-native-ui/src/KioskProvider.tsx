@@ -1,22 +1,9 @@
-import * as React from 'react';
-
+import React from 'react';
 import { FeedbackProvider } from './contexts/feedback';
-import {
-  ThemeProvider,
-  IThemeOptionType,
-  IAppearanceType,
-  FontColor,
-  BackgroundColor,
-} from './contexts/theme';
+import { ThemeProvider } from './contexts/theme';
+import type { ThemeProviderProps } from './contexts/theme';
 
-export type KioskProviderProps = {
-  children: React.ReactNode;
-  themeOption: IThemeOptionType;
-  appearance: IAppearanceType;
-  hexCode: string;
-  fontColor: FontColor;
-  backgroundColor: BackgroundColor;
-};
+export interface KioskProviderProps extends ThemeProviderProps {}
 
 export const KioskProvider = ({
   children,
@@ -25,6 +12,8 @@ export const KioskProvider = ({
   hexCode,
   fontColor,
   backgroundColor,
+  autoClose,
+  autoCloseCountdown,
 }: KioskProviderProps) => {
   return (
     <ThemeProvider
@@ -33,6 +22,8 @@ export const KioskProvider = ({
       hexCode={hexCode}
       fontColor={fontColor}
       backgroundColor={backgroundColor}
+      autoClose={autoClose}
+      autoCloseCountdown={autoCloseCountdown}
     >
       <FeedbackProvider>{children}</FeedbackProvider>
     </ThemeProvider>

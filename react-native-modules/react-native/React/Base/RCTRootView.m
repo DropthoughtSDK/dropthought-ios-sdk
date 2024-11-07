@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -44,9 +44,10 @@ NSString *const RCTContentDidAppearNotification = @"RCTContentDidAppearNotificat
   CGSize _intrinsicContentSize;
 }
 
-- (instancetype)initWithBridge:(RCTBridge *)bridge
-                    moduleName:(NSString *)moduleName
-             initialProperties:(NSDictionary *)initialProperties
+- (instancetype)initWithFrame:(CGRect)frame
+                       bridge:(RCTBridge *)bridge
+                   moduleName:(NSString *)moduleName
+            initialProperties:(NSDictionary *)initialProperties
 {
   RCTAssertMainQueue();
   RCTAssert(bridge, @"A bridge instance is required to create an RCTRootView");
@@ -57,7 +58,7 @@ NSString *const RCTContentDidAppearNotification = @"RCTContentDidAppearNotificat
     [bridge.performanceLogger markStartForTag:RCTPLTTI];
   }
 
-  if (self = [super initWithFrame:CGRectZero]) {
+  if (self = [super initWithFrame:frame]) {
     self.backgroundColor = [UIColor whiteColor];
 
     _bridge = bridge;
@@ -95,6 +96,13 @@ NSString *const RCTContentDidAppearNotification = @"RCTContentDidAppearNotificat
   return self;
 }
 
+- (instancetype)initWithBridge:(RCTBridge *)bridge
+                    moduleName:(NSString *)moduleName
+             initialProperties:(NSDictionary *)initialProperties
+{
+  return [self initWithFrame:CGRectZero bridge:bridge moduleName:moduleName initialProperties:initialProperties];
+}
+
 - (instancetype)initWithBundleURL:(NSURL *)bundleURL
                        moduleName:(NSString *)moduleName
                 initialProperties:(NSDictionary *)initialProperties
@@ -107,6 +115,11 @@ NSString *const RCTContentDidAppearNotification = @"RCTContentDidAppearNotificat
 
 RCT_NOT_IMPLEMENTED(-(instancetype)initWithFrame : (CGRect)frame)
 RCT_NOT_IMPLEMENTED(-(instancetype)initWithCoder : (NSCoder *)aDecoder)
+
+- (UIView *)view
+{
+  return self;
+}
 
 #pragma mark - passThroughTouches
 
@@ -260,7 +273,7 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithCoder : (NSCoder *)aDecoder)
   _contentView = [[RCTRootContentView alloc] initWithFrame:self.bounds
                                                     bridge:bridge
                                                   reactTag:self.reactTag
-                                            sizeFlexiblity:_sizeFlexibility];
+                                           sizeFlexibility:_sizeFlexibility];
   [self runApplication:bridge];
 
   _contentView.passThroughTouches = _passThroughTouches;
@@ -355,6 +368,9 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithCoder : (NSCoder *)aDecoder)
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
 {
   [super traitCollectionDidChange:previousTraitCollection];
+  if (RCTSharedApplication().applicationState == UIApplicationStateBackground) {
+    return;
+  }
 
   [[NSNotificationCenter defaultCenter]
       postNotificationName:RCTUserInterfaceStyleDidChangeNotification

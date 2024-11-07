@@ -1,5 +1,5 @@
 import { append, identity, evolve, assoc } from 'ramda';
-import type { Feedback } from 'src/data';
+import type { Feedback } from '../../data';
 
 export type FeedbackReducerState = {
   answeredQuestionIds: string[];
@@ -9,11 +9,13 @@ export type FeedbackReducerState = {
 export enum FeedbackReducerActionType {
   Clear = 'clear-feedbacks',
   Update = 'update-feedback',
+  RemoveSingle = 'remove-single-feedback',
 }
 
 export type IFeedbackReducerActionType =
   | FeedbackReducerActionType.Clear
-  | FeedbackReducerActionType.Update;
+  | FeedbackReducerActionType.Update
+  | FeedbackReducerActionType.RemoveSingle;
 
 export type ClearFeedbacksAction = {
   type: FeedbackReducerActionType.Clear;
@@ -24,7 +26,15 @@ export type UpdateFeedbackAction = {
   payload: { feedback: Feedback };
 };
 
-export type FeedbackReducerAction = ClearFeedbacksAction | UpdateFeedbackAction;
+export type RemoveSingleFeedbackAction = {
+  type: FeedbackReducerActionType.RemoveSingle;
+  payload: { questionId: string };
+};
+
+export type FeedbackReducerAction =
+  | ClearFeedbacksAction
+  | UpdateFeedbackAction
+  | RemoveSingleFeedbackAction;
 
 export type FeedbackReducerDispatch = (action: FeedbackReducerAction) => void;
 
@@ -40,6 +50,8 @@ export const feedbackReducer = (
   switch (action.type) {
     case FeedbackReducerActionType.Update:
       return updateFeedbackReducer(state, action);
+    case FeedbackReducerActionType.RemoveSingle:
+      return removeSingleFeedbackReducer(state, action);
     case FeedbackReducerActionType.Clear:
       return initialState;
   }
@@ -60,4 +72,15 @@ const updateFeedbackReducer = (
     // always set the questionId to the feedback object
     feedbacksMap: assoc(feedback.questionId, feedback),
   })(state);
+};
+const removeSingleFeedbackReducer = (
+  state: FeedbackReducerState,
+  action: RemoveSingleFeedbackAction
+): FeedbackReducerState => {
+  const questionId = action.payload.questionId;
+  state.answeredQuestionIds = state.answeredQuestionIds.filter(
+    (id) => id !== questionId
+  );
+  delete state.feedbacksMap[questionId];
+  return { ...state };
 };

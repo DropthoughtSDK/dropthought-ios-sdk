@@ -102,12 +102,15 @@ const PictureChoiceOtherItem = ({
 
   async function hasAndroidPermission() {
     const permission = PermissionsAndroid.PERMISSIONS.CAMERA;
-    const hasPermission = await PermissionsAndroid.check(permission);
-    if (hasPermission) {
-      return true;
+    if (permission) {
+      const hasPermission = await PermissionsAndroid.check(permission);
+      if (hasPermission) {
+        return true;
+      }
+      const status = await PermissionsAndroid.request(permission);
+      return status === PermissionsAndroid.RESULTS.GRANTED;
     }
-    const status = await PermissionsAndroid.request(permission);
-    return status === PermissionsAndroid.RESULTS.GRANTED;
+    return false;
   }
 
   const openPhotoLibrary = () => {
@@ -133,7 +136,7 @@ const PictureChoiceOtherItem = ({
       })
         .then((images) => {
           setActionSheetVisible(false);
-          if (images.length > 0) {
+          if (images.length > 0 && images[0]) {
             uploadPicture(images[0]);
           }
         })
@@ -231,6 +234,7 @@ const PictureChoiceOtherItem = ({
               onPress={openPhotoLibrary}
             >
               <Text
+                testID="test:id/picture_choice_photo_lib"
                 style={isDarkMode ? styles.darkActionText : styles.actionText}
               >
                 {`${i18n.t('picture-choice:photoLibrary')}`}
@@ -252,6 +256,7 @@ const PictureChoiceOtherItem = ({
             onPress={() => setActionSheetVisible(false)}
           >
             <Text
+              testID="test:id/picture_choice_photo_cancel"
               style={
                 isDarkMode ? styles.darkActionText : styles.actionCancelText
               }
@@ -271,6 +276,7 @@ const PictureChoiceOtherItem = ({
   return (
     <View>
       <TouchableOpacity
+        testID={`test:id/picture_choice_other_loading_${isUploading}`}
         style={styles.buttonContainer}
         disabled={preview}
         onPress={() => {
@@ -334,6 +340,8 @@ const PictureChoiceOtherItem = ({
         <ActivityIndicatorMask loading={selected && isUploading} />
       </TouchableOpacity>
       <TouchableOpacity
+        accessible={false}
+        accessibilityLabel={`test:id/picture_choice_selected_${selected}`}
         style={[styles.optionContainer, rtl && GlobalStyle.flexRowReverse]}
         disabled={preview}
         onPress={() => {
@@ -349,10 +357,14 @@ const PictureChoiceOtherItem = ({
           themeColor={themeColor}
         />
         <View style={GlobalStyle.flex1}>
-          <Text style={optionTextStyle}>
+          <Text
+            testID="test:id/picture_choice_item_other"
+            style={optionTextStyle}
+          >
             {`${i18n.t('picture-choice:other')}`}
           </Text>
           <TextInput
+            testID="test:id/field_picture_choice_item_other"
             multiline
             style={inputStyle}
             maxLength={100}

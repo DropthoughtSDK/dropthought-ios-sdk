@@ -26,7 +26,6 @@ export const ChooseIcon = ({
     style: cubeStyle
   });
 };
-
 const PictureChoiceItem = ({
   title,
   uri,
@@ -70,7 +69,6 @@ const PictureChoiceItem = ({
     const reloadTextStyle = [styles.reloadText, {
       color: fontColor
     }];
-
     if (imageLoadError) {
       const reloadStyle = [styles.pictureReloadContainer, {
         width: itemWidth,
@@ -125,21 +123,25 @@ const PictureChoiceItem = ({
   const selection = useMemo(() => {
     const containerStyle = [styles.optionContainer, rtl && GlobalStyle.flexRowReverse];
     const textStyle = colorScheme === COLOR_SCHEMES.dark ? [styles.optionText, {
-      color: fontColor !== null && fontColor !== void 0 ? fontColor : Colors.appearanceSubBlack
+      color: fontColor ?? Colors.appearanceSubBlack
     }] : [styles.optionText, {
       color: fontColor
     }];
     return /*#__PURE__*/React.createElement(View, {
+      accessibilityLabel: `test:id/picture_choice_selected_${selected}`,
       style: containerStyle
     }, /*#__PURE__*/React.createElement(ChooseIcon, {
       isMultipleChoice: isMultipleChoice,
       selected: selected,
       themeColor: themeColor
     }), /*#__PURE__*/React.createElement(Text, {
+      testID: `test:id/picture_choice_item_${fontColor}`,
       style: textStyle
     }, title));
   }, [colorScheme, fontColor, isMultipleChoice, rtl, selected, themeColor, title]);
   return /*#__PURE__*/React.createElement(TouchableOpacity, {
+    accessible: false,
+    testID: `test:id/picture_choice_loading_${loadingImage}`,
     style: itemGapStyle,
     onPress: () => {
       if (imageLoadError) {
@@ -151,7 +153,6 @@ const PictureChoiceItem = ({
     }
   }, /*#__PURE__*/React.createElement(View, null, photo, border, selection));
 };
-
 export default /*#__PURE__*/React.memo(PictureChoiceItem);
 const styles = StyleSheet.create({
   optionContainer: {

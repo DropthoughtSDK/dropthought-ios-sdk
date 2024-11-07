@@ -1,5 +1,5 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,58 +8,28 @@
  * @format
  */
 
-'use strict';
+import type {
+  Extras,
+  ExtraValue,
+  IPerformanceLogger,
+  Timespan,
+} from './IPerformanceLogger';
 
-const Systrace = require('../Performance/Systrace');
-
-const infoLog = require('./infoLog');
-
-export type Timespan = {
-  startTime: number,
-  endTime?: number,
-  totalTime?: number,
-  startExtras?: Extras,
-  endExtras?: Extras,
-};
-
-// Extra values should be serializable primitives
-export type ExtraValue = number | string | boolean;
-
-export type Extras = {[key: string]: ExtraValue};
-
-export interface IPerformanceLogger {
-  addTimespan(
-    key: string,
-    startTime: number,
-    endTime: number,
-    startExtras?: Extras,
-    endExtras?: Extras,
-  ): void;
-  append(logger: IPerformanceLogger): void;
-  clear(): void;
-  clearCompleted(): void;
-  close(): void;
-  currentTimestamp(): number;
-  getExtras(): $ReadOnly<{[key: string]: ?ExtraValue, ...}>;
-  getPoints(): $ReadOnly<{[key: string]: ?number, ...}>;
-  getPointExtras(): $ReadOnly<{[key: string]: ?Extras, ...}>;
-  getTimespans(): $ReadOnly<{[key: string]: ?Timespan, ...}>;
-  hasTimespan(key: string): boolean;
-  isClosed(): boolean;
-  logEverything(): void;
-  markPoint(key: string, timestamp?: number, extras?: Extras): void;
-  removeExtra(key: string): ?ExtraValue;
-  setExtra(key: string, value: ExtraValue): void;
-  startTimespan(key: string, timestamp?: number, extras?: Extras): void;
-  stopTimespan(key: string, timestamp?: number, extras?: Extras): void;
-}
+import * as Systrace from '../Performance/Systrace';
+import ReactNativeFeatureFlags from '../ReactNative/ReactNativeFeatureFlags';
+import NativePerformance from '../WebPerformance/NativePerformance';
+import infoLog from './infoLog';
 
 const _cookies: {[key: string]: number, ...} = {};
 
 const PRINT_TO_CONSOLE: false = false; // Type as false to prevent accidentally committing `true`;
 
+// This is the prefix for optional logging points/timespans as marks/measures via Performance API,
+// used to separate these internally from other marks/measures
+const WEB_PERFORMANCE_PREFIX = 'global_perf_';
+
 export const getCurrentTimestamp: () => number =
-  global.nativeQPLTimestamp ?? global.performance.now.bind(global.performance);
+  global.nativeQPLTimestamp ?? (() => global.performance.now());
 
 class PerformanceLogger implements IPerformanceLogger {
   _timespans: {[key: string]: ?Timespan} = {};
@@ -67,6 +37,51 @@ class PerformanceLogger implements IPerformanceLogger {
   _points: {[key: string]: ?number} = {};
   _pointExtras: {[key: string]: ?Extras, ...} = {};
   _closed: boolean = false;
+  _isGlobalLogger: boolean = false;
+  _isGlobalWebPerformanceLoggerEnabled: ?boolean;
+
+  constructor(isGlobalLogger?: boolean) {
+    this._isGlobalLogger = isGlobalLogger === true;
+  }
+
+  _isLoggingForWebPerformance(): boolean {
+    if (!this._isGlobalLogger || NativePerformance == null) {
+      return false;
+    }
+    if (this._isGlobalWebPerformanceLoggerEnabled == null) {
+      this._isGlobalWebPerformanceLoggerEnabled =
+        ReactNativeFeatureFlags.isGlobalWebPerformanceLoggerEnabled();
+    }
+    return this._isGlobalWebPerformanceLoggerEnabled === true;
+  }
+
+  // NOTE: The Performance.mark/measure calls are wrapped here to ensure that
+  // we are safe from the cases when the global 'peformance' object is still not yet defined.
+  // It is only necessary in this file because of potential race conditions in the initialization
+  // order between 'createPerformanceLogger' and 'setUpPerformance'.
+  //
+  // In most of the other cases this kind of check for `performance` being defined
+  // wouldn't be necessary.
+  _performanceMark(key: string, startTime: number) {
+    if (this._isLoggingForWebPerformance()) {
+      global.performance?.mark?.(key, {
+        startTime,
+      });
+    }
+  }
+
+  _performanceMeasure(
+    key: string,
+    start: number | string,
+    end: number | string,
+  ) {
+    if (this._isLoggingForWebPerformance()) {
+      global.performance?.measure?.(key, {
+        start,
+        end,
+      });
+    }
+  }
 
   addTimespan(
     key: string,
@@ -98,6 +113,12 @@ class PerformanceLogger implements IPerformanceLogger {
       startExtras,
       endExtras,
     };
+
+    this._performanceMeasure(
+      `${WEB_PERFORMANCE_PREFIX}_${key}`,
+      startTime,
+      endTime,
+    );
   }
 
   append(performanceLogger: IPerformanceLogger) {
@@ -139,31 +160,31 @@ class PerformanceLogger implements IPerformanceLogger {
     this._closed = true;
   }
 
-  currentTimestamp() {
+  currentTimestamp(): number {
     return getCurrentTimestamp();
   }
 
-  getExtras() {
+  getExtras(): {[key: string]: ?ExtraValue} {
     return this._extras;
   }
 
-  getPoints() {
+  getPoints(): {[key: string]: ?number} {
     return this._points;
   }
 
-  getPointExtras() {
+  getPointExtras(): {[key: string]: ?Extras} {
     return this._pointExtras;
   }
 
-  getTimespans() {
+  getTimespans(): {[key: string]: ?Timespan} {
     return this._timespans;
   }
 
-  hasTimespan(key: string) {
+  hasTimespan(key: string): boolean {
     return !!this._timespans[key];
   }
 
-  isClosed() {
+  isClosed(): boolean {
     return this._closed;
   }
 
@@ -212,6 +233,8 @@ class PerformanceLogger implements IPerformanceLogger {
     if (extras) {
       this._pointExtras[key] = extras;
     }
+
+    this._performanceMark(`${WEB_PERFORMANCE_PREFIX}_${key}`, timestamp);
   }
 
   removeExtra(key: string): ?ExtraValue {
@@ -273,6 +296,11 @@ class PerformanceLogger implements IPerformanceLogger {
     if (PRINT_TO_CONSOLE) {
       infoLog('PerformanceLogger.js', 'start: ' + key);
     }
+
+    this._performanceMark(
+      `${WEB_PERFORMANCE_PREFIX}_timespan_start_${key}`,
+      timestamp,
+    );
   }
 
   stopTimespan(
@@ -318,14 +346,26 @@ class PerformanceLogger implements IPerformanceLogger {
       Systrace.endAsyncEvent(key, _cookies[key]);
       delete _cookies[key];
     }
+
+    this._performanceMeasure(
+      `${WEB_PERFORMANCE_PREFIX}_${key}`,
+      `${WEB_PERFORMANCE_PREFIX}_timespan_start_${key}`,
+      timestamp,
+    );
   }
 }
+
+// Re-exporting for backwards compatibility with all the clients that
+// may still import it from this module.
+export type {Extras, ExtraValue, IPerformanceLogger, Timespan};
 
 /**
  * This function creates performance loggers that can be used to collect and log
  * various performance data such as timespans, points and extras.
  * The loggers need to have minimal overhead since they're used in production.
  */
-export default function createPerformanceLogger(): IPerformanceLogger {
-  return new PerformanceLogger();
+export default function createPerformanceLogger(
+  isGlobalLogger?: boolean,
+): IPerformanceLogger {
+  return new PerformanceLogger(isGlobalLogger);
 }

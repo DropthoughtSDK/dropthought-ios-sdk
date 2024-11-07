@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,8 +7,7 @@
 
 #import "NSDataBigString.h"
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 static NSData *ensureNullTerminated(NSData *source)
 {
@@ -39,5 +38,4 @@ NSDataBigString::NSDataBigString(NSData *data)
   m_data = ensureNullTerminated(data);
 }
 
-}
-}
+} // namespace facebook::react

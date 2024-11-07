@@ -4,17 +4,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = StartScreenLayout;
-
 var _react = _interopRequireDefault(require("react"));
-
 var _theme = require("../contexts/theme");
-
 var _StartScreen = _interopRequireDefault(require("./StartScreen"));
-
 var _ClassicStartScreen = _interopRequireDefault(require("./ClassicStartScreen"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function StartScreenLayout({
   onLanguageSelect,
   onClose,
@@ -24,7 +18,6 @@ function StartScreenLayout({
   const {
     themeOption
   } = (0, _theme.useTheme)();
-
   switch (themeOption) {
     case _theme.THEME_OPTION.CLASSIC:
     case _theme.THEME_OPTION.BIJLIRIDE:
@@ -33,7 +26,6 @@ function StartScreenLayout({
         onLanguageSelect: onLanguageSelect,
         onStart: onStart
       });
-
     default:
       return /*#__PURE__*/_react.default.createElement(_StartScreen.default, {
         survey: survey,

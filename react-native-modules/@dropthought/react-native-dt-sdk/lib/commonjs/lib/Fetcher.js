@@ -7,10 +7,8 @@ exports.throwRequestError = exports.isRequestTimeoutError = exports.isNoInternet
 var _reactNative = require("react-native");
 var _jwtDecode = _interopRequireDefault(require("jwt-decode"));
 var _ramda = require("ramda");
+var _axios = _interopRequireDefault(require("axios"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return typeof key === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (typeof input !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (typeof res !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 const RENEW_ENDPOINT = '/api/token/renew';
 const DT_API_KEY_HEADER = 'X-DT-API-KEY';
 const DEFAULT_TIMEOUT = 30000; // default timeout: 30 seconds
@@ -88,39 +86,40 @@ const setRequestHeader = (requestConfig, header = {}) => {
  * @property {string=} apiKey - or simply given the apiKey, optional
  */
 class Fetcher {
+  defaultRequestConfig = {
+    baseURL: '',
+    timeout: DEFAULT_TIMEOUT,
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  };
+
   /** @type {() => Promise<string>} */
+  authToken = () => Promise.resolve(undefined);
 
   /** @type {string | undefined} this is for api key version2 */
+  apiKey = undefined;
 
   /** @type {() => Promise<string>} */
+  refreshToken = () => Promise.resolve(undefined);
 
   /** @type {(authTokens: AuthToken) => Promise<undefined>} */
+  storeTokens = () => Promise.resolve(undefined);
 
   /**
    * @template T
    * @type {(url: string) => Promise<T>}
    */
+  loadCache = url => Promise.resolve(undefined);
 
   /** @type {(url: string, response: {data: any, status: number, statusText: string}) => Promise<undefined>} */
+  saveCache = (url, response) => Promise.resolve(undefined);
 
   /**
    * @param {InitializeParams} param
    */
   constructor(param = {}) {
-    _defineProperty(this, "defaultRequestConfig", {
-      baseURL: '',
-      timeout: DEFAULT_TIMEOUT,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    });
-    _defineProperty(this, "authToken", () => Promise.resolve(undefined));
-    _defineProperty(this, "apiKey", undefined);
-    _defineProperty(this, "refreshToken", () => Promise.resolve(undefined));
-    _defineProperty(this, "storeTokens", () => Promise.resolve(undefined));
-    _defineProperty(this, "loadCache", url => Promise.resolve(undefined));
-    _defineProperty(this, "saveCache", (url, response) => Promise.resolve(undefined));
     this.init(param);
   }
 
@@ -183,6 +182,15 @@ class Fetcher {
     const params = Object.keys(requestConfig.params || {}).filter(key => !(0, _ramda.isNil)(requestConfig.params[key])).map(key => `${key}=${encodeURIComponent(requestConfig.params[key])}`).join('&');
     // compose fetch full URL
     const fetchURL = (requestConfig.baseURL || this.defaultRequestConfig.baseURL) + url + `?${params}`;
+    if (url === '/api/event/storage/file') {
+      return await _axios.default.post(fetchURL, requestConfig.body, {
+        headers: {
+          ...this.defaultRequestConfig.headers,
+          ...requestConfig.headers
+        },
+        ...requestConfig
+      });
+    }
     return await fetch(fetchURL, {
       method: requestConfig.method || 'GET',
       headers: {

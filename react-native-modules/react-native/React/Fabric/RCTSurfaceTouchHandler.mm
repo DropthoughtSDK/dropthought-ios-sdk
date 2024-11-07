@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,45 +7,15 @@
 
 #import "RCTSurfaceTouchHandler.h"
 
+#import <React/RCTIdentifierPool.h>
 #import <React/RCTUtils.h>
 #import <React/RCTViewComponentView.h>
-#import <UIKit/UIGestureRecognizerSubclass.h>
 
 #import "RCTConversions.h"
+#import "RCTSurfacePointerHandler.h"
 #import "RCTTouchableComponentViewProtocol.h"
 
 using namespace facebook::react;
-
-template <size_t size>
-class IdentifierPool {
- public:
-  void enqueue(int index)
-  {
-    usage[index] = false;
-  }
-
-  int dequeue()
-  {
-    while (true) {
-      if (!usage[lastIndex]) {
-        usage[lastIndex] = true;
-        return lastIndex;
-      }
-      lastIndex = (lastIndex + 1) % size;
-    }
-  }
-
-  void reset()
-  {
-    for (int i = 0; i < size; i++) {
-      usage[i] = false;
-    }
-  }
-
- private:
-  bool usage[size];
-  int lastIndex;
-};
 
 typedef NS_ENUM(NSInteger, RCTTouchEventType) {
   RCTTouchEventTypeTouchStart,
@@ -85,8 +55,9 @@ static void UpdateActiveTouchWithUITouch(
     CGPoint rootViewOriginOffset)
 {
   CGPoint offsetPoint = [uiTouch locationInView:activeTouch.componentView];
-  CGPoint screenPoint = [uiTouch locationInView:uiTouch.window];
   CGPoint pagePoint = [uiTouch locationInView:rootComponentView];
+  CGPoint screenPoint = [rootComponentView convertPoint:pagePoint
+                                      toCoordinateSpace:rootComponentView.window.screen.coordinateSpace];
   pagePoint = CGPointMake(pagePoint.x + rootViewOriginOffset.x, pagePoint.y + rootViewOriginOffset.y);
 
   activeTouch.touch.offsetPoint = RCTPointFromCGPoint(offsetPoint);
@@ -96,7 +67,7 @@ static void UpdateActiveTouchWithUITouch(
   activeTouch.touch.timestamp = uiTouch.timestamp;
 
   if (RCTForceTouchAvailable()) {
-    activeTouch.touch.force = uiTouch.force / uiTouch.maximumPossibleForce;
+    activeTouch.touch.force = RCTZeroIfNaN(uiTouch.force / uiTouch.maximumPossibleForce);
   }
 }
 
@@ -166,7 +137,9 @@ struct PointerHasher {
    * We hold the view weakly to prevent a retain cycle.
    */
   __weak UIView *_rootComponentView;
-  IdentifierPool<11> _identifierPool;
+  RCTIdentifierPool<11> _identifierPool;
+
+  RCTSurfacePointerHandler *_pointerHandler;
 }
 
 - (instancetype)init
@@ -181,6 +154,10 @@ struct PointerHasher {
     self.delaysTouchesEnded = NO;
 
     self.delegate = self;
+
+    if (RCTGetDispatchW3CPointerEvents()) {
+      _pointerHandler = [[RCTSurfacePointerHandler alloc] init];
+    }
   }
 
   return self;
@@ -194,6 +171,10 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithTarget : (id)target action : (SEL)act
 
   [view addGestureRecognizer:self];
   _rootComponentView = view;
+
+  if (_pointerHandler != nil) {
+    [_pointerHandler attachToView:view];
+  }
 }
 
 - (void)detachFromView:(UIView *)view
@@ -203,6 +184,10 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithTarget : (id)target action : (SEL)act
 
   [view removeGestureRecognizer:self];
   _rootComponentView = nil;
+
+  if (_pointerHandler != nil) {
+    [_pointerHandler detachFromView:view];
+  }
 }
 
 - (void)_registerTouches:(NSSet<UITouch *> *)touches
@@ -218,7 +203,7 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithTarget : (id)target action : (SEL)act
 {
   for (UITouch *touch in touches) {
     auto iterator = _activeTouches.find(touch);
-    assert(iterator != _activeTouches.end() && "Inconsistency between local and UIKit touch registries");
+    RCTAssert(iterator != _activeTouches.end(), @"Inconsistency between local and UIKit touch registries");
     if (iterator == _activeTouches.end()) {
       continue;
     }
@@ -231,7 +216,7 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithTarget : (id)target action : (SEL)act
 {
   for (UITouch *touch in touches) {
     auto iterator = _activeTouches.find(touch);
-    assert(iterator != _activeTouches.end() && "Inconsistency between local and UIKit touch registries");
+    RCTAssert(iterator != _activeTouches.end(), @"Inconsistency between local and UIKit touch registries");
     if (iterator == _activeTouches.end()) {
       continue;
     }
@@ -248,7 +233,7 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithTarget : (id)target action : (SEL)act
 
   for (UITouch *touch in touches) {
     auto iterator = _activeTouches.find(touch);
-    assert(iterator != _activeTouches.end() && "Inconsistency between local and UIKit touch registries");
+    RCTAssert(iterator != _activeTouches.end(), @"Inconsistency between local and UIKit touch registries");
     if (iterator == _activeTouches.end()) {
       continue;
     }
@@ -377,7 +362,7 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithTarget : (id)target action : (SEL)act
     std::vector<ActiveTouch> activeTouches;
     activeTouches.reserve(_activeTouches.size());
 
-    for (auto const &pair : _activeTouches) {
+    for (const auto &pair : _activeTouches) {
       activeTouches.push_back(pair.second);
     }
 
@@ -408,6 +393,24 @@ RCT_NOT_IMPLEMENTED(-(instancetype)initWithTarget : (id)target action : (SEL)act
 {
   // Same condition for `failure of` as for `be prevented by`.
   return [self canBePreventedByGestureRecognizer:otherGestureRecognizer];
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
+    shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+  BOOL canBePrevented = [self canBePreventedByGestureRecognizer:otherGestureRecognizer];
+  if (canBePrevented) {
+    [self _cancelTouches];
+  }
+  return NO;
+}
+
+#pragma mark -
+
+- (void)_cancelTouches
+{
+  [self setEnabled:NO];
+  [self setEnabled:YES];
 }
 
 @end

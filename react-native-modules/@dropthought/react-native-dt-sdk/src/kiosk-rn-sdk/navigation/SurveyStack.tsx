@@ -7,22 +7,44 @@ import {
   i18n,
   SurveyScreenLayout,
   ActivityIndicatorMask,
-} from '@dropthought/react-native-ui/src';
+} from '@dropthought/react-native-ui';
+import type { SurveyFeedback } from '@dropthought/react-native-ui';
+import type { QuestionType } from '@dropthought/react-native-ui';
 import { useAsync } from 'react-async';
-import { useMetadata } from '../contexts/custom-props';
+// @ts-ignore
+import { useMetadata } from '../contexts/custom-props/CustomPropsContext';
+// @ts-ignore
 import StartScreen from '../screens/StartScreen';
+// @ts-ignore
 import EndScreen from '../screens/EndScreen';
+// @ts-ignore
 import ErrorHintScreen from '../screens/ErrorHintScreen';
-import { useSurveyContext } from '../contexts/survey';
-import { submitFeedback } from '../../lib/Feedback';
+// @ts-ignore
+import { useSurveyContext } from '../contexts/survey/SurveyContext';
+// @ts-ignore
+import { submitFeedback, finalizeSubmitedFeedback } from '../../lib/Feedback';
 import ScreenWrapper from './ScreenWrapper';
+// @ts-ignore
 import Header from './Header';
+// @ts-ignore
 import { fromJSToAPIDateStr } from '../../lib/DateTimerParser';
-import { uploadPicture } from '../../lib/UploadPicture';
-import type { ImageFormData } from '../../lib/UploadFileAPI';
+// @ts-ignore
+import { uploadFile } from '../../lib/UploadFile';
+// @ts-ignore
+import type { FormData } from '../../lib/UploadFileAPI';
+import type { AxiosRequestConfig } from 'axios';
+
+// @ts-ignore
+import { postPollChoice } from '../../lib/Poll';
 
 type StackProps = {
   preview: boolean;
+};
+
+type PollChoiceData = {
+  questionId: string;
+  choice?: string;
+  isOther: boolean;
 };
 
 const noData = (a: any) => isNil(a) || isEmpty(a);
@@ -30,12 +52,15 @@ const noData = (a: any) => isNil(a) || isEmpty(a);
 const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
   const { survey, onClose } = useSurveyContext();
   const themeColor = survey.surveyProperty.hexCode;
-  const [visiblePageIds, setVisiblePageIds] = useState([]);
+  const [visiblePageIds, setVisiblePageIds] = useState<string[]>([]);
   const [endScreenvisible, setEndScreenvisible] = useState(false);
-  const [surveyFeedback, setSurveyFeedback] = useState(undefined);
+  const [surveyFeedback, setSurveyFeedback] = useState<
+    SurveyFeedback | undefined
+  >(undefined);
   const [error, setError] = useState<Error | undefined>();
   const metadata = useMetadata();
   const { run, isPending: loading } = useAsync({
+    // @ts-ignore
     deferFn: submitFeedback,
     onResolve: () => {
       setEndScreenvisible(true);
@@ -49,6 +74,7 @@ const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
   const handleNextPage = useCallback(
     (nextPageIndex) => {
       if (nextPageIndex < survey.pageOrder.length) {
+        // @ts-ignore
         setVisiblePageIds((prevPageIds) => {
           const nextPageId = survey.pageOrder[nextPageIndex];
           return [
@@ -72,11 +98,17 @@ const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
   }, []);
 
   const handleSubmit = useCallback(
-    (feedback) => {
+    (feedback: SurveyFeedback) => {
       if (preview) {
         setEndScreenvisible(true);
       } else {
         const { timeZone } = NativeModules.DtSdk.getConstants();
+        const finalFeedbacks = finalizeSubmitedFeedback(
+          feedback.feedbacks,
+          survey
+        );
+
+        feedback.feedbacks = finalFeedbacks;
         setSurveyFeedback(feedback);
         run({
           ...feedback,
@@ -86,15 +118,19 @@ const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
         });
       }
     },
-    [metadata, preview, run]
+    [metadata, preview, run, survey]
   );
 
   const [isUploading, setIsUploading] = useState(false);
-  const handleUpload = async (file: ImageFormData) => {
+  const handleUpload = async (
+    file: FormData,
+    questionType: QuestionType,
+    requestConfig?: AxiosRequestConfig
+  ) => {
     if (file) {
       setIsUploading(true);
       try {
-        const { url } = await uploadPicture(file);
+        const { url } = await uploadFile(file, questionType, requestConfig);
         setIsUploading(false);
         return url;
       } catch (reason) {
@@ -103,6 +139,22 @@ const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
       }
     } else {
       return undefined;
+    }
+  };
+
+  const [isPostingPollChoice, setIsPostingPollChoice] = useState(false);
+  const handlePostingPollChoice = async (data: PollChoiceData) => {
+    setIsPostingPollChoice(true);
+    try {
+      const response = await postPollChoice({
+        programToken: survey.token,
+        ...data,
+      });
+      setIsPostingPollChoice(false);
+      return response.result;
+    } catch (reason) {
+      setIsPostingPollChoice(false);
+      return reason;
     }
   };
 
@@ -130,6 +182,7 @@ const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
               rtl={survey.language === 'ar'}
             >
               <SurveyScreenLayout
+                // @ts-ignore
                 survey={survey}
                 pageIndex={pageIndex}
                 onClose={onClose}
@@ -138,6 +191,8 @@ const Stack: React.FunctionComponent<StackProps> = ({ preview }) => {
                 onSubmit={handleSubmit}
                 onUpload={handleUpload}
                 isUploading={isUploading}
+                onPostPollChoice={handlePostingPollChoice}
+                isPostingPollChoice={isPostingPollChoice}
                 preview={preview}
               />
             </ScreenWrapper>

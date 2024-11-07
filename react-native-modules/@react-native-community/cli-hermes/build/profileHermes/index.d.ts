@@ -1,10 +1,12 @@
 import { Config } from '@react-native-community/cli-types';
-declare type Options = {
+type Options = {
     filename?: string;
     raw?: boolean;
     sourcemapPath?: string;
     generateSourcemap?: boolean;
     port: string;
+    appId?: string;
+    appIdSuffix?: string;
 };
 declare function profileHermes([dstPath]: Array<string>, ctx: Config, options: Options): Promise<void>;
 declare const _default: {

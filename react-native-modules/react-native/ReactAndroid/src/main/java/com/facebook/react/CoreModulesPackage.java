@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -21,7 +21,6 @@ import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.module.annotations.ReactModuleList;
 import com.facebook.react.module.model.ReactModuleInfo;
 import com.facebook.react.module.model.ReactModuleInfoProvider;
-import com.facebook.react.modules.bundleloader.NativeDevSplitBundleLoaderModule;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.modules.core.ExceptionsManagerModule;
@@ -32,12 +31,12 @@ import com.facebook.react.modules.debug.SourceCodeModule;
 import com.facebook.react.modules.deviceinfo.DeviceInfoModule;
 import com.facebook.react.modules.systeminfo.AndroidInfoModule;
 import com.facebook.react.turbomodule.core.interfaces.TurboModule;
-import com.facebook.react.uimanager.UIImplementationProvider;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.ViewManager;
+import com.facebook.react.uimanager.ViewManagerResolver;
 import com.facebook.systrace.Systrace;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -57,7 +56,6 @@ import java.util.Map;
       SourceCodeModule.class,
       TimingModule.class,
       UIManagerModule.class,
-      NativeDevSplitBundleLoaderModule.class,
     })
 public class CoreModulesPackage extends TurboReactPackage implements ReactPackageLogger {
 
@@ -69,7 +67,6 @@ public class CoreModulesPackage extends TurboReactPackage implements ReactPackag
   public CoreModulesPackage(
       ReactInstanceManager reactInstanceManager,
       DefaultHardwareBackBtnHandler hardwareBackBtnHandler,
-      @Nullable UIImplementationProvider uiImplementationProvider,
       boolean lazyViewManagersEnabled,
       int minTimeLeftInFrameForNonBatchedOperationMs) {
     mReactInstanceManager = reactInstanceManager;
@@ -104,7 +101,6 @@ public class CoreModulesPackage extends TurboReactPackage implements ReactPackag
             SourceCodeModule.class,
             TimingModule.class,
             UIManagerModule.class,
-            NativeDevSplitBundleLoaderModule.class,
           };
 
       final Map<String, ReactModuleInfo> reactModuleInfoMap = new HashMap<>();
@@ -118,17 +114,11 @@ public class CoreModulesPackage extends TurboReactPackage implements ReactPackag
                 moduleClass.getName(),
                 reactModule.canOverrideExistingModule(),
                 reactModule.needsEagerInit(),
-                reactModule.hasConstants(),
                 reactModule.isCxxModule(),
                 TurboModule.class.isAssignableFrom(moduleClass)));
       }
 
-      return new ReactModuleInfoProvider() {
-        @Override
-        public Map<String, ReactModuleInfo> getReactModuleInfos() {
-          return reactModuleInfoMap;
-        }
-      };
+      return () -> reactModuleInfoMap;
     } catch (InstantiationException e) {
       throw new RuntimeException(
           "No ReactModuleInfoProvider for CoreModulesPackage$$ReactModuleInfoProvider", e);
@@ -161,9 +151,6 @@ public class CoreModulesPackage extends TurboReactPackage implements ReactPackag
         return createUIManager(reactContext);
       case DeviceInfoModule.NAME:
         return new DeviceInfoModule(reactContext);
-      case NativeDevSplitBundleLoaderModule.NAME:
-        return new NativeDevSplitBundleLoaderModule(
-            reactContext, mReactInstanceManager.getDevSupportManager());
       default:
         throw new IllegalArgumentException(
             "In CoreModulesPackage, could not find Native module for " + name);
@@ -175,15 +162,15 @@ public class CoreModulesPackage extends TurboReactPackage implements ReactPackag
     Systrace.beginSection(Systrace.TRACE_TAG_REACT_JAVA_BRIDGE, "createUIManagerModule");
     try {
       if (mLazyViewManagersEnabled) {
-        UIManagerModule.ViewManagerResolver resolver =
-            new UIManagerModule.ViewManagerResolver() {
+        ViewManagerResolver resolver =
+            new ViewManagerResolver() {
               @Override
               public @Nullable ViewManager getViewManager(String viewManagerName) {
                 return mReactInstanceManager.createViewManager(viewManagerName);
               }
 
               @Override
-              public List<String> getViewManagerNames() {
+              public Collection<String> getViewManagerNames() {
                 return mReactInstanceManager.getViewManagerNames();
               }
             };

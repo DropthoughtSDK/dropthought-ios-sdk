@@ -1,10 +1,11 @@
-import { PureComponent } from 'react';
-import { Animated, LayoutChangeEvent, PanResponderInstance, ViewStyle } from 'react-native';
+import React, { PureComponent } from 'react';
+import { Animated } from 'react-native';
+import type { LayoutChangeEvent, PanResponderInstance, ViewStyle } from 'react-native';
 import type { Dimensions, SliderProps, SliderState, CustomSliderProps, SliderContainerProps } from './types';
 /**
  * @description  source code refrence: https://github.com/miblanchard/react-native-slider
  */
-declare type RectReturn = {
+type RectReturn = {
     containsPoint: (nativeX: number, nativeY: number) => boolean;
     height: number;
     trackDistanceToPoint: (nativeX: number) => number;
@@ -31,7 +32,7 @@ export declare class Slider extends PureComponent<SliderProps, SliderState> {
     };
     static getDerivedStateFromProps(props: SliderProps, state: SliderState): SliderState | undefined;
     componentDidUpdate(): void;
-    _getRawValues(values: Array<Animated.Value> | Array<Animated.AnimatedInterpolation>): any[];
+    _getRawValues(values: Array<Animated.Value> | Array<Animated.AnimatedInterpolation<number>>): any[];
     _handleStartShouldSetPanResponder: (e: any) => boolean;
     _handleMoveShouldSetPanResponder(): boolean;
     _handlePanResponderGrant: (e: {
@@ -51,7 +52,7 @@ export declare class Slider extends PureComponent<SliderProps, SliderState> {
         dy: number;
     }) => number;
     _getCurrentValue: (thumbIndex?: number) => any;
-    _setCurrentValue: (value: number, thumbIndex: number | null | undefined, callback?: (() => void) | undefined) => void;
+    _setCurrentValue: (value: number, thumbIndex: number | null | undefined, callback?: () => void) => void;
     _setCurrentValueAnimated: (value: number, thumbIndex?: number) => void;
     _getTouchOverflowSize: () => {
         width: number;
@@ -68,11 +69,12 @@ export declare class Slider extends PureComponent<SliderProps, SliderState> {
     _previousLeft: number;
     _thumbSize: Dimensions | null | undefined;
     _trackSize: Dimensions | null | undefined;
-    _renderDebugThumbTouchRect: (thumbLeft: Animated.AnimatedInterpolation, index: number) => JSX.Element;
-    _renderThumbImage: (thumbIndex?: number) => JSX.Element | null;
-    render(): JSX.Element;
+    _renderDebugThumbTouchRect: (thumbLeft: Animated.AnimatedInterpolation<number>, index: number) => React.JSX.Element;
+    _renderThumbImage: (thumbIndex?: number) => React.JSX.Element | null;
+    render(): React.JSX.Element;
 }
-declare const SliderContainer: (props: SliderContainerProps) => JSX.Element;
-declare const CustomSlider: (props: CustomSliderProps) => JSX.Element;
+declare const SliderContainer: (props: SliderContainerProps) => React.JSX.Element;
+declare const CustomSlider: (props: CustomSliderProps) => React.JSX.Element;
 export { SliderContainer };
 export default CustomSlider;
+//# sourceMappingURL=index.d.ts.map

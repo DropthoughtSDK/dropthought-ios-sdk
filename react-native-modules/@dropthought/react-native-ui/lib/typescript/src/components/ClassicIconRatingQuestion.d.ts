@@ -1,9 +1,9 @@
 import React from 'react';
 import type { Feedback as OriginFeedback, Question } from '../data';
-declare type Feedback = OriginFeedback & {
+type Feedback = OriginFeedback & {
     answers: string[];
 };
-declare type Props = {
+type Props = {
     mandatoryErrorMessage: string;
     question: Question;
     onFeedback: ({ questionId, answers, type, }: {
@@ -15,5 +15,6 @@ declare type Props = {
     forgot: boolean;
     themeColor: string;
 };
-declare const _default: React.MemoExoticComponent<({ mandatoryErrorMessage, question, feedback, forgot, onFeedback, }: Props) => JSX.Element>;
+declare const _default: React.MemoExoticComponent<({ mandatoryErrorMessage, question, feedback, forgot, onFeedback, }: Props) => React.JSX.Element>;
 export default _default;
+//# sourceMappingURL=ClassicIconRatingQuestion.d.ts.map

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -13,10 +13,11 @@
 
 #ifdef ANDROID
 #include <folly/dynamic.h>
+#include <react/renderer/mapbuffer/MapBuffer.h>
+#include <react/renderer/mapbuffer/MapBufferBuilder.h>
 #endif
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * State for <TextInput> component.
@@ -53,27 +54,6 @@ class AndroidTextInputState final {
   ParagraphAttributes paragraphAttributes{};
 
   /**
-   * Default TextAttributes used if we need to construct a new Fragment.
-   * Only used if text is inserted into an AttributedString with no existing
-   * Fragments.
-   */
-  TextAttributes defaultTextAttributes;
-
-  /**
-   * Default parent ShadowView used if we need to construct a new Fragment.
-   * Only used if text is inserted into an AttributedString with no existing
-   * Fragments.
-   */
-  ShadowView defaultParentShadowView;
-
-  /*
-   * `TextLayoutManager` provides a connection to platform-specific
-   * text rendering infrastructure which is capable to render the
-   * `AttributedString`.
-   */
-  SharedTextLayoutManager layoutManager{};
-
-  /**
    * Communicates Android theme padding back to the ShadowNode / Component
    * Descriptor for layout.
    */
@@ -84,12 +64,9 @@ class AndroidTextInputState final {
 
   AndroidTextInputState(
       int64_t mostRecentEventCount,
-      AttributedString const &attributedString,
-      AttributedString const &reactTreeAttributedString,
-      ParagraphAttributes const &paragraphAttributes,
-      TextAttributes const &defaultTextAttributes,
-      ShadowView const &defaultParentShadowView,
-      SharedTextLayoutManager const &layoutManager,
+      AttributedString attributedString,
+      AttributedString reactTreeAttributedString,
+      ParagraphAttributes paragraphAttributes,
       float defaultThemePaddingStart,
       float defaultThemePaddingEnd,
       float defaultThemePaddingTop,
@@ -97,10 +74,10 @@ class AndroidTextInputState final {
 
   AndroidTextInputState() = default;
   AndroidTextInputState(
-      AndroidTextInputState const &previousState,
-      folly::dynamic const &data);
+      const AndroidTextInputState& previousState,
+      const folly::dynamic& data);
   folly::dynamic getDynamic() const;
+  MapBuffer getMapBuffer() const;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

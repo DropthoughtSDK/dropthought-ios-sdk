@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -7,12 +7,15 @@
 
 #pragma once
 
-#include <folly/dynamic.h>
 #include <react/renderer/imagemanager/ImageRequest.h>
 #include <react/renderer/imagemanager/primitives.h>
 
-namespace facebook {
-namespace react {
+#ifdef ANDROID
+#include <react/renderer/mapbuffer/MapBuffer.h>
+#include <react/renderer/mapbuffer/MapBufferBuilder.h>
+#endif
+
+namespace facebook::react {
 
 /*
  * State for <Image> component.
@@ -20,9 +23,9 @@ namespace react {
 class ImageState final {
  public:
   ImageState(
-      ImageSource const &imageSource,
+      const ImageSource& imageSource,
       ImageRequest imageRequest,
-      Float const blurRadius)
+      const Float blurRadius)
       : imageSource_(imageSource),
         imageRequest_(std::make_shared<ImageRequest>(std::move(imageRequest))),
         blurRadius_(blurRadius){};
@@ -36,12 +39,12 @@ class ImageState final {
    * Exposes for reading stored `ImageRequest` object.
    * `ImageRequest` object cannot be copied or moved from `ImageLocalData`.
    */
-  ImageRequest const &getImageRequest() const;
+  const ImageRequest& getImageRequest() const;
 
   Float getBlurRadius() const;
 
 #ifdef ANDROID
-  ImageState(ImageState const &previousState, folly::dynamic data)
+  ImageState(const ImageState& previousState, folly::dynamic data)
       : blurRadius_{0} {};
 
   /*
@@ -50,13 +53,16 @@ class ImageState final {
   folly::dynamic getDynamic() const {
     return {};
   };
+
+  MapBuffer getMapBuffer() const {
+    return MapBufferBuilder::EMPTY();
+  };
 #endif
 
  private:
   ImageSource imageSource_;
   std::shared_ptr<ImageRequest> imageRequest_;
-  Float const blurRadius_;
+  const Float blurRadius_;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

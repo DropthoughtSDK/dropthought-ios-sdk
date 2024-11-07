@@ -11,13 +11,10 @@ var _exportNames = {
   EndScreenLayout: true,
   StartScreenLayout: true,
   PlaceholderScreen: true,
-  KioskProvider: true,
-  KioskProviderProps: true,
+  ActivityIndicatorMask: true,
   i18n: true,
   Colors: true,
-  GlobalStyle: true,
-  ActivityIndicatorMask: true,
-  KeyboardAvoidingScrollView: true
+  GlobalStyle: true
 };
 Object.defineProperty(exports, "ActivityIndicatorMask", {
   enumerable: true,
@@ -47,24 +44,6 @@ Object.defineProperty(exports, "GlobalStyle", {
   enumerable: true,
   get: function () {
     return _styles.GlobalStyle;
-  }
-});
-Object.defineProperty(exports, "KeyboardAvoidingScrollView", {
-  enumerable: true,
-  get: function () {
-    return _KeyboardAvoidingView.KeyboardAvoidingScrollView;
-  }
-});
-Object.defineProperty(exports, "KioskProvider", {
-  enumerable: true,
-  get: function () {
-    return _KioskProvider.KioskProvider;
-  }
-});
-Object.defineProperty(exports, "KioskProviderProps", {
-  enumerable: true,
-  get: function () {
-    return _KioskProvider.KioskProviderProps;
   }
 });
 Object.defineProperty(exports, "PlaceholderScreen", {
@@ -103,19 +82,12 @@ Object.defineProperty(exports, "i18n", {
     return _translation.default;
   }
 });
-
 var _ClassicQuestionContainer = _interopRequireDefault(require("./containers/ClassicQuestionContainer"));
-
 var _QuestionContainer = _interopRequireDefault(require("./containers/QuestionContainer"));
-
 var _SurveyScreenLayout = _interopRequireWildcard(require("./containers/SurveyScreenLayout"));
-
 var _EndScreenLayout = _interopRequireDefault(require("./containers/EndScreenLayout"));
-
 var _StartScreenLayout = _interopRequireDefault(require("./containers/StartScreenLayout"));
-
 var _PlaceholderScreen = _interopRequireWildcard(require("./components/PlaceholderScreen"));
-
 Object.keys(_PlaceholderScreen).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
@@ -127,15 +99,22 @@ Object.keys(_PlaceholderScreen).forEach(function (key) {
     }
   });
 });
-
-var _KioskProvider = require("./KioskProvider");
-
+var _ActivityIndicatorMask = _interopRequireDefault(require("./components/ActivityIndicatorMask"));
 var _translation = _interopRequireDefault(require("./translation"));
-
 var _styles = require("./styles");
-
+var _KioskProvider = require("./KioskProvider");
+Object.keys(_KioskProvider).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  if (key in exports && exports[key] === _KioskProvider[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _KioskProvider[key];
+    }
+  });
+});
 var _useWindowDimensions = require("./hooks/useWindowDimensions");
-
 Object.keys(_useWindowDimensions).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
@@ -147,9 +126,7 @@ Object.keys(_useWindowDimensions).forEach(function (key) {
     }
   });
 });
-
 var _feedback = require("./contexts/feedback");
-
 Object.keys(_feedback).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
@@ -161,9 +138,7 @@ Object.keys(_feedback).forEach(function (key) {
     }
   });
 });
-
 var _theme = require("./contexts/theme");
-
 Object.keys(_theme).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
@@ -175,9 +150,7 @@ Object.keys(_theme).forEach(function (key) {
     }
   });
 });
-
 var _Button = require("./components/Button");
-
 Object.keys(_Button).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
@@ -189,13 +162,31 @@ Object.keys(_Button).forEach(function (key) {
     }
   });
 });
-
-var _ActivityIndicatorMask = _interopRequireDefault(require("./components/ActivityIndicatorMask"));
-
 var _KeyboardAvoidingView = require("./components/KeyboardAvoidingView");
-
+Object.keys(_KeyboardAvoidingView).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  if (key in exports && exports[key] === _KeyboardAvoidingView[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _KeyboardAvoidingView[key];
+    }
+  });
+});
+var _FileIcon = require("./components/FileIcon");
+Object.keys(_FileIcon).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  if (key in exports && exports[key] === _FileIcon[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _FileIcon[key];
+    }
+  });
+});
 var _data = require("./data");
-
 Object.keys(_data).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
@@ -207,10 +198,7 @@ Object.keys(_data).forEach(function (key) {
     }
   });
 });
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 //# sourceMappingURL=index.js.map

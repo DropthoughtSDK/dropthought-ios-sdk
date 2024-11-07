@@ -131,6 +131,8 @@ const ClassicSliderRatingQuestion = ({
     ];
     return [...Array(maximumValue).keys()].map((valueData, index) => (
       <TouchableHighlight
+        accessible={false}
+        testID={`test:id/scale_option_${index === value}`}
         underlayColor={themeBackgroundColor}
         key={index.toString()}
         onPress={() => {
@@ -152,6 +154,7 @@ const ClassicSliderRatingQuestion = ({
           ]}
         >
           <Text
+            testID={`test:id/scale_label_${fontColor}`}
             style={[textStyle, index === value ? styles.selectedLabel : {}]}
           >
             {getLabelText({
@@ -190,7 +193,10 @@ const ClassicSliderRatingQuestion = ({
       ) : (
         <>
           <View style={rtl && GlobalStyle.flexRowReverse}>
-            <View style={getWidthStyle()}>
+            <View
+              // @ts-ignore
+              style={getWidthStyle()}
+            >
               <View style={styles.line} />
               <View
                 style={[styles.horizontal, rtl && GlobalStyle.flexRowReverse]}

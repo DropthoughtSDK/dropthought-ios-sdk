@@ -1,22 +1,18 @@
 declare const _default: {
     container: {
-        alignItems: "center";
         backgroundColor: string;
         width: number;
         height: number;
+        flexDirection: "row";
+        justifyContent: "center";
+        alignItems: "center";
         borderRadius: number;
     };
     content: {
         width: number;
         height: number;
-        position: "relative";
-        flexDirection: "column";
-        justifyContent: "center";
-        alignItems: "center";
-        top: number;
         backgroundColor: string;
         borderRadius: number;
-        margin: string;
     };
     item: {
         position: "absolute";
@@ -28,5 +24,10 @@ declare const _default: {
         position: "absolute";
         top: number;
     };
+    lottieContent: {
+        width: "100%";
+        height: "100%";
+    };
 };
 export default _default;
+//# sourceMappingURL=RotaryPhonePicker.styles.d.ts.map

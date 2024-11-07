@@ -1,5 +1,6 @@
 import React from 'react';
-import { TextInput, KeyboardTypeOptions } from 'react-native';
+import { TextInput } from 'react-native';
+import type { KeyboardTypeOptions } from 'react-native';
 import type { Question, QuestionMetaDataType as TypeQuestionMetaDataType, Feedback } from '../../data';
 export declare const metadataTypeKeyboard: (metadataType: TypeQuestionMetaDataType | undefined) => KeyboardTypeOptions | undefined;
 export declare const metadataTypeAutoCapitalize: (metadataType: TypeQuestionMetaDataType | undefined) => "none" | "words" | "sentences";
@@ -18,3 +19,4 @@ interface Props {
 }
 declare const MultiLineTextInput: React.FC<Props>;
 export default MultiLineTextInput;
+//# sourceMappingURL=MultiLineTextInput.d.ts.map

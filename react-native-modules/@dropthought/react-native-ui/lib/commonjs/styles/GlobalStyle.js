@@ -4,14 +4,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.QuestionContentTextSize = exports.GlobalStyle = void 0;
-
 var _reactNative = require("react-native");
-
 var _Colors = require("./Colors");
-
 var _useWindowDimensions = require("../hooks/useWindowDimensions");
-
-const QuestionContentTextSize = _reactNative.StyleSheet.create({
+const QuestionContentTextSize = exports.QuestionContentTextSize = _reactNative.StyleSheet.create({
   [_useWindowDimensions.DimensionWidthType.phone]: {
     fontSize: 17
   },
@@ -19,10 +15,7 @@ const QuestionContentTextSize = _reactNative.StyleSheet.create({
     fontSize: 15
   }
 });
-
-exports.QuestionContentTextSize = QuestionContentTextSize;
-
-const GlobalStyle = _reactNative.StyleSheet.create({
+const GlobalStyle = exports.GlobalStyle = _reactNative.StyleSheet.create({
   container: {
     alignItems: 'center',
     backgroundColor: _Colors.Colors.white,
@@ -119,6 +112,4 @@ const GlobalStyle = _reactNative.StyleSheet.create({
     height: '100%'
   }
 });
-
-exports.GlobalStyle = GlobalStyle;
 //# sourceMappingURL=GlobalStyle.js.map

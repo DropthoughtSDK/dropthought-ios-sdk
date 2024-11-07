@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -14,22 +14,19 @@
 
 #include <condition_variable>
 
+#include <react/debug/react_native_assert.h>
+#include <react/renderer/debug/SystraceSection.h>
 #include <react/renderer/mounting/ShadowViewMutation.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
-MountingCoordinator::MountingCoordinator(
-    ShadowTreeRevision baseRevision,
-    std::weak_ptr<MountingOverrideDelegate const> delegate,
-    bool enableReparentingDetection)
+MountingCoordinator::MountingCoordinator(const ShadowTreeRevision& baseRevision)
     : surfaceId_(baseRevision.rootShadowNode->getSurfaceId()),
       baseRevision_(baseRevision),
-      mountingOverrideDelegate_(delegate),
-      telemetryController_(*this),
-      enableReparentingDetection_(enableReparentingDetection) {
+      telemetryController_(*this) {
 #ifdef RN_SHADOW_TREE_INTROSPECTION
-  stubViewTree_ = stubViewTreeFromShadowNode(*baseRevision_.rootShadowNode);
+  stubViewTree_ = buildStubViewTreeWithoutUsingDifferentiator(
+      *baseRevision_.rootShadowNode);
 #endif
 }
 
@@ -37,15 +34,15 @@ SurfaceId MountingCoordinator::getSurfaceId() const {
   return surfaceId_;
 }
 
-void MountingCoordinator::push(ShadowTreeRevision const &revision) const {
+void MountingCoordinator::push(ShadowTreeRevision revision) const {
   {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::scoped_lock lock(mutex_);
 
-    assert(
+    react_native_assert(
         !lastRevision_.has_value() || revision.number != lastRevision_->number);
 
     if (!lastRevision_.has_value() || lastRevision_->number < revision.number) {
-      lastRevision_ = revision;
+      lastRevision_ = std::move(revision);
     }
   }
 
@@ -53,7 +50,7 @@ void MountingCoordinator::push(ShadowTreeRevision const &revision) const {
 }
 
 void MountingCoordinator::revoke() const {
-  std::lock_guard<std::mutex> lock(mutex_);
+  std::scoped_lock lock(mutex_);
   // We have two goals here.
   // 1. We need to stop retaining `ShadowNode`s to not prolong their lifetime
   // to prevent them from overliving `ComponentDescriptor`s.
@@ -70,19 +67,21 @@ bool MountingCoordinator::waitForTransaction(
 }
 
 void MountingCoordinator::updateBaseRevision(
-    ShadowTreeRevision const &baseRevision) const {
-  baseRevision_ = std::move(baseRevision);
+    const ShadowTreeRevision& baseRevision) const {
+  baseRevision_ = baseRevision;
 }
 
 void MountingCoordinator::resetLatestRevision() const {
   lastRevision_.reset();
 }
 
-better::optional<MountingTransaction> MountingCoordinator::pullTransaction()
+std::optional<MountingTransaction> MountingCoordinator::pullTransaction()
     const {
-  std::lock_guard<std::mutex> lock(mutex_);
+  SystraceSection section("MountingCoordinator::pullTransaction");
 
-  auto transaction = better::optional<MountingTransaction>{};
+  std::scoped_lock lock(mutex_);
+
+  auto transaction = std::optional<MountingTransaction>{};
 
   // Base case
   if (lastRevision_.has_value()) {
@@ -93,9 +92,7 @@ better::optional<MountingTransaction> MountingCoordinator::pullTransaction()
     telemetry.willDiff();
 
     auto mutations = calculateShadowViewMutations(
-        *baseRevision_.rootShadowNode,
-        *lastRevision_->rootShadowNode,
-        enableReparentingDetection_);
+        *baseRevision_.rootShadowNode, *lastRevision_->rootShadowNode);
 
     telemetry.didDiff();
 
@@ -142,8 +139,8 @@ better::optional<MountingTransaction> MountingCoordinator::pullTransaction()
     // tree therefore we cannot validate the validity of the mutation
     // instructions.
     if (!shouldOverridePullTransaction && lastRevision_.has_value()) {
-      auto stubViewTree =
-          stubViewTreeFromShadowNode(*lastRevision_->rootShadowNode);
+      auto stubViewTree = buildStubViewTreeWithoutUsingDifferentiator(
+          *lastRevision_->rootShadowNode);
 
       bool treesEqual = stubViewTree_ == stubViewTree;
 
@@ -168,7 +165,8 @@ better::optional<MountingTransaction> MountingCoordinator::pullTransaction()
         }
       }
 
-      assert((treesEqual) && "Incorrect set of mutations detected.");
+      react_native_assert(
+          (treesEqual) && "Incorrect set of mutations detected.");
     }
   }
 #endif
@@ -180,9 +178,22 @@ better::optional<MountingTransaction> MountingCoordinator::pullTransaction()
   return transaction;
 }
 
-TelemetryController const &MountingCoordinator::getTelemetryController() const {
+bool MountingCoordinator::hasPendingTransactions() const {
+  return lastRevision_.has_value();
+}
+
+const TelemetryController& MountingCoordinator::getTelemetryController() const {
   return telemetryController_;
 }
 
-} // namespace react
-} // namespace facebook
+const ShadowTreeRevision& MountingCoordinator::getBaseRevision() const {
+  return baseRevision_;
+}
+
+void MountingCoordinator::setMountingOverrideDelegate(
+    std::weak_ptr<const MountingOverrideDelegate> delegate) const {
+  std::scoped_lock lock(mutex_);
+  mountingOverrideDelegate_ = std::move(delegate);
+}
+
+} // namespace facebook::react

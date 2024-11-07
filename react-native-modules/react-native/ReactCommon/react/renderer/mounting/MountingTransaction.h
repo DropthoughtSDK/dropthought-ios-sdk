@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,11 +8,10 @@
 #pragma once
 
 #include <react/renderer/mounting/ShadowViewMutation.h>
-#include <react/renderer/mounting/SurfaceTelemetry.h>
-#include <react/renderer/mounting/TransactionTelemetry.h>
+#include <react/renderer/telemetry/SurfaceTelemetry.h>
+#include <react/renderer/telemetry/TransactionTelemetry.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * Encapsulates all artifacts of `ShadowTree` commit (or a series of them),
@@ -36,7 +35,7 @@ class MountingTransaction final {
   MountingTransaction(
       SurfaceId surfaceId,
       Number number,
-      ShadowViewMutationList &&mutations,
+      ShadowViewMutationList&& mutations,
       TransactionTelemetry telemetry);
 
   /*
@@ -44,28 +43,28 @@ class MountingTransaction final {
    * Copying of MountingTransaction is expensive, so copy-constructor is
    * explicit and copy-assignment is deleted to prevent accidental copying.
    */
-  explicit MountingTransaction(const MountingTransaction &mountingTransaction) =
+  explicit MountingTransaction(const MountingTransaction& mountingTransaction) =
       default;
-  MountingTransaction &operator=(const MountingTransaction &other) = delete;
+  MountingTransaction& operator=(const MountingTransaction& other) = delete;
 
   /*
    * Move semantic.
    */
-  MountingTransaction(MountingTransaction &&mountingTransaction) noexcept =
+  MountingTransaction(MountingTransaction&& mountingTransaction) noexcept =
       default;
-  MountingTransaction &operator=(MountingTransaction &&other) = default;
+  MountingTransaction& operator=(MountingTransaction&& other) = default;
 
   /*
    * Returns a list of mutations that represent the transaction. The list can be
    * empty (theoretically).
    */
-  ShadowViewMutationList const &getMutations() const &;
+  const ShadowViewMutationList& getMutations() const&;
   ShadowViewMutationList getMutations() &&;
 
   /*
    * Returns telemetry associated with this transaction.
    */
-  TransactionTelemetry const &getTelemetry() const;
+  TransactionTelemetry& getTelemetry() const;
 
   /*
    * Returns the id of the surface that the transaction belongs to.
@@ -81,8 +80,7 @@ class MountingTransaction final {
   SurfaceId surfaceId_;
   Number number_;
   ShadowViewMutationList mutations_;
-  TransactionTelemetry telemetry_;
+  mutable TransactionTelemetry telemetry_;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

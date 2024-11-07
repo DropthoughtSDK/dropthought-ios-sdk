@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,9 +12,9 @@
 #include <react/renderer/components/scrollview/ScrollViewState.h>
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 #include <react/renderer/core/LayoutContext.h>
+#include <react/renderer/core/ShadowNodeFamily.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 extern const char ScrollViewComponentName[];
 
@@ -29,6 +29,11 @@ class ScrollViewShadowNode final : public ConcreteViewShadowNode<
  public:
   using ConcreteViewShadowNode::ConcreteViewShadowNode;
 
+  static ScrollViewState initialStateData(
+      const Props::Shared& props,
+      const ShadowNodeFamily::Shared& family,
+      const ComponentDescriptor& componentDescriptor);
+
 #pragma mark - LayoutableShadowNode
 
   void layout(LayoutContext layoutContext) override;
@@ -36,7 +41,7 @@ class ScrollViewShadowNode final : public ConcreteViewShadowNode<
 
  private:
   void updateStateIfNeeded();
+  void updateScrollContentOffsetIfNeeded();
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

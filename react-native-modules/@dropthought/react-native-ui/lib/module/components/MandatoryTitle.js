@@ -6,12 +6,12 @@ import QuestionWarningMessage from './QuestionWarningMessage';
 import i18n from '../translation';
 import { DimensionWidthType, useDimensionWidthType } from '../hooks/useWindowDimensions';
 import { useTheme, THEME_OPTION } from '../contexts/theme';
-
 const MandatoryTitle = ({
   forgot,
   invalidMessage = '',
   mandatoryErrorMessage,
   question,
+  subTitleMessage,
   style
 }) => {
   const rtl = i18n.dir() === 'rtl';
@@ -23,7 +23,7 @@ const MandatoryTitle = ({
   } = useTheme();
   const {
     questionId,
-    questionTitle,
+    questionTitlePlain,
     mandatory,
     type,
     subType,
@@ -38,11 +38,9 @@ const MandatoryTitle = ({
   }, [addMandatoryRef, questionId]);
   let color = fontColor;
   const isOption6Smiley = themeOption === THEME_OPTION.OPTION6 && type === 'rating' && subType === 'smiley';
-
   if ((customFontColor === undefined || customFontColor === '') && isOption6Smiley) {
     color = Colors.white;
   }
-
   const textStyle = [styles.questionTitle, questionTitleSize[dimensionWidthType], {
     color,
     lineHeight: i18n.language === 'te' ? 42 : undefined
@@ -51,16 +49,22 @@ const MandatoryTitle = ({
     ref: ref,
     style: [styles.horizontal, style, rtl && GlobalStyle.flexRowReverse]
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/mandatory_title",
     style: textStyle
-  }, questionTitle, //optional was been used on matrix question
+  }, questionTitlePlain,
+  //optional was been used on matrix question
   (mandatory || optional) && /*#__PURE__*/React.createElement(Text, {
     style: styles.hint
-  }, "*")), /*#__PURE__*/React.createElement(QuestionWarningMessage // forgot message has higher priority than custom invalid message
+  }, "*")), subTitleMessage ? /*#__PURE__*/React.createElement(View, {
+    style: rtl && GlobalStyle.flexRowReverse
+  }, /*#__PURE__*/React.createElement(Text, {
+    style: styles.subTitle
+  }, subTitleMessage)) : null, /*#__PURE__*/React.createElement(QuestionWarningMessage
+  // forgot message has higher priority than custom invalid message
   , {
     message: forgot ? mandatoryErrorMessage : invalidMessage
   }));
 };
-
 export default MandatoryTitle;
 const questionTitleSize = StyleSheet.create({
   [DimensionWidthType.phone]: {
@@ -85,6 +89,10 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: '600',
     textAlign: 'center'
+  },
+  subTitle: {
+    marginTop: 8,
+    color: Colors.border
   }
 });
 //# sourceMappingURL=MandatoryTitle.js.map

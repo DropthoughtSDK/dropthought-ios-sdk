@@ -79,5 +79,10 @@
     "invalidTypeHint": "Please upload only PNG, JPG, JPEG formats",
     "reload": "Tap to reload image",
     "uploadFailed": "Image upload failed. Please try again"
+  },
+  "file-upload": {
+    "files": "Files",
+    "photo": "Photo Library",
+    "cancel": "Cancel"
   }
 }

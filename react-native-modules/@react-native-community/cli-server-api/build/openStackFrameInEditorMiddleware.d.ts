@@ -1,5 +1,5 @@
 import connect from 'connect';
-declare type Options = {
+type Options = {
     watchFolders: ReadonlyArray<string>;
 };
 declare const _default: (options: Options) => connect.Server;

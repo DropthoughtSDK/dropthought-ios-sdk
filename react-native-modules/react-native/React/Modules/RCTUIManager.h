@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,6 +9,7 @@
 
 #import <React/RCTBridge.h>
 #import <React/RCTBridgeModule.h>
+#import <React/RCTBridgeProxy.h>
 #import <React/RCTInvalidating.h>
 #import <React/RCTRootView.h>
 #import <React/RCTViewManager.h>
@@ -172,3 +173,16 @@ RCT_EXTERN NSString *const RCTUIManagerWillUpdateViewsDueToContentSizeMultiplier
 @property (nonatomic, readonly) RCTUIManager *uiManager;
 
 @end
+
+@interface RCTBridgeProxy (RCTUIManager)
+
+@property (nonatomic, readonly) RCTUIManager *uiManager;
+
+@end
+
+RCT_EXTERN NSMutableDictionary<NSString *, id> *RCTModuleConstantsForDestructuredComponent(
+    NSMutableDictionary<NSString *, NSDictionary *> *directEvents,
+    NSMutableDictionary<NSString *, NSDictionary *> *bubblingEvents,
+    Class managerClass,
+    NSString *name,
+    NSDictionary<NSString *, id> *viewConfig);

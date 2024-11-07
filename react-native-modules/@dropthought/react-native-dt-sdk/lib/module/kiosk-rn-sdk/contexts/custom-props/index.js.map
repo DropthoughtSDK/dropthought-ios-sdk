@@ -1,1 +1,1 @@
-{"version":3,"names":[],"sources":["index.js"],"sourcesContent":["export * from './CustomPropsContext';\n"],"mappings":"AAAA,cAAc,sBAAsB"}
+{"version":3,"names":["CustomPropsContextProvider"],"sourceRoot":"../../../../../src","sources":["kiosk-rn-sdk/contexts/custom-props/index.js"],"mappings":"AAAA,SAASA,0BAA0B,QAAQ,sBAAsB"}

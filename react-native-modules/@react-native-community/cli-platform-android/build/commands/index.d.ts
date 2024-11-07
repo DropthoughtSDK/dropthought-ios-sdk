@@ -9,7 +9,17 @@ declare const _default: ({
     options: ({
         name: string;
         description: string;
+        parse?: undefined;
         default?: undefined;
+    } | {
+        name: string;
+        description: string;
+        parse: (val: string) => string[];
+        default?: undefined;
+    } | {
+        name: string;
+        description: string;
+        default: boolean;
         parse?: undefined;
     } | {
         name: string;
@@ -24,7 +34,7 @@ declare const _default: ({
     } | {
         name: string;
         description: string;
-        parse: (val: string) => string[];
+        parse: NumberConstructor;
         default?: undefined;
     })[];
 })[];

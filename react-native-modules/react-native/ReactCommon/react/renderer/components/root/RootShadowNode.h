@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -12,9 +12,9 @@
 #include <react/renderer/components/root/RootProps.h>
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 #include <react/renderer/core/LayoutContext.h>
+#include <react/renderer/core/PropsParserContext.h>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 class RootShadowNode;
 
@@ -31,7 +31,7 @@ class RootShadowNode final
  public:
   using ConcreteViewShadowNode::ConcreteViewShadowNode;
 
-  using Shared = std::shared_ptr<RootShadowNode const>;
+  using Shared = std::shared_ptr<const RootShadowNode>;
   using Unshared = std::shared_ptr<RootShadowNode>;
 
   static ShadowNodeTraits BaseTraits() {
@@ -45,17 +45,17 @@ class RootShadowNode final
    * Returns `false` if the three is already laid out.
    */
   bool layoutIfNeeded(
-      std::vector<LayoutableShadowNode const *> *affectedNodes = {});
+      std::vector<const LayoutableShadowNode*>* affectedNodes = {});
 
   /*
    * Clones the node with given `layoutConstraints` and `layoutContext`.
    */
   RootShadowNode::Unshared clone(
-      LayoutConstraints const &layoutConstraints,
-      LayoutContext const &layoutContext) const;
+      const PropsParserContext& propsParserContext,
+      const LayoutConstraints& layoutConstraints,
+      const LayoutContext& layoutContext) const;
 
   Transform getTransform() const override;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

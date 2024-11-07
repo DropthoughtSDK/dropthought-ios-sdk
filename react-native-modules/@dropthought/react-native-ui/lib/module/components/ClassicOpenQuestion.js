@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet, Text, TextInput, Platform } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, Text, TextInput, Platform, Keyboard } from 'react-native';
 import { QuestionMetaDataType, metaDataFormatValidator, mandatoryQuestionValidator } from '../utils/data';
 import GlobalStyle, { Colors } from '../styles';
 import ClassicMandatoryTitle from './ClassicMandatoryTitle';
@@ -12,16 +12,13 @@ export const metadataTypeKeyboard = metadataType => {
   switch (metadataType === null || metadataType === void 0 ? void 0 : metadataType.toLocaleLowerCase()) {
     case QuestionMetaDataType.Email:
       return 'default';
-
     case QuestionMetaDataType.Phone:
       return 'phone-pad';
-
     case QuestionMetaDataType.Number:
       return Platform.select({
         ios: 'numbers-and-punctuation',
         default: 'default'
       });
-
     case QuestionMetaDataType.Date:
     default:
       return 'default';
@@ -31,18 +28,15 @@ export const metadataTypeAutoCapitalize = metadataType => {
   switch (metadataType === null || metadataType === void 0 ? void 0 : metadataType.toLocaleLowerCase()) {
     case QuestionMetaDataType.Name:
       return 'words';
-
     case QuestionMetaDataType.Email:
     case QuestionMetaDataType.Phone:
     case QuestionMetaDataType.Date:
     case QuestionMetaDataType.Number:
       return 'none';
-
     default:
       return 'sentences';
   }
 };
-
 const OpenQuestion = ({
   mandatoryErrorMessage,
   anonymous,
@@ -53,18 +47,25 @@ const OpenQuestion = ({
   forgot,
   themeColor
 }) => {
-  var _question$responseErr;
-
   const {
     colorScheme,
     fontColor
   } = useTheme();
-  const [text, setText] = React.useState(feedback !== null && feedback !== void 0 && feedback.answers[0] ? `${feedback === null || feedback === void 0 ? void 0 : feedback.answers[0]}` : '');
-  const [focus, setFocus] = React.useState(false);
-  const [hasEdited, setHasEdited] = React.useState(false);
+  const [text, setText] = useState(feedback !== null && feedback !== void 0 && feedback.answers[0] ? `${feedback === null || feedback === void 0 ? void 0 : feedback.answers[0]}` : '');
+  const [focus, setFocus] = useState(false);
+  const [hasEdited, setHasEdited] = useState(false);
+  const inputRef = useRef(null);
   const dimensionWidthType = useDimensionWidthType();
   const styles = dimensionWidthType === DimensionWidthType.phone ? phoneStyles : phoneStyles;
-
+  useEffect(() => {
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      var _inputRef$current;
+      return (_inputRef$current = inputRef.current) === null || _inputRef$current === void 0 ? void 0 : _inputRef$current.blur();
+    });
+    return () => {
+      keyboardDidHideListener.remove();
+    };
+  }, []);
   const onEndEditingHandler = () => {
     setHasEdited(true);
     onFeedback({
@@ -73,20 +74,18 @@ const OpenQuestion = ({
       type: 'open'
     });
   };
-
   const getBackgroundColorStyle = () => {
     return {
       borderColor: themeColor
     };
   };
-
   const rtl = i18n.dir() === 'rtl';
   const showAnonymousWarning = anonymous && question.metaDataType && (question.metaDataType === 'Email' || question.metaDataType === 'Name' || question.metaDataType === 'Phone');
   const maxCharacterLength = question.scale ? parseInt(question.scale, 10) : MAX_CHARACTER;
   const characterLeft = maxCharacterLength - text.length;
   const isValid = metaDataFormatValidator(text, question.metaDataType);
-  /** @type {Feedback} */
 
+  /** @type {Feedback} */
   const tempFeedback = {
     questionId: question.questionId,
     answers: [text],
@@ -95,8 +94,9 @@ const OpenQuestion = ({
   const hasForgot = forgot && !mandatoryQuestionValidator(question, tempFeedback);
   const upperView = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ClassicMandatoryTitle, {
     forgot: hasForgot,
-    invalidMessage: // show the error message after the user has done edited
-    hasEdited && !isValid ? (_question$responseErr = question.responseErrorText) !== null && _question$responseErr !== void 0 ? _question$responseErr : i18n.t('metadata-invalid-message', question.metaDataType) : '',
+    invalidMessage:
+    // show the error message after the user has done edited
+    hasEdited && !isValid ? question.responseErrorText : '',
     mandatoryErrorMessage: mandatoryErrorMessage,
     question: question,
     style: styles.title
@@ -105,10 +105,13 @@ const OpenQuestion = ({
     rtl: rtl
   }));
   const inputView = /*#__PURE__*/React.createElement(View, {
-    style: [styles.inputBG, colorScheme === COLOR_SCHEMES.dark ? styles.inputBGDark : {}, focus && getBackgroundColorStyle() // question.metaDataType && styles.metaDataTypeInput,
+    style: [styles.inputBG, colorScheme === COLOR_SCHEMES.dark ? styles.inputBGDark : {}, focus && getBackgroundColorStyle()
+    // question.metaDataType && styles.metaDataTypeInput,
     // !question.metaDataType && styles.paddingVertical15,
     ]
   }, /*#__PURE__*/React.createElement(TextInput, {
+    testID: "test:id/field_open_ended",
+    ref: inputRef,
     style: [styles.input, {
       color: fontColor
     }, rtl && GlobalStyle.textAlignRight],
@@ -117,8 +120,8 @@ const OpenQuestion = ({
       if (focus) {
         // [DK-3756] if the text is close to the maxLength it will be rendered twice in the iOS, so we add the focus to prevent the issue.
         setText(t);
-      } // onValueChange(text) // Keep it for Kiosk usage
-
+      }
+      // onValueChange(text) // Keep it for Kiosk usage
     },
     placeholder: question.questionBrand,
     placeholderTextColor: Colors.inputPlaceholder,
@@ -137,15 +140,16 @@ const OpenQuestion = ({
   const bottomView = /*#__PURE__*/React.createElement(View, {
     style: [styles.subTextRow, rtl && GlobalStyle.flexRowReverse]
   }, /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/open_ended_warning",
     style: styles.descText
-  }, showAnonymousWarning && i18n.t('survey:metadata-anonymous-warning')), /*#__PURE__*/React.createElement(Text, {
+  }, showAnonymousWarning && `${i18n.t('survey:metadata-anonymous-warning')}`), /*#__PURE__*/React.createElement(Text, {
+    testID: "test:id/open_ended_text_length",
     style: styles.descText
   }, characterLeft, " / ", maxCharacterLength));
   return /*#__PURE__*/React.createElement(View, {
     style: GlobalStyle.questionContainer
   }, upperView, inputView, bottomView);
 };
-
 export default OpenQuestion;
 const phoneStyles = StyleSheet.create({
   descText: {
@@ -172,9 +176,9 @@ const phoneStyles = StyleSheet.create({
     // when multi=true, it is important to note that this aligns the text to the top on iOS,
     // and centers it on Android. Use with textAlignVertical set to top for the same behavior in both platforms.
     textAlignVertical: 'top' // this is an android only props, won't affect ios
-
   },
-  paddingVertical15: { ...Platform.select({
+  paddingVertical15: {
+    ...Platform.select({
       ios: {
         paddingVertical: 15
       },

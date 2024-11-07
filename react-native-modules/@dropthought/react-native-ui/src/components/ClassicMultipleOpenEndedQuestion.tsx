@@ -106,7 +106,9 @@ const RowComponent = ({
       },
     ];
     bottomTextComponent = (
-      <Text style={errorTextStyle}>{responseErrorText}</Text>
+      <Text testID="test:id/multiple_open_ended_warning" style={errorTextStyle}>
+        {responseErrorText}
+      </Text>
     );
   } else if (isFocus) {
     inputBorderColor = themeColor;
@@ -134,13 +136,24 @@ const RowComponent = ({
   return (
     <View style={rowContainerStyle}>
       <View>
-        <Text style={rowTitleTextStyle}>{questionTitle}</Text>
+        <Text
+          testID={`test:id/multiple_open_ended_title_${fontColor}`}
+          style={rowTitleTextStyle}
+        >
+          {questionTitle}
+        </Text>
       </View>
       <View style={styles.rowContent}>
         {exampleMetadataText && isFoucsAndInValid ? (
-          <Text style={styles.rowSubTitleText}>{exampleMetadataText}</Text>
+          <Text
+            testID="test:id/multiple_open_ended_desc"
+            style={styles.rowSubTitleText}
+          >
+            {exampleMetadataText}
+          </Text>
         ) : null}
         <TextInput
+          testID="test:id/field_multiple_open_ended"
           style={inputStyle}
           onChangeText={onChangeText}
           onEndEditing={onEndEditingHandler}
@@ -154,7 +167,10 @@ const RowComponent = ({
         <View style={styles.rowBottomContent}>
           <View style={GlobalStyle.flex1}>{bottomTextComponent}</View>
           {isFoucsAndInValid ? (
-            <Text style={[styles.inputLengthText, GlobalStyle.textAlignRight]}>
+            <Text
+              testID="test:id/multiple_open_ended_text_length"
+              style={[styles.inputLengthText, GlobalStyle.textAlignRight]}
+            >
               {`${scale - text.length}/${scale}`}
             </Text>
           ) : null}

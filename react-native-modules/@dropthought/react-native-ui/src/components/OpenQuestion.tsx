@@ -79,10 +79,7 @@ const OpenQuestion = ({
         forgot={hasForgot}
         invalidMessage={
           // show the error message after the user has done edited
-          hasEdited && !isValid
-            ? question.responseErrorText ??
-              i18n.t('metadata-invalid-message', question.metaDataType)
-            : ''
+          hasEdited && !isValid ? question.responseErrorText : ''
         }
         mandatoryErrorMessage={survey.mandatoryErrorMessage}
         question={question}

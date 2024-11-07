@@ -32,7 +32,7 @@ export declare function clearCache(): Promise<void>;
  * @param {T=} initValue
  * @returns {Promise<T>}
  */
-export declare const loadData: (key: string, initValue?: any) => Promise<any>;
+export declare const loadData: (key: string, initValue?: undefined) => Promise<undefined>;
 /**
  * @template T
  * @param {string} key
@@ -49,7 +49,7 @@ export declare const removeData: (key: string) => Promise<void>;
  * @param {T=} initValue
  * @returns {Promise<T>}
  */
-export declare const loadCache: (key: string, initValue?: any) => Promise<any>;
+export declare const loadCache: (key: string, initValue?: undefined) => Promise<undefined>;
 /**
  * @template T
  * @param {string} key
@@ -57,3 +57,4 @@ export declare const loadCache: (key: string, initValue?: any) => Promise<any>;
  */
 export declare const saveCache: (key: string, data: any) => Promise<any>;
 export declare const initStorage: (storage: Storage) => void;
+//# sourceMappingURL=Storage.d.ts.map

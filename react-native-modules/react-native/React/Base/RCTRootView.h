@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -8,6 +8,8 @@
 #import <UIKit/UIKit.h>
 
 #import <React/RCTBridge.h>
+#import <React/RCTBridgeModule.h>
+#import <React/RCTEventDispatcherProtocol.h>
 
 @protocol RCTRootViewDelegate;
 
@@ -50,9 +52,18 @@ extern
 /**
  * - Designated initializer -
  */
+- (instancetype)initWithFrame:(CGRect)frame
+                       bridge:(RCTBridge *)bridge
+                   moduleName:(NSString *)moduleName
+            initialProperties:(nullable NSDictionary *)initialProperties NS_DESIGNATED_INITIALIZER;
+
+/**
+ * - Convenience initializer -
+ * The frame will default to CGRectZero.
+ */
 - (instancetype)initWithBridge:(RCTBridge *)bridge
                     moduleName:(NSString *)moduleName
-             initialProperties:(nullable NSDictionary *)initialProperties NS_DESIGNATED_INITIALIZER;
+             initialProperties:(nullable NSDictionary *)initialProperties;
 
 /**
  * - Convenience initializer -
@@ -108,6 +119,11 @@ extern
  * The backing view controller of the root view.
  */
 @property (nonatomic, weak, nullable) UIViewController *reactViewController;
+
+/**
+ * The root view casted as UIView. Used by splash screen libraries.
+ */
+@property (nonatomic, strong, readonly) UIView *view;
 
 /**
  * The React-managed contents view of the root view.

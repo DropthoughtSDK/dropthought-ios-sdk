@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
   Text,
   TextInput,
   Platform,
-  KeyboardTypeOptions,
+  Keyboard,
 } from 'react-native';
+import type { KeyboardTypeOptions } from 'react-native';
 import {
   QuestionMetaDataType,
   metaDataFormatValidator,
@@ -85,15 +86,26 @@ const OpenQuestion = ({
   themeColor,
 }: Props) => {
   const { colorScheme, fontColor } = useTheme();
-  const [text, setText] = React.useState<string>(
+  const [text, setText] = useState<string>(
     feedback?.answers[0] ? `${feedback?.answers[0]}` : ''
   );
-  const [focus, setFocus] = React.useState(false);
-  const [hasEdited, setHasEdited] = React.useState(false);
+  const [focus, setFocus] = useState(false);
+  const [hasEdited, setHasEdited] = useState(false);
+  const inputRef = useRef<TextInput>(null);
 
   const dimensionWidthType = useDimensionWidthType();
   const styles =
     dimensionWidthType === DimensionWidthType.phone ? phoneStyles : phoneStyles;
+
+  useEffect(() => {
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => inputRef.current?.blur()
+    );
+    return () => {
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   const onEndEditingHandler = () => {
     setHasEdited(true);
@@ -138,10 +150,7 @@ const OpenQuestion = ({
         forgot={hasForgot}
         invalidMessage={
           // show the error message after the user has done edited
-          hasEdited && !isValid
-            ? question.responseErrorText ??
-              i18n.t('metadata-invalid-message', question.metaDataType)
-            : ''
+          hasEdited && !isValid ? question.responseErrorText : ''
         }
         mandatoryErrorMessage={mandatoryErrorMessage}
         question={question}
@@ -162,6 +171,8 @@ const OpenQuestion = ({
       ]}
     >
       <TextInput
+        testID="test:id/field_open_ended"
+        ref={inputRef}
         style={[
           styles.input,
           { color: fontColor },
@@ -194,10 +205,11 @@ const OpenQuestion = ({
 
   const bottomView = (
     <View style={[styles.subTextRow, rtl && GlobalStyle.flexRowReverse]}>
-      <Text style={styles.descText}>
-        {showAnonymousWarning && i18n.t('survey:metadata-anonymous-warning')}
+      <Text testID="test:id/open_ended_warning" style={styles.descText}>
+        {showAnonymousWarning &&
+          `${i18n.t('survey:metadata-anonymous-warning')}`}
       </Text>
-      <Text style={styles.descText}>
+      <Text testID="test:id/open_ended_text_length" style={styles.descText}>
         {characterLeft} / {maxCharacterLength}
       </Text>
     </View>

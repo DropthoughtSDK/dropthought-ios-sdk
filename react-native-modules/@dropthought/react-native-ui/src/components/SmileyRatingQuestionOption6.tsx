@@ -1,10 +1,5 @@
-import {
-  View,
-  StyleSheet,
-  Text,
-  ImageBackground,
-  ImageStyle,
-} from 'react-native';
+import { View, StyleSheet, Text, ImageBackground } from 'react-native';
+import type { ImageStyle } from 'react-native';
 import React, { useState, useMemo } from 'react';
 import { Colors } from '../styles';
 import i18n from '../translation';
@@ -61,6 +56,7 @@ type Props = {
     type: string;
   }) => void;
   feedback: Feedback;
+  isLastPage: boolean;
 };
 
 const SmileyRatingQuestionOption6 = ({
@@ -73,31 +69,33 @@ const SmileyRatingQuestionOption6 = ({
   onNextPage,
   onFeedback,
   feedback,
+  isLastPage,
 }: Props) => {
   const answered =
     feedback &&
     feedback.answers &&
     !isNil(feedback.answers[0]) &&
     typeof feedback.answers[0] === 'number';
-  const answeredValue: number = answered
-    ? parseInt(feedback.answers[0], 10)
-    : 0;
+  const answeredValue: number =
+    answered && feedback.answers[0] ? parseInt(feedback.answers[0], 10) : 0;
 
   const [selectedIndex, setSelectedIndex] = useState<number>(
     answered ? answeredValue : -1
   );
   const { questionId, scale, options } = question;
   const scaleLogicList = scaleLogic[scale];
-  const descriptions = scaleLogicList.map((_, index) => options[index]);
+  const descriptions = scaleLogicList?.map((_, index) => options[index]);
 
   // We through the null text string to keep blank to make it as same as the rotary dial design.
   const lotties = useMemo(() => {
     let result = [''];
-    scaleLogicList.forEach((scaleIndex) => {
-      result = [...result, animations[scaleIndex]];
-    });
-    const remainDummy = 7 - scaleLogicList.length;
-    result = [...result, ...repeat('', remainDummy)];
+    if (scaleLogicList) {
+      scaleLogicList.forEach((scaleIndex) => {
+        result = [...result, animations[scaleIndex]];
+      });
+      const remainDummy = 7 - scaleLogicList.length;
+      result = [...result, ...repeat('', remainDummy)];
+    }
     return result;
   }, [scaleLogicList]);
 
@@ -107,7 +105,7 @@ const SmileyRatingQuestionOption6 = ({
   const isAtCoverScreen = selectedIndex === -1;
 
   const updateScore = React.useCallback(
-    (currentIndex) => {
+    (currentIndex: number) => {
       setSelectedIndex(currentIndex - 1);
       onFeedback({
         questionId,
@@ -138,9 +136,17 @@ const SmileyRatingQuestionOption6 = ({
   };
 
   const lottieContainer = (
-    <View style={commonStyles.lottieContainer}>
+    <View
+      accessibilityLabel={`selected_custom_dialer_${selectedIndex}`}
+      style={commonStyles.lottieContainer}
+    >
       {selectedIndex > -1 && lotties[selectedIndex + 1] !== '' ? (
-        <LottieView source={lotties[selectedIndex + 1]} autoPlay />
+        <LottieView
+          // @ts-ignore
+          source={lotties[selectedIndex + 1]}
+          autoPlay
+          style={commonStyles.lottieContent}
+        />
       ) : null}
     </View>
   );
@@ -148,10 +154,22 @@ const SmileyRatingQuestionOption6 = ({
     <View style={commonStyles.scoreContainer}>
       <View style={commonStyles.scoreContainer}>
         <View style={commonStyles.scoreText}>
-          <Text style={scoreSelectedStyle}>{selectedIndex + 1}</Text>
-          <Text style={scoreTotalStyle}>{'/' + totalScore}</Text>
+          <Text
+            testID="test:id/custom_dialer_render_score"
+            style={scoreSelectedStyle}
+          >
+            {selectedIndex + 1}
+          </Text>
+          <Text
+            testID="test:id/custom_dialer_total_score"
+            style={scoreTotalStyle}
+          >
+            {'/' + totalScore}
+          </Text>
         </View>
-        <Text style={descStyle}>{descriptions[selectedIndex]}</Text>
+        <Text testID="test:id/custom_dialer_score_desc" style={descStyle}>
+          {descriptions && descriptions[selectedIndex]}
+        </Text>
       </View>
     </View>
   );
@@ -177,8 +195,11 @@ const SmileyRatingQuestionOption6 = ({
         <View style={commonStyles.contentContainer}>
           {isAtCoverScreen ? (
             <View style={commonStyles.hintContainer}>
-              <Text style={hintTextStyle}>
-                {i18n.t('option6HintDescription:title')}
+              <Text
+                testID={`test:id/custom_dialer_title_${colorScheme}`}
+                style={hintTextStyle}
+              >
+                {`${i18n.t('option6HintDescription:title')}`}
               </Text>
             </View>
           ) : (
@@ -193,7 +214,7 @@ const SmileyRatingQuestionOption6 = ({
         submitSurvey={survey.submitSurvey}
         surveyColor={hexCode}
         isFirstPage={pageIndex === 0}
-        isLastPage={pageIndex === survey.pageOrder.length - 1}
+        isLastPage={isLastPage}
         onPrevPage={onPrevPage}
         onNextPage={onNextPage}
       />
@@ -262,6 +283,10 @@ const commonStyles = StyleSheet.create({
   picker: {
     alignItems: 'center',
     height: 120,
+  },
+  lottieContent: {
+    width: '100%',
+    height: '100%',
   },
 });
 

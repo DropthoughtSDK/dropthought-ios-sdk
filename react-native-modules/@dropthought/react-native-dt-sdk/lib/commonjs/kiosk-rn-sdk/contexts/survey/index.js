@@ -3,15 +3,11 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var _SurveyContext = require("./SurveyContext");
-Object.keys(_SurveyContext).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (key in exports && exports[key] === _SurveyContext[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function () {
-      return _SurveyContext[key];
-    }
-  });
+Object.defineProperty(exports, "SurveyContextProvider", {
+  enumerable: true,
+  get: function () {
+    return _SurveyContext.SurveyContextProvider;
+  }
 });
+var _SurveyContext = require("./SurveyContext");
 //# sourceMappingURL=index.js.map

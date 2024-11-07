@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -11,9 +11,18 @@
 #include <fbsystrace.h>
 #endif
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
+/**
+ * Allow providing an fbsystrace implementation that can short-circuit out
+ * quickly and can throttle too frequent events so we can get useful traces even
+ * if rendering etc. is spinning. For throttling we'll need file/line info so we
+ * use a macro.
+ */
+#if defined(WITH_LOOM_TRACE)
+#define SystraceSection                                         \
+  static constexpr const char systraceSectionFile[] = __FILE__; \
+  fbsystrace::FbSystraceSection<systraceSectionFile, __LINE__>
 /**
  * This is a convenience class to avoid lots of verbose profiling
  * #ifdefs.  If WITH_FBSYSTRACE is not defined, the optimizer will
@@ -23,13 +32,13 @@ namespace react {
  * different values in different files, there is no inconsistency in the sizes
  * of defined symbols.
  */
-#ifdef WITH_FBSYSTRACE
+#elif defined(WITH_FBSYSTRACE)
 struct ConcreteSystraceSection {
  public:
   template <typename... ConvertsToStringPiece>
   explicit ConcreteSystraceSection(
-      const char *name,
-      ConvertsToStringPiece &&... args)
+      const char* name,
+      ConvertsToStringPiece&&... args)
       : m_section(TRACE_TAG_REACT_CXX_BRIDGE, name, args...) {}
 
  private:
@@ -41,11 +50,10 @@ struct DummySystraceSection {
  public:
   template <typename... ConvertsToStringPiece>
   explicit DummySystraceSection(
-      __unused const char *name,
-      __unused ConvertsToStringPiece &&... args) {}
+      __unused const char* name,
+      __unused ConvertsToStringPiece&&... args) {}
 };
 using SystraceSection = DummySystraceSection;
 #endif
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

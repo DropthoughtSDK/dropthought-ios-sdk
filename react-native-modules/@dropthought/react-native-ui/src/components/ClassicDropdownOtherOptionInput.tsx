@@ -66,6 +66,7 @@ const ClassicDropdownOtherOptionInput: React.FC<Props> = ({
         style={[styles.textInputContainer, rtl && GlobalStyle.flexRowReverse]}
       >
         <TextInput
+          testID="test:id/field_dropdown_other"
           ref={inputRef}
           style={[
             styles.textInput,
@@ -86,7 +87,10 @@ const ClassicDropdownOtherOptionInput: React.FC<Props> = ({
           {...focusProps}
         />
       </View>
-      <Text style={[styles.descText, rtl && GlobalStyle.textAlignLeft]}>
+      <Text
+        testID="test:id/dropdown_text_length"
+        style={[styles.descText, rtl && GlobalStyle.textAlignLeft]}
+      >
         {value.length}/100
       </Text>
     </>
