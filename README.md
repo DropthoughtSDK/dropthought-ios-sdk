@@ -84,21 +84,6 @@ target '{your_project_target}' do
 
 post_install do |installer|
 +   react_native_post_install(installer)
-
-+   targets_to_skip_verification = [
-+     'lottie-ios',
-+     'lottie-react-native'
-+   ]
-    
-+   installer.pods_project.targets.each do |target|
-+     if targets_to_skip_verification.include?(target.name)
-+       target.build_configurations.each do |config|
-+         puts "Updating OTHER_SWIFT_FLAGS for target #{target.name} to include -no-verify-emitted-module-interface"
-+         config.build_settings['OTHER_SWIFT_FLAGS'] = '$(inherited) -no-verify-emitted-module-interface'
-+       end
-+     end
-+   end
-
    {...}
 
 end

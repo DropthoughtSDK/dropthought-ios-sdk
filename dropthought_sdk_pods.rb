@@ -8,6 +8,7 @@
 require 'json'
 require 'open3'
 require 'pathname'
+# edited by dropthought team
 require_relative './react-native-modules/react-native/scripts/react_native_pods_utils/script_phases.rb'
 require_relative './react-native-modules/react-native/scripts/cocoapods/jsengine.rb'
 require_relative './react-native-modules/react-native/scripts/cocoapods/flipper.rb'
@@ -63,6 +64,7 @@ end
 # - app_path: path to the React Native app. Required by the New Architecture.
 # - config_file_dir: directory of the `package.json` file, required by the New Architecture.
 # - ios_folder: the folder where the iOS code base lives. For a template app, it is `ios`, the default. For RNTester, it is `.`.
+# edited by dropthought team
 def use_dropthought_sdk (
   path: "./react-native-modules/react-native",
   fabric_enabled: false,
@@ -155,6 +157,7 @@ def use_dropthought_sdk (
   # for actual user usage
   pod 'Dropthought', :path => './Dropthought'
 
+  # added by dropthought team --
   # The prefix to the 3rd party lib
   third_party_prefix = "./react-native-modules"
   
@@ -168,7 +171,7 @@ def use_dropthought_sdk (
   pod 'react-native-secure-key-store', :path => "#{third_party_prefix}/react-native-secure-key-store"
   pod 'RNSVG', :path => "#{third_party_prefix}/react-native-svg"
   pod 'react-native-webview', :path => "#{third_party_prefix}/react-native-webview"
-
+  #--
 
   run_codegen!(
     app_path,
@@ -293,11 +296,28 @@ end
 # - react_native_path: path to React Native.
 # - mac_catalyst_enabled: whether we are running the Pod on a Mac Catalyst project or not.
 # - enable_hermes_profiler: whether the hermes profiler should be turned on in Release mode
+# edited by dropthought team
 def react_native_post_install(
   installer,
   react_native_path = "./react-native-modules/react-native",
   mac_catalyst_enabled: false
 )
+  # added by dropthought team--
+  targets_to_skip_verification = [
+      'lottie-ios',
+      'lottie-react-native'
+      # add others as necessary...
+    ]
+
+  installer.pods_project.targets.each do |target|
+    if targets_to_skip_verification.include?(target.name)
+      target.build_configurations.each do |config|
+        puts "Updating OTHER_SWIFT_FLAGS for target #{target.name} to include -no-verify-emitted-module-interface"
+        config.build_settings['OTHER_SWIFT_FLAGS'] = '$(inherited) -no-verify-emitted-module-interface'
+      end
+    end
+  end
+  #--
   ReactNativePodsUtils.turn_off_resource_bundle_react_core(installer)
 
   ReactNativePodsUtils.apply_mac_catalyst_patches(installer) if mac_catalyst_enabled
